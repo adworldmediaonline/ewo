@@ -87,6 +87,7 @@ export default function RootLayout({ children }) {
         // className={`${body.variable} ${heading.variable} ${p.variable} ${jost.variable} ${roboto.variable} ${oregano.variable} ${charm.variable}`}
         className={`${body.variable} ${heading.variable} ${p.variable} ${jost.variable} ${roboto.variable} ${oregano.variable} ${charm.variable}`}
       >
+        {/*  */}
         <Providers>{children}</Providers>
       </body>
     </html>
