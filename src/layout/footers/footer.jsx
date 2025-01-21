@@ -118,7 +118,7 @@ const Footer = ({
                       </h4>
                     </div>
                     <div className="tp-footer-contact">
-                      <div className="tp-footer-contact-item d-flex align-items-start">
+                      {/* <div className="tp-footer-contact-item d-flex align-items-start">
                         <div className="tp-footer-contact-icon">
                           <span>
                             <Email />
@@ -129,8 +129,8 @@ const Footer = ({
                             <a href="mailto: "></a>
                           </p>
                         </div>
-                      </div>
-                      <div className="tp-footer-contact-item d-flex align-items-start">
+                      </div> */}
+                      {/* <div className="tp-footer-contact-item d-flex align-items-start">
                         <div className="tp-footer-contact-icon">
                           <span>
                             <Location />
@@ -146,7 +146,7 @@ const Footer = ({
                             </a>
                           </p>
                         </div>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 </div>
