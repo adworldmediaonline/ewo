@@ -86,6 +86,7 @@ export default function RootLayout({ children }) {
       <body
         // className={`${body.variable} ${heading.variable} ${p.variable} ${jost.variable} ${roboto.variable} ${oregano.variable} ${charm.variable}`}
         className={`${body.variable} ${heading.variable} ${p.variable} ${jost.variable} ${roboto.variable} ${oregano.variable} ${charm.variable}`}
+        suppressHydrationWarning
       >
         {/*  */}
         <Providers>{children}</Providers>

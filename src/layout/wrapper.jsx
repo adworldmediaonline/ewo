@@ -1,21 +1,24 @@
-'use client'
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { ToastContainer } from "react-toastify";
-if (typeof window !== "undefined") {
-  require("bootstrap/dist/js/bootstrap");
+'use client';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+if (typeof window !== 'undefined') {
+  require('bootstrap/dist/js/bootstrap');
 }
 // internal
-import BackToTopCom from "@/components/common/back-to-top";
-import ProductModal from "@/components/common/product-modal";
-import {get_cart_products,initialOrderQuantity} from "@/redux/features/cartSlice";
-import { get_wishlist_products } from "@/redux/features/wishlist-slice";
-import { get_compare_products } from "@/redux/features/compareSlice";
-import useAuthCheck from "@/hooks/use-auth-check";
-import Loader from "@/components/loader/loader";
+import BackToTopCom from '@/components/common/back-to-top';
+import ProductModal from '@/components/common/product-modal';
+import {
+  get_cart_products,
+  initialOrderQuantity,
+} from '@/redux/features/cartSlice';
+import { get_wishlist_products } from '@/redux/features/wishlist-slice';
+import { get_compare_products } from '@/redux/features/compareSlice';
+import useAuthCheck from '@/hooks/use-auth-check';
+import Loader from '@/components/loader/loader';
+import { ToastContainer } from 'react-toastify';
 
 const Wrapper = ({ children }) => {
-  const { productItem } = useSelector((state) => state.productModal);
+  const { productItem } = useSelector(state => state.productModal);
   const dispatch = useDispatch();
   const authChecked = useAuthCheck();
 
@@ -29,7 +32,7 @@ const Wrapper = ({ children }) => {
   return !authChecked ? (
     <div
       className="d-flex align-items-center justify-content-center"
-      style={{ height: "100vh" }}
+      style={{ height: '100vh' }}
     >
       <Loader spinner="fade" loading={!authChecked} />
     </div>
