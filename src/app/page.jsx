@@ -1,12 +1,8 @@
 import Wrapper from '@/layout/wrapper';
 import Header from '@/layout/headers/header';
-// import HomeHeroSlider from "@/components/hero-banner/home-hero-slider";
-// import BannerArea from '@/components/banner/banner-area';
-import BlogArea from '@/components/blog/electronic/blog-area';
+import HeroSlider from '@/components/hero-banner/hero-slider';
 import ElectronicCategory from '@/components/categories/electronic-category';
-import CtaArea from '@/components/cta/cta-area';
 import FeatureArea from '@/components/features/feature-area';
-import InstagramArea from '@/components/instagram/instagram-area';
 import NewArrivals from '@/components/products/electronics/new-arrivals';
 import OfferProducts from '@/components/products/electronics/offer-products';
 import ProductArea from '@/components/products/electronics/product-area';
@@ -19,7 +15,7 @@ export default function HomePage() {
   return (
     <Wrapper>
       <Header />
-      {/* <HomeHeroSlider/> */}
+      <HeroSlider />
       <ElectronicCategory />
       <FeatureArea />
       <ProductArea />
