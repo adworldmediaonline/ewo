@@ -5,55 +5,51 @@
     position: relative;
     overflow: hidden;
     max-width: 100%;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-
-    &.is-loaded {
-      opacity: 1;
-    }
+    background: #f8f8f8;
+    opacity: 1;
 
     @media #{$md} {
-      aspect-ratio: 1920/516;
-      min-height: 516px;
+      height: 516px;
     }
 
     @media #{$sm} {
-      aspect-ratio: 430/360;
-      min-height: 360px;
+      height: 360px;
     }
 
     .slick-slider {
       position: relative;
       display: block;
+      height: 100%;
     }
 
     .slick-list {
       overflow: hidden;
       margin: 0;
       padding: 0;
+      height: 100%;
     }
 
     .slick-track {
       position: relative;
-      top: 0;
       left: 0;
-      display: flex;
-      margin-left: auto;
-      margin-right: auto;
+      top: 0;
+      display: block;
+      margin: 0;
+      height: 100%;
     }
 
     .slick-slide {
       position: relative;
-      display: none;
+      float: left;
       height: 100%;
       min-height: 1px;
 
-      &.slick-active {
-        display: block;
-      }
-
       & > div {
         height: 100%;
+      }
+
+      div[style] {
+        height: 100% !important;
       }
 
       img {
@@ -65,26 +61,18 @@
     }
 
     .slick-arrow {
-      width: 50px;
-      height: 50px;
-      background: rgba($color: #000, $alpha: 0.3);
-      border-radius: 50%;
-      color: var(--tp-common-white);
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
       z-index: 2;
-      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.5);
       border: none;
-      transition: all 0.3s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0;
-
-      &:hover {
-        background-color: var(--tp-theme-primary);
-      }
+      color: white;
+      cursor: pointer;
+      padding: 0;
 
       &.slick-prev {
         left: 20px;
@@ -92,11 +80,6 @@
 
       &.slick-next {
         right: 20px;
-      }
-
-      @media #{$lg} {
-        width: 40px;
-        height: 40px;
       }
 
       @media #{$md} {
@@ -109,33 +92,29 @@
       bottom: 20px;
       left: 0;
       right: 0;
-      text-align: center;
-      line-height: 0;
-      z-index: 2;
       margin: 0;
       padding: 0;
+      text-align: center;
       list-style: none;
+      z-index: 1;
 
       li {
         display: inline-block;
-        margin: 0 5px;
+        margin: 0 4px;
 
         button {
-          width: 10px;
-          height: 10px;
-          border: 2px solid var(--tp-common-white);
-          border-radius: 50%;
-          font-size: 0;
+          width: 8px;
+          height: 8px;
           padding: 0;
-          background-color: transparent;
-          transition: all 0.3s;
+          border: 0;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.5);
+          text-indent: -9999px;
           cursor: pointer;
         }
 
         &.slick-active button {
-          background-color: var(--tp-common-white);
-          border-color: var(--tp-common-white);
-          transform: scale(1.2);
+          background: white;
         }
       }
     }
