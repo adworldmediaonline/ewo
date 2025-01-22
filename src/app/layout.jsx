@@ -1,4 +1,5 @@
 import './globals.scss';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 // import { Jost, Roboto, Charm, Oregano } from 'next/font/google';
 import { Krub, Jost, Roboto, Charm, Oregano } from 'next/font/google';
 import Providers from '@/components/provider';
@@ -90,6 +91,7 @@ export default function RootLayout({ children }) {
       >
         {/*  */}
         <Providers>{children}</Providers>
+        <SpeedInsights />
       </body>
     </html>
   );
