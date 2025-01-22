@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Rating } from 'react-simple-star-rating';
 import dayjs from 'dayjs';
@@ -7,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 // internal
 import { Cart, QuickView, Wishlist } from '@/svg';
 import Timer from '@/components/common/timer';
+import CloudinaryImage from '@/components/common/CloudinaryImage';
 import { handleProductModal } from '@/redux/features/productModalSlice';
 import { add_cart_product } from '@/redux/features/cartSlice';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
@@ -59,13 +59,20 @@ const ProductItem = ({ product, offer_style = false }) => {
       >
         <div className="tp-product-thumb p-relative fix">
           <Link href={`/product-details/${_id}`}>
-            <Image
+            <CloudinaryImage
               src={img}
-              width="0"
-              height="0"
-              sizes="100vw"
-              style={{ width: '100%', height: 'auto' }}
-              alt="product-electronic"
+              width={400}
+              height={400}
+              sizes="(max-width: 768px) 100vw, 400px"
+              style={{ width: '100%', height: '100%' }}
+              alt={title || 'Product image'}
+              crop="fit"
+              objectFit="contain"
+              loading={offer_style ? 'eager' : 'lazy'}
+              quality="auto"
+              format="auto"
+              dpr="auto"
+              // removeBackground={true}
             />
 
             <div className="tp-product-badge">

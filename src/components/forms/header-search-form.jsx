@@ -1,15 +1,16 @@
 'use client';
-import { useState } from "react";
+import { useState } from 'react';
 // internal
-import { Search } from "@/svg";
-import NiceSelect from "@/ui/nice-select";
-import useSearchFormSubmit from "@/hooks/use-search-form-submit";
+import { Search } from '@/svg';
+import NiceSelect from '@/ui/nice-select';
+import useSearchFormSubmit from '@/hooks/use-search-form-submit';
 
 const HeaderSearchForm = () => {
-  const { setSearchText, setCategory, handleSubmit, searchText } = useSearchFormSubmit();
+  const { setSearchText, setCategory, handleSubmit, searchText } =
+    useSearchFormSubmit();
 
   // selectHandle
-  const selectCategoryHandle = (e) => {
+  const selectCategoryHandle = e => {
     setCategory(e.value);
   };
 
@@ -18,13 +19,13 @@ const HeaderSearchForm = () => {
       <div className="tp-header-search-wrapper d-flex align-items-center">
         <div className="tp-header-search-box">
           <input
-            onChange={(e) => setSearchText(e.target.value)}
+            onChange={e => setSearchText(e.target.value)}
             value={searchText}
             type="text"
             placeholder="Search for Products..."
           />
         </div>
-        <div className="tp-header-search-category">
+        {/* <div className="tp-header-search-category">
           <NiceSelect
             options={[
               { value: "Select Category", text: "Select Category" },
@@ -37,7 +38,7 @@ const HeaderSearchForm = () => {
             onChange={selectCategoryHandle}
             name="Select Category"
           />
-        </div>
+        </div> */}
         <div className="tp-header-search-btn">
           <button type="submit">
             <Search />
