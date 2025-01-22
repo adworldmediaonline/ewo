@@ -1,94 +1,82 @@
 'use client';
-import React, { memo, useState, useEffect } from 'react';
-import Slider from 'react-slick'; // Remove dynamic import to ensure immediate loading
-import CloudinaryImage from '../common/CloudinaryImage';
+import React, { memo } from 'react';
+import Slider from 'react-slick';
+import Image from 'next/image';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
 const sliderData = [
   {
     id: 1,
-    img: 'EWO_Slider_01_qadgov_brzwi0',
-    mobileImg: 'EWO_430x360_01_x5ieap',
+    img: '/assets/img/slider/EWO_Slider_01.webp',
+    mobileImg: '/assets/img/slider/EWO_430x360_02.webp',
     alt: 'EWO Slider 1',
   },
   {
     id: 2,
-    img: 'EWO_Slider_02_frthom_uekltd',
-    mobileImg: 'EWO_430x360_03_cbyriq',
+    img: '/assets/img/slider/EWO_Slider_02.webp',
+    mobileImg: '/assets/img/slider/EWO_430x360_02.webp',
     alt: 'EWO Slider 2',
   },
 ];
 
 const HeroSlider = memo(() => {
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  useEffect(() => {
-    setIsLoaded(true);
-  }, []);
-
   const settings = {
-    autoplay: true,
-    autoplaySpeed: 5000,
+    autoplay: false, // Disable autoplay initially
     arrows: true,
     dots: true,
-    fade: true,
+    fade: false, // Disable fade for better performance
     infinite: true,
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
     adaptiveHeight: false,
-    lazyLoad: 'ondemand',
+    lazyLoad: false,
   };
 
   return (
-    <div className={`tp-slider-area${isLoaded ? ' is-loaded' : ''}`}>
+    <div className="tp-slider-area">
+      <noscript>
+        <style>{`.tp-slider-area{opacity:1 !important}`}</style>
+      </noscript>
       <Slider {...settings}>
         {sliderData.map((slide, index) => (
           <div key={slide.id}>
             {/* Desktop Image */}
             <div className="d-none d-md-block">
-              <CloudinaryImage
-                src={slide.img}
-                alt={slide.alt}
-                width={1920}
-                height={516}
-                sizes="(min-width: 768px) 100vw, 0px"
-                priority={true}
-                quality={75}
-                format="webp"
-                dpr="auto"
-                crop="fill"
-                loading="eager"
-                style={{
-                  width: '100%',
-                  height: 'auto',
-                  aspectRatio: '1920/516',
-                  display: 'block',
-                }}
-              />
+              <div
+                style={{ position: 'relative', width: '100%', height: '516px' }}
+              >
+                <Image
+                  src={slide.img}
+                  alt={slide.alt}
+                  fill
+                  priority={index === 0}
+                  quality={75}
+                  sizes="100vw"
+                  style={{
+                    objectFit: 'cover',
+                  }}
+                />
+              </div>
             </div>
             {/* Mobile Image */}
             <div className="d-block d-md-none">
-              <CloudinaryImage
-                src={slide.mobileImg}
-                alt={slide.alt}
-                width={430}
-                height={360}
-                sizes="(max-width: 767px) 100vw, 0px"
-                priority={true}
-                quality={75}
-                format="webp"
-                dpr="auto"
-                crop="fill"
-                loading="eager"
-                style={{
-                  width: '100%',
-                  height: 'auto',
-                  aspectRatio: '430/360',
-                  display: 'block',
-                }}
-              />
+              <div
+                style={{ position: 'relative', width: '100%', height: '360px' }}
+              >
+                <Image
+                  src={slide.mobileImg}
+                  alt={slide.alt}
+                  fill
+                  priority={index === 0}
+                  quality={75}
+                  sizes="100vw"
+                  style={{
+                    objectFit: 'cover',
+                  }}
+                />
+              </div>
             </div>
           </div>
         ))}
