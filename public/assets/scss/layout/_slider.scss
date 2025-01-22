@@ -5,22 +5,53 @@
     position: relative;
     overflow: hidden;
     max-width: 100%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+
+    &.is-loaded {
+      opacity: 1;
+    }
 
     @media #{$md} {
       aspect-ratio: 1920/516;
+      min-height: 516px;
     }
 
     @media #{$sm} {
       aspect-ratio: 430/360;
+      min-height: 360px;
     }
 
-    .slick-slider,
-    .slick-list,
+    .slick-slider {
+      position: relative;
+      display: block;
+    }
+
+    .slick-list {
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+
     .slick-track {
-      height: 100%;
+      position: relative;
+      top: 0;
+      left: 0;
+      display: flex;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .slick-slide {
+      position: relative;
+      display: none;
+      height: 100%;
+      min-height: 1px;
+
+      &.slick-active {
+        display: block;
+      }
+
       & > div {
         height: 100%;
       }

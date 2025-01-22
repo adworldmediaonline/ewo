@@ -1,11 +1,10 @@
 'use client';
-import React from 'react';
-import Slider from 'react-slick';
+import React, { memo, useState, useEffect } from 'react';
+import Slider from 'react-slick'; // Remove dynamic import to ensure immediate loading
 import CloudinaryImage from '../common/CloudinaryImage';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
-// slider data
 const sliderData = [
   {
     id: 1,
@@ -21,8 +20,13 @@ const sliderData = [
   },
 ];
 
-const HeroSlider = () => {
-  // slider settings
+const HeroSlider = memo(() => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    setIsLoaded(true);
+  }, []);
+
   const settings = {
     autoplay: true,
     autoplaySpeed: 5000,
@@ -34,12 +38,13 @@ const HeroSlider = () => {
     slidesToShow: 1,
     slidesToScroll: 1,
     adaptiveHeight: false,
+    lazyLoad: 'ondemand',
   };
 
   return (
-    <div className="tp-slider-area">
+    <div className={`tp-slider-area${isLoaded ? ' is-loaded' : ''}`}>
       <Slider {...settings}>
-        {sliderData.map(slide => (
+        {sliderData.map((slide, index) => (
           <div key={slide.id}>
             {/* Desktop Image */}
             <div className="d-none d-md-block">
@@ -48,12 +53,13 @@ const HeroSlider = () => {
                 alt={slide.alt}
                 width={1920}
                 height={516}
-                sizes="100vw"
+                sizes="(min-width: 768px) 100vw, 0px"
                 priority={true}
-                quality="auto"
-                format="auto"
+                quality={75}
+                format="webp"
                 dpr="auto"
                 crop="fill"
+                loading="eager"
                 style={{
                   width: '100%',
                   height: 'auto',
@@ -69,12 +75,13 @@ const HeroSlider = () => {
                 alt={slide.alt}
                 width={430}
                 height={360}
-                sizes="100vw"
+                sizes="(max-width: 767px) 100vw, 0px"
                 priority={true}
-                quality="auto"
-                format="auto"
+                quality={75}
+                format="webp"
                 dpr="auto"
                 crop="fill"
+                loading="eager"
                 style={{
                   width: '100%',
                   height: 'auto',
@@ -88,6 +95,8 @@ const HeroSlider = () => {
       </Slider>
     </div>
   );
-};
+});
+
+HeroSlider.displayName = 'HeroSlider';
 
 export default HeroSlider;
