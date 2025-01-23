@@ -1,11 +1,11 @@
-'use client'
-import React from "react";
-import Image from "next/image";
+'use client';
+import React from 'react';
+import Image from 'next/image';
 // internal
-import ContactForm from "../forms/contact-form";
-import contact_icon_1 from "@assets/img/contact/contact-icon-1.png";
-import contact_icon_2 from "@assets/img/contact/contact-icon-2.png";
-import contact_icon_3 from "@assets/img/contact/contact-icon-3.png";
+import ContactForm from '../forms/contact-form';
+import contact_icon_1 from '@assets/img/contact/contact-icon-1.png';
+import contact_icon_2 from '@assets/img/contact/contact-icon-2.png';
+import contact_icon_3 from '@assets/img/contact/contact-icon-3.png';
 
 const ContactArea = () => {
   return (
@@ -36,14 +36,14 @@ const ContactArea = () => {
                     </div>
                     <div className="tp-contact-info-content">
                       <p data-info="mail">
-                        <a href="mailto:contact@shofy.com">contact@shofy.com</a>
+                        <a href="mailto:contact@ewo.com">contact@ewo.com</a>
                       </p>
                       <p data-info="phone">
                         <a href="tel:670-413-90-762">+670 413 90 762</a>
                       </p>
                     </div>
                   </div>
-                  <div className="tp-contact-info-item">
+                  {/* <div className="tp-contact-info-item">
                     <div className="tp-contact-info-icon">
                       <span>
                         <Image src={contact_icon_2} alt="contact-icon" />
@@ -59,8 +59,8 @@ const ContactArea = () => {
                         </a>
                       </p>
                     </div>
-                  </div>
-                  <div className="tp-contact-info-item">
+                  </div> */}
+                  {/* <div className="tp-contact-info-item">
                     <div className="tp-contact-info-icon">
                       <span>
                         <Image src={contact_icon_3} alt="contact-icon" />
@@ -85,7 +85,7 @@ const ContactArea = () => {
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>

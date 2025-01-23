@@ -39,10 +39,7 @@ const Footer = ({
                         <Image src={logo} alt="logo" width={120} />
                       </Link>
                     </div>
-                    <p className="tp-footer-desc">
-                      We are a team of designers and developers that create high
-                      quality WordPress
-                    </p>
+                    <p className="tp-footer-desc"></p>
                     <div className="tp-footer-social">
                       {social_data.map(s => (
                         <a href={s.link} key={s.id} target="_blank">

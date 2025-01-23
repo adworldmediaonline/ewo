@@ -1,5 +1,5 @@
 'use client';
-import { getTrackBackground, Range } from "react-range";
+import { getTrackBackground, Range } from 'react-range';
 
 const InputRange = ({ STEP, MIN, MAX, values, handleChanges }) => {
   return (
@@ -9,7 +9,7 @@ const InputRange = ({ STEP, MIN, MAX, values, handleChanges }) => {
         min={MIN}
         max={MAX}
         values={values}
-        onChange={(vals) => handleChanges(vals)}
+        onChange={vals => handleChanges(vals)}
         renderTrack={({ props, children }) => (
           <div
             {...props}
@@ -20,9 +20,9 @@ const InputRange = ({ STEP, MIN, MAX, values, handleChanges }) => {
               width: '100%',
               background: getTrackBackground({
                 values: values,
-                colors: ["#EDEDED", "#0989FF", "#EDEDED"],
+                colors: ['#EDEDED', '#07215e', '#EDEDED'],
                 min: MIN,
-                max: MAX
+                max: MAX,
               }),
             }}
           >
@@ -37,8 +37,8 @@ const InputRange = ({ STEP, MIN, MAX, values, handleChanges }) => {
               ...props.style,
               height: '17px',
               width: '5px',
-              backgroundColor: '#0989FF',
-              backgroundColor: isDragged ? "#0989FF" : "#0989FF"
+              backgroundColor: '#07215e',
+              backgroundColor: isDragged ? '#07215e' : '#07215e',
             }}
           />
         )}
@@ -46,6 +46,5 @@ const InputRange = ({ STEP, MIN, MAX, values, handleChanges }) => {
     </>
   );
 };
-
 
 export default InputRange;

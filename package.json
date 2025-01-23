@@ -18,6 +18,7 @@
     "@vercel/speed-insights": "^1.1.0",
     "bootstrap": "^5.3.2",
     "dayjs": "^1.11.10",
+    "isomorphic-dompurify": "^2.20.0",
     "js-cookie": "^3.0.5",
     "next": "^15.0.3",
     "next-cloudinary": "^6.16.0",

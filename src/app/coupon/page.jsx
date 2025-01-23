@@ -12,7 +12,7 @@ export default function CouponPage() {
   return (
     <Wrapper>
       <HeaderTwo style_2={true} />
-      <CommonBreadcrumb title="Grab Best Offer" subtitle="Coupon" />
+      <CommonBreadcrumb subtitle="Coupon" />
       <CouponArea />
       <Footer primary_style={true} />
     </Wrapper>

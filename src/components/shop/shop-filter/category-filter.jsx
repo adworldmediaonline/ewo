@@ -1,14 +1,14 @@
-'use client'
-import React from "react";
-import { useRouter,useSearchParams } from "next/navigation";
-import { useDispatch } from "react-redux";
+'use client';
+import React from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useDispatch } from 'react-redux';
 // internal
-import ErrorMsg from "@/components/common/error-msg";
-import { useGetShowCategoryQuery } from "@/redux/features/categoryApi";
-import { handleFilterSidebarClose } from "@/redux/features/shop-filter-slice";
-import ShopCategoryLoader from "@/components/loader/shop/shop-category-loader";
+import ErrorMsg from '@/components/common/error-msg';
+import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
+import { handleFilterSidebarClose } from '@/redux/features/shop-filter-slice';
+import ShopCategoryLoader from '@/components/loader/shop/shop-category-loader';
 
-const CategoryFilter = ({setCurrPage,shop_right=false}) => {
+const CategoryFilter = ({ setCurrPage, shop_right = false }) => {
   const { data: categories, isLoading, isError } = useGetShowCategoryQuery();
   const router = useRouter();
   const dispatch = useDispatch();
@@ -16,22 +16,22 @@ const CategoryFilter = ({setCurrPage,shop_right=false}) => {
   const category = searchParams.get('category');
 
   // handle category route
-  const handleCategoryRoute = (title) => {
+  const handleCategoryRoute = title => {
     setCurrPage(1);
     router.push(
-      `/${shop_right?'shop-right-sidebar':'shop'}?category=${title
+      `/${shop_right ? 'shop-right-sidebar' : 'shop'}?category=${title
         .toLowerCase()
-        .replace("&", "")
-        .split(" ")
-        .join("-")}`
-        )
+        .replace('&', '')
+        .split(' ')
+        .join('-')}`
+    );
     dispatch(handleFilterSidebarClose());
-  }
+  };
   // decide what to render
   let content = null;
 
   if (isLoading) {
-    content = <ShopCategoryLoader loading={isLoading}/>;
+    content = <ShopCategoryLoader loading={isLoading} />;
   }
   if (!isLoading && isError) {
     content = <ErrorMsg msg="There was an error" />;
@@ -41,16 +41,16 @@ const CategoryFilter = ({setCurrPage,shop_right=false}) => {
   }
   if (!isLoading && !isError && categories?.result?.length > 0) {
     const category_items = categories.result;
-    content = category_items.map((item) => (
+    content = category_items.map(item => (
       <li key={item._id}>
         <a
           onClick={() => handleCategoryRoute(item.parent)}
-          style={{ cursor: "pointer" }}
+          style={{ cursor: 'pointer' }}
           className={
             category ===
-            item.parent.toLowerCase().replace("&", "").split(" ").join("-")
-              ? "active"
-              : ""
+            item.parent.toLowerCase().replace('&', '').split(' ').join('-')
+              ? 'active'
+              : ''
           }
         >
           {item.parent} <span>{item.products.length}</span>

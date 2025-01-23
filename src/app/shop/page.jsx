@@ -12,7 +12,7 @@ export default function ShopPage() {
   return (
     <Wrapper>
       <HeaderTwo style_2={true} />
-      <ShopBreadcrumb title="Shop Grid" subtitle="Shop Grid" />
+      <ShopBreadcrumb subtitle="Shop" />
       <ShopArea />
       <Footer primary_style={true} />
     </Wrapper>

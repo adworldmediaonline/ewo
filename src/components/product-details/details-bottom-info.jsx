@@ -1,9 +1,9 @@
 'use client';
-import React from "react";
-import Image from "next/image";
+import React from 'react';
+import Image from 'next/image';
 import payment_option_img from '@assets/img/product/icons/payment-option.png';
 
-const DetailsBottomInfo = ({sku,category,tag}) => {
+const DetailsBottomInfo = ({ sku, category, tag }) => {
   return (
     <>
       {/* product-details-query */}
@@ -16,15 +16,15 @@ const DetailsBottomInfo = ({sku,category,tag}) => {
           <span>Category: </span>
           <p>{category}</p>
         </div>
-        <div className="tp-product-details-query-item d-flex align-items-center">
+        {/* <div className="tp-product-details-query-item d-flex align-items-center">
           <span>Tag: </span>
           <p>{tag}</p>
-        </div>
+        </div> */}
       </div>
 
       {/*  product-details-social*/}
 
-      <div className="tp-product-details-social">
+      {/* <div className="tp-product-details-social">
         <span>Share: </span>
         <a href="#">
           <i className="fa-brands fa-facebook-f"></i>
@@ -38,7 +38,7 @@ const DetailsBottomInfo = ({sku,category,tag}) => {
         <a href="#">
           <i className="fa-brands fa-vimeo-v"></i>
         </a>
-      </div>
+      </div> */}
 
       {/* product-details-msg */}
 

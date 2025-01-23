@@ -4,7 +4,8 @@ export const metadata = {
   title: 'EWO- Email Verify Page',
 };
 
-export default function EmailVerifyPage({ params }) {
+export default async function EmailVerifyPage(props) {
+  const params = await props.params;
   return (
     <>
       <EmailVerifyArea token={params.token} />
