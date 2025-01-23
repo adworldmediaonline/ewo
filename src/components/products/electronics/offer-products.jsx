@@ -1,21 +1,21 @@
 'use client';
-import React from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination } from "swiper/modules";
-import Link from "next/link";
+import React from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Pagination } from 'swiper/modules';
+import Link from 'next/link';
 // internal
-import ProductItem from "./product-item";
-import { useGetOfferProductsQuery } from "@/redux/features/productApi";
-import { ArrowRightLong, ShapeLine } from "@/svg";
-import ErrorMsg from "@/components/common/error-msg";
-import HomeOfferPrdLoader from "@/components/loader/home/home-offer-prd-loader";
+import ProductItem from './product-item';
+import { useGetOfferProductsQuery } from '@/redux/features/productApi';
+import { ArrowRightLong } from '@/svg';
+import ErrorMsg from '@/components/common/error-msg';
+import HomeOfferPrdLoader from '@/components/loader/home/home-offer-prd-loader';
 
 // slider setting
 const sliderSetting = {
   slidesPerView: 3,
   spaceBetween: 30,
   pagination: {
-    el: ".tp-deals-slider-dot",
+    el: '.tp-deals-slider-dot',
     clickable: true,
   },
   breakpoints: {
@@ -38,7 +38,11 @@ const sliderSetting = {
 };
 
 const OfferProducts = () => {
-  const {data: products,isError,isLoading} = useGetOfferProductsQuery("electronics");
+  const {
+    data: products,
+    isError,
+    isLoading,
+  } = useGetOfferProductsQuery('electronics');
   // decide what to render
   let content = null;
 
@@ -77,10 +81,7 @@ const OfferProducts = () => {
           <div className="row align-items-end">
             <div className="col-xl-4 col-md-5 col-sm-6">
               <div className="tp-section-title-wrapper mb-40">
-                <h3 className="tp-section-title">
-                  Deal of The Day
-                  <ShapeLine />
-                </h3>
+                <h3 className="tp-section-title">Deal of The Day</h3>
               </div>
             </div>
             <div className="col-xl-8 col-md-7 col-sm-6">

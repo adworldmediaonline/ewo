@@ -1,21 +1,28 @@
-'use client'
-import React,{ useState} from 'react';
-import Pagination from "@/ui/Pagination";
-import ProductItem from "../products/fashion/product-item";
-import CategoryFilter from "./shop-filter/category-filter";
-import ColorFilter from "./shop-filter/color-filter";
-import PriceFilter from "./shop-filter/price-filter";
-import ProductBrand from "./shop-filter/product-brand";
-import StatusFilter from "./shop-filter/status-filter";
-import TopRatedProducts from "./shop-filter/top-rated-products";
-import ShopListItem from "./shop-list-item";
-import ShopTopLeft from "./shop-top-left";
-import ShopTopRight from "./shop-top-right";
-import ResetButton from "./shop-filter/reset-button";
+'use client';
+import React, { useState } from 'react';
+import Pagination from '@/ui/Pagination';
+import ProductItem from '../products/fashion/product-item';
+import CategoryFilter from './shop-filter/category-filter';
+import ColorFilter from './shop-filter/color-filter';
+import PriceFilter from './shop-filter/price-filter';
+import ProductBrand from './shop-filter/product-brand';
+import StatusFilter from './shop-filter/status-filter';
+import TopRatedProducts from './shop-filter/top-rated-products';
+import ShopListItem from './shop-list-item';
+import ShopTopLeft from './shop-top-left';
+import ShopTopRight from './shop-top-right';
+import ResetButton from './shop-filter/reset-button';
 
-const ShopContent = ({all_products,products,otherProps,shop_right,hidden_sidebar}) => {
-  const {priceFilterValues,selectHandleFilter,currPage,setCurrPage} = otherProps;
-  const {setPriceValue} = priceFilterValues || {};
+const ShopContent = ({
+  all_products,
+  products,
+  otherProps,
+  shop_right,
+  hidden_sidebar,
+}) => {
+  const { priceFilterValues, selectHandleFilter, currPage, setCurrPage } =
+    otherProps;
+  const { setPriceValue } = priceFilterValues || {};
   const [filteredRows, setFilteredRows] = useState(products);
   const [pageStart, setPageStart] = useState(0);
   const [countOfPage, setCountOfPage] = useState(12);
@@ -32,7 +39,7 @@ const ShopContent = ({all_products,products,otherProps,shop_right,hidden_sidebar
   }, 0);
   return (
     <>
-     <section className="tp-shop-area pb-120">
+      <section className="tp-shop-area pb-120">
         <div className="container">
           <div className="row">
             {!shop_right && !hidden_sidebar && (
@@ -48,18 +55,25 @@ const ShopContent = ({all_products,products,otherProps,shop_right,hidden_sidebar
                   {/* categories */}
                   <CategoryFilter setCurrPage={setCurrPage} />
                   {/* color */}
-                  <ColorFilter setCurrPage={setCurrPage} />
+                  {/* <ColorFilter setCurrPage={setCurrPage} /> */}
                   {/* product rating */}
                   <TopRatedProducts />
                   {/* brand */}
-                  <ProductBrand setCurrPage={setCurrPage} />
+                  {/* <ProductBrand setCurrPage={setCurrPage} /> */}
                   {/* reset filter */}
-                  <ResetButton setPriceValues={setPriceValue} maxPrice={maxPrice} />
+                  <ResetButton
+                    setPriceValues={setPriceValue}
+                    maxPrice={maxPrice}
+                  />
                 </div>
               </div>
             )}
 
-            <div className={`${hidden_sidebar ? 'col-xl-12 col-lg-12' : 'col-xl-9 col-lg-8'}`}>
+            <div
+              className={`${
+                hidden_sidebar ? 'col-xl-12 col-lg-12' : 'col-xl-9 col-lg-8'
+              }`}
+            >
               <div className="tp-shop-main-wrapper">
                 <div className="tp-shop-top mb-45">
                   <div className="row">
@@ -95,7 +109,7 @@ const ShopContent = ({all_products,products,otherProps,shop_right,hidden_sidebar
                         <div className="row">
                           {filteredRows
                             .slice(pageStart, pageStart + countOfPage)
-                            .map((item,i) => (
+                            .map((item, i) => (
                               <div
                                 key={i}
                                 className="col-xl-4 col-md-6 col-sm-6"
@@ -117,7 +131,7 @@ const ShopContent = ({all_products,products,otherProps,shop_right,hidden_sidebar
                             <div className="col-xl-12">
                               {filteredRows
                                 .slice(pageStart, pageStart + countOfPage)
-                                .map((item,i) => (
+                                .map((item, i) => (
                                   <ShopListItem key={i} product={item} />
                                 ))}
                             </div>
@@ -162,13 +176,16 @@ const ShopContent = ({all_products,products,otherProps,shop_right,hidden_sidebar
                   {/* brand */}
                   <ProductBrand setCurrPage={setCurrPage} />
                   {/* reset filter */}
-                  <ResetButton setPriceValues={setPriceValue} maxPrice={maxPrice} />
+                  <ResetButton
+                    setPriceValues={setPriceValue}
+                    maxPrice={maxPrice}
+                  />
                 </div>
-             </div>
+              </div>
             )}
           </div>
         </div>
-      </section> 
+      </section>
     </>
   );
 };

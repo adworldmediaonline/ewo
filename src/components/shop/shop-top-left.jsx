@@ -1,11 +1,11 @@
-import { GridTab, ListTab } from "@/svg";
-import React from "react";
+import { GridTab, ListTab } from '@/svg';
+import React from 'react';
 
-const ShopTopLeft = ({total,showing=9}) => {
+const ShopTopLeft = ({ total, showing = 9 }) => {
   return (
     <>
       <div className="tp-shop-top-left d-flex align-items-center ">
-        <div className="tp-shop-top-tab tp-tab">
+        {/* <div className="tp-shop-top-tab tp-tab">
           <ul className="nav nav-tabs" id="productTab" role="tablist">
             <li className="nav-item" role="presentation">
               <button
@@ -38,9 +38,11 @@ const ShopTopLeft = ({total,showing=9}) => {
               </button>
             </li>
           </ul>
-        </div>
+        </div> */}
         <div className="tp-shop-top-result">
-          <p>Showing 1–{showing} of {total} results</p>
+          <p>
+            Showing 1–{showing} of {total} results
+          </p>
         </div>
       </div>
     </>

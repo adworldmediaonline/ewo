@@ -1,7 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { useGetProductTypeQuery } from '@/redux/features/productApi';
-import { ShapeLine, TabLine } from '@/svg';
 import ProductItem from './product-item';
 import ErrorMsg from '@/components/common/error-msg';
 import HomePrdLoader from '@/components/loader/home/home-prd-loader';
@@ -54,10 +53,7 @@ const ProductArea = () => {
         <div className="row align-items-end">
           <div className="col-xl-5 col-lg-6 col-md-5">
             <div className="tp-section-title-wrapper mb-40">
-              <h3 className="tp-section-title">
-                Trending Products
-                <ShapeLine />
-              </h3>
+              <h3 className="tp-section-title">Trending Products</h3>
             </div>
           </div>
           <div className="col-xl-7 col-lg-6 col-md-7">
@@ -72,9 +68,7 @@ const ProductArea = () => {
                       }`}
                     >
                       {tab.split('-').join(' ')}
-                      <span className="tp-product-tab-line">
-                        <TabLine />
-                      </span>
+                      <span className="tp-product-tab-line"></span>
                     </button>
                   </li>
                 ))}

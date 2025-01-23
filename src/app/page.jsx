@@ -2,7 +2,7 @@ import Wrapper from '@/layout/wrapper';
 import Header from '@/layout/headers/header';
 import HeroSlider from '@/components/hero-banner/hero-slider';
 import ElectronicCategory from '@/components/categories/electronic-category';
-import FeatureArea from '@/components/features/feature-area';
+// import FeatureArea from '@/components/features/feature-area';
 import NewArrivals from '@/components/products/electronics/new-arrivals';
 import OfferProducts from '@/components/products/electronics/offer-products';
 import ProductArea from '@/components/products/electronics/product-area';
@@ -17,7 +17,7 @@ export default function HomePage() {
       <Header />
       <HeroSlider />
       <ElectronicCategory />
-      <FeatureArea />
+      {/* <FeatureArea /> */}
       <ProductArea />
       {/* <BannerArea /> */}
       <OfferProducts />
