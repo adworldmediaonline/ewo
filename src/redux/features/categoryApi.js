@@ -1,26 +1,30 @@
-import { apiSlice } from "../api/apiSlice";
+import { apiSlice } from '../api/apiSlice';
 
 export const categoryApi = apiSlice.injectEndpoints({
-  overrideExisting:true,
-  endpoints: (builder) => ({
+  overrideExisting: true,
+  endpoints: builder => ({
     addCategory: builder.mutation({
-      query: (data) => ({
-        url: "/api/category/add",
-        method: "POST",
+      query: data => ({
+        url: '/api/category/add',
+        method: 'POST',
         body: data,
       }),
     }),
     getShowCategory: builder.query({
-      query: () => `/api/category/show`
+      query: () => `/api/category/show`,
     }),
     getProductTypeCategory: builder.query({
-      query: (type) => `/api/category/show/${type}`
+      query: type => `/api/category/show/${type}`,
+    }),
+    getAllCategories: builder.query({
+      query: () => `/api/category/all`,
     }),
   }),
 });
 
 export const {
- useAddCategoryMutation,
- useGetProductTypeCategoryQuery,
- useGetShowCategoryQuery,
+  useAddCategoryMutation,
+  useGetProductTypeCategoryQuery,
+  useGetShowCategoryQuery,
+  useGetAllCategoriesQuery,
 } = categoryApi;

@@ -8,17 +8,19 @@ import RelatedProducts from './related-products';
 
 const ProductDetailsContent = ({ productItem }) => {
   const { _id, img, imageURLs, videoId, status } = productItem || {};
-  const [activeImg, setActiveImg] = useState(img);
+  const [activeImg, setActiveImg] = useState(imageURLs?.[0] || img);
   const dispatch = useDispatch();
+
   // active image change when img change
   useEffect(() => {
-    setActiveImg(img);
-  }, [img]);
+    setActiveImg(imageURLs?.[0] || img);
+  }, [img, imageURLs]);
 
   // handle image active
-  const handleImageActive = item => {
-    setActiveImg(item.img);
+  const handleImageActive = url => {
+    setActiveImg(url);
   };
+
   return (
     <section className="tp-product-details-area">
       <div className="tp-product-details-top pb-115">

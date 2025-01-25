@@ -1,18 +1,13 @@
 'use client';
 import React from 'react';
 // internal
-import { useGetProductTypeQuery } from '@/redux/features/productApi';
+import { useGetAllProductsQuery } from '@/redux/features/productApi';
 import ErrorMsg from '@/components/common/error-msg';
 import ProductSmItem from './product-sm-item';
 import HomeSmPrdLoader from '@/components/loader/home/home-sm-prd-loader';
 
 const ProductSmArea = () => {
-  const {
-    data: products,
-    isError,
-    isLoading,
-    refetch,
-  } = useGetProductTypeQuery({ type: 'electronics' });
+  const { data: products, isError, isLoading } = useGetAllProductsQuery();
   // decide what to render
   let content = null;
 
@@ -32,9 +27,13 @@ const ProductSmArea = () => {
       .slice()
       .sort((a, b) => b.sellCount - a.sellCount)
       .slice(0, 3);
-    content = (
-      <div className="row">
-        <div className="col-xl-4 col-md-6">
+
+    // Only show sections with products
+    const sections = [];
+
+    if (discount_prd.length > 0) {
+      sections.push(
+        <div key="discount" className="col-xl-4 col-md-6">
           <div className="tp-product-sm-list mb-50">
             <div className="tp-section-title-wrapper mb-40">
               <h3 className="tp-section-title tp-section-title-sm">
@@ -48,14 +47,18 @@ const ProductSmArea = () => {
             </div>
           </div>
         </div>
-        <div className="col-xl-4 col-md-6">
+      );
+    }
+
+    if (featured_prd.length > 0) {
+      sections.push(
+        <div key="featured" className="col-xl-4 col-md-6">
           <div className="tp-product-sm-list mb-50">
             <div className="tp-section-title-wrapper mb-40">
               <h3 className="tp-section-title tp-section-title-sm">
                 Featured Products
               </h3>
             </div>
-
             <div className="tp-product-sm-wrapper mr-20">
               {featured_prd.map(item => (
                 <ProductSmItem key={item._id} product={item} />
@@ -63,14 +66,18 @@ const ProductSmArea = () => {
             </div>
           </div>
         </div>
-        <div className="col-xl-4 col-md-6">
+      );
+    }
+
+    if (selling_prd.length > 0) {
+      sections.push(
+        <div key="selling" className="col-xl-4 col-md-6">
           <div className="tp-product-sm-list mb-50">
             <div className="tp-section-title-wrapper mb-40">
               <h3 className="tp-section-title tp-section-title-sm">
                 Selling Products
               </h3>
             </div>
-
             <div className="tp-product-sm-wrapper mr-20">
               {selling_prd.map(item => (
                 <ProductSmItem key={item._id} product={item} />
@@ -78,14 +85,20 @@ const ProductSmArea = () => {
             </div>
           </div>
         </div>
-      </div>
-    );
+      );
+    }
+
+    // Only render the section if there are products to show
+    content =
+      sections.length > 0 ? <div className="row">{sections}</div> : null;
   }
-  return (
+
+  // Only render the section if there's content to show
+  return content ? (
     <section className="tp-product-sm-area">
       <div className="container">{content}</div>
     </section>
-  );
+  ) : null;
 };
 
 export default ProductSmArea;

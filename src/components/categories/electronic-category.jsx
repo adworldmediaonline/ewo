@@ -4,15 +4,11 @@ import { useRouter } from 'next/navigation';
 // internal
 import ErrorMsg from '../common/error-msg';
 import CloudinaryImage from '@/components/common/CloudinaryImage';
-import { useGetProductTypeCategoryQuery } from '@/redux/features/categoryApi';
+import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
 import HomeCateLoader from '../loader/home/home-cate-loader';
 
 const ElectronicCategory = () => {
-  const {
-    data: categories,
-    isLoading,
-    isError,
-  } = useGetProductTypeCategoryQuery('electronics');
+  const { data: categories, isLoading, isError } = useGetShowCategoryQuery();
   const router = useRouter();
 
   // handle category route
@@ -38,7 +34,10 @@ const ElectronicCategory = () => {
     content = <ErrorMsg msg="No Category found!" />;
   }
   if (!isLoading && !isError && categories?.result?.length > 0) {
-    const category_items = categories.result;
+    // Get main categories (categories with products)
+    const category_items = categories.result.filter(
+      cat => cat.products?.length > 0 && cat.status === 'Show'
+    );
     content = category_items.map(item => (
       <div className="col" key={item._id}>
         <div className="tp-product-category-item text-center mb-40">
@@ -66,7 +65,6 @@ const ElectronicCategory = () => {
                   transition: 'all 0.35s cubic-bezier(0.24, 0.74, 0.58, 1)',
                 }}
                 gravity="center"
-                // removeBackground={true}
                 className="category-image"
               />
             </a>
@@ -80,7 +78,10 @@ const ElectronicCategory = () => {
                 {item.parent}
               </a>
             </h3>
-            <p>{item.products.length} Product</p>
+            <p>
+              {item.products.length} Product
+              {item.products.length !== 1 ? 's' : ''}
+            </p>
           </div>
         </div>
       </div>
