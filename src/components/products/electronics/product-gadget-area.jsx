@@ -11,16 +11,12 @@ import PrdCategoryList from './prd-category-list';
 import ErrorMsg from '@/components/common/error-msg';
 import b_bg_1 from '@assets/img/product/gadget/gadget-banner-1.jpg';
 import b_bg_2 from '@assets/img/product/gadget/gadget-banner-2.jpg';
-import { useGetProductTypeQuery } from '@/redux/features/productApi';
+import { useGetAllProductsQuery } from '@/redux/features/productApi';
 import gadget_girl from '@assets/img/product/gadget/gadget-girl.png';
 import HomeGadgetPrdLoader from '@/components/loader/home/home-gadget-prd-loader';
 
 const ProductGadgetArea = () => {
-  const {
-    data: products,
-    isError,
-    isLoading,
-  } = useGetProductTypeQuery({ type: 'electronics' });
+  const { data: products, isError, isLoading } = useGetAllProductsQuery();
 
   // decide what to render
   let content = null;
@@ -35,7 +31,11 @@ const ProductGadgetArea = () => {
     content = <ErrorMsg msg="No Products found!" />;
   }
   if (!isLoading && !isError && products?.data?.length > 0) {
-    const product_items = products.data.slice(0, 6);
+    // Get the latest 6 products
+    const product_items = [...products.data]
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 6);
+
     content = product_items.map((prd, i) => (
       <div key={i} className="col-xl-4 col-sm-6">
         <ProductItem product={prd} />

@@ -1,18 +1,13 @@
 'use client';
 import React from 'react';
 // internal
-import { useGetProductTypeQuery } from '@/redux/features/productApi';
+import { useGetAllProductsQuery } from '@/redux/features/productApi';
 import ErrorMsg from '@/components/common/error-msg';
 import ProductSmItem from './product-sm-item';
 import HomeSmPrdLoader from '@/components/loader/home/home-sm-prd-loader';
 
 const ProductSmArea = () => {
-  const {
-    data: products,
-    isError,
-    isLoading,
-    refetch,
-  } = useGetProductTypeQuery({ type: 'electronics' });
+  const { data: products, isError, isLoading } = useGetAllProductsQuery();
   // decide what to render
   let content = null;
 

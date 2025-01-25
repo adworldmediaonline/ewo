@@ -3,7 +3,7 @@ import React from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 // internal
-import { useGetProductTypeQuery } from '@/redux/features/productApi';
+import { useGetAllProductsQuery } from '@/redux/features/productApi';
 import { NextArr, PrevArr } from '@/svg';
 import ErrorMsg from '@/components/common/error-msg';
 import ProductItem from './product-item';
@@ -41,11 +41,7 @@ const slider_setting = {
 };
 
 const NewArrivals = () => {
-  const {
-    data: products,
-    isError,
-    isLoading,
-  } = useGetProductTypeQuery({ type: 'electronics', query: 'new=true' });
+  const { data: products, isError, isLoading } = useGetAllProductsQuery();
   // decide what to render
   let content = null;
 
@@ -59,7 +55,11 @@ const NewArrivals = () => {
     content = <ErrorMsg msg="No Products found!" />;
   }
   if (!isLoading && !isError && products?.data?.length > 0) {
-    const product_items = products.data;
+    // Sort products by createdAt in descending order and take the first 8
+    const product_items = [...products.data]
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 8);
+
     content = (
       <Swiper
         {...slider_setting}
