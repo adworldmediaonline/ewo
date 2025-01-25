@@ -18,14 +18,14 @@ const DetailsThumbWrapper = ({
       <div className="tp-product-details-thumb-wrapper tp-tab d-sm-flex">
         <nav>
           <div className="nav nav-tabs flex-sm-column">
-            {imageURLs?.map((item, i) => (
+            {imageURLs?.map((url, i) => (
               <button
                 key={i}
-                className={`nav-link ${item.img === activeImg ? 'active' : ''}`}
-                onClick={() => handleImageActive(item)}
+                className={`nav-link ${url === activeImg ? 'active' : ''}`}
+                onClick={() => handleImageActive(url)}
               >
                 <CloudinaryImage
-                  src={item.img}
+                  src={url}
                   alt="product thumbnail"
                   width={78}
                   height={100}

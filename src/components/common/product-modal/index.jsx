@@ -22,19 +22,20 @@ const customStyles = {
 const ProductModal = () => {
   const { productItem, isModalOpen } = useSelector(state => state.productModal);
   const { img, imageURLs, status } = productItem || {};
-  const [activeImg, setActiveImg] = useState(img);
+  const [activeImg, setActiveImg] = useState(imageURLs?.[0] || img);
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
+
   // active image change when img change
   useEffect(() => {
-    setActiveImg(img);
+    setActiveImg(imageURLs?.[0] || img);
     dispatch(initialOrderQuantity());
     setLoading(false);
-  }, [img, dispatch]);
+  }, [img, imageURLs, dispatch]);
 
   // handle image active
-  const handleImageActive = item => {
-    setActiveImg(item.img);
+  const handleImageActive = url => {
+    setActiveImg(url);
     setLoading(true);
   };
 
