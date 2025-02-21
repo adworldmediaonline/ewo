@@ -1,66 +1,119 @@
 .ewoSkeleton {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-  padding: 20px 0;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 30px;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 30px;
 }
 
 .ewoSkeletonItem {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 20px;
+  transition: transform 0.2s ease;
+  border: 1px solid #f0f0f0;
 }
 
 .ewoSkeletonImage {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background-color: #e0e0e0;
-  margin-bottom: 15px;
+  width: 280px;
+  height: 280px;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.ewoSkeletonImage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid #f0f0f0;
+  border-radius: 16px;
 }
 
 .ewoSkeletonContent {
   width: 100%;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
 }
 
 .ewoSkeletonTitle {
-  height: 20px;
+  height: 24px;
   width: 70%;
-  background-color: #e0e0e0;
-  margin: 0 auto 8px;
-  border-radius: 4px;
+  background: #f5f5f5;
+  border-radius: 6px;
 }
 
 .ewoSkeletonCount {
-  height: 16px;
+  height: 18px;
   width: 40%;
-  background-color: #e0e0e0;
-  margin: 0 auto;
-  border-radius: 4px;
-}
-
-.ewoAnimatePulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  background: #f5f5f5;
+  border-radius: 6px;
 }
 
 @keyframes pulse {
   0%,
   100% {
-    opacity: 1;
+    opacity: 0.8;
   }
   50% {
-    opacity: 0.5;
+    opacity: 0.4;
   }
 }
 
-@media (max-width: 576px) {
+.ewoSkeletonTitle,
+.ewoSkeletonCount {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Responsive Design */
+@media (min-width: 1400px) {
+  .ewoSkeleton {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 1399px) {
+  .ewoSkeleton {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1199px) {
   .ewoSkeleton {
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 767px) {
+  .ewoSkeleton {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .ewoSkeletonItem {
+    padding: 20px;
+  }
+
+  .ewoSkeletonImage {
+    width: 220px;
+    height: 220px;
+    margin-bottom: 20px;
+  }
+
+  .ewoSkeletonTitle {
+    height: 22px;
+    width: 75%;
+  }
+
+  .ewoSkeletonCount {
+    height: 16px;
+    width: 45%;
   }
 }

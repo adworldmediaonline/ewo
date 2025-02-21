@@ -1,6 +1,6 @@
 .ewoSection {
-  padding: 60px 0;
-  background-color: #fff;
+  padding: 40px 0;
+  background-color: #ffffff;
 }
 
 .ewoHeader {
@@ -9,85 +9,127 @@
 }
 
 .ewoTitle {
-  font-size: 28px;
-  font-weight: 600;
-  color: #222;
-  margin-bottom: 10px;
+  font-size: 24px;
+  font-weight: 500;
+  color: #333333;
+  margin-bottom: 0;
 }
 
 .ewoList {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
-  padding: 20px 0;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
 .ewoItem {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
-  background: #fff;
+  padding: 15px;
+  background: #ffffff;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid #eaeaea;
+  transition: all 0.2s ease;
   text-decoration: none;
 }
 
 .ewoItem:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  border-color: #e0e0e0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .ewoImageWrapper {
-  width: 80px;
-  height: 80px;
+  width: 140px;
+  height: 140px;
   margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 8px;
+  background: #f9f9f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .ewoImage {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  border-radius: 50%;
+  transition: transform 0.2s ease;
 }
 
 .ewoContent {
   text-align: center;
+  width: 100%;
 }
 
 .ewoCategoryTitle {
   font-size: 16px;
   font-weight: 500;
-  color: #222;
-  margin-bottom: 5px;
+  color: #333333;
+  margin-bottom: 6px;
 }
 
 .ewoCount {
   font-size: 14px;
-  color: #666;
+  color: #666666;
+  font-weight: normal;
 }
 
 .ewoError {
   text-align: center;
   padding: 20px;
-  color: #dc3545;
+  color: #dc2626;
   font-size: 16px;
+  background: #fef2f2;
+  border-radius: 8px;
+  margin: 20px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1199px) {
+  .ewoList {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 991px) {
+  .ewoList {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
   .ewoSection {
-    padding: 40px 0;
+    padding: 30px 0;
+  }
+
+  .ewoHeader {
+    margin-bottom: 20px;
   }
 
   .ewoTitle {
-    font-size: 24px;
+    font-size: 20px;
   }
-}
 
-@media (max-width: 576px) {
   .ewoList {
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
+    padding: 0 15px;
+  }
+
+  .ewoImageWrapper {
+    width: 120px;
+    height: 120px;
+  }
+
+  .ewoCategoryTitle {
+    font-size: 14px;
+  }
+
+  .ewoCount {
+    font-size: 12px;
   }
 }

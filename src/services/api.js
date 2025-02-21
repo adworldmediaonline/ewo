@@ -58,13 +58,12 @@ export const fetchApi = async ({
   method = 'GET',
   body = null,
   headers = {},
-  cache = 'force-cache',
-  timeout = 8000,
-  tags = [],
+  cache,
+  tags,
   revalidate,
 }) => {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const baseUrl = process.env.API_BASE_URL;
     if (!baseUrl) {
       throw new ApiError(500, 'API base URL is not configured');
     }
@@ -81,28 +80,37 @@ export const fetchApi = async ({
     const options = {
       method,
       headers: defaultHeaders,
-      cache,
-      ...(tags.length > 0 && { next: { tags } }),
-      ...(revalidate && { next: { revalidate } }),
     };
 
-    // Add body for non-GET requests
-    if (body && method !== 'GET') {
+    // Only add body if it exists
+    if (body) {
       options.body = JSON.stringify(body);
     }
 
-    // Race between fetch and timeout
-    const response = await Promise.race([
-      fetch(url, options),
-      timeoutPromise(timeout),
-    ]);
+    // Only add cache if it's provided
+    if (cache) {
+      options.cache = cache;
+    }
 
-    // Check if response is ok
+    // Only add next.js specific options if they're provided
+    if (tags || revalidate) {
+      options.next = {};
+      if (tags) {
+        options.next.tags = tags;
+      }
+      if (revalidate) {
+        options.next.revalidate = revalidate;
+      }
+    }
+
+    const response = await fetch(url, options);
+
+    // Handle non-2xx responses
     if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
+      const errorData = await response.json();
       throw new ApiError(
         response.status,
-        errorData?.message || 'An error occurred',
+        errorData.message || 'An error occurred',
         errorData
       );
     }
@@ -113,17 +121,7 @@ export const fetchApi = async ({
     if (error instanceof ApiError) {
       throw error;
     }
-
-    // Network errors
-    if (error.name === 'AbortError') {
-      throw new ApiError(408, 'Request timeout');
-    }
-
-    if (!navigator.onLine) {
-      throw new ApiError(503, 'No internet connection');
-    }
-
-    throw new ApiError(500, 'An unexpected error occurred', error);
+    throw new ApiError(500, error.message || 'An error occurred');
   }
 };
 
