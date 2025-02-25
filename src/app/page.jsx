@@ -12,7 +12,7 @@ import Header from '@/layout/headers/header';
 import Footer from '@/layout/footers/footer';
 import CategoryList from '@/components/V2/category/CategoryList';
 
-export default function HomePage() {
+export default async function HomePage() {
   return (
     <Wrapper>
       <Header />
