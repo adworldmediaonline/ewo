@@ -1,18 +1,18 @@
 'use client';
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import Link from "next/link";
-import Image from "next/image";
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import Link from 'next/link';
+import Image from 'next/image';
 // internal
-import useCartInfo from "@/hooks/use-cart-info";
-import { CartTwo, Compare, Menu, User, Wishlist } from "@/svg";
-import { openCartMini } from "@/redux/features/cartSlice";
+import useCartInfo from '@/hooks/use-cart-info';
+import { CartTwo, Compare, Menu, User, Wishlist } from '@/svg';
+import { openCartMini } from '@/redux/features/cartSlice';
 
 const HeaderMainRight = ({ setIsCanvasOpen }) => {
-  const { user: userInfo } = useSelector((state) => state.auth);
-  const { wishlist } = useSelector((state) => state.wishlist);
+  const { user: userInfo } = useSelector(state => state.auth);
+  const { wishlist } = useSelector(state => state.wishlist);
   const { quantity } = useCartInfo();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   return (
     <div className="tp-header-main-right d-flex align-items-center justify-content-end">
       <div className="tp-header-login d-none d-lg-block">
@@ -39,6 +39,7 @@ const HeaderMainRight = ({ setIsCanvasOpen }) => {
               )}
             </span>
           </div>
+          {/*  */}
           <div className="tp-header-login-content d-none d-xl-block">
             {!userInfo?.name && (
               <Link href="/login">
