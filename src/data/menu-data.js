@@ -98,12 +98,12 @@ const menu_data = [
     link: '/coupon',
   },
 
-  {
-    id: 4,
-    single_link: true,
-    title: 'Contact',
-    link: '/contact',
-  },
+  // {
+  //   id: 4,
+  //   single_link: true,
+  //   title: 'Contact',
+  //   link: '/contact',
+  // },
 ];
 
 export default menu_data;
@@ -198,10 +198,10 @@ export const mobile_menu = [
   //     { title: 'Blog Details Full Width', link: '/blog-details-2' },
   //   ],
   // },
-  {
-    id: 4,
-    single_link: true,
-    title: 'Contact',
-    link: '/contact',
-  },
+  // {
+  //   id: 4,
+  //   single_link: true,
+  //   title: 'Contact',
+  //   link: '/contact',
+  // },
 ];
