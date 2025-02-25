@@ -1,30 +1,32 @@
 import Wrapper from '@/layout/wrapper';
 import Header from '@/layout/headers/header';
-import HeroSlider from '@/components/hero-banner/hero-slider';
-import ElectronicCategory from '@/components/categories/electronic-category';
+// import HeroSlider from '@/components/hero-banner/hero-slider';
+// import ElectronicCategory from '@/components/categories/electronic-category';
 // import FeatureArea from '@/components/features/feature-area';
-import NewArrivals from '@/components/products/electronics/new-arrivals';
-import OfferProducts from '@/components/products/electronics/offer-products';
-import ProductArea from '@/components/products/electronics/product-area';
+// import NewArrivals from '@/components/products/electronics/new-arrivals';
+// import OfferProducts from '@/components/products/electronics/offer-products';
+// import ProductArea from '@/components/products/electronics/product-area';
 // import ProductBanner from '@/components/products/electronics/product-banner';
-import ProductGadgetArea from '@/components/products/electronics/product-gadget-area';
-import ProductSmArea from '@/components/products/electronics/product-sm-area';
+// import ProductGadgetArea from '@/components/products/electronics/product-gadget-area';
+// import ProductSmArea from '@/components/products/electronics/product-sm-area';
 import Footer from '@/layout/footers/footer';
+import CategoryList from '@/components/V2/category/CategoryList';
 
-export default function HomePage() {
+export default async function HomePage() {
   return (
     <Wrapper>
       <Header />
-      <HeroSlider />
-      <ElectronicCategory />
+      {/* <HeroSlider /> */}
+      <CategoryList />
+      {/* <ElectronicCategory /> */}
       {/* <FeatureArea /> */}
-      <ProductArea />
+      {/* <ProductArea /> */}
       {/* <BannerArea /> */}
-      <OfferProducts />
-      <ProductGadgetArea />
+      {/* <OfferProducts /> */}
+      {/* <ProductGadgetArea /> */}
       {/* <ProductBanner /> */}
-      <NewArrivals />
-      <ProductSmArea />
+      {/* <NewArrivals /> */}
+      {/* <ProductSmArea /> */}
       {/* <BlogArea />
       <InstagramArea />
       <CtaArea /> */}
