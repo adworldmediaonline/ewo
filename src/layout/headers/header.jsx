@@ -35,27 +35,6 @@ const Header = () => {
     <>
       <header>
         <div className="tp-header-area p-relative z-index-11">
-          {/* header top start  */}
-          {/* <div className="tp-header-top black-bg p-relative z-index-1 d-none d-md-block">
-            <div className="container">
-              <div className="row align-items-center">
-                <div className="col-md-6">
-                  <div className="tp-header-welcome d-flex align-items-center">
-                    <span>
-                      <ShippingCar />
-                    </span>
-                    <p>FREE Express Shipping On Orders $570+</p>
-                  </div>
-                </div>
-                <div className="col-md-6">
-                  <div className="tp-header-top-right d-flex align-items-center justify-content-end">
-                    <HeaderTopRight />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div> */}
-
           {/* header main start */}
           <div className="tp-header-main tp-header-sticky">
             <div className="container">
@@ -107,21 +86,6 @@ const Header = () => {
                       <nav className="tp-main-menu-content">
                         <Menus />
                       </nav>
-                    </div>
-                  </div>
-                  <div className="col-xl-3 col-lg-3">
-                    <div className="tp-header-contact d-flex align-items-center justify-content-end">
-                      <div className="tp-header-contact-icon">
-                        <span>
-                          <Phone />
-                        </span>
-                      </div>
-                      <div className="tp-header-contact-content">
-                        <h5>Hotline:</h5>
-                        <p>
-                          <a href="tel:402-763-282-46">+(402) 763 282 46</a>
-                        </p>
-                      </div>
                     </div>
                   </div>
                 </div>

@@ -11,11 +11,12 @@ import Header from '@/layout/headers/header';
 // import ProductSmArea from '@/components/products/electronics/product-sm-area';
 import Footer from '@/layout/footers/footer';
 import CategoryList from '@/components/V2/category/CategoryList';
+import HeaderV2 from '@/layout/headers/HeaderV2';
 
 export default async function HomePage() {
   return (
     <Wrapper>
-      <Header />
+      <HeaderV2 />
       {/* <HeroSlider /> */}
       <CategoryList />
       {/* <ElectronicCategory /> */}
