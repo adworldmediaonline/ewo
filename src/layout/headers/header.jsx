@@ -14,15 +14,7 @@ import HeaderCategory from './header-com/header-category';
 import HeaderMainRight from './header-com/header-main-right';
 import CartMiniSidebar from '@/components/common/cart-mini-sidebar';
 import HeaderSearchForm from '@/components/forms/header-search-form';
-import {
-  CartTwo,
-  CategoryMenu,
-  Compare,
-  Menu,
-  Phone,
-  ShippingCar,
-  Wishlist,
-} from '@/svg';
+import { CartTwo, CategoryMenu, Compare, Menu, Wishlist } from '@/svg';
 
 const Header = () => {
   const { wishlist } = useSelector(state => state.wishlist);

@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,9 +10,10 @@ import CartMiniSidebar from '@/components/common/cart-mini-sidebar';
 import OffCanvas from '@/components/common/off-canvas';
 import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
 import logo from '@assets/img/logo/logo.webp';
-import { CartTwo, Compare, Menu, Search, User, Wishlist } from '@/svg';
+import { CartTwo, Compare, Menu, User, Wishlist } from '@/svg';
 import styles from './HeaderV2.module.css';
-import { Router } from 'next/router';
+import { useRouter } from 'next/navigation';
+import SearchForm from '@/components/V2/common/SearchForm';
 
 const HeaderV2 = () => {
   const { wishlist } = useSelector(state => state.wishlist);
@@ -22,9 +23,9 @@ const HeaderV2 = () => {
   const { quantity } = useCartInfo();
   const { sticky } = useSticky();
   const dispatch = useDispatch();
-  const searchRef = useRef(null);
-  const [activeMobileCategory, setActiveMobileCategory] = useState(null);
 
+  const [activeMobileCategory, setActiveMobileCategory] = useState(null);
+  const router = useRouter();
   // Fetch categories
   const { data: categories, isLoading: categoriesLoading } =
     useGetShowCategoryQuery();
@@ -32,7 +33,7 @@ const HeaderV2 = () => {
   // Handle category route
   const handleCategoryRoute = (title, route) => {
     if (route === 'parent') {
-      Router.push(
+      router.push(
         `/shop?category=${title
           .toLowerCase()
           .replace('&', '')
@@ -84,7 +85,7 @@ const HeaderV2 = () => {
           <div className={styles.headerTop}>
             {/* Logo */}
             <Link href="/" className={styles.logo}>
-              <Image src={logo} alt="logo" width={120} height={40} priority />
+              <Image src={logo} alt="logo" width={120} priority />
             </Link>
 
             {/* Main Navigation */}
@@ -151,15 +152,18 @@ const HeaderV2 = () => {
                   </div>
                 </li>
                 <li>
-                  <Link href="/docs" className={styles.navLink}>
-                    DOCS
+                  {/* <Link href="/coupon" className={styles.navLink}>
+                    COUPON
+                  </Link> */}
+                  <Link href="/shop" className={styles.navLink}>
+                    PRODUCTS
                   </Link>
                 </li>
               </ul>
             </nav>
 
             {/* Search Form */}
-            <form className={styles.searchForm} onSubmit={handleSearchSubmit}>
+            {/* <form className={styles.searchForm} onSubmit={handleSearchSubmit}>
               <input
                 type="text"
                 className={styles.searchInput}
@@ -170,7 +174,8 @@ const HeaderV2 = () => {
               <button type="submit" className={styles.searchButton}>
                 <Search />
               </button>
-            </form>
+            </form> */}
+            <SearchForm />
 
             {/* Action Buttons */}
             <div className={styles.actions}>

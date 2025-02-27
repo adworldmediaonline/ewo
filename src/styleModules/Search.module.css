@@ -20,15 +20,15 @@
   gap: 2rem;
 }
 
-/* .logo {
+.logo {
   display: flex;
   align-items: center;
-} */
+}
 
-/* .logo img {
+.logo img {
   height: 32px;
   width: auto;
-} */
+}
 
 .navigation {
   display: flex;
