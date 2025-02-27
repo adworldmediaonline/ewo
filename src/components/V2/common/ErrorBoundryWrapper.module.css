@@ -1,0 +1,86 @@
+.errorContainer {
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  border-radius: 8px;
+  background-color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 42rem;
+  margin: 2rem auto;
+}
+
+.content {
+  text-align: center;
+}
+
+.icon {
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto 1rem;
+  color: #ef4444;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.75rem;
+}
+
+.message {
+  color: #4b5563;
+  margin-bottom: 0.5rem;
+}
+
+.errorBox {
+  background-color: #fef2f2;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.errorText {
+  color: #dc2626;
+  font-family: monospace;
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.buttonContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.primaryButton {
+  padding: 0.5rem 1.5rem;
+  background-color: #2563eb;
+  color: white;
+  border-radius: 6px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.primaryButton:hover {
+  background-color: #1d4ed8;
+}
+
+.secondaryButton {
+  padding: 0.5rem 1.5rem;
+  color: #4b5563;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.secondaryButton:hover {
+  color: #1f2937;
+}

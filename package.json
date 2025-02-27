@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3000",
+    "dev": "next dev -p 3005",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -25,6 +25,7 @@
     "react": "^18",
     "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "^18",
+    "react-error-boundary": "^5.0.0",
     "react-hook-form": "^7.48.2",
     "react-medium-image-zoom": "^5.2.13",
     "react-modal": "^3.16.1",
