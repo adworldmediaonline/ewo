@@ -1,26 +1,26 @@
 import React from 'react';
-import styles from './CategorySkeleton.module.css';
+import styles from '../../../styleModules/Category.module.css';
 
-const CategorySkeleton = () => {
+function CategorySkeleton() {
   return (
-    <div className={styles.ewoSkeleton}>
-      {[1, 2, 3, 4, 5, 6].map(item => (
-        <div key={item} className={styles.ewoSkeletonItem}>
-          <div
-            className={`${styles.ewoSkeletonImage} ${styles.ewoAnimatePulse}`}
-          ></div>
-          <div className={styles.ewoSkeletonContent}>
+    <div className={styles.container}>
+      <div className={`${styles.skeletonTitle} ${styles.skeleton}`}></div>
+      <div className={`${styles.skeletonDescription} ${styles.skeleton}`}></div>
+
+      <div className={styles.grid}>
+        {[...Array(6)].map((_, index) => (
+          <div key={index} className={styles.skeletonCard}>
             <div
-              className={`${styles.ewoSkeletonTitle} ${styles.ewoAnimatePulse}`}
+              className={`${styles.skeletonCardTitle} ${styles.skeleton}`}
             ></div>
             <div
-              className={`${styles.ewoSkeletonCount} ${styles.ewoAnimatePulse}`}
+              className={`${styles.skeletonCardLink} ${styles.skeleton}`}
             ></div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
-};
+}
 
 export default CategorySkeleton;
