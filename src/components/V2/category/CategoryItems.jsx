@@ -22,9 +22,7 @@ export default async function CategoryItems() {
       <div className={styles.ewoList}>
         {data.result.map(category => (
           <Link
-            href={`/shop?category=${category?.parent
-              .toLowerCase()
-              .replace(/[&\s]+/g, '-')}`}
+            href={`/category?id=${category._id}`}
             key={category._id}
             className={styles.ewoItem}
           >
