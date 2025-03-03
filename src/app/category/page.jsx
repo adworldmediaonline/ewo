@@ -8,12 +8,12 @@ export const metadata = {
   description: 'Browse our product categories',
 };
 
-export default async function CategoryPage({ searchParams }) {
-  // Validate category ID
+export default async function CategoryPage(props) {
+  const searchParams = await props.searchParams;
   const categoryId = searchParams?.id;
 
   if (!categoryId) {
-    return redirect('/shop');
+    redirect('/shop');
   }
 
   return (
