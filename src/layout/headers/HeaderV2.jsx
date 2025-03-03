@@ -7,61 +7,59 @@ import useSticky from '@/hooks/use-sticky';
 import useCartInfo from '@/hooks/use-cart-info';
 import { openCartMini } from '@/redux/features/cartSlice';
 import CartMiniSidebar from '@/components/common/cart-mini-sidebar';
-import OffCanvas from '@/components/common/off-canvas';
 import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
 import logo from '@assets/img/logo/logo.webp';
-import { CartTwo, Compare, Menu, User, Wishlist } from '@/svg';
+import { CartTwo, Close, Compare, Menu, Search, User, Wishlist } from '@/svg';
 import styles from './HeaderV2.module.css';
 import { useRouter } from 'next/navigation';
 import SearchForm from '@/components/V2/common/SearchForm';
 
 const HeaderV2 = () => {
   const { wishlist } = useSelector(state => state.wishlist);
-  const [isOffCanvasOpen, setIsCanvasOpen] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [activeMobileCategory, setActiveMobileCategory] = useState(null);
   const { quantity } = useCartInfo();
   const { sticky } = useSticky();
   const dispatch = useDispatch();
-
-  const [activeMobileCategory, setActiveMobileCategory] = useState(null);
   const router = useRouter();
+
   // Fetch categories
   const { data: categories, isLoading: categoriesLoading } =
     useGetShowCategoryQuery();
 
   // Handle category route
-  const handleCategoryRoute = (title, route) => {
-    if (route === 'parent') {
-      router.push(
-        `/shop?category=${title
-          .toLowerCase()
-          .replace('&', '')
-          .split(' ')
-          .join('-')}`
-      );
-    } else {
-      router.push(
-        `/shop?subCategory=${title
-          .toLowerCase()
-          .replace('&', '')
-          .split(' ')
-          .join('-')}`
-      );
-    }
+  const handleCategoryRoute = title => {
+    router.push(
+      `/shop?category=${title
+        .toLowerCase()
+        .replace('&', '')
+        .split(' ')
+        .join('-')}`
+    );
+    setIsMobileNavOpen(false);
+  };
+
+  const handleChildCategoryRoute = (parent, child) => {
+    router.push(
+      `/shop?category=${parent
+        .toLowerCase()
+        .replace('&', '')
+        .split(' ')
+        .join('-')}&subCategory=${child
+        .toLowerCase()
+        .replace('&', '')
+        .split(' ')
+        .join('-')}`
+    );
+    setIsMobileNavOpen(false);
   };
 
   // Close mobile nav on route change
   useEffect(() => {
     setIsMobileNavOpen(false);
+    setIsMobileSearchOpen(false);
   }, []);
-
-  // Handle search submit
-  const handleSearchSubmit = e => {
-    e.preventDefault();
-    // Implement your search logic here
-    console.log('Search query:', searchQuery);
-  };
 
   // Filter categories to only show ones with products and status 'Show'
   const filteredCategories =
@@ -84,7 +82,7 @@ const HeaderV2 = () => {
         <div className={styles.container}>
           <div className={styles.headerTop}>
             {/* Logo */}
-            <Link href="/" className={styles.logo}>
+            <Link href="/">
               <Image src={logo} alt="logo" width={120} priority />
             </Link>
 
@@ -92,10 +90,7 @@ const HeaderV2 = () => {
             <nav>
               <ul className={styles.navigation}>
                 <li>
-                  <Link
-                    href="/"
-                    className={`${styles.navLink} ${styles.active}`}
-                  >
+                  <Link href="/" className={styles.navLink}>
                     HOME
                   </Link>
                 </li>
@@ -110,9 +105,7 @@ const HeaderV2 = () => {
                         <li key={category._id} className={styles.categoryItem}>
                           <div
                             className={styles.categoryLink}
-                            onClick={() =>
-                              handleCategoryRoute(category.parent, 'parent')
-                            }
+                            onClick={() => handleCategoryRoute(category.parent)}
                           >
                             <div>
                               <h3 className={styles.categoryTitle}>
@@ -132,9 +125,9 @@ const HeaderV2 = () => {
                                           className={styles.subCategoryLink}
                                           onClick={e => {
                                             e.stopPropagation();
-                                            handleCategoryRoute(
-                                              child,
-                                              'children'
+                                            handleChildCategoryRoute(
+                                              category.parent,
+                                              child
                                             );
                                           }}
                                         >
@@ -152,9 +145,6 @@ const HeaderV2 = () => {
                   </div>
                 </li>
                 <li>
-                  {/* <Link href="/coupon" className={styles.navLink}>
-                    COUPON
-                  </Link> */}
                   <Link href="/shop" className={styles.navLink}>
                     PRODUCTS
                   </Link>
@@ -162,23 +152,20 @@ const HeaderV2 = () => {
               </ul>
             </nav>
 
-            {/* Search Form */}
-            {/* <form className={styles.searchForm} onSubmit={handleSearchSubmit}>
-              <input
-                type="text"
-                className={styles.searchInput}
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-              />
-              <button type="submit" className={styles.searchButton}>
-                <Search />
-              </button>
-            </form> */}
-            <SearchForm />
+            {/* Desktop Search */}
+            <div className={styles.searchContainer}>
+              <SearchForm />
+            </div>
 
             {/* Action Buttons */}
             <div className={styles.actions}>
+              <button
+                className={styles.searchButton}
+                onClick={() => setIsMobileSearchOpen(true)}
+              >
+                <Search />
+              </button>
+
               <Link href="/compare" className={styles.actionButton}>
                 <Compare />
               </Link>
@@ -215,6 +202,23 @@ const HeaderV2 = () => {
         </div>
       </header>
 
+      {/* Mobile Search */}
+      <div
+        className={`${styles.mobileSearch} ${
+          isMobileSearchOpen ? styles.mobileSearchActive : ''
+        }`}
+      >
+        <div className={styles.mobileSearchHeader}>
+          <button
+            className={styles.mobileSearchClose}
+            onClick={() => setIsMobileSearchOpen(false)}
+          >
+            <Close />
+          </button>
+          <SearchForm />
+        </div>
+      </div>
+
       {/* Mobile Navigation */}
       <div
         className={`${styles.mobileNav} ${
@@ -222,28 +226,31 @@ const HeaderV2 = () => {
         }`}
       >
         <div className={styles.mobileNavHeader}>
-          <Image src={logo} alt="logo" width={100} height={32} priority />
+          <Image src={logo} alt="logo" width={100} priority />
           <button
             className={styles.actionButton}
             onClick={() => setIsMobileNavOpen(false)}
           >
-            <svg viewBox="0 0 24 24" width="24" height="24">
-              <path
-                fill="currentColor"
-                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-              />
-            </svg>
+            <Close />
           </button>
         </div>
         <div className={styles.mobileNavContent}>
           <ul className={styles.mobileNavigation}>
             <li>
-              <Link href="/" className={styles.navLink}>
+              <Link
+                href="/"
+                className={styles.navLink}
+                onClick={() => setIsMobileNavOpen(false)}
+              >
                 HOME
               </Link>
             </li>
             <li>
-              <Link href="/shop" className={styles.navLink}>
+              <Link
+                href="/shop"
+                className={styles.navLink}
+                onClick={() => setIsMobileNavOpen(false)}
+              >
                 SHOP
               </Link>
               {filteredCategories.map(category => (
@@ -262,66 +269,52 @@ const HeaderV2 = () => {
                           : ''
                       }`}
                       viewBox="0 0 24 24"
-                      width="20"
-                      height="20"
+                      fill="none"
+                      stroke="currentColor"
                     >
-                      <path fill="currentColor" d="M7 10l5 5 5-5H7z" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
                     </svg>
                   </div>
-                  {category.children && category.children.length > 0 && (
-                    <div
-                      className={`${styles.mobileSubCategories} ${
-                        activeMobileCategory === category._id
-                          ? styles.active
-                          : ''
-                      }`}
-                    >
-                      <ul className={styles.mobileSubCategoryList}>
-                        {category.children.map((child, index) => (
-                          <li
-                            key={index}
-                            className={styles.mobileSubCategoryItem}
-                            onClick={() =>
-                              handleCategoryRoute(child, 'children')
-                            }
-                          >
-                            {child}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                  <div
+                    className={`${styles.mobileSubCategories} ${
+                      activeMobileCategory === category._id ? styles.active : ''
+                    }`}
+                  >
+                    {category.children?.map((child, index) => (
+                      <div
+                        key={index}
+                        className={styles.subCategoryLink}
+                        onClick={() =>
+                          handleChildCategoryRoute(category.parent, child)
+                        }
+                      >
+                        {child}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))}
             </li>
             <li>
-              <Link href="/docs" className={styles.navLink}>
-                DOCS
+              <Link
+                href="/shop"
+                className={styles.navLink}
+                onClick={() => setIsMobileNavOpen(false)}
+              >
+                PRODUCTS
               </Link>
             </li>
           </ul>
         </div>
       </div>
 
-      {/* Mobile Navigation Overlay */}
-      {isMobileNavOpen && (
-        <div
-          className={`${styles.mobileNavOverlay} ${
-            isMobileNavOpen ? styles.mobileNavOverlayActive : ''
-          }`}
-          onClick={() => setIsMobileNavOpen(false)}
-        />
-      )}
-
       {/* Cart Mini Sidebar */}
       <CartMiniSidebar />
-
-      {/* Off Canvas */}
-      <OffCanvas
-        isOffCanvasOpen={isOffCanvasOpen}
-        setIsCanvasOpen={setIsCanvasOpen}
-        categoryType="electronics"
-      />
     </>
   );
 };

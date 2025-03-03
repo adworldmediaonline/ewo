@@ -1,5 +1,5 @@
 import Wrapper from '@/layout/wrapper';
-import HeaderTwo from '@/layout/headers/header-2';
+import HeaderV2 from '@/layout/headers/HeaderV2';
 import Footer from '@/layout/footers/footer';
 import ProfileArea from '@/components/my-account/profile-area';
 
@@ -10,7 +10,7 @@ export const metadata = {
 export default function ProfilePage() {
   return (
     <Wrapper>
-      <HeaderTwo style_2={true} />
+      <HeaderV2 />
       <ProfileArea />
       <Footer style_2={true} />
     </Wrapper>

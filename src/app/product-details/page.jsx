@@ -1,5 +1,5 @@
 import Wrapper from '@/layout/wrapper';
-import HeaderTwo from '@/layout/headers/header-2';
+import HeaderV2 from '@/layout/headers/HeaderV2';
 import ProductDetailsArea from '@/components/product-details/product-details-area';
 import Footer from '@/layout/footers/footer';
 
@@ -10,7 +10,7 @@ export const metadata = {
 export default function ProductDetailsPage() {
   return (
     <Wrapper>
-      <HeaderTwo style_2={true} />
+      <HeaderV2 />
       <ProductDetailsArea id="6431364df5a812bd37e765ac" />
       <Footer primary_style={true} />
     </Wrapper>
