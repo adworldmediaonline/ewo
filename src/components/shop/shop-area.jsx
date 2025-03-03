@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import ShopLoader from '../loader/shop/shop-loader';
 import ErrorMsg from '../common/error-msg';
 import ShopFilterOffCanvas from '../common/shop-filter-offcanvas';
@@ -10,7 +10,6 @@ import parentCategoryModified from '@/lib/parentCategory';
 
 const ShopArea = ({ shop_right = false, hidden_sidebar = false }) => {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const category = searchParams.get('category');
   const brand = searchParams.get('brand');
   const minPrice = searchParams.get('minPrice');
