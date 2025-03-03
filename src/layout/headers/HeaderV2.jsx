@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,6 +14,70 @@ import styles from './HeaderV2.module.css';
 import { useRouter } from 'next/navigation';
 import SearchForm from '@/components/V2/common/SearchForm';
 
+const CategoryCard = ({ category, onCategoryClick }) => {
+  const router = useRouter();
+
+  const handleParentClick = e => {
+    e.stopPropagation();
+    router.push(
+      `/shop?category=${category.parent
+        .toLowerCase()
+        .replace('&', '')
+        .split(' ')
+        .join('-')}`
+    );
+    onCategoryClick();
+  };
+
+  const handleSubCategoryClick = (e, child) => {
+    e.stopPropagation();
+    router.push(
+      `/shop?category=${category.parent
+        .toLowerCase()
+        .replace('&', '')
+        .split(' ')
+        .join('-')}&subCategory=${child
+        .toLowerCase()
+        .replace('&', '')
+        .split(' ')
+        .join('-')}`
+    );
+    onCategoryClick();
+  };
+
+  return (
+    <div className={styles.categoryLink} role="menuitem" tabIndex="0">
+      <button onClick={handleParentClick} className={styles.categoryHeader}>
+        <span className={styles.categoryTitle}>{category.parent}</span>
+        <span className={styles.categoryCount}>
+          {category.products.length} Products
+        </span>
+      </button>
+      {category.children && category.children.length > 0 && (
+        <div className={styles.subCategories}>
+          <ul
+            className={styles.subCategoryList}
+            role="menu"
+            aria-label={`${category.parent} subcategories`}
+          >
+            {category.children.map((child, index) => (
+              <li key={index} role="none">
+                <button
+                  className={styles.subCategoryLink}
+                  onClick={e => handleSubCategoryClick(e, child)}
+                  role="menuitem"
+                >
+                  {child}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const HeaderV2 = () => {
   const { wishlist } = useSelector(state => state.wishlist);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
@@ -23,10 +87,46 @@ const HeaderV2 = () => {
   const { sticky } = useSticky();
   const dispatch = useDispatch();
   const router = useRouter();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const dropdownButtonRef = useRef(null);
 
   // Fetch categories
   const { data: categories, isLoading: categoriesLoading } =
     useGetShowCategoryQuery();
+
+  const handleDropdownToggle = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleDropdownKeyDown = e => {
+    if (e.key === 'Escape') {
+      setIsDropdownOpen(false);
+      dropdownButtonRef.current?.focus();
+    }
+  };
+
+  const handleClickOutside = event => {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target) &&
+      !dropdownButtonRef.current?.contains(event.target)
+    ) {
+      setIsDropdownOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Close dropdown when navigating
+  const handleCategoryClick = () => {
+    setIsDropdownOpen(false);
+  };
 
   // Handle category route
   const handleCategoryRoute = title => {
@@ -94,51 +194,44 @@ const HeaderV2 = () => {
                     HOME
                   </Link>
                 </li>
-                <li className={styles.shopDropdown}>
-                  <Link href="/shop" className={styles.navLink}>
-                    SHOP
+                <li className={styles.shopDropdown} ref={dropdownRef}>
+                  <button
+                    ref={dropdownButtonRef}
+                    className={styles.dropdownButton}
+                    onClick={handleDropdownToggle}
+                    aria-expanded={isDropdownOpen}
+                    aria-controls="shop-dropdown"
+                    aria-haspopup="true"
+                  >
+                    Shop
                     <span className={styles.dropdownIcon}>▼</span>
-                  </Link>
-                  <div className={styles.dropdownContent}>
-                    <ul className={styles.categoryList}>
+                    <span className={styles.srOnly}>
+                      {isDropdownOpen ? 'Close menu' : 'Open menu'}
+                    </span>
+                  </button>
+
+                  <div
+                    id="shop-dropdown"
+                    className={styles.dropdownContent}
+                    aria-hidden={!isDropdownOpen}
+                    role="menu"
+                    onKeyDown={handleDropdownKeyDown}
+                  >
+                    <ul className={styles.categoryList} role="none">
                       {filteredCategories.map(category => (
-                        <li key={category._id} className={styles.categoryItem}>
-                          <div
-                            className={styles.categoryLink}
-                            onClick={() => handleCategoryRoute(category.parent)}
-                          >
-                            <div>
-                              <h3 className={styles.categoryTitle}>
-                                {category.parent}
-                              </h3>
-                              <span className={styles.categoryCount}>
-                                {category.products.length} Products
-                              </span>
-                            </div>
-                            {category.children &&
-                              category.children.length > 0 && (
-                                <div className={styles.subCategories}>
-                                  <ul className={styles.subCategoryList}>
-                                    {category.children.map((child, index) => (
-                                      <li key={index}>
-                                        <span
-                                          className={styles.subCategoryLink}
-                                          onClick={e => {
-                                            e.stopPropagation();
-                                            handleChildCategoryRoute(
-                                              category.parent,
-                                              child
-                                            );
-                                          }}
-                                        >
-                                          {child}
-                                        </span>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              )}
-                          </div>
+                        <li
+                          key={category._id}
+                          className={styles.categoryItem}
+                          role="none"
+                          onClick={() => {
+                            handleCategoryRoute(category.parent);
+                            handleCategoryClick();
+                          }}
+                        >
+                          <CategoryCard
+                            category={category}
+                            onCategoryClick={handleCategoryClick}
+                          />
                         </li>
                       ))}
                     </ul>
@@ -255,48 +348,64 @@ const HeaderV2 = () => {
               </Link>
               {filteredCategories.map(category => (
                 <div key={category._id} className={styles.mobileCategory}>
-                  <div
-                    className={styles.mobileCategoryHeader}
-                    onClick={() => toggleMobileCategory(category._id)}
-                  >
-                    <div className={styles.mobileCategoryTitle}>
-                      {category.parent}
-                    </div>
-                    <svg
-                      className={`${styles.mobileDropdownIcon} ${
-                        activeMobileCategory === category._id
-                          ? styles.active
-                          : ''
-                      }`}
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  </div>
-                  <div
-                    className={`${styles.mobileSubCategories} ${
-                      activeMobileCategory === category._id ? styles.active : ''
-                    }`}
-                  >
-                    {category.children?.map((child, index) => (
-                      <div
-                        key={index}
-                        className={styles.subCategoryLink}
-                        onClick={() =>
-                          handleChildCategoryRoute(category.parent, child)
-                        }
+                  {category.children && category.children.length > 0 ? (
+                    <>
+                      <button
+                        className={styles.mobileCategoryHeader}
+                        onClick={() => toggleMobileCategory(category._id)}
+                        aria-expanded={activeMobileCategory === category._id}
                       >
-                        {child}
+                        <span className={styles.mobileCategoryTitle}>
+                          {category.parent}
+                        </span>
+                        <svg
+                          className={`${styles.mobileDropdownIcon} ${
+                            activeMobileCategory === category._id
+                              ? styles.active
+                              : ''
+                          }`}
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      </button>
+                      <div
+                        className={`${styles.mobileSubCategories} ${
+                          activeMobileCategory === category._id
+                            ? styles.active
+                            : ''
+                        }`}
+                      >
+                        {category.children?.map((child, index) => (
+                          <button
+                            key={index}
+                            className={styles.subCategoryLink}
+                            onClick={() =>
+                              handleChildCategoryRoute(category.parent, child)
+                            }
+                          >
+                            {child}
+                          </button>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    </>
+                  ) : (
+                    <button
+                      className={styles.mobileCategoryHeader}
+                      onClick={() => handleCategoryRoute(category.parent)}
+                    >
+                      <span className={styles.mobileCategoryTitle}>
+                        {category.parent}
+                      </span>
+                    </button>
+                  )}
                 </div>
               ))}
             </li>
