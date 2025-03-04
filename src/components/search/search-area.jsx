@@ -45,8 +45,10 @@ export default function SearchArea() {
     let product_items = all_products;
 
     if (searchText && !productType) {
-      product_items = all_products.filter(prd =>
-        prd.title.toLowerCase().includes(searchText.toLowerCase())
+      product_items = all_products.filter(
+        prd =>
+          prd.title.toLowerCase().includes(searchText.toLowerCase()) ||
+          prd.sku.toLowerCase().includes(searchText.toLowerCase())
       );
     }
     if (searchText && productType) {
