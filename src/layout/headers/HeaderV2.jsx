@@ -175,7 +175,7 @@ const HeaderV2 = () => {
   };
 
   return (
-    <>
+    <div className={styles.headerWrapper}>
       <header
         className={`${styles.header} ${sticky ? styles.headerSticky : ''}`}
       >
@@ -185,65 +185,6 @@ const HeaderV2 = () => {
             <Link href="/">
               <Image src={logo} alt="logo" width={120} priority />
             </Link>
-
-            {/* Main Navigation */}
-            <nav>
-              <ul className={styles.navigation}>
-                <li>
-                  <Link href="/" className={styles.navLink}>
-                    HOME
-                  </Link>
-                </li>
-                <li className={styles.shopDropdown} ref={dropdownRef}>
-                  <button
-                    ref={dropdownButtonRef}
-                    className={styles.dropdownButton}
-                    onClick={handleDropdownToggle}
-                    aria-expanded={isDropdownOpen}
-                    aria-controls="shop-dropdown"
-                    aria-haspopup="true"
-                  >
-                    Shop
-                    <span className={styles.dropdownIcon}>▼</span>
-                    <span className={styles.srOnly}>
-                      {isDropdownOpen ? 'Close menu' : 'Open menu'}
-                    </span>
-                  </button>
-
-                  <div
-                    id="shop-dropdown"
-                    className={styles.dropdownContent}
-                    aria-hidden={!isDropdownOpen}
-                    role="menu"
-                    onKeyDown={handleDropdownKeyDown}
-                  >
-                    <ul className={styles.categoryList} role="none">
-                      {filteredCategories.map(category => (
-                        <li
-                          key={category._id}
-                          className={styles.categoryItem}
-                          role="none"
-                          onClick={() => {
-                            handleCategoryRoute(category.parent);
-                            handleCategoryClick();
-                          }}
-                        >
-                          <CategoryCard
-                            category={category}
-                            onCategoryClick={handleCategoryClick}
-                          />
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </li>
-                <li>
-                  <Link href="/shop" className={styles.navLink}>
-                    PRODUCTS
-                  </Link>
-                </li>
-              </ul>
-            </nav>
 
             {/* Desktop Search */}
             <div className={styles.searchContainer}>
@@ -294,6 +235,68 @@ const HeaderV2 = () => {
           </div>
         </div>
       </header>
+
+      {/* Secondary Navigation */}
+      <div className={styles.headerBottom}>
+        <nav className={styles.bottomNav}>
+          <ul className={styles.bottomNavList}>
+            <li>
+              <Link href="/" className={styles.bottomNavLink}>
+                HOME
+              </Link>
+            </li>
+            <li>
+              <button
+                ref={dropdownButtonRef}
+                className={`${styles.bottomNavLink} ${styles.dropdownButton}`}
+                onClick={handleDropdownToggle}
+                aria-expanded={isDropdownOpen}
+                aria-controls="shop-dropdown"
+                aria-haspopup="true"
+              >
+                SHOP
+                <span className={styles.dropdownIcon}>▼</span>
+                <span className={styles.srOnly}>
+                  {isDropdownOpen ? 'Close menu' : 'Open menu'}
+                </span>
+              </button>
+
+              <div
+                id="shop-dropdown"
+                className={styles.dropdownContent}
+                aria-hidden={!isDropdownOpen}
+                role="menu"
+                onKeyDown={handleDropdownKeyDown}
+                ref={dropdownRef}
+              >
+                <ul className={styles.categoryList} role="none">
+                  {filteredCategories.map(category => (
+                    <li
+                      key={category._id}
+                      className={styles.categoryItem}
+                      role="none"
+                      onClick={() => {
+                        handleCategoryRoute(category.parent);
+                        handleCategoryClick();
+                      }}
+                    >
+                      <CategoryCard
+                        category={category}
+                        onCategoryClick={handleCategoryClick}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </li>
+            <li>
+              <Link href="/shop" className={styles.bottomNavLink}>
+                PRODUCTS
+              </Link>
+            </li>
+          </ul>
+        </nav>
+      </div>
 
       {/* Mobile Search */}
       <div
@@ -424,7 +427,7 @@ const HeaderV2 = () => {
 
       {/* Cart Mini Sidebar */}
       <CartMiniSidebar />
-    </>
+    </div>
   );
 };
 
