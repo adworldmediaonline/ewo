@@ -7,6 +7,10 @@ import Providers from '@/components/provider';
 export const metadata = {
   title: 'EWO',
   description: 'ewo',
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 const body = Jost({

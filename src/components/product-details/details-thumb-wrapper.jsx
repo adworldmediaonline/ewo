@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import styles from './ProductDetailsContent.module.css';
 import PopupVideo from '../common/popup-video';
 import CloudinaryImage from '../common/CloudinaryImage';
 import Lightbox from 'yet-another-react-lightbox';
@@ -10,7 +11,7 @@ import 'yet-another-react-lightbox/plugins/thumbnails.css';
 import Mediumzoom from 'react-medium-image-zoom';
 import 'react-medium-image-zoom/dist/styles.css';
 
-const DetailsThumbWrapper = ({
+export default function DetailsThumbWrapper({
   imageURLs,
   handleImageActive,
   activeImg,
@@ -18,7 +19,7 @@ const DetailsThumbWrapper = ({
   imgHeight = 480,
   videoId = false,
   status,
-}) => {
+}) {
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
@@ -35,92 +36,93 @@ const DetailsThumbWrapper = ({
 
   return (
     <>
-      <div className="tp-product-details-thumb-wrapper tp-tab d-sm-flex">
-        <nav>
-          <div className="nav nav-tabs flex-sm-column">
-            {imageURLs?.map((url, i) => (
-              <button
-                key={i}
-                className={`nav-link ${url === activeImg ? 'active' : ''}`}
-                onClick={() => handleImageActive(url)}
-              >
-                <CloudinaryImage
-                  src={url}
-                  alt="product thumbnail"
-                  width={78}
-                  height={100}
-                  sizes="(max-width: 768px) 60px, 78px"
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    aspectRatio: '78/100',
-                    objectFit: 'cover',
-                    display: 'block',
-                  }}
-                  crop="fill"
-                  quality="auto"
-                  format="auto"
-                  dpr="auto"
-                />
-              </button>
-            ))}
-          </div>
-        </nav>
-        <div className="tab-content m-img">
-          <div className="tab-pane fade show active">
-            <div className="tp-product-details-nav-main-thumb">
-              <div onClick={() => setIsLightboxOpen(true)}>
-                <Mediumzoom>
-                  <CloudinaryImage
-                    src={activeImg}
-                    alt="product main image"
-                    width={imgWidth}
-                    height={imgHeight}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 416px"
-                    style={{
-                      maxWidth: '100%',
-                      width: 'auto',
-                      height: 'auto',
-                      maxHeight: '480px',
-                      objectFit: 'contain',
-                      margin: '0 auto',
-                      display: 'block',
-                      backgroundColor: '#f8f8f8',
-                      cursor: 'zoom-in',
-                    }}
-                    crop="pad"
-                    quality="auto"
-                    format="auto"
-                    dpr="auto"
-                    priority={true}
-                  />
-                </Mediumzoom>
-              </div>
+      <div className={styles.thumbnailNav}>
+        {imageURLs?.map((url, i) => (
+          <button
+            key={i}
+            className={`${styles.thumbnailBtn} ${
+              url === activeImg ? styles.active : ''
+            }`}
+            onClick={() => handleImageActive(url)}
+          >
+            <CloudinaryImage
+              src={url ?? null}
+              alt="product thumbnail"
+              width={78}
+              height={100}
+              sizes="78px"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                display: 'block',
+              }}
+              crop="fill"
+              quality="auto"
+              format="auto"
+              dpr="auto"
+            />
+          </button>
+        ))}
+      </div>
 
-              <div className="tp-product-badge">
-                {status === 'out-of-stock' && (
-                  <span className="product-hot">out-stock</span>
-                )}
-              </div>
-              {videoId && (
-                <div
-                  onClick={e => {
-                    e.stopPropagation();
-                    setIsVideoOpen(true);
-                  }}
-                  className="tp-product-details-thumb-video"
-                >
-                  <a className="tp-product-details-thumb-video-btn cursor-pointer popup-video">
-                    <i className="fas fa-play"></i>
-                  </a>
-                </div>
-              )}
-            </div>
-          </div>
+      <div className={styles.mainImage}>
+        <div onClick={() => setIsLightboxOpen(true)}>
+          <Mediumzoom>
+            <CloudinaryImage
+              src={activeImg}
+              alt="product main image"
+              width={imgWidth}
+              height={imgHeight}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 580px"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                display: 'block',
+                backgroundColor: '#ffffff',
+                cursor: 'zoom-in',
+              }}
+              crop="pad"
+              quality="auto"
+              format="auto"
+              dpr="auto"
+              priority={true}
+            />
+          </Mediumzoom>
+        </div>
+
+        {status === 'out-of-stock' && (
+          <div className={styles.productBadge}>Out of Stock</div>
+        )}
+
+        <div className={styles.imageActions}>
+          {videoId && (
+            <button
+              onClick={e => {
+                e.stopPropagation();
+                setIsVideoOpen(true);
+              }}
+              className={styles.imageAction}
+              aria-label="Play video"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                />
+                <path
+                  d="M9.5 8.5L16 12L9.5 15.5V8.5Z"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Lightbox */}
       <Lightbox
         open={isLightboxOpen}
         close={() => setIsLightboxOpen(false)}
@@ -129,7 +131,6 @@ const DetailsThumbWrapper = ({
         index={currentSlideIndex}
       />
 
-      {/* Video modal */}
       {videoId && (
         <PopupVideo
           isVideoOpen={isVideoOpen}
@@ -137,31 +138,6 @@ const DetailsThumbWrapper = ({
           videoId={videoId}
         />
       )}
-
-      <style jsx global>{`
-        /* Custom zoom styles */
-        [data-rmiz-modal-overlay] {
-          background-color: rgba(0, 0, 0, 0.8);
-        }
-
-        [data-rmiz-modal-img] {
-          padding: 2rem;
-        }
-
-        .tp-product-details-nav-main-thumb {
-          position: relative;
-          cursor: pointer;
-        }
-
-        /* Responsive styles */
-        @media (max-width: 768px) {
-          [data-rmiz-modal-overlay] {
-            background-color: rgba(0, 0, 0, 0.9);
-          }
-        }
-      `}</style>
     </>
   );
-};
-
-export default DetailsThumbWrapper;
+}
