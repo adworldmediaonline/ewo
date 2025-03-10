@@ -20,7 +20,6 @@ const ProductArea = () => {
   let content = null;
 
   if (isLoading) {
-    console.log('isLoading', isLoading);
     // content = (
     //   <div
     //     className="text-red"
@@ -32,15 +31,12 @@ const ProductArea = () => {
     content = <HomePrdLoader loading={isLoading} />;
   }
   if (!isLoading && isError) {
-    console.log('isError', isError);
     content = <ErrorMsg msg="There was an error" />;
   }
   if (!isLoading && !isError && products?.data?.length === 0) {
-    console.log('products?.data?.length', products?.data?.length);
     content = <ErrorMsg msg="No Products found!" />;
   }
   if (!isLoading && !isError && products?.data?.length > 0) {
-    console.log('products?.data?.length', products?.data?.length);
     let filteredProducts = [...products.data];
 
     // Filter products based on active tab

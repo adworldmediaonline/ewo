@@ -23,7 +23,7 @@ const ProductItem = ({ product, offer_style = false }) => {
     status,
     offerDate,
   } = product || {};
-  console.log(status);
+
   const { cart_products } = useSelector(state => state.cart);
   const { wishlist } = useSelector(state => state.wishlist);
   const isAddedToCart = cart_products.some(prd => prd._id === _id);
