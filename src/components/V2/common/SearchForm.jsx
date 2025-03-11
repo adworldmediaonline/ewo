@@ -6,7 +6,7 @@ import { useCallback, useState, useRef, useEffect } from 'react';
 import { debounce } from 'lodash';
 import { useRouter } from 'next/navigation';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
+const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:7000';
 
 export default function SearchForm() {
   const [suggestions, setSuggestions] = useState([]);
