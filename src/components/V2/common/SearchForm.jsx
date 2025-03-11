@@ -5,6 +5,7 @@ import SearchButton from './SearchButton';
 import { useCallback, useState, useRef, useEffect } from 'react';
 import { debounce } from 'lodash';
 import { useRouter } from 'next/navigation';
+import CloudinaryImage from '@/components/common/CloudinaryImage';
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:7000';
 
@@ -163,15 +164,17 @@ export default function SearchForm({ inputRef }) {
             >
               <div className={styles.suggestionContent}>
                 {suggestion.img ? (
-                  <img
+                  <CloudinaryImage
                     src={suggestion.img}
                     alt={suggestion.title}
+                    width={50}
+                    height={50}
                     className={styles.suggestionImage}
                     loading="lazy"
-                    onError={e => {
-                      e.target.onerror = null;
-                      e.target.src = '/images/placeholder.png';
-                    }}
+                    quality="auto"
+                    format="auto"
+                    crop="fill"
+                    gravity="auto"
                   />
                 ) : (
                   <div className={styles.noImage}>No Image</div>
