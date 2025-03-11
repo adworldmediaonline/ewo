@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:7000';
 
-export default function SearchForm() {
+export default function SearchForm({ inputRef }) {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [searchText, setSearchText] = useState('');
@@ -128,6 +128,7 @@ export default function SearchForm() {
         onSubmit={handleSubmit}
       >
         <input
+          ref={inputRef}
           type="search"
           name="q"
           value={searchText}
