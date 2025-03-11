@@ -11,8 +11,18 @@ import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { add_to_compare } from '@/redux/features/compareSlice';
 
 const ProductItem = ({ product, style_2 = false }) => {
-  const { _id, img, category, title, reviews, price, discount, tags, status } =
-    product || {};
+  const {
+    _id,
+    img,
+    category,
+    title,
+    reviews,
+    price,
+    discount,
+    tags,
+    status,
+    slug,
+  } = product || {};
   const [ratingVal, setRatingVal] = useState(0);
   const { cart_products } = useSelector(state => state.cart);
   const { wishlist } = useSelector(state => state.wishlist);
@@ -48,7 +58,7 @@ const ProductItem = ({ product, style_2 = false }) => {
   return (
     <div className={`tp-product-item-2 ${style_2 ? '' : 'mb-40'}`}>
       <div className="tp-product-thumb-2 p-relative z-index-1 fix">
-        <Link href={`/product-details/${_id}`}>
+        <Link href={`/product/${slug}`}>
           <CloudinaryImage
             src={img}
             alt={title || 'Product image'}
@@ -149,7 +159,7 @@ const ProductItem = ({ product, style_2 = false }) => {
           ))}
         </div>
         <h3 className="tp-product-title-2">
-          <Link href={`/product-details/${_id}`}>{title}</Link>
+          <Link href={`/product/${slug}`}>{title}</Link>
         </h3>
         <div className="tp-product-rating-icon tp-product-rating-icon-2">
           <Rating

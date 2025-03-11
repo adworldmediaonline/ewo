@@ -1,40 +1,43 @@
 'use client';
-import React from "react";
-import Image from "next/image";
-import { useDispatch, useSelector } from "react-redux";
-import Link from "next/link";
+import React from 'react';
+import Image from 'next/image';
+import { useDispatch, useSelector } from 'react-redux';
+import Link from 'next/link';
 // internal
-import { Close, Minus, Plus } from "@/svg";
-import {add_cart_product,quantityDecrement} from "@/redux/features/cartSlice";
-import { remove_wishlist_product } from "@/redux/features/wishlist-slice";
+import { Close, Minus, Plus } from '@/svg';
+import {
+  add_cart_product,
+  quantityDecrement,
+} from '@/redux/features/cartSlice';
+import { remove_wishlist_product } from '@/redux/features/wishlist-slice';
 
 const WishlistItem = ({ product }) => {
   const { _id, img, title, price } = product || {};
-  const { cart_products } = useSelector((state) => state.cart);
-  const isAddToCart = cart_products.find((item) => item._id === _id);
+  const { cart_products } = useSelector(state => state.cart);
+  const isAddToCart = cart_products.find(item => item._id === _id);
   const dispatch = useDispatch();
   // handle add product
-  const handleAddProduct = (prd) => {
+  const handleAddProduct = prd => {
     dispatch(add_cart_product(prd));
   };
   // handle decrement product
-  const handleDecrement = (prd) => {
+  const handleDecrement = prd => {
     dispatch(quantityDecrement(prd));
   };
 
   // handle remove product
-  const handleRemovePrd = (prd) => {
+  const handleRemovePrd = prd => {
     dispatch(remove_wishlist_product(prd));
   };
   return (
     <tr>
       <td className="tp-cart-img">
-        <Link href={`/product-details/${_id}`}>
+        <Link href={`/product/${_id}`}>
           <Image src={img} alt="product img" width={70} height={100} />
         </Link>
       </td>
       <td className="tp-cart-title">
-        <Link href={`/product-details/${_id}`}>{title}</Link>
+        <Link href={`/product/${_id}`}>{title}</Link>
       </td>
       <td className="tp-cart-price">
         <span>${price.toFixed(2)}</span>

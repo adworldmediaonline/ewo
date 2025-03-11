@@ -54,7 +54,7 @@ const CartMiniSidebar = () => {
                 {cart_products.map((item, i) => (
                   <div key={i} className="cartmini__widget-item">
                     <div className="cartmini__thumb">
-                      <Link href={`/product-details/${item._id}`}>
+                      <Link href={`/product/${item._id}`}>
                         <Image
                           src={item.img}
                           width={70}
@@ -65,9 +65,7 @@ const CartMiniSidebar = () => {
                     </div>
                     <div className="cartmini__content">
                       <h5 className="cartmini__title">
-                        <Link href={`/product-details/${item._id}`}>
-                          {item.title}
-                        </Link>
+                        <Link href={`/product/${item._id}`}>{item.title}</Link>
                       </h5>
                       <div className="cartmini__price-wrapper">
                         {item.discount > 0 ? (

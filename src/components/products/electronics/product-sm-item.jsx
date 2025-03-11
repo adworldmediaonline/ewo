@@ -21,7 +21,7 @@ const ProductSmItem = ({ product }) => {
   return (
     <div className="tp-product-sm-item d-flex align-items-center">
       <div className="tp-product-thumb mr-25 fix">
-        <Link href={`/product-details/${_id}`}>
+        <Link href={`/product/${_id}`}>
           <CloudinaryImage
             src={img}
             alt={title || 'Product image'}
@@ -48,7 +48,7 @@ const ProductSmItem = ({ product }) => {
           <a href="#">{category?.name}</a>
         </div>
         <h3 className="tp-product-title">
-          <Link href={`/product-details/${_id}`}>{title}</Link>
+          <Link href={`/product/${_id}`}>{title}</Link>
         </h3>
         <div className="tp-product-rating d-sm-flex align-items-center">
           <div className="tp-product-rating-icon">
