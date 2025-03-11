@@ -90,6 +90,7 @@ const HeaderV2 = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const dropdownButtonRef = useRef(null);
+  const mobileSearchInputRef = useRef(null);
 
   // Fetch categories
   const { data: categories, isLoading: categoriesLoading } =
@@ -174,6 +175,15 @@ const HeaderV2 = () => {
     );
   };
 
+  // Handle mobile search open
+  const handleMobileSearchOpen = () => {
+    setIsMobileSearchOpen(true);
+    // Use setTimeout to ensure the input is mounted before focusing
+    setTimeout(() => {
+      mobileSearchInputRef.current?.focus();
+    }, 100);
+  };
+
   return (
     <div className={styles.headerWrapper}>
       <header
@@ -195,7 +205,7 @@ const HeaderV2 = () => {
             <div className={styles.actions}>
               <button
                 className={styles.searchButton}
-                onClick={() => setIsMobileSearchOpen(true)}
+                onClick={handleMobileSearchOpen}
               >
                 <Search />
               </button>
@@ -311,7 +321,7 @@ const HeaderV2 = () => {
           >
             <Close />
           </button>
-          <SearchForm />
+          <SearchForm inputRef={mobileSearchInputRef} />
         </div>
       </div>
 
