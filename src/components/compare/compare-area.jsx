@@ -1,23 +1,23 @@
 'use client';
-import React from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { useDispatch, useSelector } from "react-redux";
-import { Rating } from "react-simple-star-rating";
+import React from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useDispatch, useSelector } from 'react-redux';
+import { Rating } from 'react-simple-star-rating';
 // internal
-import { add_cart_product } from "@/redux/features/cartSlice";
-import { remove_compare_product } from "@/redux/features/compareSlice";
+import { add_cart_product } from '@/redux/features/cartSlice';
+import { remove_compare_product } from '@/redux/features/compareSlice';
 
 const CompareArea = () => {
-  const { compareItems } = useSelector((state) => state.compare);
+  const { compareItems } = useSelector(state => state.compare);
   const dispatch = useDispatch();
 
   // handle add product
-  const handleAddProduct = (prd) => {
+  const handleAddProduct = prd => {
     dispatch(add_cart_product(prd));
   };
   // handle add product
-  const handleRemoveComparePrd = (prd) => {
+  const handleRemoveComparePrd = prd => {
     dispatch(remove_compare_product(prd));
   };
 
@@ -51,7 +51,7 @@ const CompareArea = () => {
                                 height={176}
                               />
                               <h4 className="tp-compare-product-title">
-                                <Link href={`/product-details/${item._id}`}>
+                                <Link href={`/product/${item._id}`}>
                                   {item.title}
                                 </Link>
                               </h4>
@@ -66,8 +66,8 @@ const CompareArea = () => {
                           <td key={item._id}>
                             <div className="tp-compare-desc">
                               <p>
-                                Lorem ipsum dolor sit amet consectetur adipisicing
-                                elit. Ad, distinctio.
+                                Lorem ipsum dolor sit amet consectetur
+                                adipisicing elit. Ad, distinctio.
                               </p>
                             </div>
                           </td>
@@ -90,7 +90,11 @@ const CompareArea = () => {
                         {compareItems.map(item => (
                           <td key={item._id}>
                             <div className="tp-compare-add-to-cart">
-                              <button onClick={() => handleAddProduct(item)} type="button" className="tp-btn">
+                              <button
+                                onClick={() => handleAddProduct(item)}
+                                type="button"
+                                className="tp-btn"
+                              >
                                 Add to Cart
                               </button>
                             </div>
@@ -106,7 +110,14 @@ const CompareArea = () => {
                               <Rating
                                 allowFraction
                                 size={16}
-                                initialValue={item.reviews.length > 0 ? item.reviews.reduce((acc, review) => acc + review.rating, 0) / item.reviews.length : 0}
+                                initialValue={
+                                  item.reviews.length > 0
+                                    ? item.reviews.reduce(
+                                        (acc, review) => acc + review.rating,
+                                        0
+                                      ) / item.reviews.length
+                                    : 0
+                                }
                                 readonly={true}
                               />
                             </div>
@@ -119,7 +130,14 @@ const CompareArea = () => {
                         {compareItems.map(item => (
                           <td key={item._id}>
                             <div className="tp-compare-remove">
-                              <button onClick={()=>handleRemoveComparePrd({title:item.title,id:item._id })}>
+                              <button
+                                onClick={() =>
+                                  handleRemoveComparePrd({
+                                    title: item.title,
+                                    id: item._id,
+                                  })
+                                }
+                              >
                                 <i className="fal fa-trash-alt"></i>
                               </button>
                             </div>

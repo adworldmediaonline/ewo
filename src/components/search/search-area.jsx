@@ -9,7 +9,7 @@ import { useGetAllProductsQuery } from '@/redux/features/productApi';
 
 export default function SearchArea() {
   const searchParams = useSearchParams();
-  const searchText = searchParams.get('searchText');
+  const searchText = searchParams.get('q');
   const productType = searchParams.get('productType');
   const { data: products, isError, isLoading } = useGetAllProductsQuery();
   const [shortValue, setShortValue] = useState('');
@@ -33,6 +33,7 @@ export default function SearchArea() {
   }
 
   if (!isLoading && isError) {
+    console.log('isError', isError);
     content = <ErrorMsg msg="There was an error" />;
   }
 

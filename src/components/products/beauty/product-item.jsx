@@ -32,7 +32,7 @@ const ProductItem = ({ product, prdCenter = false, primary_style = false }) => {
       } ${prdCenter ? 'text-center' : ''}`}
     >
       <div className="tp-product-thumb-3 mb-15 fix p-relative z-index-1">
-        <Link href={`/product-details/${_id}`}>
+        <Link href={`/product/${_id}`}>
           <CloudinaryImage
             src={img}
             alt="product image"
@@ -132,7 +132,7 @@ const ProductItem = ({ product, prdCenter = false, primary_style = false }) => {
           <span>{tags[1]}</span>
         </div>
         <h3 className="tp-product-title-3">
-          <Link href={`/product-details/${_id}`}>{title}</Link>
+          <Link href={`/product/${_id}`}>{title}</Link>
         </h3>
         <div className="tp-product-price-wrapper-3">
           <span className="tp-product-price-3">${price.toFixed(2)}</span>

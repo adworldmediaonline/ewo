@@ -58,7 +58,7 @@ const ProductItem = ({ product, offer_style = false }) => {
         } tp-product-item transition-3`}
       >
         <div className="tp-product-thumb p-relative fix">
-          <Link href={`/product-details/${_id}`}>
+          <Link href={`/product/${_id}`}>
             <CloudinaryImage
               src={img}
               width={400}
@@ -137,7 +137,7 @@ const ProductItem = ({ product, offer_style = false }) => {
             <a href="#">{category?.name}</a>
           </div>
           <h3 className="tp-product-title">
-            <Link href={`/product-details/${_id}`}>{title}</Link>
+            <Link href={`/product/${_id}`}>{title}</Link>
           </h3>
           <div className="tp-product-rating d-flex align-items-center">
             <div className="tp-product-rating-icon">

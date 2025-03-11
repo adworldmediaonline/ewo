@@ -6,7 +6,8 @@ import ProductDetailsBreadcrumb from '../breadcrumb/product-details-breadcrumb';
 import { useGetProductQuery } from '@/redux/features/productApi';
 import ProductDetailsContent from './product-details-content';
 
-const ProductDetailsArea = ({ id = '6431364df5a812bd37e765ac' }) => {
+const ProductDetailsArea = ({ id }) => {
+  console.log(id);
   const { data: product, isLoading, isError } = useGetProductQuery(id);
   // decide what to render
   let content = null;
@@ -17,6 +18,7 @@ const ProductDetailsArea = ({ id = '6431364df5a812bd37e765ac' }) => {
     content = <ErrorMsg msg="There was an error" />;
   }
   if (!isLoading && !isError && product) {
+    console.log(product);
     content = (
       <>
         <ProductDetailsBreadcrumb

@@ -89,7 +89,7 @@ const PopularProducts = () => {
             className="tp-category-item-2 p-relative z-index-1 text-center"
           >
             <div className="tp-category-thumb-2">
-              <Link href={`/product-details/${item._id}`}>
+              <Link href={`/product/${item._id}`}>
                 <Image
                   src={item.img}
                   alt="product-img"
@@ -101,7 +101,7 @@ const PopularProducts = () => {
             <div className="tp-category-content-2">
               <span>From ${item.price}</span>
               <h3 className="tp-category-title-2">
-                <Link href={`/product-details/${item._id}`}>
+                <Link href={`/product/${item._id}`}>
                   {item.title.substring(0, 15)}
                 </Link>
               </h3>

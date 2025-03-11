@@ -1,10 +1,25 @@
 /**
+ * Get the base URL for API calls
+ * @returns {string} The base URL for API calls
+ */
+export const getBaseUrl = () => {
+  // For client-side requests, use relative URLs
+  if (typeof window !== 'undefined') {
+    return '';
+  }
+  // For server-side requests, use the full URL
+  return process.env.API_BASE_URL || '';
+};
+
+/**
  * API endpoints configuration
  * @constant
  * @type {Object.<string, string>}
  */
 export const apiEndpoint = {
   getShowCategory: '/api/category/show',
+  productSearch: '/api/product-search/search',
+  productSuggestions: '/api/product-search/suggestions',
 };
 
 /**
@@ -63,16 +78,13 @@ export const fetchApi = async ({
   revalidate,
 }) => {
   try {
-    const baseUrl = process.env.API_BASE_URL;
-    if (!baseUrl) {
-      throw new ApiError(500, 'API base URL is not configured');
-    }
-
+    const baseUrl = getBaseUrl();
     const url = `${baseUrl}${endpoint}`;
 
     // Default headers
     const defaultHeaders = {
       'Content-Type': 'application/json',
+      Accept: 'application/json',
       ...headers,
     };
 
@@ -80,6 +92,7 @@ export const fetchApi = async ({
     const options = {
       method,
       headers: defaultHeaders,
+      credentials: 'include', // Include credentials for CORS
     };
 
     // Only add body if it exists
@@ -105,23 +118,35 @@ export const fetchApi = async ({
 
     const response = await fetch(url, options);
 
-    // Handle non-2xx responses
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new ApiError(
-        response.status,
-        errorData.message || 'An error occurred',
-        errorData
-      );
-    }
+    // Always try to parse as JSON first
+    try {
+      const data = await response.json();
 
-    const data = await response.json();
-    return data;
+      // Handle non-2xx responses
+      if (!response.ok) {
+        throw new ApiError(
+          response.status,
+          data.message || 'An error occurred',
+          data
+        );
+      }
+
+      return data;
+    } catch (parseError) {
+      // If JSON parsing fails, throw content type error
+      throw new ApiError(response.status, 'Invalid response format', {
+        url,
+        contentType: response.headers.get('content-type'),
+      });
+    }
   } catch (error) {
     if (error instanceof ApiError) {
       throw error;
     }
-    throw new ApiError(500, error.message || 'An error occurred');
+    throw new ApiError(500, error.message || 'An error occurred', {
+      originalError: error.toString(),
+      endpoint,
+    });
   }
 };
 
@@ -132,7 +157,21 @@ export const fetchApi = async ({
  * @returns {Promise<*>} Response data
  */
 export const get = async (endpoint, options = {}) => {
-  return await fetchApi({ endpoint, method: 'GET', ...options });
+  const { params, ...restOptions } = options;
+  let url = endpoint;
+
+  // Add query parameters if they exist
+  if (params) {
+    const queryString = Object.entries(params)
+      .map(
+        ([key, value]) =>
+          `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+      )
+      .join('&');
+    url = `${endpoint}${queryString ? `?${queryString}` : ''}`;
+  }
+
+  return await fetchApi({ endpoint: url, method: 'GET', ...restOptions });
 };
 
 /**
