@@ -6,8 +6,8 @@ import Link from 'next/link';
 import DOMPurify from 'isomorphic-dompurify';
 import styles from './ProductDetailsContent.module.css';
 // internal
-import { AskQuestion, CompareTwo, WishlistTwo } from '@/svg';
-import DetailsBottomInfo from './details-bottom-info';
+// import { AskQuestion, CompareTwo, WishlistTwo } from '@/svg';
+// import DetailsBottomInfo from './details-bottom-info';
 import ProductDetailsCountdown from './product-details-countdown';
 import ProductQuantity from './product-quantity';
 import { add_cart_product } from '@/redux/features/cartSlice';
@@ -74,8 +74,7 @@ const DetailsWrapper = ({
   // Get truncated description
   const getTruncatedDescription = () => {
     if (!description) return '';
-    const cleanText = DOMPurify.sanitize(description, { ALLOWED_TAGS: [] });
-    return textMore ? cleanText : cleanText.substring(0, 100);
+    return createSanitizedHTML(description);
   };
 
   return (
@@ -106,16 +105,21 @@ const DetailsWrapper = ({
         </div>
       </div>
 
-      <p className={styles.description}>
-        {getTruncatedDescription()}
-        <button
-          onClick={() => setTextMore(!textMore)}
-          className={styles.showMoreBtn}
-          type="button"
-        >
-          {textMore ? 'See less' : '...See more'}
-        </button>
-      </p>
+      <div className={styles.description}>
+        <span
+          className={!textMore ? styles.truncated : ''}
+          dangerouslySetInnerHTML={getTruncatedDescription()}
+        />
+        {description && description.length > 80 && (
+          <button
+            onClick={() => setTextMore(!textMore)}
+            className={styles.showMoreBtn}
+            type="button"
+          >
+            {textMore ? 'See less' : 'See more'}
+          </button>
+        )}
+      </div>
 
       <div className={styles.priceWrapper}>
         {discount > 0 ? (

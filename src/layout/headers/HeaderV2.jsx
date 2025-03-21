@@ -14,71 +14,7 @@ import styles from './HeaderV2.module.css';
 import { useRouter } from 'next/navigation';
 import SearchForm from '@/components/V2/common/SearchForm';
 
-const CategoryCard = ({ category, onCategoryClick }) => {
-  const router = useRouter();
-
-  const handleParentClick = e => {
-    e.stopPropagation();
-    router.push(
-      `/shop?category=${category.parent
-        .toLowerCase()
-        .replace('&', '')
-        .split(' ')
-        .join('-')}`
-    );
-    onCategoryClick();
-  };
-
-  const handleSubCategoryClick = (e, child) => {
-    e.stopPropagation();
-    router.push(
-      `/shop?category=${category.parent
-        .toLowerCase()
-        .replace('&', '')
-        .split(' ')
-        .join('-')}&subCategory=${child
-        .toLowerCase()
-        .replace('&', '')
-        .split(' ')
-        .join('-')}`
-    );
-    onCategoryClick();
-  };
-
-  return (
-    <div className={styles.categoryLink} role="menuitem" tabIndex="0">
-      <button onClick={handleParentClick} className={styles.categoryHeader}>
-        <span className={styles.categoryTitle}>{category.parent}</span>
-        <span className={styles.categoryCount}>
-          {category.products.length} Products
-        </span>
-      </button>
-      {category.children && category.children.length > 0 && (
-        <div className={styles.subCategories}>
-          <ul
-            className={styles.subCategoryList}
-            role="menu"
-            aria-label={`${category.parent} subcategories`}
-          >
-            {category.children.map((child, index) => (
-              <li key={index} role="none">
-                <button
-                  className={styles.subCategoryLink}
-                  onClick={e => handleSubCategoryClick(e, child)}
-                  role="menuitem"
-                >
-                  {child}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
-  );
-};
-
-const HeaderV2 = () => {
+export default function HeaderV2() {
   const { wishlist } = useSelector(state => state.wishlist);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
@@ -91,10 +27,39 @@ const HeaderV2 = () => {
   const dropdownRef = useRef(null);
   const dropdownButtonRef = useRef(null);
   const mobileSearchInputRef = useRef(null);
+  const [isHeaderHidden, setIsHeaderHidden] = useState(false);
+  const prevScrollPos = useRef(0);
 
   // Fetch categories
   const { data: categories, isLoading: categoriesLoading } =
     useGetShowCategoryQuery();
+
+  // Simple and effective scroll handling
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollPos = window.scrollY;
+      const scrollDelta = currentScrollPos - prevScrollPos.current;
+
+      // Don't do anything at the very top of the page
+      if (currentScrollPos < 50) {
+        setIsHeaderHidden(false);
+        prevScrollPos.current = currentScrollPos;
+        return;
+      }
+
+      // Going down = hide, going up = show
+      if (scrollDelta > 10) {
+        setIsHeaderHidden(true);
+      } else if (scrollDelta < -10) {
+        setIsHeaderHidden(false);
+      }
+
+      prevScrollPos.current = currentScrollPos;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleDropdownToggle = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -124,12 +89,13 @@ const HeaderV2 = () => {
     };
   }, []);
 
-  // Close dropdown when navigating
-  const handleCategoryClick = () => {
+  // Handle category navigation
+  const handleCategoryNavigation = category => {
+    router.push(`/category?id=${category._id}`);
     setIsDropdownOpen(false);
   };
 
-  // Handle category route
+  // Handle category route for mobile
   const handleCategoryRoute = title => {
     router.push(
       `/shop?category=${title
@@ -186,126 +152,134 @@ const HeaderV2 = () => {
 
   return (
     <div className={styles.headerWrapper}>
-      <header
-        className={`${styles.header} ${sticky ? styles.headerSticky : ''}`}
+      <div
+        className={`${styles.headerContainer} ${
+          sticky ? styles.stickyActive : ''
+        } ${isHeaderHidden ? styles.headerHidden : ''}`}
       >
-        <div className={styles.container}>
-          <div className={styles.headerTop}>
-            {/* Logo */}
-            <Link href="/">
-              <Image src={logo} alt="logo" width={120} priority />
-            </Link>
-
-            {/* Desktop Search */}
-            <div className={styles.searchContainer}>
-              <SearchForm />
-            </div>
-
-            {/* Action Buttons */}
-            <div className={styles.actions}>
-              <button
-                className={styles.searchButton}
-                onClick={handleMobileSearchOpen}
-              >
-                <Search />
-              </button>
-
-              <Link href="/compare" className={styles.actionButton}>
-                <Compare />
+        <header className={styles.header}>
+          <div className={styles.container}>
+            <div className={styles.headerTop}>
+              {/* Logo */}
+              <Link href="/">
+                <Image src={logo} alt="logo" width={120} priority />
               </Link>
 
-              <Link href="/wishlist" className={styles.actionButton}>
-                <Wishlist />
-                {wishlist.length > 0 && (
-                  <span className={styles.actionBadge}>{wishlist.length}</span>
-                )}
-              </Link>
+              {/* Desktop Search */}
+              <div className={styles.searchContainer}>
+                <SearchForm />
+              </div>
 
-              <button
-                className={styles.actionButton}
-                onClick={() => dispatch(openCartMini())}
-              >
-                <CartTwo />
-                {quantity > 0 && (
-                  <span className={styles.actionBadge}>{quantity}</span>
-                )}
-              </button>
+              {/* Action Buttons */}
+              <div className={styles.actions}>
+                <button
+                  className={styles.searchButton}
+                  onClick={handleMobileSearchOpen}
+                >
+                  <Search />
+                </button>
 
-              <Link href="/profile" className={styles.actionButton}>
-                <User />
-              </Link>
+                <Link href="/compare" className={styles.actionButton}>
+                  <Compare />
+                </Link>
 
-              <button
-                className={`${styles.actionButton} ${styles.mobileMenu}`}
-                onClick={() => setIsMobileNavOpen(true)}
-              >
-                <Menu />
-              </button>
+                <Link href="/wishlist" className={styles.actionButton}>
+                  <Wishlist />
+                  {wishlist.length > 0 && (
+                    <span className={styles.actionBadge}>
+                      {wishlist.length}
+                    </span>
+                  )}
+                </Link>
+
+                <button
+                  className={styles.actionButton}
+                  onClick={() => dispatch(openCartMini())}
+                >
+                  <CartTwo />
+                  {quantity > 0 && (
+                    <span className={styles.actionBadge}>{quantity}</span>
+                  )}
+                </button>
+
+                <Link href="/profile" className={styles.actionButton}>
+                  <User />
+                </Link>
+
+                <button
+                  className={`${styles.actionButton} ${styles.mobileMenu}`}
+                  onClick={() => setIsMobileNavOpen(true)}
+                >
+                  <Menu />
+                </button>
+              </div>
             </div>
           </div>
+        </header>
+
+        {/* Secondary Navigation */}
+        <div className={styles.headerBottom}>
+          <nav className={styles.bottomNav}>
+            <ul className={styles.bottomNavList}>
+              <li>
+                <Link href="/" className={styles.bottomNavLink}>
+                  HOME
+                </Link>
+              </li>
+              <li>
+                <button
+                  ref={dropdownButtonRef}
+                  className={`${styles.bottomNavLink} ${styles.dropdownButton}`}
+                  onClick={handleDropdownToggle}
+                  aria-expanded={isDropdownOpen}
+                  aria-controls="shop-dropdown"
+                  aria-haspopup="true"
+                >
+                  SHOP
+                  <span className={styles.dropdownIcon}>▼</span>
+                  <span className={styles.srOnly}>
+                    {isDropdownOpen ? 'Close menu' : 'Open menu'}
+                  </span>
+                </button>
+
+                <div
+                  id="shop-dropdown"
+                  className={styles.dropdownContent}
+                  aria-hidden={!isDropdownOpen}
+                  role="menu"
+                  onKeyDown={handleDropdownKeyDown}
+                  ref={dropdownRef}
+                >
+                  <ul className={styles.simpleDropdownList} role="none">
+                    {filteredCategories.map(category => (
+                      <li
+                        key={category._id}
+                        className={styles.simpleDropdownItem}
+                        role="none"
+                      >
+                        <button
+                          className={styles.simpleDropdownButton}
+                          onClick={() => handleCategoryNavigation(category)}
+                          role="menuitem"
+                        >
+                          {category.parent}
+                          <span className={styles.productCount}>
+                            ({category.products.length})
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </li>
+              <li>
+                <Link href="/shop" className={styles.bottomNavLink}>
+                  PRODUCTS
+                </Link>
+              </li>
+            </ul>
+          </nav>
         </div>
-      </header>
-
-      {/* Secondary Navigation */}
-      <div className={styles.headerBottom}>
-        <nav className={styles.bottomNav}>
-          <ul className={styles.bottomNavList}>
-            <li>
-              <Link href="/" className={styles.bottomNavLink}>
-                HOME
-              </Link>
-            </li>
-            <li>
-              <button
-                ref={dropdownButtonRef}
-                className={`${styles.bottomNavLink} ${styles.dropdownButton}`}
-                onClick={handleDropdownToggle}
-                aria-expanded={isDropdownOpen}
-                aria-controls="shop-dropdown"
-                aria-haspopup="true"
-              >
-                SHOP
-                <span className={styles.dropdownIcon}>▼</span>
-                <span className={styles.srOnly}>
-                  {isDropdownOpen ? 'Close menu' : 'Open menu'}
-                </span>
-              </button>
-
-              <div
-                id="shop-dropdown"
-                className={styles.dropdownContent}
-                aria-hidden={!isDropdownOpen}
-                role="menu"
-                onKeyDown={handleDropdownKeyDown}
-                ref={dropdownRef}
-              >
-                <ul className={styles.categoryList} role="none">
-                  {filteredCategories.map(category => (
-                    <li
-                      key={category._id}
-                      className={styles.categoryItem}
-                      role="none"
-                      onClick={() => {
-                        handleCategoryRoute(category.parent);
-                        handleCategoryClick();
-                      }}
-                    >
-                      <CategoryCard
-                        category={category}
-                        onCategoryClick={handleCategoryClick}
-                      />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </li>
-            <li>
-              <Link href="/shop" className={styles.bottomNavLink}>
-                PRODUCTS
-              </Link>
-            </li>
-          </ul>
-        </nav>
       </div>
 
       {/* Mobile Search */}
@@ -439,6 +413,4 @@ const HeaderV2 = () => {
       <CartMiniSidebar />
     </div>
   );
-};
-
-export default HeaderV2;
+}

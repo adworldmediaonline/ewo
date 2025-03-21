@@ -10,9 +10,9 @@ export default function SearchButton({ className, isLoading }) {
   return (
     <button className={className} type="submit" disabled={showLoader}>
       {showLoader ? (
-        <ClipLoader size={20} color="var(--tp-theme-primary)" />
+        <ClipLoader size={20} color="white" />
       ) : (
-        <Search />
+        <Search style={{ color: 'white!important' }} />
       )}
     </button>
   );

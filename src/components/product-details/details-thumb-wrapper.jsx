@@ -15,8 +15,8 @@ export default function DetailsThumbWrapper({
   imageURLs,
   handleImageActive,
   activeImg,
-  imgWidth = 416,
-  imgHeight = 480,
+  imgWidth = 600,
+  imgHeight = 600,
   videoId = false,
   status,
 }) {
@@ -44,13 +44,13 @@ export default function DetailsThumbWrapper({
               url === activeImg ? styles.active : ''
             }`}
             onClick={() => handleImageActive(url)}
+            aria-label={`View product image ${i + 1}`}
           >
             <CloudinaryImage
               src={url ?? null}
-              alt="product thumbnail"
-              width={78}
-              height={100}
-              sizes="78px"
+              alt={`Product thumbnail ${i + 1}`}
+              width={80}
+              height={80}
               style={{
                 width: '100%',
                 height: '100%',
@@ -58,6 +58,7 @@ export default function DetailsThumbWrapper({
                 display: 'block',
               }}
               crop="fill"
+              gravity="auto"
               quality="auto"
               format="auto"
               dpr="auto"
@@ -71,13 +72,14 @@ export default function DetailsThumbWrapper({
           <Mediumzoom>
             <CloudinaryImage
               src={activeImg}
-              alt="product main image"
+              alt="Product main image"
               width={imgWidth}
               height={imgHeight}
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 580px"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px"
               style={{
                 width: '100%',
                 height: '100%',
+                maxHeight: '100%',
                 objectFit: 'contain',
                 display: 'block',
                 backgroundColor: '#ffffff',
@@ -106,7 +108,7 @@ export default function DetailsThumbWrapper({
               className={styles.imageAction}
               aria-label="Play video"
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                 <path
                   d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
                   stroke="currentColor"

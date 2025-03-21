@@ -7,9 +7,8 @@ import { useGetProductQuery } from '@/redux/features/productApi';
 import ProductDetailsContent from './product-details-content';
 
 const ProductDetailsArea = ({ id }) => {
-  console.log(id);
   const { data: product, isLoading, isError } = useGetProductQuery(id);
-  // decide what to render
+
   let content = null;
   if (isLoading) {
     content = <PrdDetailsLoader loading={isLoading} />;

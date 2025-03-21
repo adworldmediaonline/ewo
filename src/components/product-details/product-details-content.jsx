@@ -12,12 +12,10 @@ export default function ProductDetailsContent({ productItem }) {
   const [activeImg, setActiveImg] = useState(imageURLs?.[0] || img);
   const dispatch = useDispatch();
 
-  // active image change when img change
   useEffect(() => {
     setActiveImg(imageURLs?.[0] || img);
   }, [img, imageURLs]);
 
-  // handle image active
   const handleImageActive = url => {
     setActiveImg(url);
   };
