@@ -43,22 +43,8 @@ const HeaderTwo = ({ style_2 = false }) => {
               <div className="row align-items-center">
                 <div className="col-md-6">
                   <div className="tp-header-info d-flex align-items-center">
-                    <div className="tp-header-info-item">
-                      {/* <a href="#">
-                        <span>
-                          <Facebook />
-                        </span>{' '}
-                        7500k Followers
-                      </a> */}
-                    </div>
-                    <div className="tp-header-info-item">
-                      {/* <a href="tel:402-763-282-46">
-                        <span>
-                          <PhoneTwo />
-                        </span>{' '}
-                        +(402) 763 282 46
-                      </a> */}
-                    </div>
+                    <div className="tp-header-info-item"></div>
+                    <div className="tp-header-info-item"></div>
                   </div>
                 </div>
                 <div className="col-md-6">
