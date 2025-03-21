@@ -1,6 +1,6 @@
 import React from 'react';
 import { redirect } from 'next/navigation';
-import styles from '../../../styleModules/Category.module.css';
+import styles from './CategoryContent.module.css';
 import ChildCategoryCard from './ChildCategoryCard';
 import HeaderV2 from '@/layout/headers/HeaderV2';
 import Footer from '@/layout/footers/footer';
@@ -21,7 +21,6 @@ async function fetchCategory(id) {
 
 async function CategoryContent({ categoryId }) {
   const category = await fetchCategory(categoryId);
-
   const parentCategory = parentCategoryModified(category.parent);
 
   if (!category.children || category.children.length === 0) {
@@ -39,8 +38,13 @@ async function CategoryContent({ categoryId }) {
           {category.description && (
             <p className={styles.description}>{category.description}</p>
           )}
-
-          <div className={styles.divider}></div>
+          {!category.description && (
+            <p className={styles.description}>
+              Discover our collection of high-quality{' '}
+              {category.parent.toLowerCase()} products designed to meet your
+              needs. Browse our categories below.
+            </p>
+          )}
         </div>
 
         <div className={styles.gridContainer}>
