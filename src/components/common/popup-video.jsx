@@ -1,6 +1,6 @@
 'use client';
-import React from "react";
-import ModalVideo from "react-modal-video";
+import React from 'react';
+import ModalVideo from 'react-modal-video';
 
 const PopupVideo = ({ isVideoOpen, setIsVideoOpen, videoId }) => {
   return (

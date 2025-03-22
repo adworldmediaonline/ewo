@@ -2,9 +2,9 @@
 import React from 'react';
 import PrdDetailsLoader from '../loader/prd-details-loader';
 import ErrorMsg from '../common/error-msg';
-import ProductDetailsBreadcrumb from '../breadcrumb/product-details-breadcrumb';
 import { useGetProductQuery } from '@/redux/features/productApi';
 import ProductDetailsContent from './product-details-content';
+import styles from '../../app/product/[id]/product-details.module.css';
 
 const ProductDetailsArea = ({ id }) => {
   const { data: product, isLoading, isError } = useGetProductQuery(id);
@@ -17,15 +17,23 @@ const ProductDetailsArea = ({ id }) => {
     content = <ErrorMsg msg="There was an error" />;
   }
   if (!isLoading && !isError && product) {
-    console.log(product);
     content = (
-      <>
-        <ProductDetailsBreadcrumb
-          category={product.category.name}
-          title={product.title}
-        />
+      <div className={styles.productContainer}>
+        <div className={styles.breadcrumb}>
+          <div className={styles.breadcrumbContent}>
+            <a href="/" className={styles.breadcrumbLink}>
+              Home
+            </a>
+            <span className={styles.breadcrumbSeparator}>/</span>
+            <a href="/shop" className={styles.breadcrumbLink}>
+              {product.category.name}
+            </a>
+            <span className={styles.breadcrumbSeparator}>/</span>
+            <span className={styles.breadcrumbCurrent}>{product.title}</span>
+          </div>
+        </div>
         <ProductDetailsContent productItem={product} />
-      </>
+      </div>
     );
   }
   return <>{content}</>;
