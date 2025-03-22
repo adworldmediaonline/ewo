@@ -1,122 +1,57 @@
 'use client';
 import React from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Autoplay } from 'swiper/modules';
-import styles from '../../app/product/[id]/product-details.module.css';
-// internal
 import { useGetRelatedProductsQuery } from '@/redux/features/productApi';
+import Link from 'next/link';
 import ProductItem from '../products/fashion/product-item';
-import ErrorMsg from '../common/error-msg';
-import { HomeNewArrivalPrdLoader } from '../loader';
-
-// slider setting
-const slider_setting = {
-  slidesPerView: 4,
-  spaceBetween: 20,
-  navigation: {
-    nextEl: '.related-next',
-    prevEl: '.related-prev',
-  },
-  autoplay: {
-    delay: 5000,
-  },
-  breakpoints: {
-    1200: {
-      slidesPerView: 4,
-    },
-    992: {
-      slidesPerView: 3,
-    },
-    768: {
-      slidesPerView: 2,
-    },
-    576: {
-      slidesPerView: 2,
-    },
-    0: {
-      slidesPerView: 1,
-    },
-  },
-};
+import styles from '../../app/product/[id]/product-details.module.css';
 
 const RelatedProducts = ({ id }) => {
   const { data: products, isError, isLoading } = useGetRelatedProductsQuery(id);
+
   // decide what to render
   let content = null;
 
   if (isLoading) {
-    content = <HomeNewArrivalPrdLoader loading={isLoading} />;
-  }
-  if (!isLoading && isError) {
-    content = <ErrorMsg msg="There was an error" />;
-  }
-  if (!isLoading && !isError && products?.data?.length === 0) {
-    content = <ErrorMsg msg="No Products found!" />;
-  }
-  if (!isLoading && !isError && products?.data?.length > 0) {
-    const product_items = products.data;
     content = (
-      <div className={styles.productsContainer}>
-        <Swiper
-          {...slider_setting}
-          modules={[Autoplay, Navigation]}
-          className={styles.productsSlider}
-        >
-          {product_items.map(item => (
-            <SwiperSlide key={item._id}>
-              <div className={styles.productCard}>
-                <ProductItem product={item} />
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-
-        <div className={styles.sliderNavigation}>
-          <button
-            className={`${styles.sliderButton} related-prev`}
-            aria-label="Previous slide"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M11.6667 15.8333L5.83333 10L11.6667 4.16667"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-          <button
-            className={`${styles.sliderButton} related-next`}
-            aria-label="Next slide"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M8.33333 4.16667L14.1667 10L8.33333 15.8333"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
+      <div className="container">
+        <div className="row">
+          <div className="col-xl-12">
+            <div className="tp-product-loader text-center">
+              <span>Loading...</span>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
-  return <>{content}</>;
+
+  if (!isLoading && isError) {
+    content = <p>Error fetching products</p>;
+  }
+
+  if (!isLoading && !isError && products?.data?.length === 0) {
+    content = <p>No Products found</p>;
+  }
+
+  if (!isLoading && !isError && products?.data?.length > 0) {
+    // filter products
+    const relatedProducts = products.data.filter(p => p._id !== id).slice(0, 4);
+
+    content = (
+      <div className={styles.relatedProducts}>
+        <h2 className={styles.sectionTitle}>Related Products</h2>
+        <div className={styles.productsGrid}>
+          {relatedProducts.map(product => (
+            <div key={product._id} className={styles.productCard}>
+              <ProductItem product={product} />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return content;
 };
 
 export default RelatedProducts;

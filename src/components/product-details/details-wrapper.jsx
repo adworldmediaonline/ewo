@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { Rating } from 'react-simple-star-rating';
 import { useDispatch } from 'react-redux';
-import Link from 'next/link';
 import DOMPurify from 'isomorphic-dompurify';
 import ShowMoreText from 'react-show-more-text';
 import styles from '../../app/product/[id]/product-details.module.css';
@@ -12,7 +11,11 @@ import { add_cart_product } from '@/redux/features/cartSlice';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { add_to_compare } from '@/redux/features/compareSlice';
 
-const DetailsWrapper = ({ productItem, handleImageActive, activeImg }) => {
+export default function DetailsWrapper({
+  productItem,
+  handleImageActive,
+  activeImg,
+}) {
   const {
     sku,
     title,
@@ -259,6 +262,4 @@ const DetailsWrapper = ({ productItem, handleImageActive, activeImg }) => {
       )}
     </>
   );
-};
-
-export default DetailsWrapper;
+}
