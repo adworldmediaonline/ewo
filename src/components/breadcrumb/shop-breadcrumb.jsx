@@ -1,26 +1,20 @@
 import React from 'react';
+import Link from 'next/link';
+import styles from '../../app/shop/shop.module.css';
 
-const ShopBreadcrumb = ({ title, subtitle }) => {
+const ShopBreadcrumb = ({ title = 'Shop', subtitle }) => {
   return (
-    <>
-      <section className="breadcrumb__area include-bg pt-30 pb-30">
-        <div className="container">
-          <div className="row">
-            <div className="col-xxl-12">
-              <div className="breadcrumb__content p-relative z-index-1">
-                <h3 className="breadcrumb__title">{title}</h3>
-                <div className="breadcrumb__list">
-                  <span>
-                    <a href="#">Home</a>
-                  </span>
-                  <span>{subtitle}</span>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div className={styles.breadcrumb}>
+      <div className={styles.breadcrumbContainer}>
+        <div className={styles.breadcrumbLinks}>
+          <Link href="/" className={styles.breadcrumbLink}>
+            Home
+          </Link>
+          <span className={styles.breadcrumbSeparator}>›</span>
+          <span className={styles.breadcrumbCurrent}>{subtitle}</span>
         </div>
-      </section>
-    </>
+      </div>
+    </div>
   );
 };
 

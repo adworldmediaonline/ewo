@@ -86,55 +86,25 @@ const ProductItem = ({ product, style_2 = false }) => {
           )}
         </div>
         {/* product action */}
-        <div className="tp-product-action-2 tp-product-action-blackStyle">
+        <div className="tp-product-action-2">
           <div className="tp-product-action-item-2 d-flex flex-column">
-            {isAddedToCart ? (
-              <Link
-                href="/cart"
-                className={`tp-product-action-btn-2 ${
-                  isAddedToCart ? 'active' : ''
-                } tp-product-add-cart-btn`}
-              >
-                <Cart />
-                <span className="tp-product-tooltip tp-product-tooltip-right">
-                  View Cart
-                </span>
-              </Link>
-            ) : (
-              <button
-                type="button"
-                onClick={() => handleAddProduct(product)}
-                className={`tp-product-action-btn-2 ${
-                  isAddedToCart ? 'active' : ''
-                } tp-product-add-cart-btn`}
-                disabled={status === 'out-of-stock'}
-              >
-                <Cart />
-                <span className="tp-product-tooltip tp-product-tooltip-right">
-                  Add to Cart
-                </span>
-              </button>
-            )}
             <button
-              onClick={() => dispatch(handleProductModal(product))}
+              type="button"
               className="tp-product-action-btn-2 tp-product-quick-view-btn"
+              onClick={() => dispatch(handleProductModal(product))}
             >
               <QuickView />
-              <span className="tp-product-tooltip tp-product-tooltip-right">
-                Quick View
-              </span>
+              <span className="tp-product-tooltip">Quick View</span>
             </button>
             <button
-              disabled={status === 'out-of-stock'}
+              type="button"
               onClick={() => handleWishlistProduct(product)}
-              className={`tp-product-action-btn-2 ${
+              className={`tp-product-action-btn-2 tp-product-add-to-wishlist-btn ${
                 isAddedToWishlist ? 'active' : ''
-              } tp-product-add-to-wishlist-btn`}
+              }`}
             >
               <Wishlist />
-              <span className="tp-product-tooltip tp-product-tooltip-right">
-                Add To Wishlist
-              </span>
+              <span className="tp-product-tooltip">Add To Wishlist</span>
             </button>
             <button
               disabled={status === 'out-of-stock'}
@@ -172,17 +142,14 @@ const ProductItem = ({ product, style_2 = false }) => {
         <div className="tp-product-price-wrapper-2">
           {discount > 0 ? (
             <>
-              <span className="tp-product-price-2 new-price">
-                ${price.toFixed(2)}{' '}
-              </span>
-              <span className="tp-product-price-2 old-price">
-                {' '}
-                $
-                {(
-                  Number(price) -
-                  (Number(price) * Number(discount)) / 100
-                ).toFixed(2)}
-              </span>
+              <div className="tp-product-price-info">
+                <span className="tp-product-price-2 new-price">
+                  ${(price - (price * discount) / 100).toFixed(2)}
+                </span>
+                <span className="tp-product-price-2 old-price">
+                  ${price.toFixed(2)}
+                </span>
+              </div>
             </>
           ) : (
             <span className="tp-product-price-2 new-price">

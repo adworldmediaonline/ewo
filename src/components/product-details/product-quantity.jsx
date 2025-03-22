@@ -1,33 +1,49 @@
 'use client';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import styles from '../../app/product/[id]/product-details.module.css';
 // internal
 import { Minus, Plus } from '@/svg';
 import { decrement, increment } from '@/redux/features/cartSlice';
 
 const ProductQuantity = () => {
-  const { orderQuantity } = useSelector((state) => state.cart);
+  const { orderQuantity } = useSelector(state => state.cart);
   const dispatch = useDispatch();
+
   // handleIncrease
   const handleIncrease = () => {
     dispatch(increment());
   };
+
   // handleDecrease
   const handleDecrease = () => {
     dispatch(decrement());
   };
+
   return (
-    <div className="tp-product-details-quantity">
-    <div className="tp-product-quantity mb-15 mr-15">
-      <span className="tp-cart-minus" onClick={handleDecrease}>
-        <Minus />
-      </span>
-      <input className="tp-cart-input" type="text" readOnly value={orderQuantity} />
-      <span className="tp-cart-plus" onClick={handleIncrease}>
-        <Plus />
-      </span>
-    </div>
-  </div>
+    <>
+      <button
+        className={styles.quantityButton}
+        onClick={handleDecrease}
+        aria-label="Decrease quantity"
+      >
+        -
+      </button>
+      <input
+        className={styles.quantityInput}
+        type="text"
+        readOnly
+        value={orderQuantity}
+        aria-label="Product quantity"
+      />
+      <button
+        className={styles.quantityButton}
+        onClick={handleIncrease}
+        aria-label="Increase quantity"
+      >
+        +
+      </button>
+    </>
   );
 };
 

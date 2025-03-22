@@ -1,7 +1,6 @@
 'use client';
 import React, { useState } from 'react';
 import Pagination from '@/ui/Pagination';
-import ProductItem from '../products/fashion/product-item';
 import CategoryFilter from './shop-filter/category-filter';
 import PriceFilter from './shop-filter/price-filter';
 import StatusFilter from './shop-filter/status-filter';
@@ -10,6 +9,8 @@ import ShopListItem from './shop-list-item';
 import ShopTopLeft from './shop-top-left';
 import ShopTopRight from './shop-top-right';
 import ResetButton from './shop-filter/reset-button';
+import styles from '../../app/shop/shop.module.css';
+import ProductItemWrapper from './product-item-wrapper';
 
 const ShopContent = ({
   all_products,
@@ -35,148 +36,108 @@ const ShopContent = ({
   const maxPrice = all_products.reduce((max, product) => {
     return product.price > max ? product.price : max;
   }, 0);
-  return (
-    <>
-      <section className="tp-shop-area pb-120">
-        <div className="container">
-          <div className="row">
-            {!shop_right && !hidden_sidebar && (
-              <div className="col-xl-3 col-lg-4">
-                <div className="tp-shop-sidebar mr-10">
-                  {/* filter */}
-                  <PriceFilter
-                    priceFilterValues={priceFilterValues}
-                    maxPrice={maxPrice}
-                  />
-                  {/* status */}
-                  <StatusFilter setCurrPage={setCurrPage} />
-                  {/* categories */}
-                  <CategoryFilter setCurrPage={setCurrPage} />
-                  {/* product rating */}
-                  <TopRatedProducts />
-                  {/* reset filter */}
-                  <ResetButton
-                    setPriceValues={setPriceValue}
-                    maxPrice={maxPrice}
-                  />
-                </div>
-              </div>
-            )}
 
-            <div
-              className={`${
-                hidden_sidebar ? 'col-xl-12 col-lg-12' : 'col-xl-9 col-lg-8'
-              }`}
-            >
-              <div className="tp-shop-main-wrapper">
-                <div className="tp-shop-top mb-45">
-                  <div className="row">
-                    <div className="col-xl-6">
-                      <ShopTopLeft
-                        showing={
-                          products.length === 0
-                            ? 0
-                            : filteredRows.slice(
-                                pageStart,
-                                pageStart + countOfPage
-                              ).length
-                        }
-                        total={all_products.length}
-                      />
-                    </div>
-                    <div className="col-xl-6">
-                      <ShopTopRight selectHandleFilter={selectHandleFilter} />
-                    </div>
-                  </div>
-                </div>
-                {products.length === 0 && <h2>No products found</h2>}
-                {products.length > 0 && (
-                  <div className="tp-shop-items-wrapper tp-shop-item-primary">
-                    <div className="tab-content" id="productTabContent">
-                      <div
-                        className="tab-pane fade show active"
-                        id="grid-tab-pane"
-                        role="tabpanel"
-                        aria-labelledby="grid-tab"
-                        tabIndex="0"
-                      >
-                        <div className="row">
-                          {filteredRows
-                            .slice(pageStart, pageStart + countOfPage)
-                            .map((item, i) => (
-                              <div
-                                key={i}
-                                className="col-xl-3 col-md-6 col-sm-6"
-                              >
-                                <ProductItem product={item} />
-                              </div>
-                            ))}
-                        </div>
-                      </div>
-                      <div
-                        className="tab-pane fade"
-                        id="list-tab-pane"
-                        role="tabpanel"
-                        aria-labelledby="list-tab"
-                        tabIndex="0"
-                      >
-                        <div className="tp-shop-list-wrapper tp-shop-item-primary mb-70">
-                          <div className="row">
-                            <div className="col-xl-12">
-                              {filteredRows
-                                .slice(pageStart, pageStart + countOfPage)
-                                .map((item, i) => (
-                                  <ShopListItem key={i} product={item} />
-                                ))}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {products.length > 0 && (
-                  <div className="tp-shop-pagination mt-20">
-                    <div className="tp-pagination">
-                      <Pagination
-                        items={products}
-                        countOfPage={12}
-                        paginatedData={paginatedData}
-                        currPage={currPage}
-                        setCurrPage={setCurrPage}
-                      />
-                    </div>
-                  </div>
-                )}
+  return (
+    <div className={styles.shopSection}>
+      <div className={styles.shopContentContainer}>
+        <div className={styles.shopLayout}>
+          {!shop_right && !hidden_sidebar && (
+            <div className={styles.shopSidebar}>
+              <div className={styles.filterSection}>
+                {/* filter */}
+                <PriceFilter
+                  priceFilterValues={priceFilterValues}
+                  maxPrice={maxPrice}
+                />
+                {/* status */}
+                <StatusFilter setCurrPage={setCurrPage} />
+                {/* categories */}
+                <CategoryFilter setCurrPage={setCurrPage} />
+                {/* product rating */}
+                <TopRatedProducts />
+                {/* reset filter */}
+                <ResetButton
+                  setPriceValues={setPriceValue}
+                  maxPrice={maxPrice}
+                />
+              </div>
+            </div>
+          )}
+
+          <div className={styles.shopMainContent}>
+            <div className={styles.shopTopBar}>
+              <div>
+                <ShopTopLeft
+                  showing={
+                    products.length === 0
+                      ? 0
+                      : filteredRows.slice(pageStart, pageStart + countOfPage)
+                          .length
+                  }
+                  total={all_products.length}
+                />
+              </div>
+              <div>
+                <ShopTopRight selectHandleFilter={selectHandleFilter} />
               </div>
             </div>
 
-            {shop_right && (
-              <div className="col-xl-3 col-lg-4">
-                <div className="tp-shop-sidebar mr-10">
-                  {/* filter */}
-                  <PriceFilter
-                    priceFilterValues={priceFilterValues}
-                    maxPrice={maxPrice}
-                  />
-                  {/* status */}
-                  <StatusFilter setCurrPage={setCurrPage} />
-                  {/* categories */}
-                  <CategoryFilter setCurrPage={setCurrPage} />
-                  {/* product rating */}
-                  <TopRatedProducts />
-                  {/* reset filter */}
-                  <ResetButton
-                    setPriceValues={setPriceValue}
-                    maxPrice={maxPrice}
-                  />
+            {products.length === 0 && (
+              <div className={styles.noProducts}>No products found</div>
+            )}
+
+            {products.length > 0 && (
+              <div className={styles.productsWrapper}>
+                <div className={styles.productGrid}>
+                  {filteredRows
+                    .slice(pageStart, pageStart + countOfPage)
+                    .map((item, i) => (
+                      <div key={i} className={styles.productGridItem}>
+                        <ProductItemWrapper product={item} />
+                      </div>
+                    ))}
                 </div>
               </div>
             )}
+
+            {products.length > 0 && (
+              <div className={styles.pagination}>
+                <Pagination
+                  items={products}
+                  countOfPage={12}
+                  paginatedData={paginatedData}
+                  currPage={currPage}
+                  setCurrPage={setCurrPage}
+                />
+              </div>
+            )}
           </div>
+
+          {shop_right && (
+            <div className={styles.shopSidebar}>
+              <div className={styles.filterSection}>
+                {/* filter */}
+                <PriceFilter
+                  priceFilterValues={priceFilterValues}
+                  maxPrice={maxPrice}
+                />
+                {/* status */}
+                <StatusFilter setCurrPage={setCurrPage} />
+                {/* categories */}
+                <CategoryFilter setCurrPage={setCurrPage} />
+                {/* product rating */}
+                <TopRatedProducts />
+                {/* reset filter */}
+                <ResetButton
+                  setPriceValues={setPriceValue}
+                  maxPrice={maxPrice}
+                />
+              </div>
+            </div>
+          )}
         </div>
-      </section>
-    </>
+      </div>
+    </div>
   );
 };
 

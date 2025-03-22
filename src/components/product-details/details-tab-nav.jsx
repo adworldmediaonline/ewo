@@ -1,9 +1,9 @@
 'use client';
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import DOMPurify from 'isomorphic-dompurify';
 import ReviewForm from '../forms/review-form';
 import ReviewItem from './review-item';
-import styles from './ProductDetailsContent.module.css';
+import styles from '../../app/product/[id]/product-details.module.css';
 
 const DetailsTabNav = ({ product }) => {
   const { _id, description, additionalInformation, reviews } = product || {};
@@ -14,37 +14,39 @@ const DetailsTabNav = ({ product }) => {
   };
 
   return (
-    <div className={styles.tabContentInner}>
-      <div className={styles.tabList}>
+    <div className={styles.tabsContainer}>
+      <div className={styles.tabsHeader}>
         <button
-          className={`${styles.tabButton} ${
-            activeTab === 'desc' ? styles.active : ''
+          className={`${styles.tab} ${
+            activeTab === 'desc' ? styles.tabActive : ''
           }`}
           onClick={() => handleTabChange('desc')}
         >
           Description
         </button>
+        {additionalInformation && additionalInformation.length > 0 && (
+          <button
+            className={`${styles.tab} ${
+              activeTab === 'additional' ? styles.tabActive : ''
+            }`}
+            onClick={() => handleTabChange('additional')}
+          >
+            Additional Information
+          </button>
+        )}
         <button
-          className={`${styles.tabButton} ${
-            activeTab === 'additional' ? styles.active : ''
-          }`}
-          onClick={() => handleTabChange('additional')}
-        >
-          Additional Information
-        </button>
-        <button
-          className={`${styles.tabButton} ${
-            activeTab === 'review' ? styles.active : ''
+          className={`${styles.tab} ${
+            activeTab === 'review' ? styles.tabActive : ''
           }`}
           onClick={() => handleTabChange('review')}
         >
-          Reviews ({reviews.length})
+          Reviews ({reviews?.length || 0})
         </button>
       </div>
 
       <div className={styles.tabContent}>
         {activeTab === 'desc' && (
-          <div>
+          <div className={styles.fadeIn}>
             {description ? (
               <div
                 dangerouslySetInnerHTML={{
@@ -58,7 +60,7 @@ const DetailsTabNav = ({ product }) => {
         )}
 
         {activeTab === 'additional' && (
-          <div>
+          <div className={styles.fadeIn}>
             {additionalInformation && additionalInformation.length > 0 ? (
               <table className={styles.additionalTable}>
                 <tbody>
@@ -77,13 +79,15 @@ const DetailsTabNav = ({ product }) => {
         )}
 
         {activeTab === 'review' && (
-          <div className={styles.reviewsContainer}>
+          <div className={`${styles.reviewsContainer} ${styles.fadeIn}`}>
             <div className={styles.reviewsList}>
-              <h3 className={styles.reviewsTitle}>
-                {reviews.length > 0 ? 'Customer Reviews' : 'No Reviews Yet'}
+              <h3>
+                {reviews && reviews.length > 0
+                  ? 'Customer Reviews'
+                  : 'No Reviews Yet'}
               </h3>
 
-              {reviews.length > 0 ? (
+              {reviews && reviews.length > 0 ? (
                 reviews.map(item => <ReviewItem key={item._id} review={item} />)
               ) : (
                 <p>Be the first to review this product!</p>
@@ -91,8 +95,8 @@ const DetailsTabNav = ({ product }) => {
             </div>
 
             <div className={styles.reviewForm}>
-              <h3 className={styles.reviewFormTitle}>Add a Review</h3>
-              <p className={styles.reviewFormSubtitle}>
+              <h3>Add a Review</h3>
+              <p>
                 Your email address will not be published. Required fields are
                 marked *
               </p>

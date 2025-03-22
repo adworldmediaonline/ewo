@@ -4,6 +4,8 @@ import Footer from '@/layout/footers/footer';
 import ShopBreadcrumb from '@/components/breadcrumb/shop-breadcrumb';
 import ShopArea from '@/components/shop/shop-area';
 import HeaderV2 from '@/layout/headers/HeaderV2';
+import styles from './shop.module.css';
+
 export const metadata = {
   title: 'EWO- Shop Page',
 };
@@ -13,7 +15,13 @@ export default function ShopPage() {
     <Wrapper>
       <HeaderV2 />
       <ShopBreadcrumb subtitle="Shop" />
-      <ShopArea />
+      <div className={styles.shopContainer}>
+        <main className={styles.main}>
+          <div className={styles.shopAreaWrapper}>
+            <ShopArea />
+          </div>
+        </main>
+      </div>
       <Footer primary_style={true} />
     </Wrapper>
   );
