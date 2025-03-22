@@ -1,21 +1,22 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import styles from '../../app/product/[id]/product-details.module.css';
-import DetailsThumbWrapper from './details-thumb-wrapper';
 import DetailsWrapper from './details-wrapper';
-import DetailsTabNav from './details-tab-nav';
+import DetailsBottomInfo from './details-bottom-info';
 import RelatedProducts from './related-products';
+import DetailsThumbWrapper from './details-thumb-wrapper';
+import styles from '../../app/product/[id]/product-details.module.css';
 
 export default function ProductDetailsContent({ productItem }) {
-  const { _id, img, imageURLs, videoId, status } = productItem || {};
+  const { _id, img, imageURLs, videoId, status, title } = productItem || {};
   const [activeImg, setActiveImg] = useState(imageURLs?.[0] || img);
 
   useEffect(() => {
     setActiveImg(imageURLs?.[0] || img);
   }, [img, imageURLs]);
 
-  const handleImageActive = url => {
-    setActiveImg(url);
+  // handle image active
+  const handleImageActive = img => {
+    setActiveImg(img);
   };
 
   return (
@@ -32,23 +33,17 @@ export default function ProductDetailsContent({ productItem }) {
             status={status}
           />
         </div>
-
         <div className={styles.productInfo}>
           <DetailsWrapper
             productItem={productItem}
             handleImageActive={handleImageActive}
             activeImg={activeImg}
-            detailsBottom={true}
           />
         </div>
       </div>
 
-      <div className={styles.tabsContainer}>
-        <DetailsTabNav product={productItem} />
-      </div>
-
-      <div className={styles.relatedProducts}>
-        <h2 className={styles.sectionTitle}>Related Products</h2>
+      <div className={styles.productAdditionalInfo}>
+        <DetailsBottomInfo productItem={productItem} />
         <RelatedProducts id={_id} />
       </div>
     </>
