@@ -107,18 +107,22 @@ export default function DetailsThumbWrapper({
                 aria-label={`View product image ${i + 1}`}
                 type="button"
               >
-                <CloudinaryImage
-                  src={url ?? null}
-                  alt={`Product thumbnail ${i + 1}`}
-                  width={80}
-                  height={80}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'contain',
-                    display: 'block',
-                  }}
-                />
+                <div className={styles.thumbnailImageWrapper}>
+                  <CloudinaryImage
+                    src={url ?? null}
+                    alt={`Product thumbnail ${i + 1}`}
+                    width={80}
+                    height={80}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'contain',
+                      display: 'block',
+                    }}
+                    crop="pad"
+                    gravity="center"
+                  />
+                </div>
               </button>
             ))}
           </div>
@@ -130,21 +134,25 @@ export default function DetailsThumbWrapper({
             className={styles.mainImage}
             onClick={() => setIsLightboxOpen(true)}
           >
-            <CloudinaryImage
-              src={activeImg}
-              alt="Product main image"
-              width={imgWidth}
-              height={imgHeight}
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px"
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'contain',
-                display: 'block',
-                cursor: 'zoom-in',
-              }}
-              priority={true}
-            />
+            <div className={styles.mainImageContainer}>
+              <CloudinaryImage
+                src={activeImg}
+                alt="Product main image"
+                width={imgWidth}
+                height={imgHeight}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
+                  display: 'block',
+                  cursor: 'zoom-in',
+                }}
+                priority={true}
+                crop="pad"
+                gravity="center"
+              />
+            </div>
           </div>
 
           <div className={styles.zoomHint}>
@@ -210,18 +218,22 @@ export default function DetailsThumbWrapper({
                 aria-label={`View product image ${i + 1}`}
                 type="button"
               >
-                <CloudinaryImage
-                  src={url ?? null}
-                  alt={`Product thumbnail ${i + 1}`}
-                  width={80}
-                  height={80}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'contain',
-                    display: 'block',
-                  }}
-                />
+                <div className={styles.thumbnailImageWrapper}>
+                  <CloudinaryImage
+                    src={url ?? null}
+                    alt={`Product thumbnail ${i + 1}`}
+                    width={80}
+                    height={80}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'contain',
+                      display: 'block',
+                    }}
+                    crop="pad"
+                    gravity="center"
+                  />
+                </div>
               </button>
             ))}
           </div>
