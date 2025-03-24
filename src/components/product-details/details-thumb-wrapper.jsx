@@ -1,6 +1,9 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
 import CloudinaryImage from '../common/CloudinaryImage';
+import Lightbox from 'yet-another-react-lightbox';
+import Zoom from 'yet-another-react-lightbox/plugins/zoom';
+import 'yet-another-react-lightbox/styles.css';
 import styles from '../../app/product/[id]/product-details.module.css';
 
 export default function DetailsThumbWrapper({
@@ -11,15 +14,36 @@ export default function DetailsThumbWrapper({
   imgHeight = 580,
   status,
 }) {
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const thumbnailsRef = useRef(null);
   const verticalThumbnailsRef = useRef(null);
+
+  // Prepare slides for lightbox
+  const slides =
+    imageURLs?.length > 0
+      ? imageURLs.map(url => ({
+          src: url,
+          width: imgWidth * 2,
+          height: imgHeight * 2,
+        }))
+      : [{ src: activeImg, width: imgWidth * 2, height: imgHeight * 2 }];
+
+  // Find current slide index
+  const currentSlideIndex = slides.findIndex(slide => slide.src === activeImg);
 
   // Handle thumbnail scroll
   const scrollThumbnails = direction => {
     if (thumbnailsRef.current) {
       const container = thumbnailsRef.current;
-      const scrollAmount = direction === 'left' ? -120 : 120;
-      container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      const thumbnailWidth = 80; // Width of thumbnail + gap
+      const scrollAmount =
+        direction === 'left' ? -thumbnailWidth : thumbnailWidth;
+      const currentScroll = container.scrollLeft;
+
+      container.scrollTo({
+        left: currentScroll + scrollAmount,
+        behavior: 'smooth',
+      });
     }
   };
 
@@ -36,7 +60,11 @@ export default function DetailsThumbWrapper({
           activeThumb.offsetLeft -
           container.offsetWidth / 2 +
           activeThumb.offsetWidth / 2;
-        container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+
+        container.scrollTo({
+          left: scrollLeft,
+          behavior: 'smooth',
+        });
       }
     }
 
@@ -51,7 +79,11 @@ export default function DetailsThumbWrapper({
           activeThumb.offsetTop -
           container.offsetHeight / 2 +
           activeThumb.offsetHeight / 2;
-        container.scrollTo({ top: scrollTop, behavior: 'smooth' });
+
+        container.scrollTo({
+          top: scrollTop,
+          behavior: 'smooth',
+        });
       }
     }
   }, [activeImg, styles.thumbnailActive]);
@@ -73,6 +105,7 @@ export default function DetailsThumbWrapper({
                 }`}
                 onClick={() => handleImageActive(url)}
                 aria-label={`View product image ${i + 1}`}
+                type="button"
               >
                 <CloudinaryImage
                   src={url ?? null}
@@ -93,7 +126,10 @@ export default function DetailsThumbWrapper({
 
         {/* Main image container */}
         <div className={styles.mainImageWrapper}>
-          <div className={styles.mainImage}>
+          <div
+            className={styles.mainImage}
+            onClick={() => setIsLightboxOpen(true)}
+          >
             <CloudinaryImage
               src={activeImg}
               alt="Product main image"
@@ -105,9 +141,29 @@ export default function DetailsThumbWrapper({
                 height: '100%',
                 objectFit: 'contain',
                 display: 'block',
+                cursor: 'zoom-in',
               }}
               priority={true}
             />
+          </div>
+
+          <div className={styles.zoomHint}>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              <line x1="11" y1="8" x2="11" y2="14" />
+              <line x1="8" y1="11" x2="14" y2="11" />
+            </svg>
+            <span>Click to zoom</span>
           </div>
 
           {status === 'out-of-stock' && (
@@ -126,6 +182,7 @@ export default function DetailsThumbWrapper({
               className={`${styles.thumbnailArrow} ${styles.thumbnailArrowLeft}`}
               onClick={() => scrollThumbnails('left')}
               aria-label="Scroll thumbnails left"
+              type="button"
             >
               <svg
                 width="16"
@@ -151,6 +208,7 @@ export default function DetailsThumbWrapper({
                 }`}
                 onClick={() => handleImageActive(url)}
                 aria-label={`View product image ${i + 1}`}
+                type="button"
               >
                 <CloudinaryImage
                   src={url ?? null}
@@ -173,6 +231,7 @@ export default function DetailsThumbWrapper({
               className={`${styles.thumbnailArrow} ${styles.thumbnailArrowRight}`}
               onClick={() => scrollThumbnails('right')}
               aria-label="Scroll thumbnails right"
+              type="button"
             >
               <svg
                 width="16"
@@ -190,6 +249,21 @@ export default function DetailsThumbWrapper({
           )}
         </div>
       )}
+
+      {/* Lightbox component */}
+      <Lightbox
+        open={isLightboxOpen}
+        close={() => setIsLightboxOpen(false)}
+        slides={slides}
+        plugins={[Zoom]}
+        index={currentSlideIndex > -1 ? currentSlideIndex : 0}
+        animation={{ zoom: 500 }}
+        className={styles.customLightbox}
+        zoom={{
+          maxZoomPixelRatio: 3,
+          zoomInMultiplier: 2,
+        }}
+      />
     </div>
   );
 }
