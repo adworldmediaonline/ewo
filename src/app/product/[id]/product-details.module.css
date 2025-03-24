@@ -567,6 +567,11 @@
   line-height: 1.6;
   color: #495057;
   padding: 0.75rem 0;
+  font-size: 1rem;
+}
+
+.tabContent p {
+  font-size: 1rem;
 }
 
 /* Product Reviews */

@@ -7,7 +7,7 @@ import styles from '../../app/product/[id]/product-details.module.css';
 
 const DetailsTabNav = ({ product }) => {
   const { _id, description, additionalInformation, reviews } = product || {};
-  const [activeTab, setActiveTab] = useState('review');
+  const [activeTab, setActiveTab] = useState('desc');
 
   const handleTabChange = tabId => {
     setActiveTab(tabId);
@@ -16,14 +16,14 @@ const DetailsTabNav = ({ product }) => {
   return (
     <div className={styles.tabsContainer}>
       <div className={styles.tabsHeader}>
-        {/* <button
+        <button
           className={`${styles.tab} ${
             activeTab === 'desc' ? styles.tabActive : ''
           }`}
           onClick={() => handleTabChange('desc')}
         >
           Description
-        </button> */}
+        </button>
         {additionalInformation && additionalInformation.length > 0 && (
           <button
             className={`${styles.tab} ${
