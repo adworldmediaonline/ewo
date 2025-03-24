@@ -346,12 +346,16 @@
 }
 
 .productDescription {
-  font-size: 0.95rem;
+  font-size: 1rem;
   line-height: 1.6;
   color: #495057;
   margin-bottom: 1rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid #eaeaea;
+}
+
+.productDescription p {
+  font-size: 1rem;
 }
 
 /* Color Options */
@@ -764,7 +768,7 @@
 
 .showMoreText {
   width: 100%;
-  font-size: 0.95rem;
+  font-size: 1rem;
   line-height: 1.6;
   color: #495057;
 }
@@ -773,7 +777,7 @@
   background: none;
   border: none;
   color: #193264;
-  font-size: 0.85rem;
+  font-size: 1rem;
   font-weight: 500;
   padding: 0.2rem 0;
   cursor: pointer;
