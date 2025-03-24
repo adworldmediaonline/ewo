@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { Rating } from 'react-simple-star-rating';
 import { useDispatch } from 'react-redux';
-import DOMPurify from 'isomorphic-dompurify';
-import ShowMoreText from 'react-show-more-text';
+// import DOMPurify from 'isomorphic-dompurify';
+// import ShowMoreText from 'react-show-more-text';
 import styles from '../../app/product/[id]/product-details.module.css';
 import ProductDetailsCountdown from './product-details-countdown';
 import ProductQuantity from './product-quantity';
@@ -59,10 +59,10 @@ export default function DetailsWrapper({
   };
 
   // Sanitize and create description HTML
-  const createSanitizedHTML = text => {
-    const sanitizedHTML = DOMPurify.sanitize(text);
-    return { __html: sanitizedHTML };
-  };
+  // const createSanitizedHTML = text => {
+  //   const sanitizedHTML = DOMPurify.sanitize(text);
+  //   return { __html: sanitizedHTML };
+  // };
 
   return (
     <>
@@ -117,7 +117,7 @@ export default function DetailsWrapper({
         )}
       </div>
 
-      <div className={styles.productDescription}>
+      {/* <div className={styles.productDescription}>
         {description && (
           <ShowMoreText
             lines={2}
@@ -131,7 +131,7 @@ export default function DetailsWrapper({
             <div dangerouslySetInnerHTML={createSanitizedHTML(description)} />
           </ShowMoreText>
         )}
-      </div>
+      </div> */}
 
       {imageURLs?.some(item => item?.color && item?.color?.name) && (
         <div className={styles.optionsContainer}>
