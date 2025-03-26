@@ -5,7 +5,7 @@ import Link from 'next/link';
 import logo from '@assets/img/logo/logo.png';
 import pay from '@assets/img/footer/footer-pay.png';
 import social_data from '@/data/social-data';
-
+//
 const Footer = ({
   style_2 = false,
   style_3 = false,
