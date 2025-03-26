@@ -8,7 +8,7 @@ import useCartInfo from '@/hooks/use-cart-info';
 import { openCartMini } from '@/redux/features/cartSlice';
 import CartMiniSidebar from '@/components/common/cart-mini-sidebar';
 import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
-import logo from '@assets/img/logo/logo.webp';
+import logo from '@assets/img/logo/logo.png';
 import { CartTwo, Close, Compare, Menu, Search, User, Wishlist } from '@/svg';
 import styles from './HeaderV2.module.css';
 import { useRouter } from 'next/navigation';
@@ -162,7 +162,7 @@ export default function HeaderV2() {
             <div className={styles.headerTop}>
               {/* Logo */}
               <Link href="/">
-                <Image src={logo} alt="logo" width={120} priority />
+                <Image src={logo} alt="logo" width={190} priority />
               </Link>
 
               {/* Desktop Search */}
