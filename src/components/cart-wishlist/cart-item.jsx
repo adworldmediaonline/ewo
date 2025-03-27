@@ -12,7 +12,14 @@ import {
 } from '@/redux/features/cartSlice';
 
 const CartItem = ({ product }) => {
-  const { _id, img, title, price, orderQuantity = 0 } = product || {};
+  const {
+    _id,
+    img,
+    title,
+    price,
+    orderQuantity = 0,
+    selectedOption,
+  } = product || {};
 
   const dispatch = useDispatch();
 
@@ -40,7 +47,25 @@ const CartItem = ({ product }) => {
       </td>
       {/* title */}
       <td className="tp-cart-title">
-        <Link href={`/product/${_id}`}>{title}</Link>
+        <Link href={`/product/${_id}`}>
+          {title}
+          {selectedOption && (
+            <div
+              style={{
+                fontSize: '12px',
+                color: '#666',
+                marginTop: '5px',
+                padding: '2px 6px',
+                background: '#f5f5f5',
+                borderRadius: '3px',
+                display: 'inline-block',
+              }}
+            >
+              Option: {selectedOption.title} (+$
+              {Number(selectedOption.price).toFixed(2)})
+            </div>
+          )}
+        </Link>
       </td>
       {/* price */}
       <td className="tp-cart-price">

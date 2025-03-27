@@ -28,8 +28,10 @@ export default function DetailsWrapper({
     reviews,
     tags,
     offerDate,
+    options,
   } = productItem || {};
   const [ratingVal, setRatingVal] = useState(0);
+  const [selectedOption, setSelectedOption] = useState(null);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -43,9 +45,38 @@ export default function DetailsWrapper({
     }
   }, [reviews]);
 
+  // Calculate final price based on base price, discount, and selected option
+  const calculateFinalPrice = () => {
+    const basePrice = Number(price);
+    const discountedPrice =
+      discount > 0
+        ? basePrice - (basePrice * Number(discount)) / 100
+        : basePrice;
+
+    // Add option price if an option is selected
+    const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+    return (discountedPrice + optionPrice).toFixed(2);
+  };
+
+  // Handle option selection
+  const handleOptionChange = e => {
+    const optionIndex = e.target.value;
+    if (optionIndex === '') {
+      setSelectedOption(null);
+    } else {
+      setSelectedOption(options[parseInt(optionIndex)]);
+    }
+  };
+
   // handle add product
   const handleAddProduct = prd => {
-    dispatch(add_cart_product(prd));
+    const productToAdd = {
+      ...prd,
+      selectedOption,
+      // If an option is selected, update the final price to include the option price
+      finalPrice: selectedOption ? calculateFinalPrice() : undefined,
+    };
+    dispatch(add_cart_product(productToAdd));
   };
 
   // handle wishlist product
@@ -63,7 +94,7 @@ export default function DetailsWrapper({
   //   const sanitizedHTML = DOMPurify.sanitize(text);
   //   return { __html: sanitizedHTML };
   // };
-
+  console.log('Options', options);
   return (
     <>
       {category?.name && (
@@ -103,17 +134,18 @@ export default function DetailsWrapper({
         {discount > 0 ? (
           <>
             <span className={styles.currentPrice}>
-              $
-              {(
-                Number(price) -
-                (Number(price) * Number(discount)) / 100
-              ).toFixed(2)}
+              ${calculateFinalPrice()}
             </span>
             <span className={styles.oldPrice}>${price?.toFixed(2)}</span>
             <span className={styles.discount}>{discount}% OFF</span>
           </>
         ) : (
-          <span className={styles.currentPrice}>${price?.toFixed(2)}</span>
+          <span className={styles.currentPrice}>${calculateFinalPrice()}</span>
+        )}
+        {selectedOption && (
+          <div className={styles.optionPriceInfo}>
+            Includes ${selectedOption.price} for option: {selectedOption.title}
+          </div>
         )}
       </div>
 
@@ -159,6 +191,30 @@ export default function DetailsWrapper({
       {offerDate?.endDate && (
         <ProductDetailsCountdown offerExpiryTime={offerDate?.endDate} />
       )}
+
+      {/* Product Options Section */}
+      {options && options.length > 0 && (
+        <div className={styles.optionsContainer}>
+          <h3 className={styles.optionTitle}>Options</h3>
+          <div className={styles.selectOptionContainer}>
+            <select
+              className={styles.selectOption}
+              onChange={handleOptionChange}
+              value={
+                selectedOption ? options.indexOf(selectedOption).toString() : ''
+              }
+            >
+              <option value="">Select an option</option>
+              {options.map((option, index) => (
+                <option key={index} value={index}>
+                  {option.title} (+${Number(option.price).toFixed(2)})
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      )}
+      {/* Options section end here */}
 
       <div className={styles.quantityAndCart}>
         <div className={styles.quantitySelector}>
