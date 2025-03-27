@@ -10,6 +10,7 @@ import ProductQuantity from './product-quantity';
 import { add_cart_product } from '@/redux/features/cartSlice';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { add_to_compare } from '@/redux/features/compareSlice';
+import { titleCaseFirstLetterOfEveryWord } from '@/lib/titleCaseFirstLetterOfEveryWord';
 
 export default function DetailsWrapper({
   productItem,
@@ -103,7 +104,9 @@ export default function DetailsWrapper({
         </div>
       )}
 
-      <h1 className={styles.productTitle}>{title}</h1>
+      <h1 className={styles.productTitle}>
+        {titleCaseFirstLetterOfEveryWord(title)}
+      </h1>
 
       <div className={styles.productMeta}>
         <div className={styles.rating}>
