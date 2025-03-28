@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 // internal
-import logo from '@assets/img/logo/logo.png';
+import logo from '@assets/img/logo/logo.webp';
 import pay from '@assets/img/footer/footer-pay.png';
 import social_data from '@/data/social-data';
 //
