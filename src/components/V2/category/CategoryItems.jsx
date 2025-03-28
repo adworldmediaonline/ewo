@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import styles from './CategoryList.module.css';
 import { get } from '@/services/api';
+import { titleCaseFirstLetterOfEveryWord } from '@/lib/titleCaseFirstLetterOfEveryWord';
 
 export default async function CategoryItems() {
   const data = await get('/api/category/show', {
@@ -67,7 +68,9 @@ export default async function CategoryItems() {
               </div>
             </div>
             <div className={styles.ewoContent}>
-              <h3 className={styles.ewoCategoryTitle}>{category?.parent}</h3>
+              <h3 className={styles.ewoCategoryTitle}>
+                {titleCaseFirstLetterOfEveryWord(category?.parent)}
+              </h3>
               <div className={styles.ewoMeta}>
                 <span className={styles.ewoCount}>
                   {category.products.length}{' '}
