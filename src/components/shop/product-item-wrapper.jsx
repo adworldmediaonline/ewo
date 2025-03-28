@@ -5,14 +5,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { add_cart_product } from '@/redux/features/cartSlice';
 
 // Function to convert text to title case (first letter of each word capitalized)
-const toTitleCase = str => {
-  if (!str) return '';
-  return str
-    .toLowerCase()
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-};
+// const toTitleCase = str => {
+//   if (!str) return '';
+//   return str
+//     .toLowerCase()
+//     .split(' ')
+//     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+//     .join(' ');
+// };
 
 const ProductItemWrapper = ({ product }) => {
   const dispatch = useDispatch();
@@ -23,7 +23,8 @@ const ProductItemWrapper = ({ product }) => {
   // Create a shallow copy of the product to modify the title safely
   const formattedProduct = {
     ...product,
-    title: toTitleCase(product.title),
+    // title: toTitleCase(product.title),
+    title: product.title,
   };
 
   // Custom DOM manipulation to add cart button next to price
