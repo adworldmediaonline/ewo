@@ -148,7 +148,8 @@ export default function DetailsWrapper({
         )}
         {selectedOption && (
           <div className={styles.optionPriceInfo}>
-            Includes ${selectedOption.price} for option: {selectedOption.title}
+            {/* Includes ${selectedOption.price} for option: {selectedOption.title} */}
+            {selectedOption.title}
           </div>
         )}
       </div>
@@ -211,7 +212,8 @@ export default function DetailsWrapper({
               <option value="">Select an option</option>
               {options.map((option, index) => (
                 <option key={index} value={index}>
-                  {option.title} (+${Number(option.price).toFixed(2)})
+                  {/* {option.title} (+${Number(option.price).toFixed(2)}) */}
+                  {option.title}
                 </option>
               ))}
             </select>

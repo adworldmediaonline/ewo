@@ -5,7 +5,7 @@ import CategoryFilter from './shop-filter/category-filter';
 import PriceFilter from './shop-filter/price-filter';
 import StatusFilter from './shop-filter/status-filter';
 import TopRatedProducts from './shop-filter/top-rated-products';
-import ShopListItem from './shop-list-item';
+// import ShopListItem from './shop-list-item';
 import ShopTopLeft from './shop-top-left';
 import ShopTopRight from './shop-top-right';
 import ResetButton from './shop-filter/reset-button';
@@ -24,7 +24,7 @@ const ShopContent = ({
   const { setPriceValue } = priceFilterValues || {};
   const [filteredRows, setFilteredRows] = useState(products);
   const [pageStart, setPageStart] = useState(0);
-  const [countOfPage, setCountOfPage] = useState(12);
+  const [countOfPage, setCountOfPage] = useState(50);
 
   const paginatedData = (items, startPage, pageCount) => {
     setFilteredRows(items);
@@ -104,7 +104,7 @@ const ShopContent = ({
               <div className={styles.pagination}>
                 <Pagination
                   items={products}
-                  countOfPage={12}
+                  countOfPage={50}
                   paginatedData={paginatedData}
                   currPage={currPage}
                   setCurrPage={setCurrPage}
