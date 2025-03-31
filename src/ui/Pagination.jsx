@@ -4,7 +4,7 @@ import styles from '../app/shop/shop.module.css';
 
 export default function Pagination({
   items = [],
-  countOfPage = 12,
+  countOfPage = 50,
   paginatedData,
   currPage,
   setCurrPage,

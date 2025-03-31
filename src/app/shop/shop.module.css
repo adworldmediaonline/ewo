@@ -179,257 +179,296 @@
 /* Product grid styling */
 .productGrid {
   display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 15px;
-  margin-bottom: 1.5rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  width: 100%;
+  margin-bottom: 2rem;
 }
 
 @media (min-width: 576px) {
   .productGrid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    gap: 0.5rem;
   }
 }
 
 @media (min-width: 768px) {
   .productGrid {
     grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
+    gap: 0.5rem;
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 992px) {
   .productGrid {
     grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
+    gap: 0.5rem;
   }
 }
 
+@media (min-width: 1200px) {
+  .productGrid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+  }
+}
+
+/* PRODUCT CARD STYLING */
 .productGridItem {
   display: flex;
-  padding: 5px;
+  height: 100%;
 }
 
 .productCard {
-  position: relative;
-  margin-bottom: 15px;
-  transition: all 0.3s ease;
+  background: #fff;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
   height: 100%;
-  overflow: visible;
-  z-index: 1;
+  overflow: hidden;
+  position: relative;
+  padding: 0.75rem;
+}
+
+.productCard:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .productCardInner {
-  height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: visible;
+  height: 100%;
+  position: relative;
+}
+
+.productCard :global(.tp-product-item-2) {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+}
+
+.productCard :global(.tp-product-thumb-2) {
+  position: relative;
+  overflow: hidden;
+  background-color: #fff;
+  padding: 0;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.productCard :global(.product-img) {
+  width: 100%;
+  height: 100%;
+  object-fit: contain !important;
+  max-height: 100%;
+  transition: all 0.3s ease;
 }
 
 .productCard :global(.tp-product-content-2) {
+  padding: 0;
   display: flex;
   flex-direction: column;
-  min-height: 80px;
-  justify-content: space-between;
-  padding: 12px;
+  flex: 1;
 }
 
 .productCard :global(.tp-product-title-2) {
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 1.2;
-  max-height: 2.4em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0.4rem 0;
+  color: #333;
+}
+
+.productCard :global(.tp-product-title-2 a) {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.productCard :global(.tp-product-title-2 a:hover) {
+  color: #555;
+}
+
+.productCard :global(.tp-product-tag-2) {
+  color: #666;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.productCard :global(.tp-product-tag-2 a) {
+  color: #666;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.productCard :global(.tp-product-tag-2 a:hover) {
+  color: #193264;
+}
+
+.productCard :global(.tp-product-rating-icon-2) {
+  margin: 0.3rem 0;
 }
 
 .productCard :global(.tp-product-price-wrapper-2) {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 6px;
-  flex-wrap: wrap;
-  gap: 8px;
+  margin-top: auto;
+  padding-bottom: 0.75rem;
 }
 
-/* Price styling to handle overflow */
 .productCard :global(.tp-product-price-2) {
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 110px;
+  font-weight: 700;
+  color: #000;
+  font-size: 1.1rem;
 }
 
-/* For discounted prices (both old and new price visible) */
-.productCard :global(.tp-product-price-wrapper-2 .old-price) {
-  margin-left: 4px;
-  font-size: 0.85em;
+.productCard :global(.tp-product-price-2.old-price) {
+  color: #999;
   text-decoration: line-through;
-  color: #999;
+  font-weight: 400;
+  font-size: 0.9rem;
+  margin-left: 0.5rem;
 }
 
-/* Improved cart button styling */
-.productCard :global(.tp-product-price-wrapper-2 .add-to-cart-btn) {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 0 12px;
-  height: 36px;
-  border-radius: 18px;
-  background-color: #193264;
+.productCard :global(.tp-product-badge) {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 3;
+}
+
+.productCard :global(.product-hot) {
+  background-color: #dc3545;
   color: white;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 13px;
+  padding: 0.25rem 0.75rem;
+  border-radius: 3rem;
+  font-size: 0.75rem;
   font-weight: 500;
-  white-space: nowrap;
-  min-width: 36px;
-  flex-shrink: 0;
 }
 
-.productCard :global(.tp-product-price-wrapper-2 .add-to-cart-btn svg) {
-  margin-right: 2px;
-  flex-shrink: 0;
-}
-
-.productCard
-  :global(.tp-product-price-wrapper-2 .add-to-cart-btn .cart-btn-text) {
-  display: inline-block;
-}
-
-.productCard :global(.tp-product-price-wrapper-2 .add-to-cart-btn:hover) {
-  background-color: #0d1f45;
-  transform: translateY(-2px);
-  box-shadow: 0 5px 10px rgba(25, 50, 100, 0.2);
-}
-
-.productCard :global(.tp-product-price-wrapper-2 .add-to-cart-btn:active) {
-  transform: translateY(0);
-  box-shadow: 0 2px 5px rgba(25, 50, 100, 0.2);
-}
-
-.productCard :global(.tp-product-price-wrapper-2 .add-to-cart-btn.active) {
-  background-color: #27ae60;
-}
-
-.productCard :global(.tp-product-price-wrapper-2 .add-to-cart-btn:disabled) {
-  background-color: #e5e5e5;
-  color: #999;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-.productCardInner :global(.tp-product-item-2) {
-  height: 100%;
+.productCardActions {
   display: flex;
   flex-direction: column;
+  margin-top: auto;
 }
 
-/* Action Button Styles */
+/* Quick view button styling */
+.quickViewBtn {
+  width: 100%;
+  padding: 0.7rem;
+  background: #222;
+  color: #fff;
+  border: none;
+  border-radius: 0.25rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.quickViewBtn:hover {
+  background: #000;
+}
+
+.quickViewBtnIcon {
+  margin-left: 0.5rem;
+}
+
+/* Add to cart button styling */
+.addToCartBtn {
+  width: 100%;
+  padding: 0.7rem;
+  background: #222;
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+}
+
+.addToCartBtn:hover {
+  background: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.addToCartBtn.active {
+  background: #28a745;
+}
+
+.addToCartBtn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.cartBtnText {
+  font-weight: 500;
+}
+
+/* Fix action buttons positioning and tooltips */
 .productCard :global(.tp-product-action-2) {
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(10px);
   transition: all 0.3s ease;
-  z-index: 10;
 }
 
 .productCard:hover :global(.tp-product-action-2) {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0);
 }
 
-.productCard :global(.tp-product-action-2 ul) {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+/* Remove tooltips from action buttons */
+.productCard :global(.tp-product-tooltip) {
+  display: none !important;
 }
 
-.productCard :global(.tp-product-action-item-2) {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  position: relative;
+.productCard :global(.tp-product-tooltip-right) {
+  display: none !important;
 }
 
-.productCard :global(.tp-product-action-btn-2) {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background-color: white;
-  color: #193264;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-}
-
-.productCard :global(.tp-product-action-btn-2:hover) {
-  background-color: #f5f5f5;
-  color: #193264;
-  transform: translateY(-2px);
-  box-shadow: 0 5px 10px rgba(25, 50, 100, 0.2);
-}
-
-.productCard :global(.tp-product-action-btn-2:active) {
-  transform: translateY(0);
-  box-shadow: 0 2px 5px rgba(25, 50, 100, 0.2);
-}
-
-/* Active state styling for all action buttons */
-.productCard :global(.tp-product-action-btn-2.active),
-.productCard
-  :global(.tp-product-action-btn-2.tp-product-add-to-wishlist-btn.active),
-.productCard
-  :global(.tp-product-action-btn-2.tp-product-add-to-compare-btn.active) {
-  background-color: #193264;
-  color: white;
-  box-shadow: 0 3px 8px rgba(25, 50, 100, 0.3);
-}
-
-.productCard :global(.tp-product-action-btn-2.active .tp-product-tooltip) {
-  font-weight: 500;
-}
-
-/* Enhanced tooltip styling */
+/* Improve tooltip visibility */
 .productCard :global(.tp-product-tooltip) {
   position: absolute;
+  right: calc(100% + 10px);
   top: 50%;
   transform: translateY(-50%);
-  background-color: white;
+  background: white;
   color: #333;
-  font-size: 12px;
-  padding: 5px 10px;
-  border-radius: 3px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
   white-space: nowrap;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   opacity: 0;
   visibility: hidden;
-  transition: all 0.3s ease;
-  right: 45px;
-  left: auto;
   z-index: 20;
+  transition: all 0.2s ease;
   pointer-events: none;
 }
 
 .productCard :global(.tp-product-tooltip-right) {
   right: auto;
-  left: 45px;
+  left: calc(100% + 10px);
 }
 
 .productCard :global(.tp-product-action-btn-2:hover .tp-product-tooltip) {
@@ -437,94 +476,52 @@
   visibility: visible;
 }
 
-.productCard
-  :global(
-    .tp-product-action-btn-2:hover
-      .tp-product-tooltip:not(.tp-product-tooltip-right)
-  ) {
-  right: 48px;
-}
-
-.productCard :global(.tp-product-action-btn-2:hover .tp-product-tooltip-right) {
-  left: 48px;
-}
-
-/* Make sure tooltips don't get cutoff */
+/* Fix Product Images */
 .productCard :global(.tp-product-thumb-2) {
-  overflow: visible !important;
   position: relative;
+  overflow: hidden;
+  background-color: #fff;
+  padding: 0;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
 }
 
-/* Create space around cards to prevent tooltip cutoff */
-.productGridItem {
-  padding: 5px;
+.productCard :global(.product-img) {
+  width: 100%;
+  height: 100%;
+  object-fit: contain !important;
+  max-height: 100%;
+  transition: all 0.3s ease;
 }
 
-/* Responsive Styles */
+/* Responsive adjustments */
 @media (max-width: 767px) {
-  .productCard :global(.tp-product-action-2) {
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: translateY(0) !important;
-    top: 10px;
-    right: 10px;
-    background-color: transparent;
-  }
-
-  /* Override default hover to prevent it from showing on mobile */
-  .productCard :global(.tp-product-action-btn-2) {
-    width: 32px;
-    height: 32px;
-    margin-bottom: 4px;
-    background-color: white;
-    color: #193264;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-  }
-
-  /* Show tooltips on mobile with adjusted positioning */
-  .productCard :global(.tp-product-tooltip) {
-    font-size: 11px;
-    padding: 3px 8px;
-    right: 40px;
-  }
-
-  .productCard :global(.tp-product-tooltip-right) {
-    right: auto;
-    left: 40px;
-  }
-
   .productCard :global(.tp-product-title-2) {
-    font-size: 14px;
-  }
-
-  .productCard :global(.tp-product-price-wrapper-2) {
-    gap: 6px;
-  }
-
-  .productCard :global(.tp-product-price-wrapper-2 .add-to-cart-btn) {
-    padding: 0;
-    width: 32px;
-    height: 32px;
-    min-width: 32px;
-  }
-
-  .productCard
-    :global(.tp-product-price-wrapper-2 .add-to-cart-btn .cart-btn-text) {
-    display: none;
+    font-size: 1.1rem;
   }
 
   .productCard :global(.tp-product-price-2) {
-    max-width: 90px;
+    font-size: 1rem;
   }
 
-  .productCard :global(.tp-product-action-item-2) {
-    gap: 6px;
+  .quickViewBtn,
+  .addToCartBtn {
+    padding: 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  .productCard :global(.tp-product-thumb-2) {
+    height: 140px;
   }
 }
 
-/* Fix z-index issues with product cards */
-.productCard:hover {
-  z-index: 10;
+@media (max-width: 576px) {
+  .productCard :global(.tp-product-thumb-2) {
+    height: 120px;
+  }
 }
 
 /* Enhanced Pagination styling with reduced top margin */
@@ -792,11 +789,11 @@
 /* Fix for ensuring tooltips don't get cut off */
 @media (min-width: 768px) {
   .productGrid {
-    margin: 0 -10px;
+    margin: 0;
   }
 
   .productGridItem {
-    padding: 0 10px;
+    padding: 0;
   }
 }
 
@@ -914,4 +911,26 @@
     white-space: normal;
     text-align: left;
   }
+}
+
+.productCard :global(.tp-product-action-btn-2) {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: white;
+  color: #193264;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.productCard :global(.tp-product-action-btn-2:hover) {
+  background: #f5f5f5;
+  transform: translateY(-2px);
 }

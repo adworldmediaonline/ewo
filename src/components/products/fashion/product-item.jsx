@@ -10,7 +10,7 @@ import { add_cart_product } from '@/redux/features/cartSlice';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { add_to_compare } from '@/redux/features/compareSlice';
 
-const ProductItem = ({ product, style_2 = false }) => {
+export default function ProductItem({ product, style_2 = false }) {
   const {
     _id,
     img,
@@ -56,35 +56,38 @@ const ProductItem = ({ product, style_2 = false }) => {
   };
 
   return (
-    <div className={`tp-product-item-2 ${style_2 ? '' : 'mb-40'}`}>
-      <div className="tp-product-thumb-2 p-relative z-index-1 fix">
+    <div className="tp-product-item-2">
+      <div className="tp-product-thumb-2 p-relative">
         <Link href={`/product/${slug}`}>
           <CloudinaryImage
             src={img}
             alt={title || 'Product image'}
             width={284}
-            height={302}
+            height={284}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 284px"
             priority={false}
             quality="auto"
             format="auto"
             dpr="auto"
-            crop="fit"
-            objectFit="contain"
+            crop="pad"
+            gravity="center"
+            background="white"
             style={{
               width: '100%',
-              height: '100%',
-              maxWidth: '100%',
+              height: '240px',
+              objectFit: 'contain',
+              display: 'block',
               transition: 'all 0.3s ease',
+              backgroundColor: 'white',
             }}
             className="product-img"
           />
         </Link>
-        <div className="tp-product-badge">
-          {status === 'out-of-stock' && (
-            <span className="product-hot">out-stock</span>
-          )}
-        </div>
+        {status === 'out-of-stock' && (
+          <div className="tp-product-badge">
+            <span className="product-hot">Out of Stock</span>
+          </div>
+        )}
         {/* product action */}
         <div className="tp-product-action-2">
           <div className="tp-product-action-item-2 d-flex flex-column">
@@ -119,15 +122,17 @@ const ProductItem = ({ product, style_2 = false }) => {
           </div>
         </div>
       </div>
-      <div className="tp-product-content-2 pt-15">
-        <div className="tp-product-tag-2">
-          {tags.map((t, i) => (
-            <a key={i} href="#">
-              {t}
-              {i < tags.length - 1 && ','}
-            </a>
-          ))}
-        </div>
+      <div className="tp-product-content-2">
+        {tags && tags.length > 0 && (
+          <div className="tp-product-tag-2">
+            {tags.map((t, i) => (
+              <a key={i} href="#">
+                {t}
+                {i < tags.length - 1 && ', '}
+              </a>
+            ))}
+          </div>
+        )}
         <h3 className="tp-product-title-2">
           <Link href={`/product/${slug}`}>{title}</Link>
         </h3>
@@ -160,6 +165,4 @@ const ProductItem = ({ product, style_2 = false }) => {
       </div>
     </div>
   );
-};
-
-export default ProductItem;
+}
