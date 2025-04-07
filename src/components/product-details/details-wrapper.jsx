@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { Rating } from 'react-simple-star-rating';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 // import DOMPurify from 'isomorphic-dompurify';
 // import ShowMoreText from 'react-show-more-text';
 import styles from '../../app/product/[id]/product-details.module.css';
@@ -10,6 +10,7 @@ import ProductQuantity from './product-quantity';
 import { add_cart_product } from '@/redux/features/cartSlice';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { add_to_compare } from '@/redux/features/compareSlice';
+import { notifyError } from '@/utils/toast';
 // import { titleCaseFirstLetterOfEveryWord } from '@/lib/titleCaseFirstLetterOfEveryWord';
 
 export default function DetailsWrapper({
@@ -34,6 +35,7 @@ export default function DetailsWrapper({
   const [ratingVal, setRatingVal] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const dispatch = useDispatch();
+  const { orderQuantity, cart_products } = useSelector(state => state.cart);
 
   useEffect(() => {
     if (reviews && reviews.length > 0) {
@@ -71,6 +73,22 @@ export default function DetailsWrapper({
 
   // handle add product
   const handleAddProduct = prd => {
+    // Check if product already exists in cart
+    const existingProduct = cart_products.find(item => item._id === prd._id);
+
+    // Get total current quantity (existing + new)
+    const currentQty = existingProduct ? existingProduct.orderQuantity : 0;
+    const totalRequestedQty = currentQty + orderQuantity;
+
+    // If product has quantity limitation and requested quantity exceeds available
+    if (prd.quantity && totalRequestedQty > prd.quantity) {
+      // Show error notification
+      notifyError(
+        `Sorry, only ${prd.quantity} items available. You already have ${currentQty} in your cart.`
+      );
+      return;
+    }
+
     const productToAdd = {
       ...prd,
       selectedOption,
@@ -225,7 +243,7 @@ export default function DetailsWrapper({
 
       <div className={styles.quantityAndCart}>
         <div className={styles.quantitySelector}>
-          <ProductQuantity />
+          <ProductQuantity productItem={productItem} />
         </div>
         <button
           onClick={() => handleAddProduct(productItem)}
