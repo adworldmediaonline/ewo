@@ -1,0 +1,73 @@
+/* Product Modal Styles */
+.tp-product-modal {
+  width: 100%;
+}
+
+.tp-product-modal-content {
+  position: relative;
+  width: 100%;
+  padding: 20px;
+}
+
+.tp-product-modal-close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #f5f5f5;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s;
+}
+
+.tp-product-modal-close-btn:hover {
+  background-color: #ff3d3d;
+  color: white;
+}
+
+.tp-product-modal-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.tp-product-modal-thumb {
+  flex: 1;
+  min-width: 300px;
+}
+
+.tp-product-modal-details {
+  flex: 1;
+  min-width: 300px;
+}
+
+@media (max-width: 991px) {
+  .tp-product-modal-wrapper {
+    flex-direction: column;
+  }
+
+  .tp-product-modal-thumb,
+  .tp-product-modal-details {
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .tp-product-modal-content {
+    padding: 15px;
+  }
+
+  .tp-product-modal-close-btn {
+    top: 10px;
+    right: 10px;
+    width: 35px;
+    height: 35px;
+  }
+}

@@ -212,8 +212,9 @@ export default function DetailsWrapper({
               <option value="">Select an option</option>
               {options.map((option, index) => (
                 <option key={index} value={index}>
-                  {/* {option.title} (+${Number(option.price).toFixed(2)}) */}
-                  {option.title}
+                  {option.price && Number(option.price) !== 0
+                    ? `${option.title} (+$${Number(option.price).toFixed(2)})`
+                    : option.title}
                 </option>
               ))}
             </select>

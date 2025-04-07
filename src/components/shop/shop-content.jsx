@@ -24,7 +24,7 @@ const ShopContent = ({
   const { setPriceValue } = priceFilterValues || {};
   const [filteredRows, setFilteredRows] = useState(products);
   const [pageStart, setPageStart] = useState(0);
-  const [countOfPage, setCountOfPage] = useState(50);
+  const [countOfPage, setCountOfPage] = useState(15);
 
   const paginatedData = (items, startPage, pageCount) => {
     setFilteredRows(items);
@@ -104,7 +104,7 @@ const ShopContent = ({
               <div className={styles.pagination}>
                 <Pagination
                   items={products}
-                  countOfPage={50}
+                  countOfPage={15}
                   paginatedData={paginatedData}
                   currPage={currPage}
                   setCurrPage={setCurrPage}

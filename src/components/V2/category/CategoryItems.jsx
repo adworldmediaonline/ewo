@@ -72,11 +72,11 @@ export default async function CategoryItems() {
                 {titleCaseFirstLetterOfEveryWord(category?.parent)}
               </h3>
               <div className={styles.ewoMeta}>
-                <span className={styles.ewoCount}>
+                {/* <span className={styles.ewoCount}>
                   {category.products.length}{' '}
                   {category.products.length === 1 ? 'part' : 'parts'}
                 </span>
-                <div className={styles.ewoDivider}></div>
+                <div className={styles.ewoDivider}></div> */}
                 <span className={styles.ewoShopLink}>Shop Now</span>
               </div>
             </div>
