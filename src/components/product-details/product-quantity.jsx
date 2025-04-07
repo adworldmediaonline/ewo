@@ -5,13 +5,34 @@ import styles from '../../app/product/[id]/product-details.module.css';
 // internal
 import { Minus, Plus } from '@/svg';
 import { decrement, increment } from '@/redux/features/cartSlice';
+import { notifyError } from '@/utils/toast';
 
-const ProductQuantity = () => {
-  const { orderQuantity } = useSelector(state => state.cart);
+const ProductQuantity = ({ productItem }) => {
+  const { orderQuantity, cart_products } = useSelector(state => state.cart);
   const dispatch = useDispatch();
 
   // handleIncrease
   const handleIncrease = () => {
+    // Check if we have a product with quantity limitations
+    if (productItem?.quantity) {
+      // Check if product already exists in cart
+      const existingProduct = cart_products.find(
+        item => item._id === productItem._id
+      );
+
+      // Get total current quantity (existing + new)
+      const currentQty = existingProduct ? existingProduct.orderQuantity : 0;
+      const totalRequestedQty = currentQty + orderQuantity + 1; // +1 because we're increasing
+
+      // If requested quantity exceeds available
+      if (totalRequestedQty > productItem.quantity) {
+        notifyError(
+          `Sorry, only ${productItem.quantity} items available. You already have ${currentQty} in your cart.`
+        );
+        return;
+      }
+    }
+
     dispatch(increment());
   };
 
