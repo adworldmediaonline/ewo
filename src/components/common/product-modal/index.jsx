@@ -8,14 +8,30 @@ import DetailsWrapper from '@/components/product-details/details-wrapper';
 import { initialOrderQuantity } from '@/redux/features/cartSlice';
 
 const customStyles = {
+  overlay: {
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    zIndex: 9999,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   content: {
-    top: '50%',
-    left: '50%',
+    position: 'relative',
+    top: 'auto',
+    left: 'auto',
     right: 'auto',
     bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
-    height: 'calc(100% - 300px)',
+    maxWidth: '1000px',
+    width: '90%',
+    maxHeight: '90vh',
+    margin: '0 auto',
+    padding: '0',
+    border: 'none',
+    background: '#fff',
+    overflow: 'auto',
+    WebkitOverflowScrolling: 'touch',
+    borderRadius: '8px',
+    outline: 'none',
   },
 };
 
@@ -50,7 +66,7 @@ const ProductModal = () => {
         contentLabel="Product Modal"
       >
         <div className="tp-product-modal">
-          <div className="tp-product-modal-content d-lg-flex">
+          <div className="tp-product-modal-content">
             <button
               onClick={() => dispatch(handleModalClose())}
               type="button"
@@ -58,25 +74,31 @@ const ProductModal = () => {
             >
               <i className="fa-regular fa-xmark"></i>
             </button>
-            {/* product-details-thumb-wrapper start */}
-            <DetailsThumbWrapper
-              activeImg={activeImg}
-              handleImageActive={handleImageActive}
-              imageURLs={imageURLs}
-              imgWidth={416}
-              imgHeight={480}
-              loading={loading}
-              status={status}
-            />
-            {/* product-details-thumb-wrapper end */}
+            <div className="tp-product-modal-wrapper">
+              {/* product-details-thumb-wrapper start */}
+              <div className="tp-product-modal-thumb">
+                <DetailsThumbWrapper
+                  activeImg={activeImg}
+                  handleImageActive={handleImageActive}
+                  imageURLs={imageURLs}
+                  imgWidth={416}
+                  imgHeight={480}
+                  loading={loading}
+                  status={status}
+                />
+              </div>
+              {/* product-details-thumb-wrapper end */}
 
-            {/* product-details-wrapper start */}
-            <DetailsWrapper
-              productItem={productItem}
-              handleImageActive={handleImageActive}
-              activeImg={activeImg}
-            />
-            {/* product-details-wrapper end */}
+              {/* product-details-wrapper start */}
+              <div className="tp-product-modal-details">
+                <DetailsWrapper
+                  productItem={productItem}
+                  handleImageActive={handleImageActive}
+                  activeImg={activeImg}
+                />
+              </div>
+              {/* product-details-wrapper end */}
+            </div>
           </div>
         </div>
       </ReactModal>
