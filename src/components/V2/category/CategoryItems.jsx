@@ -6,11 +6,9 @@ import { titleCaseFirstLetterOfEveryWord } from '@/lib/titleCaseFirstLetterOfEve
 
 export default async function CategoryItems() {
   const data = await get('/api/category/show', {
-    cache: 'no-store',
+    cache: 'force-cache',
     tags: ['categories'],
-    // next: {
-    //   revalidate: 3600, // Revalidate every hour
-    // },
+    revalidate: 3600, // Revalidate every hour
   });
 
   if (!data?.result?.length) {
