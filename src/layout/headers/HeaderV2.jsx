@@ -163,7 +163,7 @@ export default function HeaderV2() {
             <div className={styles.headerTop}>
               {/* Logo */}
               <Link href="/">
-                <Image src={logo} alt="logo" width={150} priority />
+                <Image src={logo} alt="logo" width={190} priority />
               </Link>
 
               {/* Desktop Search */}
