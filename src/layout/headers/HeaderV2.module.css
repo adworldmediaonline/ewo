@@ -375,8 +375,7 @@
   }
 
   .headerTop {
-    /* height: 70px; */
-    height: 141px;
+    height: 70px;
   }
 }
 
@@ -388,7 +387,7 @@
 
 @media (min-width: 1024px) {
   .headerTop img {
-    width: 250px;
+    width: 190px;
   }
 }
 
