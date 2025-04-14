@@ -163,10 +163,9 @@ export default function HeaderV2() {
             <div className={styles.headerTop}>
               {/* Logo */}
               <Link href="/">
-                <Image src={logo} alt="logo" width={250} priority />
+                <Image src={logo} alt="logo" width={190} priority />
               </Link>
-              {/* s */}
-              {/* ff */}
+
               {/* Desktop Search */}
               <div className={styles.searchContainer}>
                 <SearchForm />
