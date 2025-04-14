@@ -381,13 +381,16 @@
 
 /* Logo */
 .headerTop img {
-  width: 100px;
+  width: 190px;
   height: auto;
 }
 
 @media (min-width: 1024px) {
   .headerTop img {
     width: 190px;
+  }
+  .headerTop {
+    height: 100px;
   }
 }
 
