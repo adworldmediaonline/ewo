@@ -6,6 +6,7 @@ import { useGetProductQuery } from '@/redux/features/productApi';
 import ProductDetailsContent from './product-details-content';
 import styles from '../../app/product/[id]/product-details.module.css';
 import Image from 'next/image';
+import parentCategoryModified from '@/lib/parentCategory';
 
 const ProductDetailsArea = ({ id }) => {
   const { data: product, isLoading, isError } = useGetProductQuery(id);
@@ -18,6 +19,7 @@ const ProductDetailsArea = ({ id }) => {
     content = <ErrorMsg msg="There was an error" />;
   }
   if (!isLoading && !isError && product) {
+    const categoryName = parentCategoryModified(product.category.name);
     content = (
       <div className={styles.productContainer}>
         <div className={styles.breadcrumb}>
@@ -26,8 +28,11 @@ const ProductDetailsArea = ({ id }) => {
               Home
             </a>
             <span className={styles.breadcrumbSeparator}>/</span>
-            <a href="/shop" className={styles.breadcrumbLink}>
-              {product.category.name}
+            <a
+              href={`/shop?category=${categoryName}`}
+              className={styles.breadcrumbLink}
+            >
+              {categoryName}
             </a>
             <span className={styles.breadcrumbSeparator}>/</span>
             <span className={styles.breadcrumbCurrent}>{product.title}</span>

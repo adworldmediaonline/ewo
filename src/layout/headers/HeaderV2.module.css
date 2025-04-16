@@ -5,6 +5,12 @@
   background-color: #0b0b09;
 }
 
+.headerInnerContainer {
+  max-width: 1680px;
+  margin: 0 auto;
+  padding: 0 0.75rem !important;
+}
+
 .headerContainer {
   position: relative;
   width: 100%;
@@ -369,28 +375,47 @@
   padding: 0 0.75rem;
 }
 
+.desktopLogo {
+  display: none;
+}
+
+.mobileLogo {
+  display: block;
+}
+
 @media (min-width: 1024px) {
   .container {
     padding: 0 1rem;
   }
 
+  .desktopLogo {
+    display: block;
+    width: 217px;
+    height: auto;
+  }
+
+  .mobileLogo {
+    display: none;
+  }
+
+  .headerTop {
+    height: 217px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .desktopLogo {
+    display: none;
+  }
+
+  .mobileLogo {
+    display: block;
+    width: 100px;
+    height: auto;
+  }
+
   .headerTop {
     height: 70px;
-  }
-}
-
-/* Logo */
-.headerTop img {
-  width: 190px;
-  height: auto;
-}
-
-@media (min-width: 1024px) {
-  .headerTop img {
-    width: 190px;
-  }
-  .headerTop {
-    height: 100px;
   }
 }
 
@@ -823,7 +848,7 @@
 .searchContainer {
   display: none;
   width: 100%;
-  max-width: 400px;
+  max-width: 700px;
   margin: 0 2rem;
 }
 

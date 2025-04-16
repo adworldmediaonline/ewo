@@ -159,60 +159,75 @@ export default function HeaderV2() {
         } ${isHeaderHidden ? styles.headerHidden : ''}`}
       >
         <header className={styles.header}>
-          <div className={styles.container}>
-            <div className={styles.headerTop}>
-              {/* Logo */}
-              <Link href="/">
-                <Image src={logo} alt="logo" width={190} priority />
-              </Link>
-
-              {/* Desktop Search */}
-              <div className={styles.searchContainer}>
-                <SearchForm />
-              </div>
-
-              {/* Action Buttons */}
-              <div className={styles.actions}>
-                <button
-                  className={styles.searchButton}
-                  onClick={handleMobileSearchOpen}
-                >
-                  <Search />
-                </button>
-
-                <Link href="/compare" className={styles.actionButton}>
-                  <Compare />
+          <div className={styles.headerInnerContainer}>
+            <div className={styles.container}>
+              <div className={styles.headerTop}>
+                {/* Logo */}
+                <Link href="/">
+                  <Image
+                    src={logo}
+                    alt="logo"
+                    width={217}
+                    priority
+                    className={styles.desktopLogo}
+                  />
+                  <Image
+                    src={logo}
+                    alt="logo"
+                    width={100}
+                    priority
+                    className={styles.mobileLogo}
+                  />
                 </Link>
 
-                <Link href="/wishlist" className={styles.actionButton}>
-                  <Wishlist />
-                  {wishlist.length > 0 && (
-                    <span className={styles.actionBadge}>
-                      {wishlist.length}
-                    </span>
-                  )}
-                </Link>
+                {/* Desktop Search */}
+                <div className={styles.searchContainer}>
+                  <SearchForm />
+                </div>
 
-                <button
-                  className={styles.actionButton}
-                  onClick={() => dispatch(openCartMini())}
-                >
-                  <CartTwo />
-                  {quantity > 0 && (
-                    <span className={styles.actionBadge}>{quantity}</span>
-                  )}
-                </button>
+                {/* Action Buttons */}
+                <div className={styles.actions}>
+                  <button
+                    className={styles.searchButton}
+                    onClick={handleMobileSearchOpen}
+                  >
+                    <Search />
+                  </button>
 
-                <Link href="/profile" className={styles.actionButton}>
-                  <User />
-                </Link>
+                  <Link href="/compare" className={styles.actionButton}>
+                    <Compare />
+                  </Link>
 
-                <button
-                  className={`${styles.actionButton} ${styles.mobileMenu}`}
-                  onClick={() => setIsMobileNavOpen(true)}
-                >
-                  <Menu />
-                </button>
+                  <Link href="/wishlist" className={styles.actionButton}>
+                    <Wishlist />
+                    {wishlist.length > 0 && (
+                      <span className={styles.actionBadge}>
+                        {wishlist.length}
+                      </span>
+                    )}
+                  </Link>
+
+                  <button
+                    className={styles.actionButton}
+                    onClick={() => dispatch(openCartMini())}
+                  >
+                    <CartTwo />
+                    {quantity > 0 && (
+                      <span className={styles.actionBadge}>{quantity}</span>
+                    )}
+                  </button>
+
+                  <Link href="/profile" className={styles.actionButton}>
+                    <User />
+                  </Link>
+
+                  <button
+                    className={`${styles.actionButton} ${styles.mobileMenu}`}
+                    onClick={() => setIsMobileNavOpen(true)}
+                  >
+                    <Menu />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -221,64 +236,66 @@ export default function HeaderV2() {
         {/* Secondary Navigation */}
         <div className={styles.headerBottom}>
           <nav className={styles.bottomNav}>
-            <ul className={styles.bottomNavList}>
-              <li>
-                <Link href="/" className={styles.bottomNavLink}>
-                  HOME
-                </Link>
-              </li>
-              <li>
-                <button
-                  ref={dropdownButtonRef}
-                  className={`${styles.bottomNavLink} ${styles.dropdownButton}`}
-                  onClick={handleDropdownToggle}
-                  aria-expanded={isDropdownOpen}
-                  aria-controls="shop-dropdown"
-                  aria-haspopup="true"
-                >
-                  SHOP
-                  <span className={styles.dropdownIcon}>▼</span>
-                  <span className={styles.srOnly}>
-                    {isDropdownOpen ? 'Close menu' : 'Open menu'}
-                  </span>
-                </button>
+            <div className={styles.headerInnerContainer}>
+              <ul className={styles.bottomNavList}>
+                <li>
+                  <Link href="/" className={styles.bottomNavLink}>
+                    HOME
+                  </Link>
+                </li>
+                <li>
+                  <button
+                    ref={dropdownButtonRef}
+                    className={`${styles.bottomNavLink} ${styles.dropdownButton}`}
+                    onClick={handleDropdownToggle}
+                    aria-expanded={isDropdownOpen}
+                    aria-controls="shop-dropdown"
+                    aria-haspopup="true"
+                  >
+                    SHOP
+                    <span className={styles.dropdownIcon}>▼</span>
+                    <span className={styles.srOnly}>
+                      {isDropdownOpen ? 'Close menu' : 'Open menu'}
+                    </span>
+                  </button>
 
-                <div
-                  id="shop-dropdown"
-                  className={styles.dropdownContent}
-                  aria-hidden={!isDropdownOpen}
-                  role="menu"
-                  onKeyDown={handleDropdownKeyDown}
-                  ref={dropdownRef}
-                >
-                  <ul className={styles.simpleDropdownList} role="none">
-                    {filteredCategories.map(category => (
-                      <li
-                        key={category._id}
-                        className={styles.simpleDropdownItem}
-                        role="none"
-                      >
-                        <button
-                          className={styles.simpleDropdownButton}
-                          onClick={() => handleCategoryNavigation(category)}
-                          role="menuitem"
+                  <div
+                    id="shop-dropdown"
+                    className={styles.dropdownContent}
+                    aria-hidden={!isDropdownOpen}
+                    role="menu"
+                    onKeyDown={handleDropdownKeyDown}
+                    ref={dropdownRef}
+                  >
+                    <ul className={styles.simpleDropdownList} role="none">
+                      {filteredCategories.map(category => (
+                        <li
+                          key={category._id}
+                          className={styles.simpleDropdownItem}
+                          role="none"
                         >
-                          {category.parent}
-                          <span className={styles.productCount}>
-                            ({category.products.length})
-                          </span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </li>
-              <li>
-                <Link href="/shop" className={styles.bottomNavLink}>
-                  PRODUCTS
-                </Link>
-              </li>
-            </ul>
+                          <button
+                            className={styles.simpleDropdownButton}
+                            onClick={() => handleCategoryNavigation(category)}
+                            role="menuitem"
+                          >
+                            {category.parent}
+                            <span className={styles.productCount}>
+                              ({category.products.length})
+                            </span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </li>
+                <li>
+                  <Link href="/shop" className={styles.bottomNavLink}>
+                    PRODUCTS
+                  </Link>
+                </li>
+              </ul>
+            </div>
           </nav>
         </div>
       </div>

@@ -123,6 +123,8 @@
   align-items: center;
   justify-content: center;
   padding: 1rem;
+  border: 7px solid #495057;
+  border-radius: 7px;
 }
 
 /* Vertical thumbnails (desktop) */

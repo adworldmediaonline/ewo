@@ -24,9 +24,10 @@ export default function HeroBanner() {
         style={{
           width: '100%',
           height: 'auto',
-          borderRadius: '8px',
+          borderBottomLeftRadius: '8px',
+          borderBottomRightRadius: '8px',
           marginBottom: '1rem',
-          marginTop: '1rem',
+          // marginTop: '1rem',
         }}
       />
     </div>
