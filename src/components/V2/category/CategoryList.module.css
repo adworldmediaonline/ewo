@@ -105,7 +105,7 @@
 
 .ewoList {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 30px;
   margin: 0 auto;
   position: relative;
@@ -202,11 +202,12 @@
 .ewoOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
+  /* background: linear-gradient(
     20deg,
     rgba(26, 35, 126, 0.85),
     rgba(64, 81, 181, 0.75)
-  );
+  ); */
+  background-color: #d1d3d6;
   display: flex;
   align-items: center;
   justify-content: center;

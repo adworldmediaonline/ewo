@@ -12,12 +12,14 @@ import Wrapper from '@/layout/wrapper';
 import Footer from '@/layout/footers/footer';
 import CategoryList from '@/components/V2/category/CategoryList';
 import HeaderV2 from '@/layout/headers/HeaderV2';
+import HeroBanner from '@/components/V2/heroBanner/HeroBanner';
 
 export default async function HomePage() {
   return (
     <Wrapper>
       <HeaderV2 />
       {/* <HeroSlider /> */}
+      <HeroBanner />
       <CategoryList />
       {/* <ElectronicCategory /> */}
       {/* <FeatureArea /> */}
