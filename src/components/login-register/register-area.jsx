@@ -26,9 +26,10 @@ const RegisterArea = () => {
                 </div>
                 <div className="tp-login-option">
                   <div className="tp-login-social mb-10 d-flex flex-wrap align-items-center justify-content-center">
-                    <div className="tp-login-option-item has-google">
+                    {/* TODO: Add social login REMOVE BELOW COMMENTED CODE */}
+                    {/* <div className="tp-login-option-item has-google">
                       <GoogleSignUp />
-                    </div>
+                    </div> */}
                   </div>
                   <div className="tp-login-mail text-center mb-40">
                     <p>
