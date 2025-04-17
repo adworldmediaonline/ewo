@@ -73,9 +73,9 @@ export const fetchApi = async ({
   method = 'GET',
   body = null,
   headers = {},
-  cache,
+  // cache,
   tags,
-  revalidate,
+  // revalidate,
 }) => {
   try {
     const baseUrl = getBaseUrl();
@@ -101,19 +101,20 @@ export const fetchApi = async ({
     }
 
     // Only add cache if it's provided
-    if (cache) {
-      options.cache = cache;
-    }
+    // if (cache) {
+    //   options.cache = cache;
+    // }
 
     // Only add next.js specific options if they're provided
-    if (tags || revalidate) {
+    // if (tags || revalidate) {
+    if (tags) {
       options.next = {};
       if (tags) {
         options.next.tags = tags;
       }
-      if (revalidate) {
-        options.next.revalidate = revalidate;
-      }
+      // if (revalidate) {
+      //   options.next.revalidate = revalidate;
+      // }
     }
 
     const response = await fetch(url, options);
