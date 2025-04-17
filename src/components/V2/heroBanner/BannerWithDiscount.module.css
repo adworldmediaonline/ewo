@@ -1,0 +1,145 @@
+.bannerContainer {
+  width: 100%;
+  max-width: 1680px;
+  margin: 0 auto;
+  padding: 0 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.bannerGrid {
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #0b0b09;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.imageColumn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #1a1a1a;
+  padding: 0.5rem;
+}
+
+.imageWrapper {
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bannerImage {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  max-height: 250px;
+}
+
+.contentColumn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.content {
+  text-align: center;
+  max-width: 90%;
+}
+
+.subTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #dc2626;
+  margin-bottom: 0.5rem;
+  letter-spacing: 1px;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.75rem;
+  line-height: 1.2;
+}
+
+.description {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.button {
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  padding: 0.625rem 1.25rem;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 0.875rem;
+}
+
+.button:hover {
+  background-color: #b91c1c;
+}
+
+/* Tablet and Desktop styles */
+@media (min-width: 768px) {
+  .bannerGrid {
+    flex-direction: row;
+    min-height: 220px;
+    height: auto;
+  }
+
+  .imageColumn {
+    width: 50%;
+    height: auto;
+  }
+
+  .imageWrapper {
+    height: 100%;
+  }
+
+  .bannerImage {
+    max-height: 280px;
+  }
+
+  .contentColumn {
+    width: 50%;
+    padding: 1.5rem;
+  }
+
+  .content {
+    text-align: left;
+    max-width: 450px;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+}
+
+/* Large Desktop styles */
+@media (min-width: 1280px) {
+  .contentColumn {
+    padding: 2rem;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .description {
+    font-size: 1rem;
+  }
+}

@@ -1,34 +1,22 @@
 'use client';
 
 import { CldImage } from 'next-cloudinary';
+import styles from './HeroBanner.module.css';
 
 export default function HeroBanner() {
   return (
-    <div
-      style={{
-        width: '100%',
-        maxWidth: '1680px',
-        margin: '0 auto',
-        padding: '0 0.75rem',
-      }}
-    >
+    <div className={styles.bannerContainer}>
       <CldImage
         src="banner1_zyqptl"
         alt="Banner"
         width={1680}
-        height={420}
+        height={650}
         sizes="100vw"
         preserveTransformations={true}
-        crop="limit"
+        crop="scale"
+        gravity="center"
         priority
-        style={{
-          width: '100%',
-          height: 'auto',
-          borderBottomLeftRadius: '8px',
-          borderBottomRightRadius: '8px',
-          marginBottom: '1rem',
-          // marginTop: '1rem',
-        }}
+        className={styles.bannerImage}
       />
     </div>
   );

@@ -22,7 +22,7 @@ export default async function CategoryItems() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.ewoHeader}>
+      {/* <div className={styles.ewoHeader}>
         <h2 className={styles.ewoTitle}>
           <span className={styles.titleHighlight}>Explore</span> Categories
         </h2>
@@ -30,7 +30,7 @@ export default async function CategoryItems() {
           Find high-quality auto parts for your vehicle from our extensive
           catalog
         </p>
-      </div>
+      </div> */}
 
       <div className={styles.ewoList}>
         {filteredCategories.map((category, index) => (
