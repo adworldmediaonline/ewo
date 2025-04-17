@@ -1,0 +1,41 @@
+.bannerContainer {
+  width: 100%;
+  max-width: 1680px;
+  margin: 0 auto;
+  padding: 0 0.75rem;
+  position: relative;
+  margin-top: 1rem;
+}
+
+.bannerImage {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  display: block;
+  object-fit: contain;
+  aspect-ratio: 1680 / 650;
+}
+
+/* Desktop styles */
+@media (min-width: 1024px) {
+  .bannerImage {
+    max-height: 650px;
+  }
+}
+
+/* Tablet styles */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .bannerImage {
+    max-height: 400px;
+    aspect-ratio: 3 / 1.2;
+  }
+}
+
+/* Mobile styles */
+@media (max-width: 767px) {
+  .bannerImage {
+    max-height: 300px;
+    aspect-ratio: 2 / 1;
+  }
+}

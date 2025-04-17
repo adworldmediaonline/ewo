@@ -13,6 +13,7 @@ import Footer from '@/layout/footers/footer';
 import CategoryList from '@/components/V2/category/CategoryList';
 import HeaderV2 from '@/layout/headers/HeaderV2';
 import HeroBanner from '@/components/V2/heroBanner/HeroBanner';
+import BannerWithDiscount from '@/components/V2/heroBanner/BannerWithDiscount';
 
 export default async function HomePage() {
   return (
@@ -20,6 +21,7 @@ export default async function HomePage() {
       <HeaderV2 />
       {/* <HeroSlider /> */}
       <HeroBanner />
+      <BannerWithDiscount />
       <CategoryList />
       {/* <ElectronicCategory /> */}
       {/* <FeatureArea /> */}
