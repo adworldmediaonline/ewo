@@ -1,24 +1,61 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import styles from './CategoryList.module.css';
-import { get } from '@/services/api';
 import { titleCaseFirstLetterOfEveryWord } from '@/lib/titleCaseFirstLetterOfEveryWord';
+import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
+import CategorySkeleton from '../loaders/CategorySkeleton';
+import EmptyState from '../common/EmptyState';
 
-export default async function CategoryItems() {
-  const data = await get('/api/category/show', {
-    // cache: 'force-cache',
-    tags: ['categories'],
-    // revalidate: 3600, // Revalidate every hour
-  });
+export default function CategoryItems() {
+  const { data, isLoading, isError, refetch } = useGetShowCategoryQuery();
+
+  if (isLoading) {
+    return <CategorySkeleton />;
+  }
+
+  if (isError) {
+    return (
+      <EmptyState
+        title="Failed to Load Categories"
+        message="We encountered an error while loading categories. Please try again later."
+        icon="error"
+        action={() => refetch()}
+        actionText="Try Again"
+      />
+    );
+  }
 
   if (!data?.result?.length) {
-    return <div className={styles.ewoError}>No categories found</div>;
+    return (
+      <EmptyState
+        title="No Categories Found"
+        message="There are no categories available at this time."
+        icon="category"
+        actionLink="/"
+        actionText="Back to Home"
+      />
+    );
   }
 
   // Filter out categories with no products or hidden status
   const filteredCategories = data.result.filter(
     category => category.products?.length > 0 && category.status === 'Show'
   );
+
+  // If after filtering there are no categories, show empty state
+  if (!filteredCategories.length) {
+    return (
+      <EmptyState
+        title="No Active Categories"
+        message="There are no categories with products available at this time."
+        icon="category"
+        actionLink="/"
+        actionText="Back to Home"
+      />
+    );
+  }
 
   return (
     <div className={styles.container}>

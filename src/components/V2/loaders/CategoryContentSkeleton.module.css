@@ -1,0 +1,131 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.headerAccent {
+  width: 60px;
+  height: 4px;
+  background-color: #f0f0f0;
+  margin: 0 auto 1.5rem;
+}
+
+.title {
+  height: 2.5rem;
+  width: 50%;
+  margin: 0 auto 1.5rem;
+  border-radius: 4px;
+}
+
+.description {
+  height: 1rem;
+  width: 70%;
+  margin: 0 auto;
+  border-radius: 4px;
+}
+
+.gridContainer {
+  width: 100%;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.categoryCard {
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  height: 120px;
+  transition: transform 0.3s ease;
+}
+
+.cardTop {
+  height: 8px;
+  background-color: #f0f0f0;
+}
+
+.cardDecoration {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 24px;
+  height: 24px;
+  background-color: #f0f0f0;
+  clip-path: polygon(100% 0, 0 0, 100% 100%);
+}
+
+.cardInner {
+  padding: 1.5rem;
+}
+
+.categoryTitle {
+  height: 1.5rem;
+  width: 70%;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.categoryMeta {
+  display: flex;
+  align-items: center;
+}
+
+.shopNow {
+  height: 1rem;
+  width: 30%;
+  border-radius: 4px;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Tablet styles */
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .title {
+    width: 40%;
+  }
+
+  .description {
+    width: 60%;
+  }
+}
+
+/* Desktop styles */
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .container {
+    padding: 3rem 2rem;
+  }
+}

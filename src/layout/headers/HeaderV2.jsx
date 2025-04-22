@@ -166,7 +166,7 @@ export default function HeaderV2() {
                   <Image
                     src={logo}
                     alt="logo"
-                    width={217}
+                    width={190}
                     priority
                     className={styles.desktopLogo}
                   />

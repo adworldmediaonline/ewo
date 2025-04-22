@@ -1,25 +1,27 @@
-import { redirect } from 'next/navigation';
-import { Suspense } from 'react';
-import CategorySkeleton from '../../components/V2/loaders/CategorySkeleton';
+'use client';
+
+import { useRouter, useSearchParams } from 'next/navigation';
 import CategoryContent from '../../components/V2/category/CategoryContent';
+import { Suspense } from 'react';
+import CategoryContentSkeleton from '@/components/V2/loaders/CategoryContentSkeleton';
 
-export const metadata = {
-  title: 'Category | EWO Shop',
-  description: 'Browse our product categories',
-};
-
-export default async function CategoryPage(props) {
-  const searchParams = await props.searchParams;
-  const categoryId = searchParams?.id;
+function CategoryPageContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const categoryId = searchParams?.get('id');
 
   if (!categoryId) {
-    redirect('/shop');
+    router.push('/shop');
+    return null;
   }
+  return <CategoryContent categoryId={categoryId} />;
+}
 
+export default function CategoryPage() {
   return (
     <main className="category-page-wrapper">
-      <Suspense fallback={<CategorySkeleton />}>
-        <CategoryContent categoryId={categoryId} />
+      <Suspense fallback={<CategoryContentSkeleton />}>
+        <CategoryPageContent />
       </Suspense>
     </main>
   );
