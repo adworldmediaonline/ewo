@@ -7,7 +7,7 @@ export default function HeroBanner() {
   return (
     <div className={styles.bannerContainer}>
       <CldImage
-        src="Untitled_1656_x_700_px_1_x1wmbk"
+        src="Untitled_1656_x_700_px_2_kzqaka"
         alt="Banner"
         width={1680}
         height={700}

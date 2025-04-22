@@ -73,6 +73,14 @@ export default function DetailsWrapper({
 
   // handle add product
   const handleAddProduct = prd => {
+    // Check if product has options but none are selected
+    if (options && options.length > 0 && !selectedOption) {
+      notifyError(
+        'Please select an option before adding the product to your cart.'
+      );
+      return;
+    }
+
     // Check if product already exists in cart
     const existingProduct = cart_products.find(item => item._id === prd._id);
 
