@@ -3,7 +3,8 @@
   max-width: 1680px;
   margin: 0 auto;
   padding: 0 0.75rem;
-  margin-bottom: 2rem;
+  position: relative;
+  margin-top: 1rem;
 }
 
 .bannerGrid {
@@ -36,9 +37,11 @@
 .bannerImage {
   width: 100%;
   height: auto;
+  border-radius: 8px;
+  margin-bottom: 1rem;
   display: block;
   object-fit: contain;
-  max-height: 250px;
+  aspect-ratio: 1680 / 400;
 }
 
 .contentColumn {
@@ -77,20 +80,61 @@
   line-height: 1.6;
 }
 
+.bannerOverlay {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 10;
+}
+
 .button {
-  background-color: #dc2626;
+  background-color: #ff4003;
   color: white;
-  border: none;
-  padding: 0.625rem 1.25rem;
-  border-radius: 4px;
   font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s;
-  font-size: 0.875rem;
+  transition: all 0.3s ease;
 }
 
 .button:hover {
-  background-color: #b91c1c;
+  background-color: #e63700;
+  transform: translateY(-2px);
+}
+
+/* Desktop styles */
+@media (min-width: 1024px) {
+  .bannerImage {
+    max-height: 400px;
+  }
+}
+
+/* Tablet styles */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .bannerContainer {
+    padding: 0 0.5rem;
+  }
+
+  .bannerImage {
+    max-height: 300px;
+    aspect-ratio: 3 / 1;
+  }
+}
+
+/* Mobile styles */
+@media (max-width: 767px) {
+  .bannerContainer {
+    padding: 0 0.25rem;
+    margin-top: 0.5rem;
+  }
+
+  .bannerImage {
+    max-height: 200px;
+    aspect-ratio: 2 / 1;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+  }
 }
 
 /* Tablet and Desktop styles */
@@ -108,10 +152,6 @@
 
   .imageWrapper {
     height: 100%;
-  }
-
-  .bannerImage {
-    max-height: 280px;
   }
 
   .contentColumn {

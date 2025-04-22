@@ -1,30 +1,65 @@
-import React from 'react';
-import { redirect } from 'next/navigation';
+'use client';
+
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import styles from './CategoryContent.module.css';
 import ChildCategoryCard from './ChildCategoryCard';
 import HeaderV2 from '@/layout/headers/HeaderV2';
 import Footer from '@/layout/footers/footer';
 import parentCategoryModified from '@/lib/parentCategory';
+import { useGetCategoryByIdQuery } from '@/redux/features/categoryApi';
+import CategoryContentSkeleton from '../loaders/CategoryContentSkeleton';
+import EmptyState from '../common/EmptyState';
 
-async function fetchCategory(id) {
-  const baseUrl = process.env.API_BASE_URL;
-  const res = await fetch(`${baseUrl}/api/category/get/${id}`, {
-    cache: 'no-store',
-  });
+function CategoryContent({ categoryId }) {
+  const router = useRouter();
+  const {
+    data: category,
+    isLoading,
+    isError,
+  } = useGetCategoryByIdQuery(categoryId);
 
-  if (!res.ok) {
-    throw new Error('Failed to fetch category');
+  // Handle redirect with useEffect
+  useEffect(() => {
+    if (category && (!category.children || category.children.length === 0)) {
+      const parentCat = parentCategoryModified(category.parent);
+      router.push(`/shop?category=${parentCat}`);
+    }
+  }, [category, router]);
+
+  // Handle loading state
+  if (isLoading) {
+    return (
+      <>
+        <HeaderV2 />
+        <CategoryContentSkeleton />
+        <Footer />
+      </>
+    );
   }
 
-  return res.json();
-}
+  // Handle error state
+  if (isError) {
+    return (
+      <>
+        <HeaderV2 />
+        <EmptyState
+          title="Failed to Load Category"
+          message="We encountered an error while loading this category. Please try again later."
+          icon="error"
+          actionLink="/shop"
+          actionText="Back to Shop"
+        />
+        <Footer />
+      </>
+    );
+  }
 
-async function CategoryContent({ categoryId }) {
-  const category = await fetchCategory(categoryId);
   const parentCategory = parentCategoryModified(category.parent);
 
+  // Return null early if there are no children
   if (!category.children || category.children.length === 0) {
-    redirect(`/shop?category=${parentCategory}`);
+    return null;
   }
 
   return (

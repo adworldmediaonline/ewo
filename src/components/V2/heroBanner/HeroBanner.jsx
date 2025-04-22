@@ -7,15 +7,15 @@ export default function HeroBanner() {
   return (
     <div className={styles.bannerContainer}>
       <CldImage
-        src="banner1_zyqptl"
+        src="Untitled_1656_x_700_px_1_x1wmbk"
         alt="Banner"
         width={1680}
-        height={650}
-        sizes="100vw"
-        preserveTransformations={true}
+        height={700}
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1680px"
         crop="scale"
         gravity="center"
         priority
+        quality={90}
         className={styles.bannerImage}
       />
     </div>

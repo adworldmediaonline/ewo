@@ -9,7 +9,7 @@
 
 .bannerImage {
   width: 100%;
-  height: auto;
+  /* height: auto; */
   border-radius: 8px;
   margin-bottom: 1rem;
   display: block;
@@ -18,14 +18,18 @@
 }
 
 /* Desktop styles */
-@media (min-width: 1024px) {
+/* @media (min-width: 1024px) {
   .bannerImage {
     max-height: 650px;
   }
-}
+} */
 
 /* Tablet styles */
 @media (min-width: 768px) and (max-width: 1023px) {
+  .bannerContainer {
+    padding: 0 0.5rem;
+  }
+
   .bannerImage {
     max-height: 400px;
     aspect-ratio: 3 / 1.2;
@@ -34,8 +38,15 @@
 
 /* Mobile styles */
 @media (max-width: 767px) {
+  .bannerContainer {
+    padding: 0 0.25rem;
+    margin-top: 0.5rem;
+  }
+
   .bannerImage {
     max-height: 300px;
     aspect-ratio: 2 / 1;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
   }
 }
