@@ -9,13 +9,13 @@ export default function BannerWithDiscount() {
       <CldImage
         src="EWO_10_ylw3co"
         width={1680}
-        height={400}
+        height={300}
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1680px"
         className={styles.bannerImage}
         alt="EWO Special Offer"
-        crop="fill"
+        crop="scale"
         quality={90}
-        loading="eager"
+        loading="lazy"
       />
     </div>
   );
