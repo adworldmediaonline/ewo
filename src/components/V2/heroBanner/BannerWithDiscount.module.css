@@ -2,7 +2,7 @@
   width: 100%;
   max-width: 1680px;
   margin: 0 auto;
-  padding: 0;
+  padding: 0 !important;
   position: relative;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
@@ -106,7 +106,7 @@
 /* Desktop styles */
 @media (min-width: 1024px) {
   .bannerContainer {
-    padding: 0 0.5rem;
+    /* padding: 0 0.5rem; */
     margin-top: 1rem;
     margin-bottom: 1rem;
   }
