@@ -25,10 +25,12 @@ export default function HeaderV2() {
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const dropdownButtonRef = useRef(null);
+  const mainDropdownButtonRef = useRef(null);
+  const stickyDropdownButtonRef = useRef(null);
   const mobileSearchInputRef = useRef(null);
-  const [isHeaderHidden, setIsHeaderHidden] = useState(false);
+  const [showStickyHeader, setShowStickyHeader] = useState(false);
   const prevScrollPos = useRef(0);
+  const [activeDropdownButton, setActiveDropdownButton] = useState(null);
 
   // Fetch categories
   const { data: categories, isLoading: categoriesLoading } =
@@ -36,22 +38,22 @@ export default function HeaderV2() {
 
   // Simple and effective scroll handling
   useEffect(() => {
+    let lastTime = 0;
+    const throttleDelay = 100; // 100ms throttle for better performance
+
     const handleScroll = () => {
+      const now = Date.now();
+      if (now - lastTime < throttleDelay) return;
+      lastTime = now;
+
       const currentScrollPos = window.scrollY;
       const scrollDelta = currentScrollPos - prevScrollPos.current;
 
-      // Don't do anything at the very top of the page
-      if (currentScrollPos < 50) {
-        setIsHeaderHidden(false);
-        prevScrollPos.current = currentScrollPos;
-        return;
-      }
-
-      // Going down = hide, going up = show
-      if (scrollDelta > 10) {
-        setIsHeaderHidden(true);
-      } else if (scrollDelta < -10) {
-        setIsHeaderHidden(false);
+      // Show sticky header when scrolling past threshold
+      if (currentScrollPos > 200) {
+        setShowStickyHeader(true);
+      } else {
+        setShowStickyHeader(false);
       }
 
       prevScrollPos.current = currentScrollPos;
@@ -61,22 +63,29 @@ export default function HeaderV2() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleDropdownToggle = () => {
+  const handleDropdownToggle = buttonType => {
+    setActiveDropdownButton(buttonType);
     setIsDropdownOpen(!isDropdownOpen);
   };
 
   const handleDropdownKeyDown = e => {
     if (e.key === 'Escape') {
       setIsDropdownOpen(false);
-      dropdownButtonRef.current?.focus();
+      if (activeDropdownButton === 'main') {
+        mainDropdownButtonRef.current?.focus();
+      } else {
+        stickyDropdownButtonRef.current?.focus();
+      }
     }
   };
 
+  // Close dropdown when clicking outside
   const handleClickOutside = event => {
     if (
       dropdownRef.current &&
       !dropdownRef.current.contains(event.target) &&
-      !dropdownButtonRef.current?.contains(event.target)
+      !mainDropdownButtonRef.current?.contains(event.target) &&
+      !stickyDropdownButtonRef.current?.contains(event.target)
     ) {
       setIsDropdownOpen(false);
     }
@@ -150,13 +159,82 @@ export default function HeaderV2() {
     }, 100);
   };
 
+  // Add a closeSearch function
+  const closeSearch = () => {
+    setIsMobileSearchOpen(false);
+  };
+
+  // Create a navigation component that can be reused
+  const renderNavLinks = (
+    linkClassName,
+    navListClassName,
+    containerClassName,
+    isSticky = false
+  ) => (
+    <div className={containerClassName || ''}>
+      <ul className={navListClassName}>
+        <li>
+          <Link href="/" className={linkClassName}>
+            HOME
+          </Link>
+        </li>
+        <li>
+          <button
+            ref={isSticky ? stickyDropdownButtonRef : mainDropdownButtonRef}
+            className={`${linkClassName} ${styles.dropdownButton}`}
+            onClick={() => handleDropdownToggle(isSticky ? 'sticky' : 'main')}
+            aria-expanded={isDropdownOpen}
+            aria-controls="shop-dropdown"
+            aria-haspopup="true"
+          >
+            SHOP
+            <span className={styles.dropdownIcon}>▼</span>
+            <span className={styles.srOnly}>
+              {isDropdownOpen ? 'Close menu' : 'Open menu'}
+            </span>
+          </button>
+        </li>
+        <li>
+          <Link href="/shop" className={linkClassName}>
+            PRODUCTS
+          </Link>
+        </li>
+      </ul>
+    </div>
+  );
+
+  // Get dropdown position based on active button
+  const getDropdownPosition = () => {
+    if (!isDropdownOpen) return {};
+
+    if (activeDropdownButton === 'sticky') {
+      const buttonRect =
+        stickyDropdownButtonRef.current?.getBoundingClientRect();
+      if (buttonRect) {
+        return {
+          position: 'fixed',
+          top: `${buttonRect.bottom}px`,
+          left: `${buttonRect.left}px`,
+        };
+      }
+    } else {
+      const buttonRect = mainDropdownButtonRef.current?.getBoundingClientRect();
+      if (buttonRect) {
+        return {
+          position: 'absolute',
+          top: '100%',
+          left: '0',
+        };
+      }
+    }
+
+    return {};
+  };
+
   return (
-    <div className={styles.headerWrapper}>
-      <div
-        className={`${styles.headerContainer} ${
-          sticky ? styles.stickyActive : ''
-        } ${isHeaderHidden ? styles.headerHidden : ''}`}
-      >
+    <header className={styles.headerWrapper}>
+      {/* Main Header (always static) */}
+      <div className={styles.headerContainer}>
         <header className={styles.header}>
           <div className={styles.headerInnerContainer}>
             <div className={styles.container}>
@@ -236,84 +314,121 @@ export default function HeaderV2() {
         <div className={styles.headerBottom}>
           <nav className={styles.bottomNav}>
             <div className={styles.headerInnerContainer}>
-              <ul className={styles.bottomNavList}>
-                <li>
-                  <Link href="/" className={styles.bottomNavLink}>
-                    HOME
-                  </Link>
-                </li>
-                <li>
-                  <button
-                    ref={dropdownButtonRef}
-                    className={`${styles.bottomNavLink} ${styles.dropdownButton}`}
-                    onClick={handleDropdownToggle}
-                    aria-expanded={isDropdownOpen}
-                    aria-controls="shop-dropdown"
-                    aria-haspopup="true"
-                  >
-                    SHOP
-                    <span className={styles.dropdownIcon}>▼</span>
-                    <span className={styles.srOnly}>
-                      {isDropdownOpen ? 'Close menu' : 'Open menu'}
-                    </span>
-                  </button>
-
-                  <div
-                    id="shop-dropdown"
-                    className={styles.dropdownContent}
-                    aria-hidden={!isDropdownOpen}
-                    role="menu"
-                    onKeyDown={handleDropdownKeyDown}
-                    ref={dropdownRef}
-                  >
-                    <ul className={styles.simpleDropdownList} role="none">
-                      {filteredCategories.map(category => (
-                        <li
-                          key={category._id}
-                          className={styles.simpleDropdownItem}
-                          role="none"
-                        >
-                          <button
-                            className={styles.simpleDropdownButton}
-                            onClick={() => handleCategoryNavigation(category)}
-                            role="menuitem"
-                          >
-                            {category.parent}
-                            <span className={styles.productCount}>
-                              ({category.products.length})
-                            </span>
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </li>
-                <li>
-                  <Link href="/shop" className={styles.bottomNavLink}>
-                    PRODUCTS
-                  </Link>
-                </li>
-              </ul>
+              {renderNavLinks(styles.bottomNavLink, styles.bottomNavList)}
             </div>
           </nav>
         </div>
       </div>
 
-      {/* Mobile Search */}
+      {/* Separate Sticky Header that appears on scroll */}
+      <div
+        className={`${styles.stickyHeader} ${
+          showStickyHeader ? styles.stickyHeaderVisible : ''
+        }`}
+      >
+        <div className={styles.stickyHeaderContent}>
+          {/* Logo */}
+          <Link href="/">
+            <Image
+              src={logo}
+              alt="logo"
+              width={120}
+              height={40}
+              className={styles.desktopLogo}
+              priority
+            />
+            <Image
+              src={logo}
+              alt="logo"
+              width={80}
+              height={30}
+              className={styles.mobileLogo}
+              priority
+            />
+          </Link>
+
+          {/* Navigation */}
+          {renderNavLinks(
+            styles.stickyNavLink,
+            styles.stickyNavList,
+            styles.stickyNav,
+            true
+          )}
+
+          {/* Sticky Header Search */}
+          <div className={styles.stickySearchContainer}>
+            <SearchForm />
+          </div>
+
+          {/* Action Buttons */}
+          <div className={styles.actions}>
+            <button
+              className={styles.searchButton}
+              onClick={handleMobileSearchOpen}
+            >
+              <Search />
+            </button>
+
+            <Link href="/compare" className={styles.actionButton}>
+              <Compare />
+            </Link>
+
+            <Link href="/wishlist" className={styles.actionButton}>
+              <Wishlist />
+              {wishlist.length > 0 && (
+                <span className={styles.actionBadge}>{wishlist.length}</span>
+              )}
+            </Link>
+
+            <button
+              className={styles.actionButton}
+              onClick={() => dispatch(openCartMini())}
+            >
+              <CartTwo />
+              {quantity > 0 && (
+                <span className={styles.actionBadge}>{quantity}</span>
+              )}
+            </button>
+
+            <Link href="/profile" className={styles.actionButton}>
+              <User />
+            </Link>
+
+            {/* Add sidebar toggle for sticky header */}
+            <button
+              className={`${styles.actionButton} ${styles.mobileMenu}`}
+              onClick={() => setIsMobileNavOpen(true)}
+              aria-label="Open menu"
+            >
+              <Menu />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Search Overlay */}
       <div
         className={`${styles.mobileSearch} ${
           isMobileSearchOpen ? styles.mobileSearchActive : ''
         }`}
       >
-        <div className={styles.mobileSearchHeader}>
-          <button
-            className={styles.mobileSearchClose}
-            onClick={() => setIsMobileSearchOpen(false)}
-          >
-            <Close />
-          </button>
-          <SearchForm inputRef={mobileSearchInputRef} />
+        <div className={styles.mobileSearchWrapper}>
+          <div className={styles.mobileSearchHeader}>
+            <button
+              className={styles.mobileSearchClose}
+              onClick={closeSearch}
+              aria-label="Close search"
+            >
+              <Close />
+            </button>
+            <SearchForm inputRef={mobileSearchInputRef} />
+          </div>
         </div>
+        {/* Add backdrop that closes search when clicked */}
+        <div
+          className={styles.mobileSearchBackdrop}
+          onClick={closeSearch}
+        ></div>
       </div>
 
       {/* Mobile Navigation */}
@@ -323,10 +438,18 @@ export default function HeaderV2() {
         }`}
       >
         <div className={styles.mobileNavHeader}>
-          <Image src={logo} alt="logo" width={100} priority />
+          <Image
+            src={logo}
+            alt="logo"
+            width={100}
+            height={35}
+            priority
+            className={styles.sidebarLogo}
+          />
           <button
             className={styles.actionButton}
             onClick={() => setIsMobileNavOpen(false)}
+            aria-label="Close menu"
           >
             <Close />
           </button>
@@ -426,8 +549,54 @@ export default function HeaderV2() {
         </div>
       </div>
 
+      {/* Dropdown Menu (for Shop) */}
+      <div
+        id="shop-dropdown"
+        className={styles.dropdownContent}
+        aria-hidden={!isDropdownOpen}
+        role="menu"
+        onKeyDown={handleDropdownKeyDown}
+        ref={dropdownRef}
+        style={{
+          ...getDropdownPosition(),
+          display: isDropdownOpen ? 'block' : 'none',
+        }}
+      >
+        <ul className={styles.simpleDropdownList} role="none">
+          {filteredCategories.map(category => (
+            <li
+              key={category._id}
+              className={styles.simpleDropdownItem}
+              role="none"
+            >
+              <button
+                className={styles.simpleDropdownButton}
+                onClick={() => handleCategoryNavigation(category)}
+                role="menuitem"
+              >
+                {category.parent}
+                <span className={styles.productCount}>
+                  ({category.products.length})
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+
       {/* Cart Mini Sidebar */}
       <CartMiniSidebar />
-    </div>
+
+      {/* Add this close backdrop to the existing code with the other backdrop */}
+      {(isMobileNavOpen || isMobileSearchOpen) && (
+        <div
+          className={styles.backdrop}
+          onClick={() => {
+            setIsMobileNavOpen(false);
+            setIsMobileSearchOpen(false);
+          }}
+        />
+      )}
+    </header>
   );
 }
