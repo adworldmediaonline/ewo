@@ -1,12 +1,12 @@
 'use client';
-import { useState } from "react";
-import { CardElement } from "@stripe/react-stripe-js";
-import { useSelector } from "react-redux";
+import { useState } from 'react';
+import { CardElement } from '@stripe/react-stripe-js';
+import { useSelector } from 'react-redux';
 // internal
-import useCartInfo from "@/hooks/use-cart-info";
-import ErrorMsg from "../common/error-msg";
+import useCartInfo from '@/hooks/use-cart-info';
+import ErrorMsg from '../common/error-msg';
 
-const CheckoutOrderArea = ({ checkoutData }) => {
+export default function CheckoutOrderArea({ checkoutData }) {
   const {
     handleShippingCost,
     cartTotal = 0,
@@ -18,9 +18,10 @@ const CheckoutOrderArea = ({ checkoutData }) => {
     showCard,
     setShowCard,
     shippingCost,
-    discountAmount
+    discountAmount,
+    processingPayment,
   } = checkoutData;
-  const { cart_products } = useSelector((state) => state.cart);
+  const { cart_products } = useSelector(state => state.cart);
   const { total } = useCartInfo();
   return (
     <div className="tp-checkout-place white-bg">
@@ -35,7 +36,7 @@ const CheckoutOrderArea = ({ checkoutData }) => {
           </li>
 
           {/*  item list */}
-          {cart_products.map((item) => (
+          {cart_products.map(item => (
             <li key={item._id} className="tp-order-info-list-desc">
               <p>
                 {item.title} <span> x {item.orderQuantity}</span>
@@ -85,20 +86,20 @@ const CheckoutOrderArea = ({ checkoutData }) => {
             </div>
           </li>
 
-           {/*  subtotal */}
-           <li className="tp-order-info-list-subtotal">
+          {/*  subtotal */}
+          <li className="tp-order-info-list-subtotal">
             <span>Subtotal</span>
             <span>${total.toFixed(2)}</span>
           </li>
 
-           {/*  shipping cost */}
-           <li className="tp-order-info-list-subtotal">
+          {/*  shipping cost */}
+          <li className="tp-order-info-list-subtotal">
             <span>Shipping Cost</span>
             <span>${shippingCost.toFixed(2)}</span>
           </li>
 
-           {/* discount */}
-           <li className="tp-order-info-list-subtotal">
+          {/* discount */}
+          <li className="tp-order-info-list-subtotal">
             <span>Discount</span>
             <span>${discountAmount.toFixed(2)}</span>
           </li>
@@ -121,7 +122,11 @@ const CheckoutOrderArea = ({ checkoutData }) => {
             name="payment"
             value="Card"
           />
-          <label onClick={() => setShowCard(true)} htmlFor="back_transfer" data-bs-toggle="direct-bank-transfer">
+          <label
+            onClick={() => setShowCard(true)}
+            htmlFor="back_transfer"
+            data-bs-toggle="direct-bank-transfer"
+          >
             Credit Card
           </label>
           {showCard && (
@@ -131,14 +136,14 @@ const CheckoutOrderArea = ({ checkoutData }) => {
                   options={{
                     style: {
                       base: {
-                        fontSize: "16px",
-                        color: "#424770",
-                        "::placeholder": {
-                          color: "#aab7c4",
+                        fontSize: '16px',
+                        color: '#424770',
+                        '::placeholder': {
+                          color: '#aab7c4',
                         },
                       },
                       invalid: {
-                        color: "#9e2146",
+                        color: '#9e2146',
                       },
                     },
                   }}
@@ -167,14 +172,23 @@ const CheckoutOrderArea = ({ checkoutData }) => {
       <div className="tp-checkout-btn-wrapper">
         <button
           type="submit"
-          disabled={!stripe || isCheckoutSubmit}
+          disabled={!stripe || isCheckoutSubmit || processingPayment}
           className="tp-checkout-btn w-100"
         >
-          Place Order
+          {processingPayment ? (
+            <span>
+              <span
+                className="spinner-border spinner-border-sm me-2"
+                role="status"
+                aria-hidden="true"
+              ></span>
+              Processing Payment...
+            </span>
+          ) : (
+            'Place Order'
+          )}
         </button>
       </div>
     </div>
   );
-};
-
-export default CheckoutOrderArea;
+}
