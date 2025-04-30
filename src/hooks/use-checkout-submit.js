@@ -193,11 +193,13 @@ const useCheckoutSubmit = () => {
     try {
       console.log('Creating payment intent with order data:', orderData);
 
-      // Create a payment intent with simple order data
+      // Create a payment intent with order data including cart
       const response = await createPaymentIntent({
         price: parseInt(cartTotal),
         email: orderData.email,
-        // Simple metadata that won't exceed size limits
+        // Include cart data for inventory management
+        cart: cart_products,
+        // Additional order metadata
         orderData: {
           email: orderData.email,
           name: orderData.name,
