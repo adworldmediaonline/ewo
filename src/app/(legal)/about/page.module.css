@@ -1,0 +1,95 @@
+/* .content {
+  max-width: 48rem;
+  margin: 0 auto;
+} */
+
+.title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 2rem;
+}
+
+.intro {
+  color: #4b5563;
+  margin-bottom: 2rem;
+  font-size: 1.125rem;
+  line-height: 1.75;
+}
+
+.missionTitle {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1.5rem;
+}
+
+.missionText {
+  color: #4b5563;
+  margin-bottom: 1.5rem;
+  line-height: 1.75;
+}
+
+.differenceTitle {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1.5rem;
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+@media (min-width: 768px) {
+  .featuresGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.featureCard {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.featureTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.75rem;
+}
+
+.featureText {
+  color: #4b5563;
+  line-height: 1.75;
+}
+
+.conclusion {
+  color: #4b5563;
+  margin-bottom: 2rem;
+  line-height: 1.75;
+}
+
+.ctaBox {
+  background-color: #f9fafb;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  margin-top: 3rem;
+}
+
+.ctaTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.ctaText {
+  color: #4b5563;
+  line-height: 1.75;
+}
