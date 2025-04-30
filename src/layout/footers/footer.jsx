@@ -63,18 +63,23 @@ export default function Footer() {
             <h3 className={styles.footerTitle}>Legal</h3>
             <ul className={styles.footerLinks}>
               <li className={styles.footerLink}>
-                <Link href="#" className={styles.footerLinkAnchor}>
+                <Link href="/terms" className={styles.footerLinkAnchor}>
                   Terms & Conditions
                 </Link>
               </li>
               <li className={styles.footerLink}>
-                <Link href="#" className={styles.footerLinkAnchor}>
-                  Privacy Policy
+                <Link href="/returns" className={styles.footerLinkAnchor}>
+                  Returns Policy
                 </Link>
               </li>
               <li className={styles.footerLink}>
-                <Link href="#" className={styles.footerLinkAnchor}>
-                  Returns Policy
+                <Link href="/history" className={styles.footerLinkAnchor}>
+                  History
+                </Link>
+              </li>
+              <li className={styles.footerLink}>
+                <Link href="/about" className={styles.footerLinkAnchor}>
+                  About
                 </Link>
               </li>
             </ul>

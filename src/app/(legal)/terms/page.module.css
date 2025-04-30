@@ -1,0 +1,75 @@
+.title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.date {
+  color: #4b5563;
+  margin-bottom: 2rem;
+}
+
+.intro {
+  color: #4b5563;
+  margin-bottom: 2rem;
+  font-size: 1.125rem;
+  line-height: 1.75;
+}
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.sectionText {
+  color: #4b5563;
+  line-height: 1.75;
+  margin-bottom: 1rem;
+}
+
+.list {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  color: #4b5563;
+  margin-bottom: 1rem;
+}
+
+.listItem {
+  margin-bottom: 0.5rem;
+}
+
+.contactBox {
+  background-color: #f9fafb;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  margin-top: 3rem;
+}
+
+.contactTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.contactInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.companyName {
+  font-weight: 600;
+  color: #111827;
+}
+
+.contactDetail {
+  color: #4b5563;
+}
