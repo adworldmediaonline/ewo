@@ -11,6 +11,23 @@ import parentCategoryModified from '@/lib/parentCategory';
 const ProductDetailsArea = ({ id }) => {
   const { data: product, isLoading, isError } = useGetProductQuery(id);
 
+  // Function to format category name without hyphens and capitalize first letter of each word
+  const formatCategoryName = name => {
+    return name
+      .replace(/-/g, ' ')
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
+  // Function to format product title with first letter of each word capitalized
+  const formatProductTitle = title => {
+    return title
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  };
+
   let content = null;
   if (isLoading) {
     content = <PrdDetailsLoader loading={isLoading} />;
@@ -20,24 +37,64 @@ const ProductDetailsArea = ({ id }) => {
   }
   if (!isLoading && !isError && product) {
     const categoryName = parentCategoryModified(product.category.name);
+    const formattedCategoryName = formatCategoryName(categoryName);
+    const formattedProductTitle = formatProductTitle(product.title);
+
     content = (
       <div className={styles.productContainer}>
-        <div className={styles.breadcrumb}>
-          <div className={styles.breadcrumbContent}>
-            <a href="/" className={styles.breadcrumbLink}>
-              Home
-            </a>
-            <span className={styles.breadcrumbSeparator}>/</span>
-            <a
-              href={`/shop?category=${categoryName}`}
-              className={styles.breadcrumbLink}
+        <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
+          <ol className={styles.breadcrumbList}>
+            <li className={styles.breadcrumbItem}>
+              <a href="/" className={styles.breadcrumbLink}>
+                <span className={styles.breadcrumbText}>Home</span>
+              </a>
+            </li>
+            <li className={styles.breadcrumbItem}>
+              <svg
+                className={styles.chevronIcon}
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+              <a
+                href={`/shop?category=${categoryName}`}
+                className={styles.breadcrumbLink}
+              >
+                <span className={styles.breadcrumbText}>
+                  {formattedCategoryName}
+                </span>
+              </a>
+            </li>
+            <li
+              className={`${styles.breadcrumbItem} ${styles.breadcrumbActive}`}
+              aria-current="page"
             >
-              {categoryName}
-            </a>
-            <span className={styles.breadcrumbSeparator}>/</span>
-            <span className={styles.breadcrumbCurrent}>{product.title}</span>
-          </div>
-        </div>
+              <svg
+                className={styles.chevronIcon}
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+              <span className={styles.breadcrumbCurrent}>
+                {formattedProductTitle}
+              </span>
+            </li>
+          </ol>
+        </nav>
         <ProductDetailsContent productItem={product} />
 
         <div className={styles.infoSection}>
@@ -114,7 +171,7 @@ const ProductDetailsArea = ({ id }) => {
                   fill="#009CDE"
                 />
                 <path
-                  d="M18.7 12.2C18.7 12.5 18.4 12.8 18.1 12.8H17.1C16.8 12.8 16.5 12.5 16.5 12.2V10.7H15.4C15.1 10.7 14.8 10.4 14.8 10.1V9.1C14.8 8.8 15.1 8.5 15.4 8.5H16.5V7C16.5 6.7 16.8 6.4 17.1 6.4H18.1C18.4 6.4 18.7 6.7 18.7 7V8.5H19.8C20.1 8.5 20.4 8.8 20.4 9.1V10.1C20.4 10.4 20.1 10.7 19.8 10.7H18.7V12.2Z"
+                  d="M18.7 12.2C18.7 12.5 18.4 12.8 18.1 12.8H17.1C16.8 12.8 16.5 12.5 16.5 12.2V10.7H15.4C15.1 10.7 14.8 10.4 14.8 10.1V9.1C14.8 8.8 15.1 8.5 15.4 8.5H16.5V7C16.5 6.7 16.8 6.4 17.1 6.4H18.1C18.4 6.4 18.7 6.7 18.7 7V8.5H19.8C19.8 8.5 20.4 8.8 20.4 9.1V10.1C20.4 10.4 20.1 10.7 19.8 10.7H18.7V12.2Z"
                   fill="#003087"
                 />
               </svg>
