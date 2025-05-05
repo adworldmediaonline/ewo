@@ -10,6 +10,7 @@ import {
   quantityDecrement,
   remove_product,
 } from '@/redux/features/cartSlice';
+import styles from '../../app/cart/cart.module.css';
 
 const CartItem = ({ product }) => {
   const {
@@ -38,70 +39,66 @@ const CartItem = ({ product }) => {
   };
 
   return (
-    <tr>
-      {/* img */}
-      <td className="tp-cart-img">
-        <Link href={`/product/${_id}`}>
-          <Image src={img} alt="product img" width={70} height={100} />
-        </Link>
-      </td>
-      {/* title */}
-      <td className="tp-cart-title">
-        <Link href={`/product/${_id}`}>
-          {title}
-          {selectedOption && (
-            <div
-              style={{
-                fontSize: '12px',
-                color: '#666',
-                marginTop: '5px',
-                padding: '2px 6px',
-                background: '#f5f5f5',
-                borderRadius: '3px',
-                display: 'inline-block',
-              }}
+    <tr className={styles['cart-item']}>
+      <td className={styles['cart-product-col']}>
+        <div className={styles['cart-product']}>
+          <div className={styles['cart-product-img']}>
+            <Link href={`/product/${_id}`}>
+              <Image src={img} alt={title} width={70} height={100} />
+            </Link>
+          </div>
+          <div className={styles['cart-product-info']}>
+            <Link
+              href={`/product/${_id}`}
+              className={styles['cart-product-title']}
             >
-              Option: {selectedOption.title} (+$
-              {Number(selectedOption.price).toFixed(2)})
-            </div>
-          )}
-        </Link>
+              {title}
+            </Link>
+            {selectedOption && (
+              <div className={styles['cart-product-option']}>
+                Option: {selectedOption.title} (+$
+                {Number(selectedOption.price).toFixed(2)})
+              </div>
+            )}
+          </div>
+        </div>
       </td>
-      {/* price */}
-      <td className="tp-cart-price">
-        <span>${(price * orderQuantity).toFixed(2)}</span>
+      <td className={styles['cart-price-col']}>
+        <span className={styles['cart-price']}>
+          ${(price * orderQuantity).toFixed(2)}
+        </span>
       </td>
-      {/* quantity */}
-      <td className="tp-cart-quantity">
-        <div className="tp-product-quantity mt-10 mb-10">
-          <span
+      <td className={styles['cart-quantity-col']}>
+        <div className={styles['cart-quantity']}>
+          <button
             onClick={() => handleDecrement(product)}
-            className="tp-cart-minus"
+            className={styles['cart-quantity-btn']}
+            aria-label="Decrease quantity"
           >
             <Minus />
-          </span>
+          </button>
           <input
-            className="tp-cart-input"
+            className={styles['cart-quantity-input']}
             type="text"
             value={orderQuantity}
             readOnly
           />
-          <span
+          <button
             onClick={() => handleAddProduct(product)}
-            className="tp-cart-plus"
+            className={styles['cart-quantity-btn']}
+            aria-label="Increase quantity"
           >
             <Plus />
-          </span>
+          </button>
         </div>
       </td>
-      {/* action */}
-      <td className="tp-cart-action">
+      <td className={styles['cart-action-col']}>
         <button
           onClick={() => handleRemovePrd({ title, id: _id })}
-          className="tp-cart-action-btn"
+          className={styles['cart-remove-btn']}
+          aria-label="Remove item"
         >
           <Close />
-          <span> Remove</span>
         </button>
       </td>
     </tr>
