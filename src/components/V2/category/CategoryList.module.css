@@ -12,6 +12,8 @@
   /* background: linear-gradient(135deg, #f8f9fa 0%, #f3f5f9 50%, #eef0f5 100%); */
   position: relative;
   overflow: visible;
+  /* background-color: #f8f9f */
+  background-color: #ffffff;
 }
 
 .ewoSection::before {
@@ -21,11 +23,11 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(
+  /* background: radial-gradient(
     circle at 80% 20%,
     rgba(26, 35, 126, 0.03) 0%,
     transparent 60%
-  );
+  ); */
   z-index: 0;
 }
 
