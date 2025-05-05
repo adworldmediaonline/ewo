@@ -6,70 +6,94 @@ import Link from 'next/link';
 import { clearCart } from '@/redux/features/cartSlice';
 import CartCheckout from './cart-checkout';
 import CartItem from './cart-item';
+import styles from '../../app/cart/cart.module.css';
 // import RenderCartProgress from '../common/render-cart-progress';
 
 const CartArea = () => {
   const { cart_products } = useSelector(state => state.cart);
   const dispatch = useDispatch();
   return (
-    <>
-      <section className="tp-cart-area pb-120">
-        <div className="container">
-          {cart_products.length === 0 && (
-            <div className="text-center pt-50">
-              <h3>No Cart Items Found</h3>
-              <Link href="/shop" className="tp-cart-checkout-btn mt-20">
-                Continue Shipping
+    <section className={styles['cart-section']}>
+      <div className="container">
+        {cart_products.length === 0 ? (
+          <div className={styles['empty-cart']}>
+            <div className={styles['empty-cart-content']}>
+              <svg
+                className={styles['empty-cart-icon']}
+                width="80"
+                height="80"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+              </svg>
+              <h3>Your Cart is Empty</h3>
+              <p>Looks like you haven't added anything to your cart yet.</p>
+              <Link href="/shop" className={styles['continue-shopping-btn']}>
+                Continue Shopping
               </Link>
             </div>
-          )}
-          {cart_products.length > 0 && (
+          </div>
+        ) : (
+          <div className={styles['cart-content']}>
+            <div className={styles['cart-header']}>
+              <h2 className={styles['cart-title']}>Shopping Cart</h2>
+              <p className={styles['cart-items-count']}>
+                {cart_products.length}{' '}
+                {cart_products.length === 1 ? 'item' : 'items'}
+              </p>
+            </div>
+
             <div className="row">
               <div className="col-xl-9 col-lg-8">
-                <div className="tp-cart-list mb-25 mr-30">
-                  {/* <div className="cartmini__shipping">
-                    <RenderCartProgress />
-                  </div> */}
-                  <table className="table">
-                    <thead>
+                <div className={styles['cart-table-wrapper']}>
+                  <table className={styles['cart-table']}>
+                    <thead className={styles['cart-table-head']}>
                       <tr>
-                        <th colSpan="2" className="tp-cart-header-product">
-                          Product
-                        </th>
-                        <th className="tp-cart-header-price">Price</th>
-                        <th className="tp-cart-header-quantity">Quantity</th>
-                        <th></th>
+                        <th className={styles['product-col']}>Product</th>
+                        <th className={styles['price-col']}>Price</th>
+                        <th className={styles['quantity-col']}>Quantity</th>
+                        <th className={styles['action-col']}></th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className={styles['cart-table-body']}>
                       {cart_products.map((item, i) => (
                         <CartItem key={i} product={item} />
                       ))}
                     </tbody>
                   </table>
                 </div>
-                <div className="tp-cart-bottom">
+                <div className={styles['cart-actions']}>
                   <div className="row align-items-end">
                     <div className="col-xl-6 col-md-8">
-                      {/* <div className="tp-cart-coupon">
-                        <form action="#">
-                          <div className="tp-cart-coupon-input-box">
-                            <label>Coupon Code:</label>
-                            <div className="tp-cart-coupon-input d-flex align-items-center">
-                              <input type="text" placeholder="Enter Coupon Code" />
-                              <button type="submit">Apply</button>
-                            </div>
-                          </div>
-                        </form>
-                      </div> */}
+                      {/* Coupon area can be added back here if needed */}
                     </div>
                     <div className="col-xl-6 col-md-4">
-                      <div className="tp-cart-update text-md-end mr-30">
+                      <div className={styles['cart-clear-btn-wrapper']}>
                         <button
                           onClick={() => dispatch(clearCart())}
                           type="button"
-                          className="tp-cart-update-btn"
+                          className={styles['cart-clear-btn']}
                         >
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                          </svg>
                           Clear Cart
                         </button>
                       </div>
@@ -81,10 +105,10 @@ const CartArea = () => {
                 <CartCheckout />
               </div>
             </div>
-          )}
-        </div>
-      </section>
-    </>
+          </div>
+        )}
+      </div>
+    </section>
   );
 };
 
