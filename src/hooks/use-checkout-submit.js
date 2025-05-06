@@ -304,9 +304,20 @@ const useCheckoutSubmit = () => {
           setIsCheckoutSubmit(false);
           setProcessingPayment(false);
 
-          // Redirect to order success page
-          // Since the order is created by the webhook, we'll redirect to a general success page
-          router.push('/order-success');
+          // Save order and get order ID for redirect
+          saveOrder({
+            ...orderInfo,
+            paymentInfo: paymentIntent,
+            isPaid: true,
+            paidAt: new Date(),
+          })
+            .then(res => {
+              router.push(`/order/${res.data?.order?._id}`);
+            })
+            .catch(err => {
+              console.error('Order error:', err);
+              router.push('/order');
+            });
         }
       } catch (err) {
         console.error('Payment error:', err);
