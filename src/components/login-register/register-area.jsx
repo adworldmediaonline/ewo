@@ -1,12 +1,26 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 // internal
 // import LoginShapes from './login-shapes';
 import RegisterForm from '../forms/register-form';
 import GoogleSignUp from './google-sign-up';
 
-const RegisterArea = () => {
+export default function RegisterArea() {
+  const searchParams = useSearchParams();
+  const [redirectMessage, setRedirectMessage] = useState('');
+  const redirectTo = searchParams.get('redirect');
+
+  useEffect(() => {
+    // Show special message if coming from checkout
+    if (redirectTo === '/checkout') {
+      setRedirectMessage(
+        'Sign up to continue with your order or go back to checkout as guest.'
+      );
+    }
+  }, [redirectTo]);
+
   return (
     <>
       <section className="tp-login-area pb-140 p-relative z-index-1 fix">
@@ -20,10 +34,34 @@ const RegisterArea = () => {
                   <p>
                     Already have an account?{' '}
                     <span>
-                      <Link href="/login">Sign In</Link>
+                      <Link
+                        href={
+                          redirectTo
+                            ? `/login?redirect=${redirectTo}`
+                            : '/login'
+                        }
+                      >
+                        Sign In
+                      </Link>
                     </span>
                   </p>
+
+                  {redirectMessage && (
+                    <div
+                      className="tp-login-checkout-msg mt-20 p-3"
+                      style={{
+                        backgroundColor: '#f8f9fa',
+                        borderRadius: '5px',
+                      }}
+                    >
+                      <p>{redirectMessage}</p>
+                      <Link href="/checkout" className="tp-login-checkout-link">
+                        Return to checkout
+                      </Link>
+                    </div>
+                  )}
                 </div>
+
                 <div className="tp-login-option">
                   <div className="tp-login-social mb-10 d-flex flex-wrap align-items-center justify-content-center">
                     {/* TODO: Add social login REMOVE BELOW COMMENTED CODE */}
@@ -33,11 +71,11 @@ const RegisterArea = () => {
                   </div>
                   <div className="tp-login-mail text-center mb-40">
                     <p>
-                      or Sign up with <a href="#">Email</a>
+                      Sign up with <a href="#">Email</a>
                     </p>
                   </div>
                   {/* form start */}
-                  <RegisterForm />
+                  <RegisterForm redirectUrl={redirectTo} />
                   {/* form end */}
                 </div>
               </div>
@@ -47,6 +85,4 @@ const RegisterArea = () => {
       </section>
     </>
   );
-};
-
-export default RegisterArea;
+}

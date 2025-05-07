@@ -34,6 +34,11 @@ export default function CheckoutArea() {
   } = checkoutData;
   const { cart_products } = useSelector(state => state.cart);
 
+  // Code to add "Sign in" link for guest users that redirects back to checkout
+  const loginWithRedirect = () => {
+    router.push('/login?redirect=/checkout');
+  };
+
   return (
     <>
       <section
@@ -61,9 +66,13 @@ export default function CheckoutArea() {
                       <div className="tp-checkout-login-form">
                         <div className="tp-checkout-login-form-wrapper">
                           <div className="tp-checkout-login-btn-wrapper">
-                            <Link href="/login" className="tp-checkout-btn">
+                            <button
+                              type="button"
+                              onClick={loginWithRedirect}
+                              className="tp-checkout-btn"
+                            >
                               Sign in instead
-                            </Link>
+                            </button>
                           </div>
                         </div>
                       </div>
