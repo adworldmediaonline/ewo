@@ -7,11 +7,12 @@ export const metadata = {
   title: 'EWO- Order Page',
 };
 
-export default function OrderPage({ params }) {
+export default async function OrderPage({ params }) {
+  const id = (await params).id;
   return (
     <Wrapper>
       <HeaderV2 />
-      <OrderArea orderId={params.id} />
+      <OrderArea orderId={id} />
       <Footer primary_style={true} />
     </Wrapper>
   );

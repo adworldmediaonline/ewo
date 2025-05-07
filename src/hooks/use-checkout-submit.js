@@ -193,6 +193,10 @@ const useCheckoutSubmit = () => {
     try {
       console.log('Creating payment intent with order data:', orderData);
 
+      // Check if user is logged in
+      const isAuthenticate = Cookies.get('userInfo');
+      const isGuestCheckout = !isAuthenticate;
+
       // Create a payment intent with order data including cart
       const response = await createPaymentIntent({
         price: parseInt(cartTotal),
@@ -203,8 +207,9 @@ const useCheckoutSubmit = () => {
         orderData: {
           email: orderData.email,
           name: orderData.name,
-          user: user?._id,
+          user: isGuestCheckout ? null : user?._id,
           totalAmount: cartTotal,
+          isGuestOrder: isGuestCheckout,
         },
       });
 
@@ -220,6 +225,10 @@ const useCheckoutSubmit = () => {
   const submitHandler = async data => {
     dispatch(set_shipping(data));
     setIsCheckoutSubmit(true);
+
+    // Check if user is logged in
+    const isAuthenticate = Cookies.get('userInfo');
+    const isGuestCheckout = !isAuthenticate;
 
     let orderInfo = {
       name: `${data.firstName} ${data.lastName}`,
@@ -238,8 +247,13 @@ const useCheckoutSubmit = () => {
       discount: discountAmount,
       totalAmount: cartTotal,
       orderNote: data.orderNote,
-      user: `${user?._id}`,
+      isGuestOrder: isGuestCheckout,
     };
+
+    // Only add user ID if the user is logged in
+    if (!isGuestCheckout && user?._id) {
+      orderInfo.user = user._id;
+    }
 
     if (data.payment === 'Card') {
       if (!stripe || !elements) {
@@ -304,9 +318,20 @@ const useCheckoutSubmit = () => {
           setIsCheckoutSubmit(false);
           setProcessingPayment(false);
 
-          // Redirect to order success page
-          // Since the order is created by the webhook, we'll redirect to a general success page
-          router.push('/order-success');
+          // Save order and get order ID for redirect
+          saveOrder({
+            ...orderInfo,
+            paymentInfo: paymentIntent,
+            isPaid: true,
+            paidAt: new Date(),
+          })
+            .then(res => {
+              router.push(`/order/${res.data?.order?._id}`);
+            })
+            .catch(err => {
+              console.error('Order error:', err);
+              router.push('/order');
+            });
         }
       } catch (err) {
         console.error('Payment error:', err);

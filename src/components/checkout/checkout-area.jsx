@@ -1,5 +1,5 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
@@ -11,14 +11,17 @@ import CheckoutLogin from './checkout-login';
 import CheckoutOrderArea from './checkout-order-area';
 import useCheckoutSubmit from '@/hooks/use-checkout-submit';
 
-const CheckoutArea = () => {
+export default function CheckoutArea() {
   const router = useRouter();
+  const [isGuest, setIsGuest] = useState(false);
+
   useEffect(() => {
     const isAuthenticate = Cookies.get('userInfo');
     if (!isAuthenticate) {
-      router.push('/login');
+      setIsGuest(true);
     }
-  }, [router]);
+  }, []);
+
   const checkoutData = useCheckoutSubmit();
   const {
     handleSubmit,
@@ -30,6 +33,7 @@ const CheckoutArea = () => {
     couponApplyMsg,
   } = checkoutData;
   const { cart_products } = useSelector(state => state.cart);
+
   return (
     <>
       <section
@@ -49,7 +53,23 @@ const CheckoutArea = () => {
             <div className="row">
               <div className="col-xl-7 col-lg-7">
                 <div className="tp-checkout-verify">
-                  <CheckoutLogin />
+                  {isGuest && (
+                    <div className="tp-checkout-login mb-25">
+                      <h5 className="tp-checkout-login-title">
+                        Checking out as guest
+                      </h5>
+                      <div className="tp-checkout-login-form">
+                        <div className="tp-checkout-login-form-wrapper">
+                          <div className="tp-checkout-login-btn-wrapper">
+                            <Link href="/login" className="tp-checkout-btn">
+                              Sign in instead
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {!isGuest && <CheckoutLogin />}
                   <CheckoutCoupon
                     handleCouponCode={handleCouponCode}
                     couponRef={couponRef}
@@ -60,10 +80,17 @@ const CheckoutArea = () => {
               <form onSubmit={handleSubmit(submitHandler)}>
                 <div className="row">
                   <div className="col-lg-7">
-                    <CheckoutBillingArea register={register} errors={errors} />
+                    <CheckoutBillingArea
+                      register={register}
+                      errors={errors}
+                      isGuest={isGuest}
+                    />
                   </div>
                   <div className="col-lg-5">
-                    <CheckoutOrderArea checkoutData={checkoutData} />
+                    <CheckoutOrderArea
+                      checkoutData={checkoutData}
+                      isGuest={isGuest}
+                    />
                   </div>
                 </div>
               </form>
@@ -73,6 +100,4 @@ const CheckoutArea = () => {
       </section>
     </>
   );
-};
-
-export default CheckoutArea;
+}
