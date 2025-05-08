@@ -1,9 +1,9 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-import { useRouter, redirect } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 // internal
 import { CloseEye, OpenEye } from '@/svg';
@@ -16,10 +16,16 @@ const schema = Yup.object().shape({
   email: Yup.string().required().email().label('Email'),
   password: Yup.string().required().min(6).label('Password'),
 });
-const LoginForm = () => {
+
+export default function LoginForm() {
   const [showPass, setShowPass] = useState(false);
-  const [loginUser, {}] = useLoginUserMutation();
+  const [loginUser, { isLoading }] = useLoginUserMutation();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Get redirect path if any
+  const redirectTo = searchParams.get('redirect') || '/';
+
   // react hook form
   const {
     register,
@@ -29,21 +35,38 @@ const LoginForm = () => {
   } = useForm({
     resolver: yupResolver(schema),
   });
+
+  // Check if user just registered
+  useEffect(() => {
+    const justRegistered = searchParams.get('registered');
+    if (justRegistered === 'true') {
+      notifySuccess('Registration successful! Please log in');
+    }
+  }, [searchParams]);
+
   // onSubmit
-  const onSubmit = data => {
-    loginUser({
-      email: data.email,
-      password: data.password,
-    }).then(data => {
-      if (data?.data) {
-        notifySuccess('Login successfully');
-        router.push('/checkout' || '/');
-      } else {
-        notifyError(data?.error?.data?.error);
+  const onSubmit = async data => {
+    try {
+      const result = await loginUser({
+        email: data.email,
+        password: data.password,
+      }).unwrap();
+
+      if (result) {
+        notifySuccess('Login successful!');
+        reset();
+
+        // Small delay for better UX
+        setTimeout(() => {
+          // Redirect to checkout if coming from there, otherwise to home
+          router.push(redirectTo === '/' ? '/checkout' : redirectTo);
+        }, 800);
       }
-    });
-    reset();
+    } catch (error) {
+      notifyError(error?.data?.error || 'Login failed');
+    }
   };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="tp-login-input-wrapper">
@@ -55,6 +78,7 @@ const LoginForm = () => {
               id="email"
               type="email"
               placeholder="your@mail.com"
+              disabled={isLoading}
             />
           </div>
           <div className="tp-login-input-title">
@@ -68,8 +92,10 @@ const LoginForm = () => {
               <input
                 {...register('password', { required: `Password is required!` })}
                 id="password"
+                name="password"
                 type={showPass ? 'text' : 'password'}
                 placeholder="Min. 6 character"
+                disabled={isLoading}
               />
             </div>
             <div className="tp-login-input-eye" id="password-show-toggle">
@@ -86,7 +112,7 @@ const LoginForm = () => {
       </div>
       <div className="tp-login-suggetions d-sm-flex align-items-center justify-content-between mb-20">
         <div className="tp-login-remeber">
-          <input id="remeber" type="checkbox" />
+          <input id="remeber" type="checkbox" disabled={isLoading} />
           <label htmlFor="remeber">Remember me</label>
         </div>
         <div className="tp-login-forgot">
@@ -94,12 +120,25 @@ const LoginForm = () => {
         </div>
       </div>
       <div className="tp-login-bottom">
-        <button type="submit" className="tp-login-btn w-100">
-          Login
+        <button
+          type="submit"
+          className="tp-login-btn w-100"
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <span>
+              <span
+                className="spinner-border spinner-border-sm me-2"
+                role="status"
+                aria-hidden="true"
+              ></span>
+              Signing In...
+            </span>
+          ) : (
+            'Login'
+          )}
         </button>
       </div>
     </form>
   );
-};
-
-export default LoginForm;
+}

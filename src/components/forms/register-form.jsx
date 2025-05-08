@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-import { useRouter, redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 // internal
 import { CloseEye, OpenEye } from '@/svg';
 import ErrorMsg from '../common/error-msg';
@@ -20,10 +20,11 @@ const schema = Yup.object().shape({
     .label('Terms and Conditions'),
 });
 
-const RegisterForm = () => {
+export default function RegisterForm({ redirectUrl }) {
   const [showPass, setShowPass] = useState(false);
-  const [registerUser, {}] = useRegisterUserMutation();
+  const [registerUser, { isLoading }] = useRegisterUserMutation();
   const router = useRouter();
+
   // react hook form
   const {
     register,
@@ -33,22 +34,33 @@ const RegisterForm = () => {
   } = useForm({
     resolver: yupResolver(schema),
   });
+
   // on submit
-  const onSubmit = data => {
-    registerUser({
-      name: data.name,
-      email: data.email,
-      password: data.password,
-    }).then(result => {
-      if (result?.error) {
-        notifyError('Register Failed');
-      } else {
-        notifySuccess(result?.data?.message);
-        router.push('/checkout');
-      }
-    });
-    reset();
+  const onSubmit = async data => {
+    try {
+      const result = await registerUser({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      }).unwrap();
+
+      notifySuccess('Account created successfully!');
+      reset();
+
+      // Slight delay before redirect for better UX
+      setTimeout(() => {
+        // If redirectUrl is provided, add it to the login redirect
+        if (redirectUrl) {
+          router.push(`/login?registered=true&redirect=${redirectUrl}`);
+        } else {
+          router.push('/login?registered=true');
+        }
+      }, 1500);
+    } catch (error) {
+      notifyError(error?.data?.message || 'Registration failed');
+    }
   };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="tp-login-input-wrapper">
@@ -60,6 +72,7 @@ const RegisterForm = () => {
               name="name"
               type="text"
               placeholder="your name..."
+              disabled={isLoading}
             />
           </div>
           <div className="tp-login-input-title">
@@ -75,6 +88,7 @@ const RegisterForm = () => {
               name="email"
               type="email"
               placeholder="your@mail.com"
+              disabled={isLoading}
             />
           </div>
           <div className="tp-login-input-title">
@@ -91,6 +105,7 @@ const RegisterForm = () => {
                 name="password"
                 type={showPass ? 'text' : 'password'}
                 placeholder="Min. 6 character"
+                disabled={isLoading}
               />
             </div>
             <div className="tp-login-input-eye" id="password-show-toggle">
@@ -114,6 +129,7 @@ const RegisterForm = () => {
             id="remember"
             name="remember"
             type="checkbox"
+            disabled={isLoading}
           />
           <label htmlFor="remember">
             I accept the terms of the Service & <a href="#">Privacy Policy</a>.
@@ -122,12 +138,25 @@ const RegisterForm = () => {
         </div>
       </div>
       <div className="tp-login-bottom">
-        <button type="submit" className="tp-login-btn w-100">
-          Sign Up
+        <button
+          type="submit"
+          className="tp-login-btn w-100"
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <span>
+              <span
+                className="spinner-border spinner-border-sm me-2"
+                role="status"
+                aria-hidden="true"
+              ></span>
+              Creating Account...
+            </span>
+          ) : (
+            'Sign Up'
+          )}
         </button>
       </div>
     </form>
   );
-};
-
-export default RegisterForm;
+}
