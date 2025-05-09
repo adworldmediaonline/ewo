@@ -7,12 +7,12 @@ import Providers from '@/components/provider';
 export const metadata = {
   title: 'EWO',
   description: 'ewo',
-
-  robots: {
-    index: false,
-    googleBot: {
-      index: false,
-    },
+  metadataBase: new URL('https://www.eastwestoffroad.com'),
+  alternates: {
+    canonical: '/',
+  },
+  verification: {
+    google: 'AHQyQA4jdaD70HO9LxS57ddkUsBibZshkqwsM5-ysaI',
   },
 };
 
