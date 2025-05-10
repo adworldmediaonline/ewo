@@ -1,6 +1,6 @@
 import './globals.scss';
 import { SpeedInsights } from '@vercel/speed-insights/next';
-
+import { GoogleTagManager } from '@next/third-parties/google';
 import { Jost, Roboto, Charm, Oregano } from 'next/font/google';
 import Providers from '@/components/provider';
 
@@ -55,6 +55,7 @@ const charm = Charm({
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <GoogleTagManager gtmId="GTM-MB34NG65" />
       <body
         className={`${body.variable} ${heading.variable} ${p.variable} ${jost.variable} ${roboto.variable} ${oregano.variable} ${charm.variable}`}
         suppressHydrationWarning
