@@ -1,10 +1,10 @@
 'use client';
-import React from "react";
-import ErrorMsg from "../common/error-msg";
-import { useSelector } from "react-redux";
+import React from 'react';
+import ErrorMsg from '../common/error-msg';
+import { useSelector } from 'react-redux';
 
 const CheckoutBillingArea = ({ register, errors }) => {
-  const { user } = useSelector((state) => state.auth);
+  const { user } = useSelector(state => state.auth);
 
   return (
     <div className="tp-checkout-bill-area">
@@ -19,7 +19,7 @@ const CheckoutBillingArea = ({ register, errors }) => {
                   First Name <span>*</span>
                 </label>
                 <input
-                  {...register("firstName", {
+                  {...register('firstName', {
                     required: `firstName is required!`,
                   })}
                   name="firstName"
@@ -37,7 +37,7 @@ const CheckoutBillingArea = ({ register, errors }) => {
                   Last Name <span>*</span>
                 </label>
                 <input
-                  {...register("lastName", {
+                  {...register('lastName', {
                     required: `lastName is required!`,
                   })}
                   name="lastName"
@@ -54,7 +54,7 @@ const CheckoutBillingArea = ({ register, errors }) => {
                   Country <span>*</span>
                 </label>
                 <input
-                  {...register("country", { required: `country is required!` })}
+                  {...register('country', { required: `country is required!` })}
                   name="country"
                   id="country"
                   type="text"
@@ -67,7 +67,7 @@ const CheckoutBillingArea = ({ register, errors }) => {
               <div className="tp-checkout-input">
                 <label>Street address</label>
                 <input
-                  {...register("address", { required: `Address is required!` })}
+                  {...register('address', { required: `Address is required!` })}
                   name="address"
                   id="address"
                   type="text"
@@ -80,20 +80,20 @@ const CheckoutBillingArea = ({ register, errors }) => {
               <div className="tp-checkout-input">
                 <label>Town / City</label>
                 <input
-                  {...register("city", { required: `City is required!` })}
+                  {...register('city', { required: `City is required!` })}
                   name="city"
                   id="city"
                   type="text"
                   placeholder="City"
                 />
-                 <ErrorMsg msg={errors?.city?.message} />
+                <ErrorMsg msg={errors?.city?.message} />
               </div>
             </div>
             <div className="col-md-6">
               <div className="tp-checkout-input">
                 <label>Postcode ZIP</label>
                 <input
-                  {...register("zipCode", { required: `zipCode is required!` })}
+                  {...register('zipCode', { required: `zipCode is required!` })}
                   name="zipCode"
                   id="zipCode"
                   type="text"
@@ -108,7 +108,7 @@ const CheckoutBillingArea = ({ register, errors }) => {
                   Phone <span>*</span>
                 </label>
                 <input
-                  {...register("contactNo", {
+                  {...register('contactNo', {
                     required: `ContactNumber is required!`,
                   })}
                   name="contactNo"
@@ -125,7 +125,7 @@ const CheckoutBillingArea = ({ register, errors }) => {
                   Email address <span>*</span>
                 </label>
                 <input
-                  {...register("email", { required: `Email is required!` })}
+                  {...register('email', { required: `Email is required!` })}
                   name="email"
                   id="email"
                   type="email"
@@ -139,7 +139,7 @@ const CheckoutBillingArea = ({ register, errors }) => {
               <div className="tp-checkout-input">
                 <label>Order notes (optional)</label>
                 <textarea
-                  {...register("orderNote", { required: false })}
+                  {...register('orderNote', { required: false })}
                   name="orderNote"
                   id="orderNote"
                   placeholder="Notes about your order, e.g. special notes for delivery."
