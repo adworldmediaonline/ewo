@@ -28,7 +28,7 @@ const DetailsBottomInfo = ({ productItem }) => {
       <div className="tp-product-details-msg mb-15">
         <ul>
           <li>30 days easy returns</li>
-          <li>Order yours before 2.30pm for same day dispatch</li>
+          <li>Secure payments with leading payment providers</li>
         </ul>
       </div>
 
