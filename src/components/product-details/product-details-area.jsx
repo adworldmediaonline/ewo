@@ -97,7 +97,7 @@ const ProductDetailsArea = ({ id }) => {
         </nav>
         <ProductDetailsContent productItem={product} />
 
-        <div className={styles.infoSection}>
+        {/* <div className={styles.infoSection}>
           <div className={styles.infoTitle}>
             <svg
               width="18"
@@ -177,7 +177,7 @@ const ProductDetailsArea = ({ id }) => {
               </svg>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     );
   }
