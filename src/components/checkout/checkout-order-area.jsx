@@ -78,7 +78,7 @@ export default function CheckoutOrderArea({ checkoutData }) {
                   Calculated Shipping:{' '}
                   <span>${totalShippingCost.toFixed(2)}</span>
                   {discountPercentage > 0 && (
-                    <span className="shipping-discount-badge ms-2 badge bg-success">
+                    <span className="shipping-discount-badge text-white ms-2 badge bg-success">
                       {discountPercentage}% off
                     </span>
                   )}
