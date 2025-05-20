@@ -53,7 +53,8 @@ const CategoryFilter = ({ setCurrPage, shop_right = false }) => {
               : ''
           }
         >
-          {item.parent} <span>{item.products.length}</span>
+          {/* {item.parent} <span>{item.products.length}</span> */}
+          {item.parent}
         </a>
       </li>
     ));

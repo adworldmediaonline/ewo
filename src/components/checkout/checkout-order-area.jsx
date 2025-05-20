@@ -45,7 +45,7 @@ export default function CheckoutOrderArea({ checkoutData }) {
             </li>
           ))}
 
-          {/*  shipping */}
+          {/* existing shipping info */}
           <li className="tp-order-info-list-shipping">
             <span>Shipping</span>
             <div className="tp-order-info-list-shipping-item d-flex flex-column align-items-end">
@@ -153,7 +153,7 @@ export default function CheckoutOrderArea({ checkoutData }) {
           )}
           <ErrorMsg msg={errors?.payment?.message} />
         </div>
-        <div className="tp-checkout-payment-item">
+        {/* <div className="tp-checkout-payment-item">
           <input
             {...register(`payment`, {
               required: `Payment Option is required!`,
@@ -166,7 +166,7 @@ export default function CheckoutOrderArea({ checkoutData }) {
           />
           <label htmlFor="cod">Cash on Delivery</label>
           <ErrorMsg msg={errors?.payment?.message} />
-        </div>
+        </div> */}
       </div>
 
       <div className="tp-checkout-btn-wrapper">
