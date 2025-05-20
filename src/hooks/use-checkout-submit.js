@@ -236,6 +236,7 @@ const useCheckoutSubmit = () => {
       contact: data.contactNo,
       email: data.email,
       city: data.city,
+      state: data.state,
       country: data.country,
       zipCode: data.zipCode,
       shippingOption: data.shippingOption,

@@ -575,9 +575,9 @@ export default function HeaderV2() {
                 role="menuitem"
               >
                 {category.parent}
-                <span className={styles.productCount}>
+                {/* <span className={styles.productCount}>
                   ({category.products.length})
-                </span>
+                </span> */}
               </button>
             </li>
           ))}
