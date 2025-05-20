@@ -1,28 +1,19 @@
 'use client';
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import dayjs from 'dayjs';
-import { useReactToPrint } from 'react-to-print';
 // internal
-import logo from '@assets/img/logo/logo.webp';
 import ErrorMsg from '@/components/common/error-msg';
 import { useGetUserOrderByIdQuery } from '@/redux/features/order/orderApi';
 import PrdDetailsLoader from '@/components/loader/prd-details-loader';
 import styles from './order-area.module.css';
 
 export default function OrderArea({ orderId }) {
-  const printRef = useRef();
   const { data: order, isError, isLoading } = useGetUserOrderByIdQuery(orderId);
 
   // UI state management
   const [activeItem, setActiveItem] = useState(null);
   const [showStatusDetails, setShowStatusDetails] = useState(false);
-
-  // Setup print handler
-  const handlePrint = useReactToPrint({
-    content: () => printRef.current,
-    documentTitle: `Invoice-${order?.order?.invoice || 'Order'}`,
-  });
 
   // Trigger animations on load
   useEffect(() => {
@@ -104,9 +95,7 @@ export default function OrderArea({ orderId }) {
       <div className={styles.innerContainer}>
         {/* Page Header */}
         <div className={styles.pageHeader}>
-          <h1 className={styles.pageTitle}>
-            Order Details <span className={styles.orderId}>#{invoice}</span>
-          </h1>
+          <h1 className={styles.pageTitle}>Order Details</h1>
         </div>
 
         {/* Status Card */}
@@ -270,11 +259,11 @@ export default function OrderArea({ orderId }) {
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    background: 'rgba(79, 70, 229, 0.1)',
+                    background: 'rgba(230, 30, 30, 0.1)',
                     padding: '0.25rem 0.75rem',
                     borderRadius: '9999px',
                     fontSize: '0.875rem',
-                    color: '#4f46e5',
+                    color: '#E61E1E',
                     fontWeight: '500',
                   }}
                 >
@@ -496,173 +485,8 @@ export default function OrderArea({ orderId }) {
                     </div>
                   </div>
                 </div>
-
-                <div className={styles.divider}></div>
-
-                <button
-                  type="button"
-                  className={styles.button}
-                  onClick={handlePrint}
-                >
-                  <svg
-                    className={styles.buttonIcon}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
-                    />
-                  </svg>
-                  Print Invoice
-                </button>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Print-only version */}
-        <div className={styles.printWrapper} ref={printRef}>
-          <div className={styles.printHeader}>
-            <h1 className={styles.printTitle}>Invoice #{invoice}</h1>
-            <Image
-              className={styles.printLogo}
-              src={logo}
-              alt="logo"
-              width={120}
-            />
-          </div>
-
-          <div className={styles.printGrid}>
-            <div>
-              <div className={styles.printSection}>
-                <h2 className={styles.printSectionTitle}>Customer</h2>
-                <p>
-                  <strong>{name}</strong>
-                </p>
-                <p>{email || contact}</p>
-                <p>
-                  {country}, {city}
-                </p>
-                <p>{contact}</p>
-              </div>
-            </div>
-            <div>
-              <div className={styles.printSection}>
-                <h2 className={styles.printSectionTitle}>Order Details</h2>
-                <p>
-                  <strong>Order Number:</strong> #{invoice}
-                </p>
-                <p>
-                  <strong>Date:</strong> {orderDate}
-                </p>
-                <p>
-                  <strong>Payment Method:</strong> {paymentMethod}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ borderBottom: '2px solid #e5e7eb' }}>
-                <th style={{ textAlign: 'left', padding: '0.75rem' }}>
-                  Product
-                </th>
-                <th style={{ textAlign: 'center', padding: '0.75rem' }}>Qty</th>
-                <th style={{ textAlign: 'right', padding: '0.75rem' }}>
-                  Price
-                </th>
-                <th style={{ textAlign: 'right', padding: '0.75rem' }}>
-                  Total
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {cart.map((item, i) => (
-                <tr key={i} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                  <td style={{ padding: '0.75rem' }}>{item.title}</td>
-                  <td style={{ textAlign: 'center', padding: '0.75rem' }}>
-                    {item.orderQuantity}
-                  </td>
-                  <td style={{ textAlign: 'right', padding: '0.75rem' }}>
-                    ${item.price.toFixed(2)}
-                  </td>
-                  <td style={{ textAlign: 'right', padding: '0.75rem' }}>
-                    ${(item.price * item.orderQuantity).toFixed(2)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <div
-            style={{
-              marginTop: '2rem',
-              borderTop: '1px solid #e5e7eb',
-              paddingTop: '1rem',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                margin: '0.5rem 0',
-              }}
-            >
-              <span>Subtotal</span>
-              <span>${subtotal.toFixed(2)}</span>
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                margin: '0.5rem 0',
-              }}
-            >
-              <span>Shipping</span>
-              <span>${shippingCost.toFixed(2)}</span>
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                margin: '0.5rem 0',
-              }}
-            >
-              <span>Discount</span>
-              <span>-${discount.toFixed(2)}</span>
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                margin: '1rem 0',
-                borderTop: '2px solid #e5e7eb',
-                paddingTop: '1rem',
-                fontWeight: 'bold',
-              }}
-            >
-              <span>Total</span>
-              <span>${parseInt(totalAmount).toFixed(2)}</span>
-            </div>
-          </div>
-
-          <div
-            style={{
-              marginTop: '3rem',
-              borderTop: '1px solid #e5e7eb',
-              paddingTop: '1rem',
-              textAlign: 'center',
-              color: '#6b7280',
-              fontSize: '0.875rem',
-            }}
-          >
-            <p>Thank you for your purchase!</p>
-            <p>If you have any questions, please contact our support team.</p>
           </div>
         </div>
       </div>

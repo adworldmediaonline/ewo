@@ -4,18 +4,18 @@ import Link from 'next/link';
 import useCartInfo from '@/hooks/use-cart-info';
 import { useState } from 'react';
 import styles from '../../app/cart/cart.module.css';
+import { useSelector } from 'react-redux';
 
-const CartCheckout = () => {
-  const { total } = useCartInfo();
-  const [shipCost, setShipCost] = useState(0);
-  // handle shipping cost
-  const handleShippingCost = value => {
-    if (value === 'free') {
-      setShipCost(0);
-    } else {
-      setShipCost(value);
-    }
-  };
+export default function CartCheckout() {
+  const { total, totalWithShipping } = useCartInfo();
+  const { totalShippingCost, shippingDiscount } = useSelector(
+    state => state.cart
+  );
+
+  // Calculate discount percentage to display
+  const discountPercentage =
+    shippingDiscount > 0 ? (shippingDiscount * 100).toFixed(0) : 0;
+
   return (
     <div className={styles['checkout-card']}>
       <div className={styles['checkout-card-header']}>
@@ -35,60 +35,19 @@ const CartCheckout = () => {
 
           <div className={styles['checkout-shipping-options']}>
             <div className={styles['checkout-shipping-option']}>
-              <input
-                id="flat_rate"
-                type="radio"
-                name="shipping"
-                className={styles['checkout-shipping-radio']}
-                onChange={() => handleShippingCost(20)}
-                defaultChecked={shipCost === 20}
-              />
-              <label
-                htmlFor="flat_rate"
-                className={styles['checkout-shipping-label']}
-              >
-                Flat rate:{' '}
+              <span className={styles['checkout-shipping-label']}>
+                Calculated shipping:{' '}
                 <span className={styles['checkout-shipping-price']}>
-                  $20.00
+                  ${totalShippingCost.toFixed(2)}
                 </span>
-              </label>
-            </div>
-
-            <div className={styles['checkout-shipping-option']}>
-              <input
-                id="local_pickup"
-                type="radio"
-                name="shipping"
-                className={styles['checkout-shipping-radio']}
-                onChange={() => handleShippingCost(25)}
-                defaultChecked={shipCost === 25}
-              />
-              <label
-                htmlFor="local_pickup"
-                className={styles['checkout-shipping-label']}
-              >
-                Local pickup:{' '}
-                <span className={styles['checkout-shipping-price']}>
-                  $25.00
-                </span>
-              </label>
-            </div>
-
-            <div className={styles['checkout-shipping-option']}>
-              <input
-                id="free_shipping"
-                type="radio"
-                name="shipping"
-                className={styles['checkout-shipping-radio']}
-                onChange={() => handleShippingCost('free')}
-                defaultChecked={shipCost === 0}
-              />
-              <label
-                htmlFor="free_shipping"
-                className={styles['checkout-shipping-label']}
-              >
-                Free shipping
-              </label>
+                {discountPercentage > 0 && (
+                  <span
+                    className={`${styles['checkout-shipping-discount']} ms-2 badge bg-success`}
+                  >
+                    {discountPercentage}% off
+                  </span>
+                )}
+              </span>
             </div>
           </div>
         </div>
@@ -96,7 +55,7 @@ const CartCheckout = () => {
         <div className={styles['checkout-total']}>
           <span className={styles['checkout-total-label']}>Total</span>
           <span className={styles['checkout-total-value']}>
-            ${(total + parseFloat(shipCost)).toFixed(2)}
+            ${(total + totalShippingCost).toFixed(2)}
           </span>
         </div>
       </div>
@@ -108,6 +67,4 @@ const CartCheckout = () => {
       </div>
     </div>
   );
-};
-
-export default CartCheckout;
+}
