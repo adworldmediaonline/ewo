@@ -1,49 +1,86 @@
-'use client'
-import React,{ useEffect } from "react";
-import ProfileNavTab from "./profile-nav-tab";
-import ProfileShape from "./profile-shape";
-import NavProfileTab from "./nav-profile-tab";
-import ProfileInfo from "./profile-info";
-import ChangePassword from "./change-password";
-import MyOrders from "./my-orders";
-import { useGetUserOrdersQuery } from "@/redux/features/order/orderApi";
-import Loader from "../loader/loader";
-import { useRouter } from "next/navigation";
-import ErrorMsg from "../common/error-msg";
-import Cookies from "js-cookie";
+'use client';
+import React, { useEffect, useState } from 'react';
+import ProfileNavTab from './profile-nav-tab';
+import ProfileShape from './profile-shape';
+import NavProfileTab from './nav-profile-tab';
+import ProfileInfo from './profile-info';
+import ChangePassword from './change-password';
+import MyOrders from './my-orders';
+import { useGetUserOrdersQuery } from '@/redux/features/order/orderApi';
+import Loader from '../loader/loader';
+import { useRouter } from 'next/navigation';
+import ErrorMsg from '../common/error-msg';
+import Cookies from 'js-cookie';
 
-const ProfileArea = () => {
+export default function ProfileArea() {
   const router = useRouter();
-  const { data: orderData, isError, isLoading, } = useGetUserOrdersQuery();
+  const [isAuthenticated, setIsAuthenticated] = useState(null); // null = checking, true/false = result
+
+  // Check authentication first
   useEffect(() => {
-    const isAuthenticate = Cookies.get("userInfo");
-    if (!isAuthenticate) {
-      router.push("/login");
+    const userInfo = Cookies.get('userInfo');
+    if (!userInfo) {
+      router.push('/login');
+    } else {
+      setIsAuthenticated(true);
     }
   }, [router]);
 
-  let content = null;
+  // Only query for orders if user is authenticated
+  const {
+    data: orderData,
+    isError,
+    isLoading,
+  } = useGetUserOrdersQuery(undefined, {
+    skip: !isAuthenticated,
+  });
+
+  // Show loading while checking authentication
+  if (isAuthenticated === null) {
+    return (
+      <div
+        className="d-flex align-items-center justify-content-center"
+        style={{ height: '100vh' }}
+      >
+        <Loader loading={true} />
+      </div>
+    );
+  }
+
+  // Don't render anything if not authenticated (during redirect)
+  if (isAuthenticated === false) {
+    return null;
+  }
+
+  // Handle loading and error states for authenticated users
   if (isLoading) {
-    content = <div
-      className="d-flex align-items-center justify-content-center"
-      style={{ height: "100vh" }}
-    >
-      <Loader loading={isLoading} />
-    </div>
+    return (
+      <div
+        className="d-flex align-items-center justify-content-center"
+        style={{ height: '100vh' }}
+      >
+        <Loader loading={true} />
+      </div>
+    );
   }
-  if (!isLoading && isError) {
-    content = <div
-      className="d-flex align-items-center justify-content-center"
-      style={{ height: "100vh" }}
-    >
-      <ErrorMsg msg="There was an error" />
-    </div>
+
+  if (isError) {
+    return (
+      <div
+        className="d-flex align-items-center justify-content-center"
+        style={{ height: '100vh' }}
+      >
+        <ErrorMsg msg="There was an error loading your orders" />
+      </div>
+    );
   }
-  if (!isLoading && !isError) {
-   content = <section className="profile__area pt-120 pb-120">
+
+  // Render the profile for authenticated users with data
+  return (
+    <section className="profile__area pt-120 pb-120">
       <div className="container">
         <div className="profile__inner p-relative">
-          <ProfileShape />
+          {/* <ProfileShape /> */}
           <div className="row">
             <div className="col-xxl-4 col-lg-4">
               <div className="profile__tab mr-40">
@@ -95,12 +132,5 @@ const ProfileArea = () => {
         </div>
       </div>
     </section>
-  }
-  return (
-    <>
-      {content}
-    </>
   );
-};
-
-export default ProfileArea;
+}
