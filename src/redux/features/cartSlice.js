@@ -6,6 +6,41 @@ const initialState = {
   cart_products: [],
   orderQuantity: 1,
   cartMiniOpen: false,
+  totalShippingCost: 0,
+  shippingDiscount: 0,
+};
+
+// Helper function to calculate shipping discount
+const calculateShippingDiscount = items => {
+  const itemCount = items.reduce(
+    (total, item) => total + item.orderQuantity,
+    0
+  );
+
+  if (itemCount <= 2) return 0; // No discount
+  if (itemCount === 3) return 0.5; // 50% discount
+  if (itemCount === 4) return 0.4; // 40% discount
+  return 0.33; // 33% discount for 5 or more
+};
+
+// Helper function to calculate total shipping cost
+const calculateTotalShipping = (items, discount) => {
+  const totalShipping = items.reduce((total, item) => {
+    const itemShipping = item.shipping?.price || 0;
+    return total + itemShipping * item.orderQuantity;
+  }, 0);
+
+  return totalShipping * (1 - discount);
+};
+
+// Helper to update shipping costs
+const updateShippingCosts = state => {
+  const discount = calculateShippingDiscount(state.cart_products);
+  state.shippingDiscount = discount;
+  state.totalShippingCost = calculateTotalShipping(
+    state.cart_products,
+    discount
+  );
 };
 
 export const cartSlice = createSlice({
@@ -72,7 +107,12 @@ export const cartSlice = createSlice({
           return { ...item };
         });
       }
+
+      // Update shipping costs
+      updateShippingCosts(state);
+
       setLocalStorage('cart_products', state.cart_products);
+      setLocalStorage('shipping_cost', state.totalShippingCost);
     },
     increment: (state, { payload }) => {
       state.orderQuantity = state.orderQuantity + 1;
@@ -92,17 +132,30 @@ export const cartSlice = createSlice({
         }
         return { ...item };
       });
+
+      // Update shipping costs
+      updateShippingCosts(state);
+
       setLocalStorage('cart_products', state.cart_products);
+      setLocalStorage('shipping_cost', state.totalShippingCost);
     },
     remove_product: (state, { payload }) => {
       state.cart_products = state.cart_products.filter(
         item => item._id !== payload.id
       );
+
+      // Update shipping costs
+      updateShippingCosts(state);
+
       setLocalStorage('cart_products', state.cart_products);
+      setLocalStorage('shipping_cost', state.totalShippingCost);
       notifyError(`${payload.title} Remove from cart`);
     },
     get_cart_products: (state, action) => {
       state.cart_products = getLocalStorage('cart_products');
+
+      // Update shipping costs when getting cart products
+      updateShippingCosts(state);
     },
     initialOrderQuantity: (state, { payload }) => {
       state.orderQuantity = 1;
@@ -113,8 +166,12 @@ export const cartSlice = createSlice({
       );
       if (isClearCart) {
         state.cart_products = [];
+        state.totalShippingCost = 0;
+        state.shippingDiscount = 0;
       }
+
       setLocalStorage('cart_products', state.cart_products);
+      setLocalStorage('shipping_cost', state.totalShippingCost);
     },
     openCartMini: (state, { payload }) => {
       state.cartMiniOpen = true;

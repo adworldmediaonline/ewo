@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CardElement } from '@stripe/react-stripe-js';
 import { useSelector } from 'react-redux';
 // internal
@@ -21,8 +21,20 @@ export default function CheckoutOrderArea({ checkoutData }) {
     discountAmount,
     processingPayment,
   } = checkoutData;
-  const { cart_products } = useSelector(state => state.cart);
-  const { total } = useCartInfo();
+  const { cart_products, totalShippingCost, shippingDiscount } = useSelector(
+    state => state.cart
+  );
+  const { total, totalWithShipping } = useCartInfo();
+
+  // Update shipping cost in checkout data when it changes
+  useEffect(() => {
+    handleShippingCost(totalShippingCost);
+  }, [totalShippingCost, handleShippingCost]);
+
+  // Calculate discount percentage to display
+  const discountPercentage =
+    shippingDiscount > 0 ? (shippingDiscount * 100).toFixed(0) : 0;
+
   return (
     <div className="tp-checkout-place white-bg">
       <h3 className="tp-checkout-place-title">Your Order</h3>
@@ -45,41 +57,31 @@ export default function CheckoutOrderArea({ checkoutData }) {
             </li>
           ))}
 
-          {/* existing shipping info */}
+          {/* Shipping info - updated to use calculated shipping */}
           <li className="tp-order-info-list-shipping">
             <span>Shipping</span>
             <div className="tp-order-info-list-shipping-item d-flex flex-column align-items-end">
-              <span>
+              <span className="calculated-shipping">
                 <input
                   {...register(`shippingOption`, {
                     required: `Shipping Option is required!`,
                   })}
-                  id="flat_shipping"
+                  id="calculated_shipping"
                   type="radio"
                   name="shippingOption"
+                  defaultChecked
                 />
                 <label
-                  onClick={() => handleShippingCost(60)}
-                  htmlFor="flat_shipping"
+                  onClick={() => handleShippingCost(totalShippingCost)}
+                  htmlFor="calculated_shipping"
                 >
-                  Delivery: Today Cost :<span>$60.00</span>
-                </label>
-                <ErrorMsg msg={errors?.shippingOption?.message} />
-              </span>
-              <span>
-                <input
-                  {...register(`shippingOption`, {
-                    required: `Shipping Option is required!`,
-                  })}
-                  id="flat_rate"
-                  type="radio"
-                  name="shippingOption"
-                />
-                <label
-                  onClick={() => handleShippingCost(20)}
-                  htmlFor="flat_rate"
-                >
-                  Delivery: 7 Days Cost: <span>$20.00</span>
+                  Calculated Shipping:{' '}
+                  <span>${totalShippingCost.toFixed(2)}</span>
+                  {discountPercentage > 0 && (
+                    <span className="shipping-discount-badge ms-2 badge bg-success">
+                      {discountPercentage}% off
+                    </span>
+                  )}
                 </label>
                 <ErrorMsg msg={errors?.shippingOption?.message} />
               </span>
@@ -95,7 +97,7 @@ export default function CheckoutOrderArea({ checkoutData }) {
           {/*  shipping cost */}
           <li className="tp-order-info-list-subtotal">
             <span>Shipping Cost</span>
-            <span>${shippingCost.toFixed(2)}</span>
+            <span>${totalShippingCost.toFixed(2)}</span>
           </li>
 
           {/* discount */}
@@ -107,7 +109,7 @@ export default function CheckoutOrderArea({ checkoutData }) {
           {/* total */}
           <li className="tp-order-info-list-total">
             <span>Total</span>
-            <span>${parseFloat(cartTotal).toFixed(2)}</span>
+            <span>${(totalWithShipping - discountAmount).toFixed(2)}</span>
           </li>
         </ul>
       </div>
