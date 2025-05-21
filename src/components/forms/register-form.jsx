@@ -44,7 +44,7 @@ export default function RegisterForm({ redirectUrl }) {
         password: data.password,
       }).unwrap();
 
-      notifySuccess('Account created successfully!');
+      notifySuccess('please check your email to verify your account!');
       reset();
 
       // Slight delay before redirect for better UX
