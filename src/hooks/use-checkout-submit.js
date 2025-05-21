@@ -205,6 +205,7 @@ const useCheckoutSubmit = () => {
         cart: cart_products,
         // Additional order metadata
         orderData: {
+          state: orderData.state,
           email: orderData.email,
           name: orderData.name,
           user: isGuestCheckout ? null : user?._id,
