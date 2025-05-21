@@ -55,7 +55,11 @@ export default function CartCheckout() {
         <div className={styles['checkout-total']}>
           <span className={styles['checkout-total-label']}>Total</span>
           <span className={styles['checkout-total-value']}>
-            ${(total + totalShippingCost).toFixed(2)}
+            $
+            {(
+              parseFloat(total.toFixed(2)) +
+              parseFloat(totalShippingCost.toFixed(2))
+            ).toFixed(2)}
           </span>
         </div>
       </div>

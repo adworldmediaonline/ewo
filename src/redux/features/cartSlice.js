@@ -30,7 +30,9 @@ const calculateTotalShipping = (items, discount) => {
     return total + itemShipping * item.orderQuantity;
   }, 0);
 
-  return totalShipping * (1 - discount);
+  // Apply discount and fix to 2 decimal places to avoid floating point errors
+  const discountedTotal = totalShipping * (1 - discount);
+  return parseFloat(discountedTotal.toFixed(2));
 };
 
 // Helper to update shipping costs
