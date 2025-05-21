@@ -312,19 +312,24 @@ export default function OrderArea({ orderId }) {
                   <div className={styles.summaryRow}>
                     <span className={styles.summaryLabel}>Shipping</span>
                     <span className={styles.summaryValue}>
-                      ${shippingCost.toFixed(2)}
+                      ${parseFloat(shippingCost.toFixed(2)).toFixed(2)}
                     </span>
                   </div>
                   <div className={styles.summaryRow}>
                     <span className={styles.summaryLabel}>Discount</span>
                     <span className={styles.summaryValue}>
-                      -${discount.toFixed(2)}
+                      -${parseFloat(discount.toFixed(2)).toFixed(2)}
                     </span>
                   </div>
                   <div className={styles.summaryTotal}>
                     <span className={styles.summaryTotalLabel}>Total</span>
                     <span className={styles.summaryTotalValue}>
-                      ${parseInt(totalAmount).toFixed(2)}
+                      $
+                      {(
+                        parseFloat(subtotal.toFixed(2)) +
+                        parseFloat(shippingCost.toFixed(2)) -
+                        parseFloat(discount.toFixed(2))
+                      ).toFixed(2)}
                     </span>
                   </div>
                 </div>
