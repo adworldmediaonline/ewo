@@ -2,7 +2,8 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import logo from '@assets/img/logo/logo.webp';
+// import logo from '@assets/img/logo/logo.webp';
+import logo from '@assets/img/logo/logo.png';
 import styles from './footer.module.css';
 
 export default function Footer() {
