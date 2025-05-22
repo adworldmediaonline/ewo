@@ -20,7 +20,6 @@ export default function CheckoutOrderArea({ checkoutData }) {
     shippingCost,
     discountAmount,
     processingPayment,
-    orderReferenceId,
   } = checkoutData;
   const { cart_products, totalShippingCost, shippingDiscount } = useSelector(
     state => state.cart
@@ -35,14 +34,6 @@ export default function CheckoutOrderArea({ checkoutData }) {
   // Calculate discount percentage to display
   const discountPercentage =
     shippingDiscount > 0 ? (shippingDiscount * 100).toFixed(0) : 0;
-
-  // Calculate final formatted values
-  const formattedSubtotal = parseFloat(total.toFixed(2));
-  const formattedShipping = parseFloat(totalShippingCost.toFixed(2));
-  const formattedDiscount = parseFloat(discountAmount.toFixed(2));
-  const formattedTotal = parseFloat(
-    (formattedSubtotal + formattedShipping - formattedDiscount).toFixed(2)
-  );
 
   return (
     <div className="tp-checkout-place white-bg">
@@ -85,7 +76,7 @@ export default function CheckoutOrderArea({ checkoutData }) {
                   htmlFor="calculated_shipping"
                 >
                   Calculated Shipping:{' '}
-                  <span>${formattedShipping.toFixed(2)}</span>
+                  <span>${totalShippingCost.toFixed(2)}</span>
                   {discountPercentage > 0 && (
                     <span className="shipping-discount-badge text-white ms-2 badge bg-success">
                       {discountPercentage}% off
@@ -100,25 +91,25 @@ export default function CheckoutOrderArea({ checkoutData }) {
           {/*  subtotal */}
           <li className="tp-order-info-list-subtotal">
             <span>Subtotal</span>
-            <span>${formattedSubtotal.toFixed(2)}</span>
+            <span>${total.toFixed(2)}</span>
           </li>
 
           {/*  shipping cost */}
           <li className="tp-order-info-list-subtotal">
             <span>Shipping Cost</span>
-            <span>${formattedShipping.toFixed(2)}</span>
+            <span>${totalShippingCost.toFixed(2)}</span>
           </li>
 
           {/* discount */}
           <li className="tp-order-info-list-subtotal">
             <span>Discount</span>
-            <span>${formattedDiscount.toFixed(2)}</span>
+            <span>${discountAmount.toFixed(2)}</span>
           </li>
 
           {/* total */}
           <li className="tp-order-info-list-total">
             <span>Total</span>
-            <span>${formattedTotal.toFixed(2)}</span>
+            <span>${(totalWithShipping - discountAmount).toFixed(2)}</span>
           </li>
         </ul>
       </div>
@@ -137,22 +128,7 @@ export default function CheckoutOrderArea({ checkoutData }) {
             onClick={() => setShowCard(true)}
             htmlFor="back_transfer"
             data-bs-toggle="direct-bank-transfer"
-            className="d-flex align-items-center"
           >
-            <svg
-              viewBox="0 0 24 24"
-              width="20"
-              height="20"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="me-2"
-            >
-              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-              <line x1="1" y1="10" x2="23" y2="10"></line>
-            </svg>
             Credit Card
           </label>
           {showCard && (
@@ -163,42 +139,46 @@ export default function CheckoutOrderArea({ checkoutData }) {
                     style: {
                       base: {
                         fontSize: '16px',
-                        fontFamily: 'Arial, sans-serif',
                         color: '#424770',
                         '::placeholder': {
                           color: '#aab7c4',
                         },
-                        iconColor: '#E61E1E',
                       },
                       invalid: {
                         color: '#9e2146',
-                        iconColor: '#9e2146',
                       },
                     },
-                    hidePostalCode: true,
                   }}
                 />
-              </div>
-              <div className="mt-3">
-                <small className="text-muted">
-                  <i className="fas fa-lock me-1"></i>
-                  Your payment is secure. Your card details are encrypted.
-                </small>
               </div>
             </div>
           )}
           <ErrorMsg msg={errors?.payment?.message} />
         </div>
+        {/* <div className="tp-checkout-payment-item">
+          <input
+            {...register(`payment`, {
+              required: `Payment Option is required!`,
+            })}
+            onClick={() => setShowCard(false)}
+            type="radio"
+            id="cod"
+            name="payment"
+            value="COD"
+          />
+          <label htmlFor="cod">Cash on Delivery</label>
+          <ErrorMsg msg={errors?.payment?.message} />
+        </div> */}
       </div>
 
       <div className="tp-checkout-btn-wrapper">
         <button
           type="submit"
           disabled={!stripe || isCheckoutSubmit || processingPayment}
-          className="tp-checkout-btn w-100 position-relative overflow-hidden"
+          className="tp-checkout-btn w-100"
         >
           {processingPayment ? (
-            <span className="d-flex align-items-center justify-content-center">
+            <span>
               <span
                 className="spinner-border spinner-border-sm me-2"
                 role="status"
@@ -207,28 +187,7 @@ export default function CheckoutOrderArea({ checkoutData }) {
               Processing Payment...
             </span>
           ) : (
-            <>
-              <span className="d-flex align-items-center justify-content-center">
-                <svg
-                  viewBox="0 0 24 24"
-                  width="18"
-                  height="18"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="me-2"
-                >
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <path d="M16 10 L12 14 L8 10"></path>
-                </svg>
-                Place Order
-              </span>
-              <span className="order-reference-id d-none">
-                {orderReferenceId}
-              </span>
-            </>
+            'Place Order'
           )}
         </button>
       </div>

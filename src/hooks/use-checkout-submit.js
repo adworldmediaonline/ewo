@@ -16,24 +16,22 @@ import {
   useSaveOrderMutation,
 } from '@/redux/features/order/orderApi';
 import { useGetOfferCouponsQuery } from '@/redux/features/coupon/couponApi';
-import { clearCart } from '@/redux/features/cartSlice';
 
 const useCheckoutSubmit = () => {
   // offerCoupons
   const { data: offerCoupons, isError, isLoading } = useGetOfferCouponsQuery();
   // addOrder
-  const [saveOrder, { isLoading: isSavingOrder }] = useSaveOrderMutation();
+  const [saveOrder, {}] = useSaveOrderMutation();
   // createPaymentIntent
-  const [createPaymentIntent, { isLoading: isCreatingIntent }] =
-    useCreatePaymentIntentMutation();
-  // cart_products and totalShippingCost
-  const { cart_products, totalShippingCost } = useSelector(state => state.cart);
+  const [createPaymentIntent, {}] = useCreatePaymentIntentMutation();
+  // cart_products
+  const { cart_products } = useSelector(state => state.cart);
   // user
   const { user } = useSelector(state => state.auth);
   // shipping_info
   const { shipping_info } = useSelector(state => state.order);
   // total amount
-  const { total, setTotal, totalWithShipping } = useCartInfo();
+  const { total, setTotal } = useCartInfo();
   // couponInfo
   const [couponInfo, setCouponInfo] = useState({});
   //cartTotal
@@ -60,8 +58,6 @@ const useCheckoutSubmit = () => {
   const [couponApplyMsg, setCouponApplyMsg] = useState('');
   // processing payment
   const [processingPayment, setProcessingPayment] = useState(false);
-  // order reference ID to prevent duplicates
-  const [orderReferenceId, setOrderReferenceId] = useState('');
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -76,13 +72,6 @@ const useCheckoutSubmit = () => {
   } = useForm();
 
   let couponRef = useRef('');
-
-  // Generate a unique order reference ID
-  useEffect(() => {
-    const timestamp = new Date().getTime();
-    const random = Math.floor(Math.random() * 1000);
-    setOrderReferenceId(`order-${timestamp}-${random}`);
-  }, []);
 
   useEffect(() => {
     if (localStorage.getItem('couponInfo')) {
@@ -102,13 +91,6 @@ const useCheckoutSubmit = () => {
     }
   }, [minimumAmount, total, discountAmount, cart_products]);
 
-  // Use shipping cost from cart state directly
-  useEffect(() => {
-    if (totalShippingCost !== undefined) {
-      setShippingCost(totalShippingCost);
-    }
-  }, [totalShippingCost]);
-
   //calculate total and discount value
   useEffect(() => {
     const result = cart_products?.filter(
@@ -119,16 +101,12 @@ const useCheckoutSubmit = () => {
         preValue + currentValue.price * currentValue.orderQuantity,
       0
     );
-
-    // Ensure all values are properly formatted to avoid floating point issues
-    const subTotal = parseFloat(
-      (total + parseFloat(shippingCost.toFixed(2))).toFixed(2)
+    let totalValue = '';
+    let subTotal = Number((total + shippingCost).toFixed(2));
+    let discountTotal = Number(
+      discountProductTotal * (discountPercentage / 100)
     );
-    const discountTotal = parseFloat(
-      (discountProductTotal * (discountPercentage / 100)).toFixed(2)
-    );
-    const totalValue = parseFloat((subTotal - discountTotal).toFixed(2));
-
+    totalValue = Number(subTotal - discountTotal);
     setDiscountAmount(discountTotal);
     setCartTotal(totalValue);
   }, [
@@ -137,6 +115,8 @@ const useCheckoutSubmit = () => {
     discountPercentage,
     cart_products,
     discountProductType,
+    discountAmount,
+    cartTotal,
   ]);
 
   // handleCouponCode
@@ -173,6 +153,9 @@ const useCheckoutSubmit = () => {
       );
       return;
     } else {
+      // notifySuccess(
+      //   `Your Coupon ${result[0].title} is Applied on ${result[0].productType}!`
+      // );
       setCouponApplyMsg(
         `Your Coupon ${result[0].title} is Applied on ${result[0].productType} productType!`
       );
@@ -189,7 +172,7 @@ const useCheckoutSubmit = () => {
 
   // handleShippingCost
   const handleShippingCost = value => {
-    setShippingCost(parseFloat(value));
+    setShippingCost(value);
   };
 
   //set values
@@ -208,15 +191,11 @@ const useCheckoutSubmit = () => {
   // create payment intent with order data for Stripe
   const createStripePaymentIntent = async orderData => {
     try {
+      console.log('Creating payment intent with order data:', orderData);
+
       // Check if user is logged in
       const isAuthenticate = Cookies.get('userInfo');
       const isGuestCheckout = !isAuthenticate;
-
-      // Log the reference ID to make sure it's being used
-      console.log(
-        'Creating payment intent with reference ID:',
-        orderReferenceId
-      );
 
       // Create a payment intent with order data including cart
       const response = await createPaymentIntent({
@@ -230,39 +209,17 @@ const useCheckoutSubmit = () => {
           email: orderData.email,
           name: orderData.name,
           user: isGuestCheckout ? null : user?._id,
-          totalAmount: parseFloat(cartTotal.toFixed(2)),
+          totalAmount: cartTotal,
           isGuestOrder: isGuestCheckout,
-          orderReferenceId: orderReferenceId, // Include reference ID to prevent duplicates
-          shippingCost: parseFloat(shippingCost.toFixed(2)),
-          discount: parseFloat(discountAmount.toFixed(2)),
-          // Add all shipping details to ensure they're in the webhook
-          address: orderData.address,
-          contact: orderData.contactNo,
-          city: orderData.city,
-          country: orderData.country,
-          zipCode: orderData.zipCode,
         },
       });
 
+      console.log('Payment intent created:', response.data);
       return response.data.clientSecret;
     } catch (error) {
       console.error('Error creating payment intent:', error);
       throw error;
     }
-  };
-
-  // Handle successful order completion
-  const handleOrderCompletion = orderId => {
-    // Clear cart data
-    dispatch(clearCart());
-    localStorage.removeItem('couponInfo');
-    localStorage.removeItem('cart_products');
-
-    // Show success message
-    notifySuccess('Your order has been placed successfully!');
-
-    // Redirect to order details page
-    router.push(`/order/${orderId}`);
   };
 
   // submitHandler
@@ -287,13 +244,12 @@ const useCheckoutSubmit = () => {
       status: 'pending',
       cart: cart_products,
       paymentMethod: data.payment,
-      subTotal: parseFloat(total.toFixed(2)),
-      shippingCost: parseFloat(shippingCost.toFixed(2)),
-      discount: parseFloat(discountAmount.toFixed(2)),
-      totalAmount: parseFloat(cartTotal.toFixed(2)),
+      subTotal: total,
+      shippingCost: shippingCost,
+      discount: discountAmount,
+      totalAmount: cartTotal,
       orderNote: data.orderNote,
       isGuestOrder: isGuestCheckout,
-      orderReferenceId: orderReferenceId, // Include reference ID for webhook matching
     };
 
     // Only add user ID if the user is logged in
@@ -301,112 +257,90 @@ const useCheckoutSubmit = () => {
       orderInfo.user = user._id;
     }
 
-    try {
-      if (data.payment === 'Card') {
-        if (!stripe || !elements) {
-          setIsCheckoutSubmit(false);
-          return;
-        }
+    if (data.payment === 'Card') {
+      if (!stripe || !elements) {
+        setIsCheckoutSubmit(false);
+        return;
+      }
 
-        const card = elements.getElement(CardElement);
-        if (card == null) {
-          setIsCheckoutSubmit(false);
-          return;
-        }
+      const card = elements.getElement(CardElement);
+      if (card == null) {
+        setIsCheckoutSubmit(false);
+        return;
+      }
 
+      try {
         setProcessingPayment(true);
-        setCardError('');
-
-        try {
-          // Step 1: Validate the card
-          const { error, paymentMethod } = await stripe.createPaymentMethod({
-            type: 'card',
-            card: card,
-          });
-
-          if (error) {
-            setCardError(error.message);
-            setIsCheckoutSubmit(false);
-            setProcessingPayment(false);
-            return;
-          }
-
-          // Step 2: Create payment intent with order data
-          const secret = await createStripePaymentIntent({
-            ...orderInfo,
-            cardInfo: paymentMethod,
-          });
-
-          // Step 3: Confirm the payment with Stripe
-          const { paymentIntent, error: confirmError } =
-            await stripe.confirmCardPayment(secret, {
-              payment_method: {
-                card: card,
-                billing_details: {
-                  name: orderInfo.name,
-                  email: orderInfo.email,
-                },
-              },
-            });
-
-          if (confirmError) {
-            setCardError(confirmError.message);
-            setIsCheckoutSubmit(false);
-            setProcessingPayment(false);
-            return;
-          }
-
-          // Step 4: Payment confirmed by Stripe
-          if (paymentIntent.status === 'succeeded') {
-            console.log(
-              'Payment succeeded, creating order with reference ID:',
-              orderReferenceId
-            );
-
-            // Always create the order in the frontend, never depend on the webhook
-            const orderResponse = await saveOrder({
-              ...orderInfo,
-              paymentIntent: {
-                id: paymentIntent.id,
-                amount: paymentIntent.amount,
-                status: paymentIntent.status,
-              },
-              isPaid: true,
-              paidAt: new Date(),
-              // The webhook will only update this order, not create a new one
-            });
-
-            if (orderResponse.data?.order?._id) {
-              handleOrderCompletion(orderResponse.data.order._id);
-            } else {
-              // Fallback if order ID is not returned
-              router.push('/order');
-            }
-          }
-        } catch (err) {
-          console.error('Payment error:', err);
-          notifyError('There was a problem processing your payment');
-          setIsCheckoutSubmit(false);
-          setProcessingPayment(false);
-        }
-      } else if (data.payment === 'COD') {
-        // For Cash on Delivery, create order directly
-        const orderResponse = await saveOrder({
-          ...orderInfo,
+        // Step 1: Validate the card
+        const { error, paymentMethod } = await stripe.createPaymentMethod({
+          type: 'card',
+          card: card,
         });
 
-        if (orderResponse.data?.order?._id) {
-          handleOrderCompletion(orderResponse.data.order._id);
-        } else {
-          notifyError('Error creating your order');
+        if (error) {
+          setCardError(error.message);
           setIsCheckoutSubmit(false);
+          setProcessingPayment(false);
+          return;
         }
+
+        // Step 2: Create payment intent with order data
+        const secret = await createStripePaymentIntent({
+          ...orderInfo,
+          cardInfo: paymentMethod,
+        });
+
+        // Step 3: Confirm the payment with Stripe
+        const { paymentIntent, error: confirmError } =
+          await stripe.confirmCardPayment(secret, {
+            payment_method: {
+              card: card,
+              billing_details: {
+                name: orderInfo.name,
+                email: orderInfo.email,
+              },
+            },
+          });
+
+        if (confirmError) {
+          setCardError(confirmError.message);
+          setIsCheckoutSubmit(false);
+          setProcessingPayment(false);
+          return;
+        }
+
+        // Step 4: Payment confirmed by Stripe
+        if (paymentIntent.status === 'succeeded') {
+          // The webhook will handle order creation
+          notifySuccess(
+            'Payment processed! Your order will be confirmed in a moment.'
+          );
+          localStorage.removeItem('cart_products');
+          localStorage.removeItem('couponInfo');
+          setIsCheckoutSubmit(false);
+          setProcessingPayment(false);
+
+          // Save order and get order ID for redirect
+          saveOrder({
+            ...orderInfo,
+            paymentInfo: paymentIntent,
+            isPaid: true,
+            paidAt: new Date(),
+          })
+            .then(res => {
+              router.push(`/order/${res.data?.order?._id}`);
+            })
+            .catch(err => {
+              console.error('Order error:', err);
+              router.push('/order');
+            });
+        }
+      } catch (err) {
+        console.error('Payment error:', err);
+        notifyError('There was a problem processing your payment');
+        setIsCheckoutSubmit(false);
+        setProcessingPayment(false);
       }
-    } catch (err) {
-      console.error('Order submission error:', err);
-      notifyError('Error creating your order');
-      setIsCheckoutSubmit(false);
-      setProcessingPayment(false);
     }
   };
 
@@ -435,7 +369,6 @@ const useCheckoutSubmit = () => {
     showCard,
     setShowCard,
     processingPayment,
-    orderReferenceId,
   };
 };
 
