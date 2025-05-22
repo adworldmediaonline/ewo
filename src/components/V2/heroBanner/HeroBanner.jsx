@@ -15,7 +15,7 @@ export default function HeroBanner() {
         crop="scale"
         gravity="center"
         priority
-        // quality={90}
+        quality={90}
         className={styles.bannerImage}
       />
     </div>
