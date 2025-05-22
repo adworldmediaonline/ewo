@@ -7,7 +7,7 @@ export default function HeroBanner() {
   return (
     <div className={styles.bannerContainer}>
       <CldImage
-        src="Untitled_1656_x_700_px_2_kzqaka"
+        src="EWO_Car_Banner_03_page-0001_rbhbhl"
         alt="Banner"
         width={1680}
         height={700}
@@ -15,7 +15,7 @@ export default function HeroBanner() {
         crop="scale"
         gravity="center"
         priority
-        quality={90}
+        // quality={90}
         className={styles.bannerImage}
       />
     </div>

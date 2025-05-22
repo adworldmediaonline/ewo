@@ -560,7 +560,7 @@
 
   .desktopLogo {
     display: block;
-    width: 190px;
+    width: 160px;
     height: auto;
   }
 
@@ -569,7 +569,7 @@
   }
 
   .headerTop {
-    height: 190px;
+    height: 120px;
   }
 }
 
