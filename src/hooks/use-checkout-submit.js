@@ -341,27 +341,6 @@ const useCheckoutSubmit = () => {
         setIsCheckoutSubmit(false);
         setProcessingPayment(false);
       }
-    } else if (data.payment === 'COD') {
-      saveOrder({
-        ...orderInfo,
-      })
-        .then(res => {
-          if (res?.error) {
-            notifyError('Error creating your order');
-            setIsCheckoutSubmit(false);
-          } else {
-            localStorage.removeItem('cart_products');
-            localStorage.removeItem('couponInfo');
-            setIsCheckoutSubmit(false);
-            notifySuccess('Your Order Confirmed!');
-            router.push(`/order/${res.data?.order?._id}`);
-          }
-        })
-        .catch(err => {
-          console.error('Order error:', err);
-          notifyError('Error creating your order');
-          setIsCheckoutSubmit(false);
-        });
     }
   };
 
