@@ -260,17 +260,20 @@ const useCheckoutSubmit = () => {
     if (data.payment === 'Card') {
       if (!stripe || !elements) {
         setIsCheckoutSubmit(false);
+        notifyError('Stripe not initialized. Please try again.');
         return;
       }
 
       const card = elements.getElement(CardElement);
       if (card == null) {
         setIsCheckoutSubmit(false);
+        notifyError('Card information is incomplete.');
         return;
       }
 
       try {
         setProcessingPayment(true);
+
         // Step 1: Validate the card
         const { error, paymentMethod } = await stripe.createPaymentMethod({
           type: 'card',
@@ -278,66 +281,147 @@ const useCheckoutSubmit = () => {
         });
 
         if (error) {
+          console.error('Card validation error:', error);
           setCardError(error.message);
+
+          // Create a summary of attempted purchase
+          const productSummary =
+            cart_products.length > 1
+              ? `${cart_products[0].title} and ${
+                  cart_products.length - 1
+                } more items`
+              : cart_products[0]?.title || 'your items';
+
+          // Show a user-friendly message
+          notifyError(
+            `We couldn't process your card for ${productSummary}. Please check your card details.`
+          );
           setIsCheckoutSubmit(false);
           setProcessingPayment(false);
           return;
         }
+
+        console.log('Payment method created:', paymentMethod);
 
         // Step 2: Create payment intent with order data
-        const secret = await createStripePaymentIntent({
-          ...orderInfo,
-          cardInfo: paymentMethod,
-        });
-
-        // Step 3: Confirm the payment with Stripe
-        const { paymentIntent, error: confirmError } =
-          await stripe.confirmCardPayment(secret, {
-            payment_method: {
-              card: card,
-              billing_details: {
-                name: orderInfo.name,
-                email: orderInfo.email,
-              },
-            },
+        try {
+          const secret = await createStripePaymentIntent({
+            ...orderInfo,
+            cardInfo: paymentMethod,
           });
 
-        if (confirmError) {
-          setCardError(confirmError.message);
-          setIsCheckoutSubmit(false);
-          setProcessingPayment(false);
-          return;
-        }
+          console.log('Payment intent created, client secret received');
 
-        // Step 4: Payment confirmed by Stripe
-        if (paymentIntent.status === 'succeeded') {
-          // The webhook will handle order creation
-          notifySuccess(
-            'Payment processed! Your order will be confirmed in a moment.'
-          );
-          localStorage.removeItem('cart_products');
-          localStorage.removeItem('couponInfo');
-          setIsCheckoutSubmit(false);
-          setProcessingPayment(false);
-
-          // Save order and get order ID for redirect
-          saveOrder({
-            ...orderInfo,
-            paymentInfo: paymentIntent,
-            isPaid: true,
-            paidAt: new Date(),
-          })
-            .then(res => {
-              router.push(`/order/${res.data?.order?._id}`);
-            })
-            .catch(err => {
-              console.error('Order error:', err);
-              router.push('/order');
+          // Step 3: Confirm the payment with Stripe
+          const { paymentIntent, error: confirmError } =
+            await stripe.confirmCardPayment(secret, {
+              payment_method: {
+                card: card,
+                billing_details: {
+                  name: orderInfo.name,
+                  email: orderInfo.email,
+                },
+              },
             });
+
+          if (confirmError) {
+            console.error('Payment confirmation error:', confirmError);
+            let errorMessage = confirmError.message;
+            // Add more user-friendly error messages based on error types
+            if (confirmError.type === 'card_error') {
+              if (confirmError.code === 'card_declined') {
+                errorMessage =
+                  'Your card was declined. Please use a different card.';
+              } else if (confirmError.code === 'expired_card') {
+                errorMessage =
+                  'Your card has expired. Please use a different card.';
+              } else if (confirmError.code === 'incorrect_cvc') {
+                errorMessage =
+                  'The security code (CVC) is incorrect. Please check and try again.';
+              } else if (confirmError.code === 'processing_error') {
+                errorMessage =
+                  'An error occurred while processing your card. Please try again.';
+              }
+            }
+
+            // Create a summary of attempted purchase
+            const productSummary =
+              cart_products.length > 1
+                ? `${cart_products[0].title} and ${
+                    cart_products.length - 1
+                  } more items`
+                : cart_products[0]?.title || 'your items';
+
+            setCardError(errorMessage);
+            notifyError(
+              `We couldn't complete your purchase for ${productSummary}: ${errorMessage}`
+            );
+            setIsCheckoutSubmit(false);
+            setProcessingPayment(false);
+            return;
+          }
+
+          console.log('Payment intent status:', paymentIntent.status);
+
+          // Step 4: Payment confirmed by Stripe
+          if (paymentIntent.status === 'succeeded') {
+            // Create a summary of purchased products
+            const productSummary =
+              cart_products.length > 1
+                ? `${cart_products[0].title} and ${
+                    cart_products.length - 1
+                  } other items`
+                : cart_products[0]?.title || 'your product';
+
+            notifySuccess(
+              `Thank you! Your order for ${productSummary} has been confirmed.`
+            );
+            localStorage.removeItem('cart_products');
+            localStorage.removeItem('couponInfo');
+            setIsCheckoutSubmit(false);
+            setProcessingPayment(false);
+
+            // Save order and get order ID for redirect
+            saveOrder({
+              ...orderInfo,
+              paymentInfo: paymentIntent,
+              isPaid: true,
+              paidAt: new Date(),
+            })
+              .then(res => {
+                router.push(`/order/${res.data?.order?._id}`);
+              })
+              .catch(err => {
+                console.error('Order error:', err);
+                notifyError(
+                  `Your payment for ${productSummary} was successful, but we encountered an issue saving your order details. Our team has been notified.`
+                );
+                router.push('/order');
+              });
+          } else {
+            notifyError(
+              `We couldn't complete your purchase. Please try again or contact customer support.`
+            );
+            setIsCheckoutSubmit(false);
+            notifyError(
+              `Payment not completed. Status: ${paymentIntent.status}`
+            );
+            setIsCheckoutSubmit(false);
+            setProcessingPayment(false);
+          }
+        } catch (err) {
+          console.error('Payment intent error:', err);
+          notifyError(
+            'Error creating payment: Please check your payment details and try again.'
+          );
+          setIsCheckoutSubmit(false);
+          setProcessingPayment(false);
         }
       } catch (err) {
         console.error('Payment error:', err);
-        notifyError('There was a problem processing your payment');
+        notifyError(
+          'There was a problem processing your payment. Please try again.'
+        );
         setIsCheckoutSubmit(false);
         setProcessingPayment(false);
       }
