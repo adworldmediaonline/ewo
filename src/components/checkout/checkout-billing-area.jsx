@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import ErrorMsg from '../common/error-msg';
 import { useSelector } from 'react-redux';
 import { Country, State, City } from 'country-state-city';
-import { useFormContext } from 'react-hook-form';
 
 const CheckoutBillingArea = ({ register, errors, isGuest = false }) => {
   const { user } = useSelector(state => state.auth);
