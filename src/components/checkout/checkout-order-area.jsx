@@ -20,6 +20,7 @@ export default function CheckoutOrderArea({ checkoutData }) {
     shippingCost,
     discountAmount,
     processingPayment,
+    cardError,
   } = checkoutData;
   const { cart_products, totalShippingCost, shippingDiscount } = useSelector(
     state => state.cart
@@ -151,6 +152,20 @@ export default function CheckoutOrderArea({ checkoutData }) {
                   }}
                 />
               </div>
+              {cardError && (
+                <div
+                  className="alert alert-danger mt-3 payment-error"
+                  role="alert"
+                >
+                  <small className="d-block mb-1">
+                    Payment could not be processed:
+                  </small>
+                  <strong>{cardError}</strong>
+                  <div className="mt-2">
+                    <small>Please check your card details and try again.</small>
+                  </div>
+                </div>
+              )}
             </div>
           )}
           <ErrorMsg msg={errors?.payment?.message} />
@@ -184,12 +199,19 @@ export default function CheckoutOrderArea({ checkoutData }) {
                 role="status"
                 aria-hidden="true"
               ></span>
-              Processing Payment...
+              Processing Your Order...
             </span>
           ) : (
-            'Place Order'
+            <>Complete Purchase</>
           )}
         </button>
+        {cardError && (
+          <div className="text-center mt-3">
+            <small className="text-danger">
+              Please fix the payment errors above before continuing.
+            </small>
+          </div>
+        )}
       </div>
     </div>
   );
