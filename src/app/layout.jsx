@@ -3,6 +3,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { GoogleTagManager } from '@next/third-parties/google';
 import { Lato } from 'next/font/google';
 import Providers from '@/components/provider';
+import 'react-country-state-city/dist/react-country-state-city.css';
 
 export const metadata = {
   title: 'East West Off Road | Premium Automotive & Off-Road Gear USA',
