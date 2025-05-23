@@ -1,10 +1,124 @@
 'use client';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ErrorMsg from '../common/error-msg';
 import { useSelector } from 'react-redux';
+import { Country, State, City } from 'country-state-city';
+import { useFormContext } from 'react-hook-form';
 
-const CheckoutBillingArea = ({ register, errors }) => {
+const CheckoutBillingArea = ({ register, errors, isGuest = false }) => {
   const { user } = useSelector(state => state.auth);
+
+  // Get all countries
+  const countries = Country.getAllCountries();
+
+  // Find US country for default
+  const defaultCountry = countries.find(country => country.isoCode === 'US');
+
+  // States for selections with defaults
+  const [selectedCountry, setSelectedCountry] = useState(
+    defaultCountry || null
+  );
+  const [selectedState, setSelectedState] = useState(null);
+  const [selectedCity, setSelectedCity] = useState('');
+  const [states, setStates] = useState([]);
+  const [cities, setCities] = useState([]);
+
+  // Form values to track selections
+  const [formValues, setFormValues] = useState({
+    country: 'US',
+    state: '',
+    city: '',
+  });
+
+  // Load states for default country (US) on initial render
+  useEffect(() => {
+    if (selectedCountry) {
+      const countryStates = State.getStatesOfCountry(selectedCountry.isoCode);
+      setStates(countryStates);
+
+      // Set form value
+      setFormValues(prev => ({
+        ...prev,
+        country: selectedCountry.isoCode,
+      }));
+    }
+  }, []);
+
+  // Update states when country changes
+  useEffect(() => {
+    if (selectedCountry) {
+      const countryStates = State.getStatesOfCountry(selectedCountry.isoCode);
+      setStates(countryStates);
+
+      // Reset state and city when country changes
+      if (selectedState) {
+        setSelectedState(null);
+        setSelectedCity('');
+        setFormValues(prev => ({
+          ...prev,
+          state: '',
+          city: '',
+        }));
+      }
+      setCities([]);
+    }
+  }, [selectedCountry]);
+
+  // Update cities when state changes
+  useEffect(() => {
+    if (selectedCountry && selectedState) {
+      const stateCities = City.getCitiesOfState(
+        selectedCountry.isoCode,
+        selectedState.isoCode
+      );
+      setCities(stateCities);
+    }
+  }, [selectedCountry, selectedState]);
+
+  // Handle country change
+  const handleCountryChange = e => {
+    const countryCode = e.target.value;
+    if (!countryCode) return;
+
+    const country = countries.find(c => c.isoCode === countryCode);
+    setSelectedCountry(country);
+
+    // Update form value for country
+    setFormValues(prev => ({
+      ...prev,
+      country: countryCode,
+      state: '',
+      city: '',
+    }));
+  };
+
+  // Handle state change
+  const handleStateChange = e => {
+    const stateCode = e.target.value;
+    if (!stateCode) return;
+
+    const state = states.find(s => s.isoCode === stateCode);
+    setSelectedState(state);
+
+    // Update form value for state
+    setFormValues(prev => ({
+      ...prev,
+      state: stateCode,
+      city: '',
+    }));
+  };
+
+  // Handle city change
+  const handleCityChange = e => {
+    const cityName = e.target.value;
+    setSelectedCity(cityName);
+
+    // Update form value for city
+    setFormValues(prev => ({
+      ...prev,
+      city: cityName,
+    }));
+  };
 
   return (
     <div className="tp-checkout-bill-area">
@@ -20,7 +134,7 @@ const CheckoutBillingArea = ({ register, errors }) => {
                 </label>
                 <input
                   {...register('firstName', {
-                    required: `firstName is required!`,
+                    required: `First Name is required!`,
                   })}
                   name="firstName"
                   id="firstName"
@@ -38,7 +152,7 @@ const CheckoutBillingArea = ({ register, errors }) => {
                 </label>
                 <input
                   {...register('lastName', {
-                    required: `lastName is required!`,
+                    required: `Last Name is required!`,
                   })}
                   name="lastName"
                   id="lastName"
@@ -53,14 +167,26 @@ const CheckoutBillingArea = ({ register, errors }) => {
                 <label>
                   Country <span>*</span>
                 </label>
-                <input
-                  {...register('country', { required: `country is required!` })}
+                <select
+                  {...register('country', {
+                    required: `Country is required!`,
+                  })}
                   name="country"
                   id="country"
-                  type="text"
-                  placeholder="United States (US)"
-                />
-                <ErrorMsg msg={errors?.lastName?.message} />
+                  className="w-100 form-select"
+                  onChange={handleCountryChange}
+                  value={formValues.country}
+                >
+                  <option value="">Select Country</option>
+                  {countries.map(country => (
+                    <option key={country.isoCode} value={country.isoCode}>
+                      {country.name}
+                    </option>
+                  ))}
+                </select>
+                {!formValues.country && (
+                  <ErrorMsg msg={errors?.country?.message} />
+                )}
               </div>
             </div>
             <div className="col-md-12">
@@ -71,22 +197,62 @@ const CheckoutBillingArea = ({ register, errors }) => {
                   name="address"
                   id="address"
                   type="text"
-                  // placeholder="House number and street name"
+                  placeholder="House number and street name"
                 />
                 <ErrorMsg msg={errors?.address?.message} />
               </div>
             </div>
             <div className="col-md-6">
               <div className="tp-checkout-input">
+                <label>
+                  State / Province <span>*</span>
+                </label>
+                <select
+                  {...register('state', {
+                    required: `State is required!`,
+                  })}
+                  name="state"
+                  id="state"
+                  className="w-100 form-select"
+                  onChange={handleStateChange}
+                  value={formValues.state}
+                  disabled={!selectedCountry}
+                >
+                  <option value="">Select State</option>
+                  {states.map(state => (
+                    <option key={state.isoCode} value={state.isoCode}>
+                      {state.name}
+                    </option>
+                  ))}
+                </select>
+                {!formValues.state && <ErrorMsg msg={errors?.state?.message} />}
+              </div>
+            </div>
+            <div className="col-md-6">
+              <div className="tp-checkout-input">
                 <label>Town / City</label>
-                <input
-                  {...register('city', { required: `City is required!` })}
+                <select
+                  {...register('city', {
+                    required: `City is required!`,
+                  })}
                   name="city"
                   id="city"
-                  type="text"
-                  placeholder="City"
-                />
-                <ErrorMsg msg={errors?.city?.message} />
+                  className="w-100 form-select"
+                  onChange={handleCityChange}
+                  value={formValues.city}
+                  disabled={!selectedState}
+                >
+                  <option value="">Select City</option>
+                  {cities.map(city => (
+                    <option
+                      key={`${city.name}-${city.latitude}`}
+                      value={city.name}
+                    >
+                      {city.name}
+                    </option>
+                  ))}
+                </select>
+                {!formValues.city && <ErrorMsg msg={errors?.city?.message} />}
               </div>
             </div>
             <div className="col-md-6">
@@ -102,74 +268,6 @@ const CheckoutBillingArea = ({ register, errors }) => {
                   placeholder="Postal Code"
                 />
                 <ErrorMsg msg={errors?.zipCode?.message} />
-              </div>
-            </div>
-            <div className="col-md-6">
-              <div className="tp-checkout-input">
-                <label>
-                  State <span>*</span>
-                </label>
-                <select
-                  {...register('state', { required: `State is required!` })}
-                  name="state"
-                  id="state"
-                  className="w-100 form-select"
-                  defaultValue=""
-                >
-                  <option value="">Select State</option>
-                  <option value="AL">Alabama</option>
-                  <option value="AK">Alaska</option>
-                  <option value="AZ">Arizona</option>
-                  <option value="AR">Arkansas</option>
-                  <option value="CA">California</option>
-                  <option value="CO">Colorado</option>
-                  <option value="CT">Connecticut</option>
-                  <option value="DE">Delaware</option>
-                  <option value="DC">District of Columbia</option>
-                  <option value="FL">Florida</option>
-                  <option value="GA">Georgia</option>
-                  <option value="HI">Hawaii</option>
-                  <option value="ID">Idaho</option>
-                  <option value="IL">Illinois</option>
-                  <option value="IN">Indiana</option>
-                  <option value="IA">Iowa</option>
-                  <option value="KS">Kansas</option>
-                  <option value="KY">Kentucky</option>
-                  <option value="LA">Louisiana</option>
-                  <option value="ME">Maine</option>
-                  <option value="MD">Maryland</option>
-                  <option value="MA">Massachusetts</option>
-                  <option value="MI">Michigan</option>
-                  <option value="MN">Minnesota</option>
-                  <option value="MS">Mississippi</option>
-                  <option value="MO">Missouri</option>
-                  <option value="MT">Montana</option>
-                  <option value="NE">Nebraska</option>
-                  <option value="NV">Nevada</option>
-                  <option value="NH">New Hampshire</option>
-                  <option value="NJ">New Jersey</option>
-                  <option value="NM">New Mexico</option>
-                  <option value="NY">New York</option>
-                  <option value="NC">North Carolina</option>
-                  <option value="ND">North Dakota</option>
-                  <option value="OH">Ohio</option>
-                  <option value="OK">Oklahoma</option>
-                  <option value="OR">Oregon</option>
-                  <option value="PA">Pennsylvania</option>
-                  <option value="RI">Rhode Island</option>
-                  <option value="SC">South Carolina</option>
-                  <option value="SD">South Dakota</option>
-                  <option value="TN">Tennessee</option>
-                  <option value="TX">Texas</option>
-                  <option value="UT">Utah</option>
-                  <option value="VT">Vermont</option>
-                  <option value="VA">Virginia</option>
-                  <option value="WA">Washington</option>
-                  <option value="WV">West Virginia</option>
-                  <option value="WI">Wisconsin</option>
-                  <option value="WY">Wyoming</option>
-                </select>
-                <ErrorMsg msg={errors?.state?.message} />
               </div>
             </div>
             <div className="col-md-6">
