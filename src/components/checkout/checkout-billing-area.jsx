@@ -394,12 +394,9 @@ const CheckoutBillingArea = ({
                       Checking Address Eligibility...
                     </span>
                   ) : (
-                    'Check for 10% First-Time Address Discount'
+                    'Check eligibility (10% discount)'
                   )}
                 </button>
-                <p className="mt-2" style={{ fontSize: '12px', color: '#666' }}>
-                  New shipping addresses qualify for a one-time 10% discount.
-                </p>
               </div>
             )}
 

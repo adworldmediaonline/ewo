@@ -299,7 +299,7 @@ export default function CheckoutOrderArea({ checkoutData }) {
           {/* New address discount section with improved visibility - keep visible during checkout */}
           <li className="tp-order-info-list-subtotal">
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ fontWeight: '500' }}>Address Discount</span>
+              <span style={{ fontWeight: '500' }}>Discount</span>
               {displayDiscountMessage && (
                 <div className="ms-2" style={{ position: 'relative' }}>
                   <div
@@ -354,7 +354,7 @@ export default function CheckoutOrderArea({ checkoutData }) {
                       <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
                         {displayDiscountEligible
                           ? '✓ Eligible for Discount'
-                          : '❌ Not Eligible for Discount'}
+                          : 'Not eligible'}
                       </div>
                       <div>{displayDiscountMessage}</div>
                       {!displayDiscountEligible && (
@@ -367,16 +367,7 @@ export default function CheckoutOrderArea({ checkoutData }) {
                             borderRadius: '4px',
                           }}
                         >
-                          <div
-                            style={{ fontWeight: 'bold', marginBottom: '3px' }}
-                          >
-                            Why?
-                          </div>
                           <div>
-                            This shipping address matches one used in a previous
-                            order. Each unique address is only eligible once.
-                          </div>
-                          <div className="mt-1">
                             Try a different shipping address to qualify for the
                             10% discount.
                           </div>
@@ -439,7 +430,7 @@ export default function CheckoutOrderArea({ checkoutData }) {
                     opacity: isCheckoutSubmit ? 0.9 : 1,
                   }}
                 >
-                  (Includes 10% address discount)
+                  Include 10% discount
                 </div>
               )}
             </span>
