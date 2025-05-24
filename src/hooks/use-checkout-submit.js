@@ -8,12 +8,18 @@ import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 //internal import
 import useCartInfo from './use-cart-info';
-import { set_shipping } from '@/redux/features/order/orderSlice';
+import {
+  set_shipping,
+  set_client_secret,
+  begin_checkout_submission,
+  end_checkout_submission,
+} from '@/redux/features/order/orderSlice';
 import { set_coupon } from '@/redux/features/coupon/couponSlice';
 import { notifyError, notifySuccess } from '@/utils/toast';
 import {
   useCreatePaymentIntentMutation,
   useSaveOrderMutation,
+  useCheckAddressDiscountMutation,
 } from '@/redux/features/order/orderApi';
 import { useGetOfferCouponsQuery } from '@/redux/features/coupon/couponApi';
 
@@ -58,6 +64,18 @@ const useCheckoutSubmit = () => {
   const [couponApplyMsg, setCouponApplyMsg] = useState('');
   // processing payment
   const [processingPayment, setProcessingPayment] = useState(false);
+  // Get address discount eligibility from redux
+  const {
+    address_discount_eligible,
+    address_discount_message,
+    address_discount_percentage,
+  } = useSelector(state => state.order);
+
+  // addressDiscountAmount
+  const [addressDiscountAmount, setAddressDiscountAmount] = useState(0);
+
+  // Check if address is eligible for discount
+  const [checkAddressDiscount] = useCheckAddressDiscountMutation();
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -91,7 +109,48 @@ const useCheckoutSubmit = () => {
     }
   }, [minimumAmount, total, discountAmount, cart_products]);
 
-  //calculate total and discount value
+  // Function to check address discount eligibility
+  const checkAddressDiscountEligibility = addressData => {
+    if (
+      !addressData ||
+      !addressData.address ||
+      !addressData.city ||
+      !addressData.state ||
+      !addressData.country
+    ) {
+      return;
+    }
+
+    checkAddressDiscount({
+      address: addressData.address,
+      city: addressData.city,
+      state: addressData.state,
+      zipCode: addressData.zipCode,
+      country: addressData.country,
+    });
+  };
+
+  // Update total with address discount if eligible
+  useEffect(() => {
+    if (address_discount_eligible) {
+      const discountValue = total * (address_discount_percentage / 100);
+      setAddressDiscountAmount(discountValue);
+    } else if (address_discount_eligible === false) {
+      // Only reset if explicitly false, not if null
+      setAddressDiscountAmount(0);
+    }
+    // Don't reset when it's null, to keep the current discount state during transitions
+  }, [total, address_discount_eligible, address_discount_percentage]);
+
+  // Add this new effect to reset the address discount amount when eligibility is reset
+  // but not during checkout submission
+  useEffect(() => {
+    if (address_discount_eligible === null && !isCheckoutSubmit) {
+      setAddressDiscountAmount(0);
+    }
+  }, [address_discount_eligible, isCheckoutSubmit]);
+
+  // Calculate total and discount value, now including address discount
   useEffect(() => {
     const result = cart_products?.filter(
       p => p.productType === discountProductType
@@ -106,8 +165,12 @@ const useCheckoutSubmit = () => {
     let discountTotal = Number(
       discountProductTotal * (discountPercentage / 100)
     );
-    totalValue = Number(subTotal - discountTotal);
-    setDiscountAmount(discountTotal);
+
+    // Add address discount if eligible
+    const totalDiscount = discountTotal + addressDiscountAmount;
+
+    totalValue = Number(subTotal - totalDiscount);
+    setDiscountAmount(totalDiscount);
     setCartTotal(totalValue);
   }, [
     total,
@@ -117,6 +180,7 @@ const useCheckoutSubmit = () => {
     discountProductType,
     discountAmount,
     cartTotal,
+    addressDiscountAmount,
   ]);
 
   // handleCouponCode
@@ -224,6 +288,19 @@ const useCheckoutSubmit = () => {
 
   // submitHandler
   const submitHandler = async data => {
+    // Make sure the zipCode field is properly validated
+    if (!data.zipCode || data.zipCode.trim() === '') {
+      return;
+    }
+
+    // Important: Mark checkout as submitting to prevent discount reset
+    dispatch(begin_checkout_submission());
+
+    // Store current discount values for safety
+    const currentAddressDiscount = addressDiscountAmount;
+    const isEligibleForDiscount = address_discount_eligible;
+
+    // Now set shipping info (discount values will be preserved)
     dispatch(set_shipping(data));
     setIsCheckoutSubmit(true);
 
@@ -250,6 +327,9 @@ const useCheckoutSubmit = () => {
       totalAmount: cartTotal,
       orderNote: data.orderNote,
       isGuestOrder: isGuestCheckout,
+      // Use stored discount values
+      addressDiscountApplied: isEligibleForDiscount,
+      addressDiscountAmount: currentAddressDiscount,
     };
 
     // Only add user ID if the user is logged in
@@ -261,6 +341,7 @@ const useCheckoutSubmit = () => {
       if (!stripe || !elements) {
         setIsCheckoutSubmit(false);
         notifyError('Stripe not initialized. Please try again.');
+        dispatch(end_checkout_submission());
         return;
       }
 
@@ -268,6 +349,7 @@ const useCheckoutSubmit = () => {
       if (card == null) {
         setIsCheckoutSubmit(false);
         notifyError('Card information is incomplete.');
+        dispatch(end_checkout_submission());
         return;
       }
 
@@ -298,6 +380,7 @@ const useCheckoutSubmit = () => {
           );
           setIsCheckoutSubmit(false);
           setProcessingPayment(false);
+          dispatch(end_checkout_submission());
           return;
         }
 
@@ -358,6 +441,7 @@ const useCheckoutSubmit = () => {
             );
             setIsCheckoutSubmit(false);
             setProcessingPayment(false);
+            dispatch(end_checkout_submission());
             return;
           }
 
@@ -408,6 +492,7 @@ const useCheckoutSubmit = () => {
             );
             setIsCheckoutSubmit(false);
             setProcessingPayment(false);
+            dispatch(end_checkout_submission());
           }
         } catch (err) {
           console.error('Payment intent error:', err);
@@ -416,6 +501,7 @@ const useCheckoutSubmit = () => {
           );
           setIsCheckoutSubmit(false);
           setProcessingPayment(false);
+          dispatch(end_checkout_submission());
         }
       } catch (err) {
         console.error('Payment error:', err);
@@ -424,6 +510,7 @@ const useCheckoutSubmit = () => {
         );
         setIsCheckoutSubmit(false);
         setProcessingPayment(false);
+        dispatch(end_checkout_submission());
       }
     }
   };
@@ -453,6 +540,11 @@ const useCheckoutSubmit = () => {
     showCard,
     setShowCard,
     processingPayment,
+    // Add new props for address discount
+    checkAddressDiscountEligibility,
+    address_discount_eligible,
+    address_discount_message,
+    addressDiscountAmount,
   };
 };
 

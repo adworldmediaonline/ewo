@@ -1,5 +1,5 @@
 import { apiSlice } from '../../api/apiSlice';
-import { set_client_secret } from './orderSlice';
+import { set_client_secret, set_address_discount_eligible } from './orderSlice';
 
 export const authApi = apiSlice.injectEndpoints({
   overrideExisting: true,
@@ -28,6 +28,26 @@ export const authApi = apiSlice.injectEndpoints({
           }
         } catch (err) {
           console.error('Payment intent creation failed:', err);
+        }
+      },
+    }),
+    // checkAddressDiscount
+    checkAddressDiscount: builder.mutation({
+      query: data => ({
+        url: 'api/order/check-address-discount',
+        method: 'POST',
+        body: data,
+      }),
+
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          const result = await queryFulfilled;
+          if (result.data) {
+            dispatch(set_address_discount_eligible(result.data.eligible));
+          }
+        } catch (err) {
+          console.error('Address discount check failed:', err);
+          dispatch(set_address_discount_eligible(false));
         }
       },
     }),
@@ -72,4 +92,5 @@ export const {
   useSaveOrderMutation,
   useGetUserOrderByIdQuery,
   useGetUserOrdersQuery,
+  useCheckAddressDiscountMutation,
 } = authApi;

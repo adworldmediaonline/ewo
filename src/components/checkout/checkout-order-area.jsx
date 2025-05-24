@@ -45,6 +45,11 @@ const quantityStyle = {
 export default function CheckoutOrderArea({ checkoutData }) {
   const dispatch = useDispatch();
 
+  // Save discount values locally to preserve during checkout
+  const [savedAddressDiscount, setSavedAddressDiscount] = useState(0);
+  const [savedDiscountEligible, setSavedDiscountEligible] = useState(null);
+  const [savedDiscountMessage, setSavedDiscountMessage] = useState('');
+
   const {
     handleShippingCost,
     cartTotal = 0,
@@ -59,11 +64,41 @@ export default function CheckoutOrderArea({ checkoutData }) {
     discountAmount,
     processingPayment,
     cardError,
+    address_discount_eligible,
+    address_discount_message,
+    addressDiscountAmount,
   } = checkoutData;
   const { cart_products, totalShippingCost, shippingDiscount } = useSelector(
     state => state.cart
   );
   const { total, totalWithShipping } = useCartInfo();
+  const { isCheckoutSubmitting } = useSelector(state => state.order);
+
+  // Save discount values when they change and we're not in checkout process
+  useEffect(() => {
+    if (!isCheckoutSubmit && !isCheckoutSubmitting) {
+      setSavedAddressDiscount(addressDiscountAmount);
+      setSavedDiscountEligible(address_discount_eligible);
+      setSavedDiscountMessage(address_discount_message);
+    }
+  }, [
+    addressDiscountAmount,
+    address_discount_eligible,
+    address_discount_message,
+    isCheckoutSubmit,
+    isCheckoutSubmitting,
+  ]);
+
+  // Use saved or current values depending on checkout state
+  const displayAddressDiscount = isCheckoutSubmit
+    ? savedAddressDiscount
+    : addressDiscountAmount;
+  const displayDiscountEligible = isCheckoutSubmit
+    ? savedDiscountEligible
+    : address_discount_eligible;
+  const displayDiscountMessage = isCheckoutSubmit
+    ? savedDiscountMessage
+    : address_discount_message;
 
   // Update shipping cost in checkout data when it changes
   useEffect(() => {
@@ -245,24 +280,159 @@ export default function CheckoutOrderArea({ checkoutData }) {
             </span>
           </li>
 
+          {/* Render regular discount */}
           <li className="tp-order-info-list-subtotal">
-            <span style={{ fontWeight: '500' }}>Discount</span>
+            <span style={{ fontWeight: '500' }}>Coupon Discount</span>
             <span
               style={{
                 fontWeight: '500',
-                color: discountAmount > 0 ? '#d04242' : 'inherit',
+                color:
+                  discountAmount > addressDiscountAmount
+                    ? '#d04242'
+                    : 'inherit',
               }}
             >
-              ${discountAmount.toFixed(2)}
+              ${(discountAmount - addressDiscountAmount).toFixed(2)}
+            </span>
+          </li>
+
+          {/* New address discount section with improved visibility - keep visible during checkout */}
+          <li className="tp-order-info-list-subtotal">
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <span style={{ fontWeight: '500' }}>Discount</span>
+              {displayDiscountMessage && (
+                <div className="ms-2" style={{ position: 'relative' }}>
+                  <div
+                    className="info-icon"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '20px',
+                      height: '20px',
+                      borderRadius: '50%',
+                      backgroundColor: displayDiscountEligible
+                        ? '#28a745'
+                        : '#f8f9fa',
+                      border: `1px solid ${
+                        displayDiscountEligible ? '#28a745' : '#dc3545'
+                      }`,
+                      color: displayDiscountEligible ? 'white' : '#dc3545',
+                      fontSize: '12px',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      position: 'relative',
+                      opacity: isCheckoutSubmit ? 0.8 : 1, // Keep visible but slightly dimmed during checkout
+                    }}
+                    title={displayDiscountMessage}
+                  >
+                    {displayDiscountEligible ? '✓' : '!'}
+                    <span
+                      className="tooltip-text"
+                      style={{
+                        visibility: 'hidden',
+                        width: '250px',
+                        backgroundColor: displayDiscountEligible
+                          ? '#28a745'
+                          : '#6c757d',
+                        color: '#fff',
+                        textAlign: 'center',
+                        borderRadius: '6px',
+                        padding: '10px 12px',
+                        position: 'absolute',
+                        zIndex: 1,
+                        bottom: '125%',
+                        left: '50%',
+                        marginLeft: '-125px',
+                        opacity: 0,
+                        transition: 'opacity 0.3s',
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+                        fontSize: '13px',
+                        pointerEvents: isCheckoutSubmit ? 'none' : 'auto', // Disable tooltip during checkout
+                      }}
+                    >
+                      <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
+                        {displayDiscountEligible
+                          ? '✓ Eligible for Discount'
+                          : 'Not eligible'}
+                      </div>
+                      <div>{displayDiscountMessage}</div>
+                      {!displayDiscountEligible && (
+                        <div
+                          className="mt-2"
+                          style={{
+                            fontSize: '12px',
+                            backgroundColor: 'rgba(0,0,0,0.1)',
+                            padding: '5px',
+                            borderRadius: '4px',
+                          }}
+                        >
+                          <div>
+                            Try a different shipping address to qualify for the
+                            10% discount.
+                          </div>
+                        </div>
+                      )}
+                    </span>
+                  </div>
+                </div>
+              )}
+              {!displayDiscountMessage && !isCheckoutSubmit && (
+                <div className="ms-2">
+                  <span style={{ fontSize: '12px', color: '#6c757d' }}>
+                    (Check eligibility in billing details)
+                  </span>
+                </div>
+              )}
+            </div>
+            <span
+              style={{
+                fontWeight: '500',
+                color: displayAddressDiscount > 0 ? '#28a745' : '#6c757d',
+              }}
+            >
+              ${displayAddressDiscount.toFixed(2)}
+              {displayAddressDiscount > 0 && (
+                <span
+                  className="ms-2 badge"
+                  style={{
+                    backgroundColor: '#e8f5e9',
+                    color: '#28a745',
+                    padding: '3px 6px',
+                    fontSize: '11px',
+                    borderRadius: '4px',
+                    opacity: isCheckoutSubmit ? 0.9 : 1, // Keep visible during checkout
+                  }}
+                >
+                  10% OFF
+                </span>
+              )}
             </span>
           </li>
 
           <li className="tp-order-info-list-total">
             <span style={{ fontSize: '16px', fontWeight: '600' }}>Total</span>
             <span
-              style={{ fontSize: '18px', fontWeight: '700', color: '#222' }}
+              style={{
+                fontSize: '18px',
+                fontWeight: '700',
+                color: '#222',
+                transition: 'color 0.3s ease',
+              }}
             >
               ${(totalWithShipping - discountAmount).toFixed(2)}
+              {displayAddressDiscount > 0 && (
+                <div
+                  className="mt-1"
+                  style={{
+                    fontSize: '13px',
+                    color: '#28a745',
+                    opacity: isCheckoutSubmit ? 0.9 : 1,
+                  }}
+                >
+                  Include 10% discount
+                </div>
+              )}
             </span>
           </li>
         </ul>
@@ -365,6 +535,14 @@ export default function CheckoutOrderArea({ checkoutData }) {
           </div>
         )}
       </div>
+
+      {/* Add CSS for tooltip hover effect */}
+      <style jsx>{`
+        .info-icon:hover .tooltip-text {
+          visibility: visible;
+          opacity: 1;
+        }
+      `}</style>
     </div>
   );
 }
