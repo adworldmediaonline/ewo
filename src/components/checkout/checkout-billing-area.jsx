@@ -366,7 +366,7 @@ const CheckoutBillingArea = ({
             </div>
 
             {/* Add eligibility check button */}
-            {showCheckButton && (
+            {showCheckButton && !isGuest && (
               <div className="col-md-12 mt-3 mb-3">
                 <button
                   type="button"
