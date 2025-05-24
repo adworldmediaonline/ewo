@@ -31,7 +31,7 @@ export default function CheckoutArea() {
     handleCouponCode,
     couponRef,
     couponApplyMsg,
-    setValue,
+    checkAddressDiscountEligibility,
   } = checkoutData;
   const { cart_products } = useSelector(state => state.cart);
 
@@ -87,13 +87,14 @@ export default function CheckoutArea() {
                   />
                 </div>
               </div>
-              <form onSubmit={handleSubmit(submitHandler)}>
+              <form onSubmit={handleSubmit(submitHandler)} noValidate>
                 <div className="row">
                   <div className="col-lg-7">
                     <CheckoutBillingArea
                       register={register}
                       errors={errors}
                       isGuest={isGuest}
+                      checkAddressDiscount={checkAddressDiscountEligibility}
                     />
                   </div>
                   <div className="col-lg-5">

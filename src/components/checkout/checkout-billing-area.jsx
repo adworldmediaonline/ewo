@@ -1,11 +1,21 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import ErrorMsg from '../common/error-msg';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Country, State, City } from 'country-state-city';
+import { reset_address_discount } from '@/redux/features/order/orderSlice';
 
-const CheckoutBillingArea = ({ register, errors, isGuest = false }) => {
+const CheckoutBillingArea = ({
+  register,
+  errors,
+  isGuest = false,
+  checkAddressDiscount,
+}) => {
   const { user } = useSelector(state => state.auth);
+  const { isCheckoutSubmitting } = useSelector(state => state.order);
+  const dispatch = useDispatch();
+  const [showCheckButton, setShowCheckButton] = useState(false);
+  const [checkingEligibility, setCheckingEligibility] = useState(false);
 
   // Get all countries
   const countries = Country.getAllCountries();
@@ -27,7 +37,37 @@ const CheckoutBillingArea = ({ register, errors, isGuest = false }) => {
     country: 'US',
     state: '',
     city: '',
+    address: '',
+    zipCode: '',
   });
+
+  // Check if form has enough data to show eligibility button
+  useEffect(() => {
+    const { address, city, state, country } = formValues;
+    setShowCheckButton(address && city && state && country);
+  }, [formValues]);
+
+  // Handle manual check for eligibility
+  const handleCheckEligibility = () => {
+    const { address, city, state, country, zipCode } = formValues;
+
+    if (address && city && state && country) {
+      setCheckingEligibility(true);
+
+      // Call the eligibility check
+      checkAddressDiscount({
+        address,
+        city,
+        state,
+        country,
+        zipCode,
+      });
+
+      setTimeout(() => {
+        setCheckingEligibility(false);
+      }, 1000);
+    }
+  };
 
   // Load states for default country (US) on initial render
   useEffect(() => {
@@ -76,8 +116,13 @@ const CheckoutBillingArea = ({ register, errors, isGuest = false }) => {
 
   // Handle country change
   const handleCountryChange = e => {
+    if (isCheckoutSubmitting) return;
+
     const countryCode = e.target.value;
     if (!countryCode) return;
+
+    // Reset address discount eligibility
+    dispatch(reset_address_discount());
 
     const country = countries.find(c => c.isoCode === countryCode);
     setSelectedCountry(country);
@@ -93,8 +138,13 @@ const CheckoutBillingArea = ({ register, errors, isGuest = false }) => {
 
   // Handle state change
   const handleStateChange = e => {
+    if (isCheckoutSubmitting) return;
+
     const stateCode = e.target.value;
     if (!stateCode) return;
+
+    // Reset address discount eligibility
+    dispatch(reset_address_discount());
 
     const state = states.find(s => s.isoCode === stateCode);
     setSelectedState(state);
@@ -109,7 +159,13 @@ const CheckoutBillingArea = ({ register, errors, isGuest = false }) => {
 
   // Handle city change
   const handleCityChange = e => {
+    if (isCheckoutSubmitting) return;
+
     const cityName = e.target.value;
+
+    // Reset address discount eligibility
+    dispatch(reset_address_discount());
+
     setSelectedCity(cityName);
 
     // Update form value for city
@@ -117,6 +173,43 @@ const CheckoutBillingArea = ({ register, errors, isGuest = false }) => {
       ...prev,
       city: cityName,
     }));
+  };
+
+  // Handle address change
+  const handleAddressChange = e => {
+    if (isCheckoutSubmitting) return;
+
+    const address = e.target.value;
+
+    // Reset address discount eligibility
+    dispatch(reset_address_discount());
+
+    setFormValues(prev => ({
+      ...prev,
+      address,
+    }));
+  };
+
+  // Handle zip code change
+  const handleZipCodeChange = e => {
+    if (isCheckoutSubmitting) return;
+
+    const zipCode = e.target.value;
+
+    // Reset address discount eligibility
+    dispatch(reset_address_discount());
+
+    // Special handling for zipCode to ensure it's properly validated
+    if (zipCode && zipCode.trim() !== '') {
+      // Make sure zipCode is properly set in the form
+      // This is a fallback to ensure zipCode is captured properly
+      setTimeout(() => {
+        setFormValues(prev => ({
+          ...prev,
+          zipCode,
+        }));
+      }, 100);
+    }
   };
 
   return (
@@ -197,6 +290,7 @@ const CheckoutBillingArea = ({ register, errors, isGuest = false }) => {
                   id="address"
                   type="text"
                   placeholder="House number and street name"
+                  onChange={handleAddressChange}
                 />
                 <ErrorMsg msg={errors?.address?.message} />
               </div>
@@ -260,6 +354,7 @@ const CheckoutBillingArea = ({ register, errors, isGuest = false }) => {
                 <input
                   {...register('zipCode', {
                     required: `Postal Code is required!`,
+                    onChange: e => handleZipCodeChange(e),
                   })}
                   name="zipCode"
                   id="zipCode"
@@ -269,6 +364,45 @@ const CheckoutBillingArea = ({ register, errors, isGuest = false }) => {
                 <ErrorMsg msg={errors?.zipCode?.message} />
               </div>
             </div>
+
+            {/* Add eligibility check button */}
+            {showCheckButton && (
+              <div className="col-md-12 mt-3 mb-3">
+                <button
+                  type="button"
+                  onClick={handleCheckEligibility}
+                  className="tp-btn-blue w-100"
+                  disabled={checkingEligibility}
+                  style={{
+                    padding: '12px',
+                    fontSize: '14px',
+                    backgroundColor: '#0989FF',
+                    border: 'none',
+                    color: 'white',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                  }}
+                >
+                  {checkingEligibility ? (
+                    <span>
+                      <span
+                        className="spinner-border spinner-border-sm me-2"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
+                      Checking Address Eligibility...
+                    </span>
+                  ) : (
+                    'Check for 10% First-Time Address Discount'
+                  )}
+                </button>
+                <p className="mt-2" style={{ fontSize: '12px', color: '#666' }}>
+                  New shipping addresses qualify for a one-time 10% discount.
+                </p>
+              </div>
+            )}
+
             <div className="col-md-6">
               <div className="tp-checkout-input">
                 <label>
