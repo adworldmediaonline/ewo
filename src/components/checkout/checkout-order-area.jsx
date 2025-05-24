@@ -42,7 +42,7 @@ const quantityStyle = {
   },
 };
 
-export default function CheckoutOrderArea({ checkoutData }) {
+export default function CheckoutOrderArea({ checkoutData, isGuest }) {
   const dispatch = useDispatch();
 
   // Save discount values locally to preserve during checkout
@@ -377,7 +377,7 @@ export default function CheckoutOrderArea({ checkoutData }) {
                   </div>
                 </div>
               )}
-              {!displayDiscountMessage && !isCheckoutSubmit && (
+              {!displayDiscountMessage && !isCheckoutSubmit && !isGuest && (
                 <div className="ms-2">
                   <span style={{ fontSize: '12px', color: '#6c757d' }}>
                     (Check eligibility in billing details)
