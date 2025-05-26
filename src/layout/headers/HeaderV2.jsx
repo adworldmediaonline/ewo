@@ -582,9 +582,13 @@ export default function HeaderV2() {
         className={`${styles.mobileSearch} ${
           isMobileSearchOpen ? styles.mobileSearchActive : ''
         }`}
+        onClick={closeSearch}
       >
         <div className={styles.mobileSearchWrapper}>
-          <div className={styles.mobileSearchHeader}>
+          <div
+            className={styles.mobileSearchHeader}
+            onClick={e => e.stopPropagation()}
+          >
             <button
               className={styles.mobileSearchClose}
               onClick={closeSearch}
@@ -595,11 +599,6 @@ export default function HeaderV2() {
             <SearchForm inputRef={mobileSearchInputRef} />
           </div>
         </div>
-        {/* Add backdrop that closes search when clicked */}
-        <div
-          className={styles.mobileSearchBackdrop}
-          onClick={closeSearch}
-        ></div>
       </div>
     </>
   );
