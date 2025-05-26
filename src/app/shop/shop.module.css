@@ -1,3 +1,48 @@
+/* Shop Page Lato Font Styling */
+.shopPage {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.shopPage * {
+  font-family: inherit;
+}
+
+.shopPage h1,
+.shopPage h2,
+.shopPage h3,
+.shopPage h4,
+.shopPage h5,
+.shopPage h6 {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 700;
+}
+
+.shopPage p,
+.shopPage span,
+.shopPage div {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.shopPage button {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
+.shopPage a {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.shopPage input,
+.shopPage select,
+.shopPage textarea {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.shopPage label {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
 /* Breadcrumb styling */
 .breadcrumb {
   background-color: #f8f9fa;
