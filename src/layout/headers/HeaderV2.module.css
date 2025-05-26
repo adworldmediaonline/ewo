@@ -9,6 +9,7 @@
   max-width: 1680px;
   margin: 0 auto;
   padding: 0 0.75rem !important;
+  width: 100%;
 }
 
 .headerContainer {
@@ -102,7 +103,15 @@
 }
 
 .bottomNav {
-  padding: 0.75rem 0;
+  padding: 1rem 0;
+}
+
+.bottomNavContainer {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+  min-width: 0;
 }
 
 .bottomNavList {
@@ -113,6 +122,64 @@
   margin: 0;
   padding: 0;
   transition: all 0.4s ease;
+}
+
+.bottomSearchContainer {
+  flex: 1;
+  margin-left: 2rem;
+  width: 100%;
+}
+
+/* Force search container to take full width */
+.bottomSearchContainer > div {
+  max-width: none !important;
+  width: 100% !important;
+}
+
+/* Force search form to take full width */
+.bottomSearchContainer form {
+  width: 100% !important;
+}
+
+/* Override global search container styles */
+.bottomSearchContainer :global(.searchContainer) {
+  max-width: none !important;
+  width: 100% !important;
+}
+
+.bottomSearchContainer :global(.searchForm) {
+  width: 100% !important;
+}
+
+.bottomSearchContainer input,
+.bottomSearchContainer :global(.searchInput) {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  transition: all 0.3s ease;
+  width: 100% !important;
+  flex: 1 !important;
+}
+
+.bottomSearchContainer input::placeholder,
+.bottomSearchContainer :global(.searchInput)::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.bottomSearchContainer button,
+.bottomSearchContainer :global(.searchButton) {
+  color: white;
+}
+
+.bottomSearchContainer button:hover,
+.bottomSearchContainer :global(.searchButton):hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+@media (min-width: 1024px) {
+  .bottomSearchContainer {
+    display: block;
+  }
 }
 
 .bottomNavLink {
@@ -1163,12 +1230,16 @@
   .headerBottom {
     display: none;
   }
+
+  .bottomSearchContainer {
+    display: none;
+  }
 }
 
 .bottomNav {
   /* max-width: 1280px; */
   margin: 0 auto;
-  padding: 0 0.75rem;
+  padding: 1rem 0.75rem;
 }
 
 .bottomNavList {
