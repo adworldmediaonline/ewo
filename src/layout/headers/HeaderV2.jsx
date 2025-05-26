@@ -258,11 +258,6 @@ export default function HeaderV2() {
                   />
                 </Link>
 
-                {/* Desktop Search */}
-                <div className={styles.searchContainer}>
-                  <SearchForm />
-                </div>
-
                 {/* Action Buttons */}
                 <div className={styles.actions}>
                   <button
@@ -315,7 +310,13 @@ export default function HeaderV2() {
         <div className={styles.headerBottom}>
           <nav className={styles.bottomNav}>
             <div className={styles.headerInnerContainer}>
-              {renderNavLinks(styles.bottomNavLink, styles.bottomNavList)}
+              <div className={styles.bottomNavContainer}>
+                {renderNavLinks(styles.bottomNavLink, styles.bottomNavList)}
+                {/* Desktop Search */}
+                <div className={styles.bottomSearchContainer}>
+                  <SearchForm />
+                </div>
+              </div>
             </div>
           </nav>
         </div>
