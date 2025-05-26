@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import CategoryContent from '../../components/V2/category/CategoryContent';
 import { Suspense } from 'react';
-import CategoryContentSkeleton from '@/components/V2/loaders/CategoryContentSkeleton';
+import CategoryContentSkeleton from '../../components/V2/loaders/CategoryContentSkeleton';
 
 function CategoryPageContent() {
   const router = useRouter();
