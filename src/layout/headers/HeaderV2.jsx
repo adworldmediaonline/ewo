@@ -32,6 +32,7 @@ export default function HeaderV2() {
   const [showStickyHeader, setShowStickyHeader] = useState(false);
   const prevScrollPos = useRef(0);
   const [activeDropdownButton, setActiveDropdownButton] = useState(null);
+  const dropdownTimeoutRef = useRef(null);
 
   // Fetch categories
   const { data: categories, isLoading: categoriesLoading } =
@@ -68,6 +69,31 @@ export default function HeaderV2() {
     setActiveDropdownButton(buttonType);
     setIsDropdownOpen(!isDropdownOpen);
   };
+
+  const handleDropdownHover = buttonType => {
+    // Clear any existing timeout
+    if (dropdownTimeoutRef.current) {
+      clearTimeout(dropdownTimeoutRef.current);
+    }
+    setActiveDropdownButton(buttonType);
+    setIsDropdownOpen(true);
+  };
+
+  const handleDropdownLeave = () => {
+    // Add a small delay before closing to prevent flickering
+    dropdownTimeoutRef.current = setTimeout(() => {
+      setIsDropdownOpen(false);
+    }, 150);
+  };
+
+  // Clear timeout on component unmount
+  useEffect(() => {
+    return () => {
+      if (dropdownTimeoutRef.current) {
+        clearTimeout(dropdownTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleDropdownKeyDown = e => {
     if (e.key === 'Escape') {
@@ -172,7 +198,10 @@ export default function HeaderV2() {
     containerClassName,
     isSticky = false
   ) => (
-    <div className={containerClassName || ''}>
+    <div
+      className={containerClassName || ''}
+      onMouseLeave={handleDropdownLeave}
+    >
       <ul className={navListClassName}>
         <li>
           <Link href="/" className={linkClassName}>
@@ -183,6 +212,9 @@ export default function HeaderV2() {
           <button
             ref={isSticky ? stickyDropdownButtonRef : mainDropdownButtonRef}
             className={`${linkClassName} ${styles.dropdownButton}`}
+            onMouseEnter={() =>
+              handleDropdownHover(isSticky ? 'sticky' : 'main')
+            }
             onClick={() => handleDropdownToggle(isSticky ? 'sticky' : 'main')}
             aria-expanded={isDropdownOpen}
             aria-controls="shop-dropdown"
@@ -219,12 +251,13 @@ export default function HeaderV2() {
         };
       }
     } else {
+      // For main header dropdown, use fixed positioning
       const buttonRect = mainDropdownButtonRef.current?.getBoundingClientRect();
       if (buttonRect) {
         return {
-          position: 'absolute',
-          top: '100%',
-          left: '0',
+          position: 'fixed',
+          top: `${buttonRect.bottom}px`,
+          left: `${buttonRect.left}px`,
         };
       }
     }
@@ -534,6 +567,13 @@ export default function HeaderV2() {
           aria-hidden={!isDropdownOpen}
           role="menu"
           onKeyDown={handleDropdownKeyDown}
+          onMouseEnter={() => {
+            if (dropdownTimeoutRef.current) {
+              clearTimeout(dropdownTimeoutRef.current);
+            }
+            setIsDropdownOpen(true);
+          }}
+          onMouseLeave={handleDropdownLeave}
           ref={dropdownRef}
           style={{
             ...getDropdownPosition(),
