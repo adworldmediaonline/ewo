@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import CategoryContent from '../../components/V2/category/CategoryContent';
 import { Suspense } from 'react';
 import CategoryContentSkeleton from '../../components/V2/loaders/CategoryContentSkeleton';
+import styles from './category.module.css';
 
 function CategoryPageContent() {
   const router = useRouter();
@@ -19,10 +20,12 @@ function CategoryPageContent() {
 
 export default function CategoryPage() {
   return (
-    <main className="category-page-wrapper">
-      <Suspense fallback={<CategoryContentSkeleton />}>
-        <CategoryPageContent />
-      </Suspense>
-    </main>
+    <div className={styles.categoryPage}>
+      <main className={styles.categoryPageWrapper}>
+        <Suspense fallback={<CategoryContentSkeleton />}>
+          <CategoryPageContent />
+        </Suspense>
+      </main>
+    </div>
   );
 }

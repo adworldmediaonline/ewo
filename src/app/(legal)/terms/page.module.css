@@ -1,13 +1,90 @@
+/* Terms Page Lato Font Styling */
+.termsPage {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.termsPage * {
+  font-family: inherit;
+}
+
+.termsPage h1,
+.termsPage h2,
+.termsPage h3,
+.termsPage h4,
+.termsPage h5,
+.termsPage h6 {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 700;
+}
+
+.termsPage p,
+.termsPage span,
+.termsPage div,
+.termsPage li {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.termsPage button {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
+.termsPage a {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+/* Container and Content Wrapper */
+.container {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  padding: 2rem 1rem;
+}
+
+.content {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
+/* List Styling */
+.list {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  color: #4b5563;
+  margin-bottom: 1rem;
+}
+
+.listItem {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  margin-bottom: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .container {
+    font-size: 0.85rem;
+  }
+}
+
+/* Original Styles with Lato Font Applied */
 .title {
   font-size: 2.25rem;
   font-weight: 700;
   color: #111827;
   margin-bottom: 1rem;
+  font-family: var(--font-lato), 'Lato', sans-serif;
 }
 
 .date {
   color: #4b5563;
   margin-bottom: 2rem;
+  font-family: var(--font-lato), 'Lato', sans-serif;
 }
 
 .intro {
@@ -15,6 +92,7 @@
   margin-bottom: 2rem;
   font-size: 1.125rem;
   line-height: 1.75;
+  font-family: var(--font-lato), 'Lato', sans-serif;
 }
 
 .section {
@@ -26,23 +104,14 @@
   font-weight: 700;
   color: #111827;
   margin-bottom: 1rem;
+  font-family: var(--font-lato), 'Lato', sans-serif;
 }
 
 .sectionText {
   color: #4b5563;
   line-height: 1.75;
   margin-bottom: 1rem;
-}
-
-.list {
-  list-style-type: disc;
-  padding-left: 1.5rem;
-  color: #4b5563;
-  margin-bottom: 1rem;
-}
-
-.listItem {
-  margin-bottom: 0.5rem;
+  font-family: var(--font-lato), 'Lato', sans-serif;
 }
 
 .contactBox {
