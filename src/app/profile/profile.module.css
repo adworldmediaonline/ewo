@@ -1,0 +1,83 @@
+/* Profile Page Lato Font Styling */
+.profilePage {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.profilePage * {
+  font-family: inherit;
+}
+
+.profilePage h1,
+.profilePage h2,
+.profilePage h3,
+.profilePage h4,
+.profilePage h5,
+.profilePage h6 {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 700;
+}
+
+.profilePage p,
+.profilePage span,
+.profilePage div {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.profilePage button {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
+.profilePage a {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.profilePage input,
+.profilePage select,
+.profilePage textarea {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.profilePage label {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
+.profilePage th,
+.profilePage td {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+/* Profile Specific Styling */
+.profilePage .profile-form {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.profilePage .profile-info {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.profilePage .profile-sidebar {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.profilePage .profile-menu {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.profilePage .order-history {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .profilePage {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .profilePage {
+    font-size: 0.85rem;
+  }
+}

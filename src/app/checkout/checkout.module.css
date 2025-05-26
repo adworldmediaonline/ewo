@@ -1,0 +1,114 @@
+/* Checkout Page Lato Font Styling */
+.checkoutPage {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.checkoutPage * {
+  font-family: inherit;
+}
+
+.checkoutPage h1,
+.checkoutPage h2,
+.checkoutPage h3,
+.checkoutPage h4,
+.checkoutPage h5,
+.checkoutPage h6 {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 700;
+}
+
+.checkoutPage p,
+.checkoutPage span,
+.checkoutPage div {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.checkoutPage button {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
+.checkoutPage a {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.checkoutPage input,
+.checkoutPage select,
+.checkoutPage textarea {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.checkoutPage label {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
+.checkoutPage th,
+.checkoutPage td {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+/* Checkout Form Styling */
+.checkoutPage .form-group {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.checkoutPage .form-control {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.checkoutPage .form-check-label {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.checkoutPage .btn {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
+/* Order Summary Styling */
+.checkoutPage .order-summary {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.checkoutPage .order-item {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.checkoutPage .order-total {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 600;
+}
+
+/* Payment Method Styling */
+.checkoutPage .payment-method {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.checkoutPage .payment-option {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+/* Billing and Shipping Forms */
+.checkoutPage .billing-form,
+.checkoutPage .shipping-form {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.checkoutPage .form-title {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 700;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .checkoutPage {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .checkoutPage {
+    font-size: 0.85rem;
+  }
+}

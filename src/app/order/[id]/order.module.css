@@ -1,0 +1,176 @@
+/* Order Success Page Lato Font Styling */
+.orderPage {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.orderPage * {
+  font-family: inherit;
+}
+
+.orderPage h1,
+.orderPage h2,
+.orderPage h3,
+.orderPage h4,
+.orderPage h5,
+.orderPage h6 {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 700;
+}
+
+.orderPage p,
+.orderPage span,
+.orderPage div {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.orderPage button {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
+.orderPage a {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.orderPage input,
+.orderPage select,
+.orderPage textarea {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.orderPage label {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
+.orderPage th,
+.orderPage td {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+/* Order Details Styling */
+.orderPage .order-summary {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.orderPage .order-item {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.orderPage .order-total {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 600;
+}
+
+.orderPage .order-status {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 600;
+}
+
+/* Success Message Styling */
+.orderPage .success-message {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.orderPage .success-title {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 700;
+}
+
+.orderPage .success-description {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+/* Order Information Styling */
+.orderPage .order-info {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.orderPage .order-number {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 600;
+}
+
+.orderPage .order-date {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+/* Billing and Shipping Info */
+.orderPage .billing-info,
+.orderPage .shipping-info {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.orderPage .info-title {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 700;
+}
+
+.orderPage .info-content {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+/* Action Buttons */
+.orderPage .action-buttons {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.orderPage .btn-primary {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
+.orderPage .btn-secondary {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
+/* Order Timeline */
+.orderPage .order-timeline {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.orderPage .timeline-item {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.orderPage .timeline-title {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 600;
+}
+
+.orderPage .timeline-description {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+/* Product List in Order */
+.orderPage .product-list {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.orderPage .product-name {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
+.orderPage .product-price {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 600;
+}
+
+.orderPage .product-quantity {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .orderPage {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .orderPage {
+    font-size: 0.85rem;
+  }
+}
