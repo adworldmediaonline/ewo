@@ -1,10 +1,54 @@
-export default function sitemap() {
+async function fetchProducts() {
+  try {
+    // Use internal API URL for server-side calls to avoid external network issues
+    const apiBaseUrl =
+      process.env.API_BASE_URL ||
+      process.env.NEXT_PUBLIC_API_BASE_URL ||
+      'http://localhost:7000';
+
+    const response = await fetch(`${apiBaseUrl}/api/product/all`, {
+      next: { revalidate: 86400 }, // Cache for 24 hours instead of 1 hour
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      return [];
+    }
+
+    const data = await response.json();
+
+    // Extract products from API response
+    const products = data?.data || [];
+
+    return products;
+  } catch (error) {
+    console.error('Error fetching products for sitemap:', error);
+    // Return empty array to ensure sitemap still works with static pages
+    return [];
+  }
+}
+
+export default async function sitemap() {
   const baseUrl = 'https://www.eastwestoffroad.com';
   const currentDate = new Date();
 
-  return [
+  // Fetch all products from the database
+  const products = await fetchProducts();
+
+  // Debug logging
+  console.log('🔍 Sitemap Debug Info:');
+  console.log(`📦 Products fetched: ${products.length}`);
+  if (products.length > 0) {
+    console.log(`🔗 First product ID: ${products[0]._id}`);
+    console.log(`📝 Sample product:`, JSON.stringify(products[0], null, 2));
+  }
+
+  // Static pages
+  const staticPages = [
     {
-      url: `${baseUrl}/`,
+      url: baseUrl,
       lastModified: currentDate,
       changeFrequency: 'daily',
       priority: 1,
@@ -58,4 +102,21 @@ export default function sitemap() {
       priority: 0.4,
     },
   ];
+
+  // Generate product pages from database
+  const productPages = products.map(product => ({
+    url: `${baseUrl}/product/${product.slug || product._id}`,
+    lastModified: product.updatedAt ? new Date(product.updatedAt) : currentDate,
+    changeFrequency: 'weekly',
+    priority: 0.8,
+  }));
+
+  // Debug final sitemap
+  const finalSitemap = [...staticPages, ...productPages];
+  console.log(`🗺️ Total sitemap entries: ${finalSitemap.length}`);
+  console.log(`📄 Static pages: ${staticPages.length}`);
+  console.log(`📦 Product pages: ${productPages.length}`);
+
+  // Combine static pages and product pages
+  return finalSitemap;
 }
