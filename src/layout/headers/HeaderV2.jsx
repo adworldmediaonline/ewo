@@ -233,182 +233,351 @@ export default function HeaderV2() {
   };
 
   return (
-    <header className={styles.headerWrapper}>
-      {/* Main Header (always static) */}
-      <div className={styles.headerContainer}>
-        <header className={styles.header}>
-          <div className={styles.headerInnerContainer}>
-            <div className={styles.container}>
-              <div className={styles.headerTop}>
-                {/* Logo */}
-                <Link href="/">
-                  <Image
-                    src={logo}
-                    alt="logo"
-                    width={190}
-                    priority
-                    className={styles.desktopLogo}
-                  />
-                  <Image
-                    src={logo}
-                    alt="logo"
-                    width={100}
-                    priority
-                    className={styles.mobileLogo}
-                  />
-                </Link>
-
-                {/* Action Buttons */}
-                <div className={styles.actions}>
-                  <button
-                    className={styles.searchButton}
-                    onClick={handleMobileSearchOpen}
-                  >
-                    <Search />
-                  </button>
-
-                  <Link href="/compare" className={styles.actionButton}>
-                    <Compare />
-                  </Link>
-
-                  <Link href="/wishlist" className={styles.actionButton}>
-                    <Wishlist />
-                    {wishlist.length > 0 && (
-                      <span className={styles.actionBadge}>
-                        {wishlist.length}
-                      </span>
-                    )}
-                  </Link>
-
-                  <button
-                    className={styles.actionButton}
-                    onClick={() => dispatch(openCartMini())}
-                  >
-                    <CartTwo />
-                    {quantity > 0 && (
-                      <span className={styles.actionBadge}>{quantity}</span>
-                    )}
-                  </button>
-
-                  <Link href="/profile" className={styles.actionButton}>
-                    <User />
-                  </Link>
-
-                  <button
-                    className={`${styles.actionButton} ${styles.mobileMenu}`}
-                    onClick={() => setIsMobileNavOpen(true)}
-                  >
-                    <Menu />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* Secondary Navigation */}
-        <div className={styles.headerBottom}>
-          <nav className={styles.bottomNav}>
+    <>
+      <header className={styles.headerWrapper}>
+        {/* Main Header (always static) */}
+        <div className={styles.headerContainer}>
+          <header className={styles.header}>
             <div className={styles.headerInnerContainer}>
-              <div className={styles.bottomNavContainer}>
-                {renderNavLinks(styles.bottomNavLink, styles.bottomNavList)}
-                {/* Desktop Search */}
-                <div className={styles.bottomSearchContainer}>
-                  <SearchForm />
+              <div className={styles.container}>
+                <div className={styles.headerTop}>
+                  {/* Logo */}
+                  <Link href="/">
+                    <Image
+                      src={logo}
+                      alt="logo"
+                      width={190}
+                      priority
+                      className={styles.desktopLogo}
+                    />
+                    <Image
+                      src={logo}
+                      alt="logo"
+                      width={100}
+                      priority
+                      className={styles.mobileLogo}
+                    />
+                  </Link>
+
+                  {/* Action Buttons */}
+                  <div className={styles.actions}>
+                    <button
+                      className={styles.searchButton}
+                      onClick={handleMobileSearchOpen}
+                    >
+                      <Search />
+                    </button>
+
+                    <Link href="/compare" className={styles.actionButton}>
+                      <Compare />
+                    </Link>
+
+                    <Link href="/wishlist" className={styles.actionButton}>
+                      <Wishlist />
+                      {wishlist.length > 0 && (
+                        <span className={styles.actionBadge}>
+                          {wishlist.length}
+                        </span>
+                      )}
+                    </Link>
+
+                    <button
+                      className={styles.actionButton}
+                      onClick={() => dispatch(openCartMini())}
+                    >
+                      <CartTwo />
+                      {quantity > 0 && (
+                        <span className={styles.actionBadge}>{quantity}</span>
+                      )}
+                    </button>
+
+                    <Link href="/profile" className={styles.actionButton}>
+                      <User />
+                    </Link>
+
+                    <button
+                      className={`${styles.actionButton} ${styles.mobileMenu}`}
+                      onClick={() => setIsMobileNavOpen(true)}
+                    >
+                      <Menu />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </nav>
-        </div>
-      </div>
+          </header>
 
-      {/* Separate Sticky Header that appears on scroll */}
-      <div
-        className={`${styles.stickyHeader} ${
-          showStickyHeader ? styles.stickyHeaderVisible : ''
-        }`}
-      >
-        <div className={styles.stickyHeaderContent}>
-          {/* Logo */}
-          <Link href="/">
-            <Image
-              src={logo}
-              alt="logo"
-              width={120}
-              height={40}
-              className={styles.desktopLogo}
-              priority
-            />
-            <Image
-              src={logo}
-              alt="logo"
-              width={80}
-              height={30}
-              className={styles.mobileLogo}
-              priority
-            />
-          </Link>
-
-          {/* Navigation */}
-          {renderNavLinks(
-            styles.stickyNavLink,
-            styles.stickyNavList,
-            styles.stickyNav,
-            true
-          )}
-
-          {/* Sticky Header Search */}
-          <div className={styles.stickySearchContainer}>
-            <SearchForm />
+          {/* Secondary Navigation */}
+          <div className={styles.headerBottom}>
+            <nav className={styles.bottomNav}>
+              <div className={styles.headerInnerContainer}>
+                <div className={styles.bottomNavContainer}>
+                  {renderNavLinks(styles.bottomNavLink, styles.bottomNavList)}
+                  {/* Desktop Search */}
+                  <div className={styles.bottomSearchContainer}>
+                    <SearchForm />
+                  </div>
+                </div>
+              </div>
+            </nav>
           </div>
+        </div>
 
-          {/* Action Buttons */}
-          <div className={styles.actions}>
-            <button
-              className={styles.searchButton}
-              onClick={handleMobileSearchOpen}
-            >
-              <Search />
-            </button>
-
-            <Link href="/compare" className={styles.actionButton}>
-              <Compare />
+        {/* Separate Sticky Header that appears on scroll */}
+        <div
+          className={`${styles.stickyHeader} ${
+            showStickyHeader ? styles.stickyHeaderVisible : ''
+          }`}
+        >
+          <div className={styles.stickyHeaderContent}>
+            {/* Logo */}
+            <Link href="/">
+              <Image
+                src={logo}
+                alt="logo"
+                width={120}
+                height={40}
+                className={styles.desktopLogo}
+                priority
+              />
+              <Image
+                src={logo}
+                alt="logo"
+                width={80}
+                height={30}
+                className={styles.mobileLogo}
+                priority
+              />
             </Link>
 
-            <Link href="/wishlist" className={styles.actionButton}>
-              <Wishlist />
-              {wishlist.length > 0 && (
-                <span className={styles.actionBadge}>{wishlist.length}</span>
-              )}
-            </Link>
+            {/* Navigation */}
+            {renderNavLinks(
+              styles.stickyNavLink,
+              styles.stickyNavList,
+              styles.stickyNav,
+              true
+            )}
 
+            {/* Sticky Header Search */}
+            <div className={styles.stickySearchContainer}>
+              <SearchForm />
+            </div>
+
+            {/* Action Buttons */}
+            <div className={styles.actions}>
+              <button
+                className={styles.searchButton}
+                onClick={handleMobileSearchOpen}
+              >
+                <Search />
+              </button>
+
+              <Link href="/compare" className={styles.actionButton}>
+                <Compare />
+              </Link>
+
+              <Link href="/wishlist" className={styles.actionButton}>
+                <Wishlist />
+                {wishlist.length > 0 && (
+                  <span className={styles.actionBadge}>{wishlist.length}</span>
+                )}
+              </Link>
+
+              <button
+                className={styles.actionButton}
+                onClick={() => dispatch(openCartMini())}
+              >
+                <CartTwo />
+                {quantity > 0 && (
+                  <span className={styles.actionBadge}>{quantity}</span>
+                )}
+              </button>
+
+              <Link href="/profile" className={styles.actionButton}>
+                <User />
+              </Link>
+
+              {/* Add sidebar toggle for sticky header */}
+              <button
+                className={`${styles.actionButton} ${styles.mobileMenu}`}
+                onClick={() => setIsMobileNavOpen(true)}
+                aria-label="Open menu"
+              >
+                <Menu />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Navigation */}
+        <div
+          className={`${styles.mobileNav} ${
+            isMobileNavOpen ? styles.mobileNavActive : ''
+          }`}
+        >
+          <div className={styles.mobileNavHeader}>
+            <Image
+              src={logo}
+              alt="logo"
+              width={100}
+              height={35}
+              priority
+              className={styles.sidebarLogo}
+            />
             <button
               className={styles.actionButton}
-              onClick={() => dispatch(openCartMini())}
+              onClick={() => setIsMobileNavOpen(false)}
+              aria-label="Close menu"
             >
-              <CartTwo />
-              {quantity > 0 && (
-                <span className={styles.actionBadge}>{quantity}</span>
-              )}
-            </button>
-
-            <Link href="/profile" className={styles.actionButton}>
-              <User />
-            </Link>
-
-            {/* Add sidebar toggle for sticky header */}
-            <button
-              className={`${styles.actionButton} ${styles.mobileMenu}`}
-              onClick={() => setIsMobileNavOpen(true)}
-              aria-label="Open menu"
-            >
-              <Menu />
+              <Close />
             </button>
           </div>
+          <div className={styles.mobileNavContent}>
+            <ul className={styles.mobileNavigation}>
+              <li>
+                <Link
+                  href="/"
+                  className={styles.navLink}
+                  onClick={() => setIsMobileNavOpen(false)}
+                >
+                  HOME
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/shop"
+                  className={styles.navLink}
+                  onClick={() => setIsMobileNavOpen(false)}
+                >
+                  SHOP
+                </Link>
+                {filteredCategories.map(category => (
+                  <div key={category._id} className={styles.mobileCategory}>
+                    {category.children && category.children.length > 0 ? (
+                      <>
+                        <button
+                          className={styles.mobileCategoryHeader}
+                          onClick={() => toggleMobileCategory(category._id)}
+                          aria-expanded={activeMobileCategory === category._id}
+                        >
+                          <span className={styles.mobileCategoryTitle}>
+                            {category.parent}
+                          </span>
+                          <svg
+                            className={`${styles.mobileDropdownIcon} ${
+                              activeMobileCategory === category._id
+                                ? styles.active
+                                : ''
+                            }`}
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 9l-7 7-7-7"
+                            />
+                          </svg>
+                        </button>
+                        <div
+                          className={`${styles.mobileSubCategories} ${
+                            activeMobileCategory === category._id
+                              ? styles.active
+                              : ''
+                          }`}
+                        >
+                          {category.children?.map((child, index) => (
+                            <button
+                              key={index}
+                              className={styles.subCategoryLink}
+                              onClick={() =>
+                                handleChildCategoryRoute(category.parent, child)
+                              }
+                            >
+                              {child}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    ) : (
+                      <button
+                        className={styles.mobileCategoryHeader}
+                        onClick={() => handleCategoryRoute(category.parent)}
+                      >
+                        <span className={styles.mobileCategoryTitle}>
+                          {category.parent}
+                        </span>
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </li>
+              <li>
+                <Link
+                  href="/shop"
+                  className={styles.navLink}
+                  onClick={() => setIsMobileNavOpen(false)}
+                >
+                  PRODUCTS
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
 
-      {/* Mobile Search Overlay */}
+        {/* Dropdown Menu (for Shop) */}
+        <div
+          id="shop-dropdown"
+          className={styles.dropdownContent}
+          aria-hidden={!isDropdownOpen}
+          role="menu"
+          onKeyDown={handleDropdownKeyDown}
+          ref={dropdownRef}
+          style={{
+            ...getDropdownPosition(),
+            display: isDropdownOpen ? 'block' : 'none',
+          }}
+        >
+          <ul className={styles.simpleDropdownList} role="none">
+            {filteredCategories.map(category => (
+              <li
+                key={category._id}
+                className={styles.simpleDropdownItem}
+                role="none"
+              >
+                <button
+                  className={styles.simpleDropdownButton}
+                  onClick={() => handleCategoryNavigation(category)}
+                  role="menuitem"
+                >
+                  {category.parent}
+                  {/* <span className={styles.productCount}>
+                  ({category.products.length})
+                </span> */}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Cart Mini Sidebar */}
+        <CartMiniSidebar />
+
+        {/* Add this close backdrop to the existing code with the other backdrop */}
+        {(isMobileNavOpen || isMobileSearchOpen) && (
+          <div
+            className={styles.backdrop}
+            onClick={() => {
+              setIsMobileNavOpen(false);
+              setIsMobileSearchOpen(false);
+            }}
+          />
+        )}
+      </header>
+
+      {/* Mobile Search Overlay - Outside header for highest z-index */}
       <div
         className={`${styles.mobileSearch} ${
           isMobileSearchOpen ? styles.mobileSearchActive : ''
@@ -432,173 +601,6 @@ export default function HeaderV2() {
           onClick={closeSearch}
         ></div>
       </div>
-
-      {/* Mobile Navigation */}
-      <div
-        className={`${styles.mobileNav} ${
-          isMobileNavOpen ? styles.mobileNavActive : ''
-        }`}
-      >
-        <div className={styles.mobileNavHeader}>
-          <Image
-            src={logo}
-            alt="logo"
-            width={100}
-            height={35}
-            priority
-            className={styles.sidebarLogo}
-          />
-          <button
-            className={styles.actionButton}
-            onClick={() => setIsMobileNavOpen(false)}
-            aria-label="Close menu"
-          >
-            <Close />
-          </button>
-        </div>
-        <div className={styles.mobileNavContent}>
-          <ul className={styles.mobileNavigation}>
-            <li>
-              <Link
-                href="/"
-                className={styles.navLink}
-                onClick={() => setIsMobileNavOpen(false)}
-              >
-                HOME
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/shop"
-                className={styles.navLink}
-                onClick={() => setIsMobileNavOpen(false)}
-              >
-                SHOP
-              </Link>
-              {filteredCategories.map(category => (
-                <div key={category._id} className={styles.mobileCategory}>
-                  {category.children && category.children.length > 0 ? (
-                    <>
-                      <button
-                        className={styles.mobileCategoryHeader}
-                        onClick={() => toggleMobileCategory(category._id)}
-                        aria-expanded={activeMobileCategory === category._id}
-                      >
-                        <span className={styles.mobileCategoryTitle}>
-                          {category.parent}
-                        </span>
-                        <svg
-                          className={`${styles.mobileDropdownIcon} ${
-                            activeMobileCategory === category._id
-                              ? styles.active
-                              : ''
-                          }`}
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 9l-7 7-7-7"
-                          />
-                        </svg>
-                      </button>
-                      <div
-                        className={`${styles.mobileSubCategories} ${
-                          activeMobileCategory === category._id
-                            ? styles.active
-                            : ''
-                        }`}
-                      >
-                        {category.children?.map((child, index) => (
-                          <button
-                            key={index}
-                            className={styles.subCategoryLink}
-                            onClick={() =>
-                              handleChildCategoryRoute(category.parent, child)
-                            }
-                          >
-                            {child}
-                          </button>
-                        ))}
-                      </div>
-                    </>
-                  ) : (
-                    <button
-                      className={styles.mobileCategoryHeader}
-                      onClick={() => handleCategoryRoute(category.parent)}
-                    >
-                      <span className={styles.mobileCategoryTitle}>
-                        {category.parent}
-                      </span>
-                    </button>
-                  )}
-                </div>
-              ))}
-            </li>
-            <li>
-              <Link
-                href="/shop"
-                className={styles.navLink}
-                onClick={() => setIsMobileNavOpen(false)}
-              >
-                PRODUCTS
-              </Link>
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      {/* Dropdown Menu (for Shop) */}
-      <div
-        id="shop-dropdown"
-        className={styles.dropdownContent}
-        aria-hidden={!isDropdownOpen}
-        role="menu"
-        onKeyDown={handleDropdownKeyDown}
-        ref={dropdownRef}
-        style={{
-          ...getDropdownPosition(),
-          display: isDropdownOpen ? 'block' : 'none',
-        }}
-      >
-        <ul className={styles.simpleDropdownList} role="none">
-          {filteredCategories.map(category => (
-            <li
-              key={category._id}
-              className={styles.simpleDropdownItem}
-              role="none"
-            >
-              <button
-                className={styles.simpleDropdownButton}
-                onClick={() => handleCategoryNavigation(category)}
-                role="menuitem"
-              >
-                {category.parent}
-                {/* <span className={styles.productCount}>
-                  ({category.products.length})
-                </span> */}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Cart Mini Sidebar */}
-      <CartMiniSidebar />
-
-      {/* Add this close backdrop to the existing code with the other backdrop */}
-      {(isMobileNavOpen || isMobileSearchOpen) && (
-        <div
-          className={styles.backdrop}
-          onClick={() => {
-            setIsMobileNavOpen(false);
-            setIsMobileSearchOpen(false);
-          }}
-        />
-      )}
-    </header>
+    </>
   );
 }
