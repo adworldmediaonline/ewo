@@ -1,0 +1,32 @@
+.homePage {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.homePage * {
+  font-family: inherit;
+}
+
+.homePage h1,
+.homePage h2,
+.homePage h3,
+.homePage h4,
+.homePage h5,
+.homePage h6 {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 700;
+}
+
+.homePage p,
+.homePage span,
+.homePage div {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.homePage button {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
+.homePage a {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}

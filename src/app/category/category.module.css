@@ -1,0 +1,169 @@
+/* Category Page Lato Font Styling */
+.categoryPage {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.categoryPage * {
+  font-family: inherit;
+}
+
+.categoryPage h1,
+.categoryPage h2,
+.categoryPage h3,
+.categoryPage h4,
+.categoryPage h5,
+.categoryPage h6 {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 700;
+}
+
+.categoryPage p,
+.categoryPage span,
+.categoryPage div {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.categoryPage button {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
+.categoryPage a {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.categoryPage input,
+.categoryPage select,
+.categoryPage textarea {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.categoryPage label {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
+.categoryPage th,
+.categoryPage td {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+/* Category Page Wrapper */
+.categoryPageWrapper {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  min-height: 100vh;
+}
+
+/* Category Specific Styling */
+.categoryPage .category-header {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.categoryPage .category-title {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 700;
+}
+
+.categoryPage .category-description {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.categoryPage .category-filters {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.categoryPage .filter-title {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 600;
+}
+
+.categoryPage .filter-option {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.categoryPage .product-grid {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.categoryPage .product-card {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.categoryPage .product-title {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
+.categoryPage .product-price {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 600;
+}
+
+.categoryPage .product-description {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+/* Breadcrumb Styling */
+.categoryPage .breadcrumb {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.categoryPage .breadcrumb-item {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+/* Pagination Styling */
+.categoryPage .pagination {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.categoryPage .pagination-item {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
+/* Sort Options */
+.categoryPage .sort-options {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.categoryPage .sort-select {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.categoryPage .sort-label {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
+/* Loading States */
+.categoryPage .loading {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.categoryPage .loading-text {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+/* Category Navigation */
+.categoryPage .category-nav {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.categoryPage .category-nav-item {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .categoryPage {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .categoryPage {
+    font-size: 0.85rem;
+  }
+}

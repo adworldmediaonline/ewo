@@ -1,13 +1,65 @@
-/* .content {
+/* About Page Lato Font Styling */
+.aboutPage {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.aboutPage * {
+  font-family: inherit;
+}
+
+.aboutPage h1,
+.aboutPage h2,
+.aboutPage h3,
+.aboutPage h4,
+.aboutPage h5,
+.aboutPage h6 {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 700;
+}
+
+.aboutPage p,
+.aboutPage span,
+.aboutPage div {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.aboutPage button {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
+.aboutPage a {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+/* Content Wrapper */
+.content {
+  font-family: var(--font-lato), 'Lato', sans-serif;
   max-width: 48rem;
   margin: 0 auto;
-} */
+  padding: 2rem 1rem;
+}
 
+/* Responsive Design */
+@media (max-width: 768px) {
+  .content {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .content {
+    font-size: 0.85rem;
+  }
+}
+
+/* Original Styles with Lato Font Applied */
 .title {
   font-size: 2.25rem;
   font-weight: 700;
   color: #111827;
   margin-bottom: 2rem;
+  font-family: var(--font-lato), 'Lato', sans-serif;
 }
 
 .intro {
@@ -15,6 +67,7 @@
   margin-bottom: 2rem;
   font-size: 1.125rem;
   line-height: 1.75;
+  font-family: var(--font-lato), 'Lato', sans-serif;
 }
 
 .missionTitle {
@@ -22,12 +75,14 @@
   font-weight: 700;
   color: #111827;
   margin-bottom: 1.5rem;
+  font-family: var(--font-lato), 'Lato', sans-serif;
 }
 
 .missionText {
   color: #4b5563;
   margin-bottom: 1.5rem;
   line-height: 1.75;
+  font-family: var(--font-lato), 'Lato', sans-serif;
 }
 
 .differenceTitle {
@@ -35,6 +90,7 @@
   font-weight: 700;
   color: #111827;
   margin-bottom: 1.5rem;
+  font-family: var(--font-lato), 'Lato', sans-serif;
 }
 
 .featuresGrid {
@@ -62,17 +118,20 @@
   font-weight: 600;
   color: #111827;
   margin-bottom: 0.75rem;
+  font-family: var(--font-lato), 'Lato', sans-serif;
 }
 
 .featureText {
   color: #4b5563;
   line-height: 1.75;
+  font-family: var(--font-lato), 'Lato', sans-serif;
 }
 
 .conclusion {
   color: #4b5563;
   margin-bottom: 2rem;
   line-height: 1.75;
+  font-family: var(--font-lato), 'Lato', sans-serif;
 }
 
 .ctaBox {
@@ -87,9 +146,11 @@
   font-weight: 700;
   color: #111827;
   margin-bottom: 1rem;
+  font-family: var(--font-lato), 'Lato', sans-serif;
 }
 
 .ctaText {
   color: #4b5563;
   line-height: 1.75;
+  font-family: var(--font-lato), 'Lato', sans-serif;
 }

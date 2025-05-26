@@ -1,13 +1,80 @@
-/* .content {
+/* History Page Lato Font Styling */
+.historyPage {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.historyPage * {
+  font-family: inherit;
+}
+
+.historyPage h1,
+.historyPage h2,
+.historyPage h3,
+.historyPage h4,
+.historyPage h5,
+.historyPage h6 {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 700;
+}
+
+.historyPage p,
+.historyPage span,
+.historyPage div,
+.historyPage li {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.historyPage button {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
+.historyPage a {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+/* Content Wrapper */
+.content {
+  font-family: var(--font-lato), 'Lato', sans-serif;
   max-width: 48rem;
   margin: 0 auto;
-} */
+  padding: 2rem 1rem;
+}
 
+/* List Styling */
+.list {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.listItem {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  color: #4b5563;
+  line-height: 1.75;
+  margin-bottom: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .content {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .content {
+    font-size: 0.85rem;
+  }
+}
+
+/* Original Styles with Lato Font Applied */
 .title {
   font-size: 2.25rem;
   font-weight: 700;
   color: #111827;
   margin-bottom: 2rem;
+  font-family: var(--font-lato), 'Lato', sans-serif;
 }
 
 .intro {
@@ -15,6 +82,7 @@
   margin-bottom: 2rem;
   font-size: 1.125rem;
   line-height: 1.75;
+  font-family: var(--font-lato), 'Lato', sans-serif;
 }
 
 .section {
@@ -26,11 +94,13 @@
   font-weight: 700;
   color: #111827;
   margin-bottom: 1rem;
+  font-family: var(--font-lato), 'Lato', sans-serif;
 }
 
 .sectionText {
   color: #4b5563;
   line-height: 1.75;
+  font-family: var(--font-lato), 'Lato', sans-serif;
 }
 
 .ctaBox {
@@ -45,12 +115,14 @@
   font-weight: 700;
   color: #111827;
   margin-bottom: 1rem;
+  font-family: var(--font-lato), 'Lato', sans-serif;
 }
 
 .ctaText {
   color: #4b5563;
   margin-bottom: 1.5rem;
   line-height: 1.75;
+  font-family: var(--font-lato), 'Lato', sans-serif;
 }
 
 .contactInfo {
@@ -62,8 +134,10 @@
 .companyName {
   font-weight: 600;
   color: #111827;
+  font-family: var(--font-lato), 'Lato', sans-serif;
 }
 
 .contactDetail {
   color: #4b5563;
+  font-family: var(--font-lato), 'Lato', sans-serif;
 }

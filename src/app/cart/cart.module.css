@@ -1,3 +1,53 @@
+/* Cart Page Lato Font Styling */
+.cartPage {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.cartPage * {
+  font-family: inherit;
+}
+
+.cartPage h1,
+.cartPage h2,
+.cartPage h3,
+.cartPage h4,
+.cartPage h5,
+.cartPage h6 {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 700;
+}
+
+.cartPage p,
+.cartPage span,
+.cartPage div {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.cartPage button {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
+.cartPage a {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.cartPage input,
+.cartPage select,
+.cartPage textarea {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.cartPage label {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
+.cartPage th,
+.cartPage td {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
 /* Breadcrumb Section Styling */
 .breadcrumb-section {
   background-color: #f8f9fa;

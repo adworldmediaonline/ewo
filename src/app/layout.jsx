@@ -67,7 +67,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <GoogleTagManager gtmId="GTM-MB34NG65" />
-      <body className={`${lato.variable}`} suppressHydrationWarning>
+      <body
+        className={`${lato.variable} ${lato.className}`}
+        suppressHydrationWarning
+      >
         <Providers>{children}</Providers>
         <SpeedInsights />
       </body>

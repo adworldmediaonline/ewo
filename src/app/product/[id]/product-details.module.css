@@ -1,10 +1,54 @@
+/* Product Details Page Lato Font Styling */
+.productDetailsPage {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.productDetailsPage * {
+  font-family: inherit;
+}
+
+.productDetailsPage h1,
+.productDetailsPage h2,
+.productDetailsPage h3,
+.productDetailsPage h4,
+.productDetailsPage h5,
+.productDetailsPage h6 {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 700;
+}
+
+.productDetailsPage p,
+.productDetailsPage span,
+.productDetailsPage div {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.productDetailsPage button {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
+.productDetailsPage a {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.productDetailsPage input,
+.productDetailsPage select,
+.productDetailsPage textarea {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+}
+
+.productDetailsPage label {
+  font-family: var(--font-lato), 'Lato', sans-serif;
+  font-weight: 500;
+}
+
 /* Product Details Page Styling */
 .productContainer {
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 1.5rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: var(--font-lato), 'Lato', sans-serif;
 }
 
 .breadcrumb {

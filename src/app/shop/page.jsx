@@ -12,17 +12,19 @@ export const metadata = {
 
 export default function ShopPage() {
   return (
-    <Wrapper>
-      <HeaderV2 />
-      <ShopBreadcrumb subtitle="Shop" />
-      <div className={styles.shopContainer}>
-        <main className={styles.main}>
-          <div className={styles.shopAreaWrapper}>
-            <ShopArea />
-          </div>
-        </main>
-      </div>
-      <Footer primary_style={true} />
-    </Wrapper>
+    <div className={styles.shopPage}>
+      <Wrapper>
+        <HeaderV2 />
+        <ShopBreadcrumb subtitle="Shop" />
+        <div className={styles.shopContainer}>
+          <main className={styles.main}>
+            <div className={styles.shopAreaWrapper}>
+              <ShopArea />
+            </div>
+          </main>
+        </div>
+        <Footer primary_style={true} />
+      </Wrapper>
+    </div>
   );
 }
