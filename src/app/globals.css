@@ -71,3 +71,235 @@
     height: 35px;
   }
 }
+
+/* Toast Notifications - Center Positioning with CSS Variables */
+:root {
+  --toastify-toast-width: 400px;
+  --toastify-z-index: 99999;
+  --toastify-container-width: fit-content;
+}
+
+/* Force center positioning with multiple selectors */
+.Toastify__toast-container,
+.Toastify__toast-container--top-center,
+.Toastify__toast-container--top-left,
+.Toastify__toast-container--top-right,
+.Toastify__toast-container--bottom-left,
+.Toastify__toast-container--bottom-center,
+.Toastify__toast-container--bottom-right,
+div[class*='Toastify__toast-container'],
+.custom-toast-container {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%) !important;
+  width: auto !important;
+  max-width: 400px !important;
+  min-width: 300px !important;
+  z-index: 99999 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Toast styling improvements with zoom animation support */
+.Toastify__toast {
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+  backdrop-filter: blur(8px) !important;
+  margin-bottom: 8px !important;
+  font-family: 'Lato', sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+  transform-origin: center center !important;
+  position: relative !important;
+  width: 100% !important;
+  max-width: 400px !important;
+  min-width: 300px !important;
+}
+
+/* Enhanced zoom animation for centered toasts */
+.Toastify__zoom-enter {
+  transform: scale(0.8) !important;
+  opacity: 0 !important;
+}
+
+.Toastify__zoom-enter--active {
+  transform: scale(1) !important;
+  opacity: 1 !important;
+  transition: transform 300ms cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    opacity 300ms ease-out !important;
+}
+
+.Toastify__zoom-exit {
+  transform: scale(1) !important;
+  opacity: 1 !important;
+}
+
+.Toastify__zoom-exit--active {
+  transform: scale(0.8) !important;
+  opacity: 0 !important;
+  transition: transform 200ms ease-in, opacity 200ms ease-in !important;
+}
+
+.Toastify__toast--success {
+  background: rgba(34, 197, 94, 0.95) !important;
+  color: white !important;
+}
+
+.Toastify__toast--error {
+  background: rgba(239, 68, 68, 0.95) !important;
+  color: white !important;
+}
+
+.Toastify__toast--info {
+  background: rgba(59, 130, 246, 0.95) !important;
+  color: white !important;
+}
+
+.Toastify__toast--warning {
+  background: rgba(245, 158, 11, 0.95) !important;
+  color: white !important;
+}
+
+/* Progress bar styling */
+.Toastify__progress-bar {
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Close button styling */
+.Toastify__close-button {
+  color: white !important;
+  opacity: 0.8 !important;
+}
+
+.Toastify__close-button:hover {
+  opacity: 1 !important;
+}
+
+/* Animation improvements - Force center positioning */
+.Toastify__toast-container--top-center,
+.Toastify__toast-container[class*='top-center'] {
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+}
+
+/* Override any inline styles */
+div[style*='top'][style*='left'] {
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+/* Custom toast center class targeting */
+.custom-toast-center {
+  position: relative !important;
+}
+
+/* Force center positioning with highest specificity */
+body .Toastify__toast-container,
+html .Toastify__toast-container,
+#__next .Toastify__toast-container {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%) !important;
+  width: auto !important;
+  max-width: 400px !important;
+  min-width: 300px !important;
+  z-index: 99999 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Alternative approach - Use CSS animations to force center */
+@keyframes centerToast {
+  0% {
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+  100% {
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+}
+
+/* Apply animation to force positioning */
+.Toastify__toast-container {
+  animation: centerToast 0.1s forwards !important;
+}
+
+/* Additional specificity for stubborn positioning */
+body > div[class*='Toastify__toast-container'],
+#__next > div[class*='Toastify__toast-container'],
+#wrapper > div[class*='Toastify__toast-container'] {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%) !important;
+  width: auto !important;
+  max-width: 400px !important;
+  min-width: 300px !important;
+  z-index: 99999 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Ensure proper spacing between multiple toasts */
+.Toastify__toast + .Toastify__toast {
+  margin-top: 8px !important;
+}
+
+/* Stack toasts properly in center */
+.Toastify__toast-container .Toastify__toast {
+  position: relative !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Force positioning with attribute selectors */
+div[style*='position'][class*='Toastify__toast-container'] {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .Toastify__toast-container,
+  body .Toastify__toast-container,
+  html .Toastify__toast-container,
+  #__next .Toastify__toast-container {
+    max-width: 90vw !important;
+    min-width: 280px !important;
+    padding: 0 10px !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+
+  .Toastify__toast {
+    font-size: 13px !important;
+    margin-bottom: 6px !important;
+  }
+}
