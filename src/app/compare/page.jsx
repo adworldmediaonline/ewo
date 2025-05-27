@@ -6,7 +6,10 @@ import CompareArea from '@/components/compare/compare-area';
 import styles from './compare.module.css';
 
 export const metadata = {
-  title: 'EWO- Compare Page',
+  title: 'EWO - Compare',
+  alternates: {
+    canonical: '/compare',
+  },
 };
 
 export default function ComparePage() {

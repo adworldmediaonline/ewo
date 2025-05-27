@@ -1,6 +1,8 @@
 export const metadata = {
   title: 'Category | EWO Shop',
-  description: 'Browse our product categories',
+  alternates: {
+    canonical: '/category',
+  },
 };
 
 export default function CategoryLayout({ children }) {

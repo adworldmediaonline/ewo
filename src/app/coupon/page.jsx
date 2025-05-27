@@ -5,7 +5,10 @@ import CouponArea from '@/components/coupon/coupon-area';
 import Footer from '@/layout/footers/footer';
 
 export const metadata = {
-  title: 'EWO- Coupon Page',
+  title: 'EWO - Coupon',
+  alternates: {
+    canonical: '/coupon',
+  },
 };
 
 export default function CouponPage() {

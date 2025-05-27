@@ -6,7 +6,10 @@ import RegisterArea from '@/components/login-register/register-area';
 import styles from './register.module.css';
 
 export const metadata = {
-  title: 'EWO- Register Page',
+  title: 'EWO - Register',
+  alternates: {
+    canonical: '/register',
+  },
 };
 
 export default function RegisterPage() {

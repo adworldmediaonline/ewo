@@ -7,6 +7,9 @@ import styles from './cart.module.css';
 
 export const metadata = {
   title: 'EWO - Shopping Cart',
+  alternates: {
+    canonical: '/cart',
+  },
 };
 
 export default function CartPage() {

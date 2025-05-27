@@ -1,5 +1,11 @@
 import styles from './page.module.css';
 
+export const metadata = {
+  title: 'Terms of Use - East West Offroad',
+  alternates: {
+    canonical: '/terms',
+  },
+};
 export default function TermsPage() {
   return (
     <div className={styles.termsPage}>

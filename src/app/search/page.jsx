@@ -6,7 +6,10 @@ import Footer from '@/layout/footers/footer';
 import styles from './search.module.css';
 
 export const metadata = {
-  title: 'EWO- Search Page',
+  title: 'EWO - Search',
+  alternates: {
+    canonical: '/search',
+  },
 };
 
 export default function SearchPage() {

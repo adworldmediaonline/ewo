@@ -1,5 +1,11 @@
 import styles from './page.module.css';
 
+export const metadata = {
+  title: 'Returns - East West Offroad',
+  alternates: {
+    canonical: '/returns',
+  },
+};
 export default function ReturnsPage() {
   return (
     <div className={styles.returnsPage}>

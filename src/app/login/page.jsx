@@ -6,7 +6,10 @@ import LoginArea from '@/components/login-register/login-area';
 import styles from './login.module.css';
 
 export const metadata = {
-  title: 'EWO- Login Page',
+  title: 'EWO - Login',
+  alternates: {
+    canonical: '/login',
+  },
 };
 
 export default function LoginPage() {

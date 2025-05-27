@@ -5,7 +5,10 @@ import ProfileArea from '@/components/my-account/profile-area';
 import styles from './profile.module.css';
 
 export const metadata = {
-  title: 'EWO- Profile Page',
+  title: 'EWO - Profile',
+  alternates: {
+    canonical: '/profile',
+  },
 };
 
 export default function ProfilePage() {
