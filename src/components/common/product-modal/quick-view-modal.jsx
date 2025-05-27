@@ -34,6 +34,7 @@ const customStyles = {
     maxWidth: '1100px',
     width: '100%',
     maxHeight: '95vh',
+    height: 'auto',
     margin: '0 auto',
     padding: '0',
     border: 'none',
@@ -43,6 +44,8 @@ const customStyles = {
     borderRadius: '16px',
     outline: 'none',
     boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    display: 'flex',
+    flexDirection: 'column',
   },
 };
 

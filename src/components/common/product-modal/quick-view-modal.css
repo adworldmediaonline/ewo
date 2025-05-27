@@ -1,9 +1,11 @@
 /* Quick View Modal Styles */
 .quick-view-modal {
   height: 100%;
+  max-height: 95vh;
   display: flex;
   flex-direction: column;
   font-family: 'Lato', sans-serif;
+  overflow: hidden;
 }
 
 .modal-header {
@@ -13,6 +15,7 @@
   padding: 24px 32px;
   border-bottom: 1px solid #e5e7eb;
   background: #fafafa;
+  flex-shrink: 0;
 }
 
 .modal-title {
@@ -45,6 +48,7 @@
   overflow-y: auto;
   flex: 1;
   min-height: 0;
+  max-height: calc(95vh - 100px);
 }
 
 .image-section {
@@ -169,6 +173,7 @@
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
+  max-height: 100%;
 }
 
 .scrollable-content {
@@ -180,6 +185,27 @@
   flex-direction: column;
   gap: 20px;
   padding-bottom: 20px;
+  max-height: calc(100% - 80px);
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db #f3f4f6;
+}
+
+.scrollable-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollable-content::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 3px;
+}
+
+.scrollable-content::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.scrollable-content::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
 }
 
 .product-category {
@@ -456,6 +482,8 @@
   flex-direction: column;
   gap: 12px;
   z-index: 10;
+  flex-shrink: 0;
+  box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .add-to-cart-btn {
@@ -538,6 +566,29 @@
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 12px;
+}
+
+/* Desktop and large screens - ensure proper scrolling */
+@media (min-width: 1025px) {
+  .quick-view-modal {
+    max-height: 95vh;
+    overflow: hidden;
+  }
+
+  .modal-content {
+    max-height: calc(95vh - 100px);
+    overflow-y: auto;
+  }
+
+  .product-info {
+    max-height: 100%;
+    overflow: hidden;
+  }
+
+  .scrollable-content {
+    max-height: calc(100% - 80px);
+    overflow-y: auto;
+  }
 }
 
 /* Tablet styles */

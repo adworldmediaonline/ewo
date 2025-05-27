@@ -279,14 +279,14 @@ export default function HeaderV2() {
                     <Image
                       src={logo}
                       alt="logo"
-                      width={190}
+                      width={140}
                       priority
                       className={styles.desktopLogo}
                     />
                     <Image
                       src={logo}
                       alt="logo"
-                      width={100}
+                      width={80}
                       priority
                       className={styles.mobileLogo}
                     />
@@ -368,16 +368,16 @@ export default function HeaderV2() {
               <Image
                 src={logo}
                 alt="logo"
-                width={120}
-                height={40}
+                width={90}
+                height={30}
                 className={styles.desktopLogo}
                 priority
               />
               <Image
                 src={logo}
                 alt="logo"
-                width={80}
-                height={30}
+                width={60}
+                height={20}
                 className={styles.mobileLogo}
                 priority
               />
@@ -452,8 +452,8 @@ export default function HeaderV2() {
             <Image
               src={logo}
               alt="logo"
-              width={100}
-              height={35}
+              width={90}
+              height={30}
               priority
               className={styles.sidebarLogo}
             />
