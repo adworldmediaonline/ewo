@@ -22,7 +22,7 @@ export const forceToastCenter = () => {
         container.style.setProperty('width', 'auto', 'important');
         container.style.setProperty('max-width', '400px', 'important');
         container.style.setProperty('min-width', '300px', 'important');
-        container.style.setProperty('z-index', '99999', 'important');
+        container.style.setProperty('z-index', '2147483647', 'important');
         container.style.setProperty('margin', '0', 'important');
         container.style.setProperty('padding', '0', 'important');
         container.style.setProperty('display', 'flex', 'important');

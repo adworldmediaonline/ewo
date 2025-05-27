@@ -28,6 +28,7 @@ const notifySuccess = message =>
               'translate(-50%, -50%)',
               'important'
             );
+            container.style.setProperty('z-index', '2147483647', 'important');
           }
         });
       }, 0);
@@ -61,6 +62,7 @@ const notifyError = message =>
               'translate(-50%, -50%)',
               'important'
             );
+            container.style.setProperty('z-index', '2147483647', 'important');
           }
         });
       }, 0);

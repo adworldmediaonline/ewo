@@ -1,4 +1,5 @@
 import './globals.scss';
+import './toast-fix.css';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { GoogleTagManager } from '@next/third-parties/google';
 import { Lato } from 'next/font/google';

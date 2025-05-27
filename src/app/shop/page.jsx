@@ -7,8 +7,8 @@ import HeaderV2 from '@/layout/headers/HeaderV2';
 import styles from './shop.module.css';
 
 export const metadata = {
-  title: 'EWO- Shop Page',
-  description: 'EWO- Shop Page',
+  title: 'EWO - Shop',
+  description: 'EWO - Shop',
   alternates: {
     canonical: '/shop',
   },
