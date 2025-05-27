@@ -107,20 +107,18 @@ const ShopArea = ({ shop_right = false, hidden_sidebar = false }) => {
 
     // category filter
     if (category) {
-      product_items = product_items
-        .filter(p => parentCategoryModified(p.parent) === category)
-        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+      product_items = product_items.filter(
+        p => parentCategoryModified(p.parent) === category
+      );
     }
 
     // category filter
     if (subCategory) {
-      product_items = product_items
-        .filter(
-          p =>
-            p.children.toLowerCase().replace('&', '').split(' ').join('-') ===
-            subCategory
-        )
-        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+      product_items = product_items.filter(
+        p =>
+          p.children.toLowerCase().replace('&', '').split(' ').join('-') ===
+          subCategory
+      );
     }
 
     // color filter
