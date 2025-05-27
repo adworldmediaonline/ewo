@@ -69,7 +69,7 @@ const Wrapper = ({ children }) => {
           width: 'auto',
           maxWidth: '400px',
           minWidth: '300px',
-          zIndex: 99999,
+          zIndex: 2147483647,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
