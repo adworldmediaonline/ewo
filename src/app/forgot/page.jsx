@@ -5,7 +5,10 @@ import CommonBreadcrumb from '@/components/breadcrumb/common-breadcrumb';
 import ForgotArea from '@/components/login-register/forgot-area';
 
 export const metadata = {
-  title: 'EWO- Forgot Page',
+  title: 'EWO - Forgot Password',
+  alternates: {
+    canonical: '/forgot',
+  },
 };
 
 export default function ForgotPage() {

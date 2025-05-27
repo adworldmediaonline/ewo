@@ -6,7 +6,10 @@ import WishlistArea from '@/components/cart-wishlist/wishlist-area';
 import styles from './wishlist.module.css';
 
 export const metadata = {
-  title: 'EWO- Wishlist Page',
+  title: 'EWO - Wishlist',
+  alternates: {
+    canonical: '/wishlist',
+  },
 };
 
 export default function WishlistPage() {

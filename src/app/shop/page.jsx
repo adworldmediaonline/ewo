@@ -8,6 +8,10 @@ import styles from './shop.module.css';
 
 export const metadata = {
   title: 'EWO- Shop Page',
+  description: 'EWO- Shop Page',
+  alternates: {
+    canonical: '/shop',
+  },
 };
 
 export default function ShopPage() {

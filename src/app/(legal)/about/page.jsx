@@ -1,5 +1,13 @@
 import styles from './page.module.css';
 import Link from 'next/link';
+
+export const metadata = {
+  title: 'About Us - East West Offroad',
+  alternates: {
+    canonical: '/about',
+  },
+};
+
 export default function AboutPage() {
   return (
     <div className={styles.aboutPage}>

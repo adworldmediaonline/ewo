@@ -6,7 +6,10 @@ import CheckoutArea from '@/components/checkout/checkout-area';
 import styles from './checkout.module.css';
 
 export const metadata = {
-  title: 'EWO- Checkout Page',
+  title: 'EWO - Checkout',
+  alternates: {
+    canonical: '/checkout',
+  },
 };
 
 export default function CheckoutPage() {

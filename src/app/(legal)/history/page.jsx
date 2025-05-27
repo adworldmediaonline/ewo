@@ -1,5 +1,11 @@
 import styles from './page.module.css';
 
+export const metadata = {
+  title: 'History - East West Offroad',
+  alternates: {
+    canonical: '/history',
+  },
+};
 export default function HistoryPage() {
   return (
     <div className={styles.historyPage}>

@@ -5,7 +5,10 @@ import OrderArea from '@/components/order/order-area';
 import styles from './order.module.css';
 
 export const metadata = {
-  title: 'EWO- Order Page',
+  title: 'EWO - Order',
+  alternates: {
+    canonical: '/order',
+  },
 };
 
 export default async function OrderPage({ params }) {
