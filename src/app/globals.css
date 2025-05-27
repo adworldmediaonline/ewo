@@ -98,7 +98,7 @@ div[class*='Toastify__toast-container'],
   width: auto !important;
   max-width: 400px !important;
   min-width: 300px !important;
-  z-index: 999999 !important;
+  z-index: 2147483647 !important;
   margin: 0 !important;
   padding: 0 !important;
   display: flex !important;
@@ -218,7 +218,7 @@ html .Toastify__toast-container,
   width: auto !important;
   max-width: 400px !important;
   min-width: 300px !important;
-  z-index: 999999 !important;
+  z-index: 2147483647 !important;
   margin: 0 !important;
   padding: 0 !important;
 }
@@ -255,7 +255,7 @@ body > div[class*='Toastify__toast-container'],
   width: auto !important;
   max-width: 400px !important;
   min-width: 300px !important;
-  z-index: 999999 !important;
+  z-index: 2147483647 !important;
   margin: 0 !important;
   padding: 0 !important;
   display: flex !important;
