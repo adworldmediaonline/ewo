@@ -41,6 +41,9 @@ export default function HeaderV2() {
   const { data: categories, isLoading: categoriesLoading } =
     useGetShowCategoryQuery();
 
+  // Add debounce ref to prevent double clicks
+  const toggleDebounceRef = useRef(false);
+
   // Simple and effective scroll handling
   useEffect(() => {
     let lastTime = 0;
@@ -269,6 +272,14 @@ export default function HeaderV2() {
 
   // Handle mobile navigation
   const handleMobileNavToggle = () => {
+    // Prevent double clicks with debounce
+    if (toggleDebounceRef.current) return;
+
+    toggleDebounceRef.current = true;
+    setTimeout(() => {
+      toggleDebounceRef.current = false;
+    }, 300); // 300ms debounce
+
     const newState = !isMobileNavOpen;
     setIsMobileNavOpen(newState);
 
@@ -395,6 +406,11 @@ export default function HeaderV2() {
                       aria-label="Open menu"
                       aria-expanded={isMobileNavOpen}
                       ref={mobileMenuButtonRef}
+                      disabled={showStickyHeader}
+                      style={{
+                        pointerEvents: showStickyHeader ? 'none' : 'auto',
+                        opacity: showStickyHeader ? 0.5 : 1,
+                      }}
                     >
                       <Menu />
                     </button>
