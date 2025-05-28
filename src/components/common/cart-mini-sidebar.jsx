@@ -8,8 +8,9 @@ import useCartInfo from '@/hooks/use-cart-info';
 // import RenderCartProgress from './render-cart-progress';
 import empty_cart_img from '@assets/img/product/cartmini/empty-cart.png';
 import { closeCartMini, remove_product } from '@/redux/features/cartSlice';
+import styles from './cart-mini-sidebar.module.css';
 
-const CartMiniSidebar = () => {
+export default function CartMiniSidebar() {
   const { cart_products, cartMiniOpen } = useSelector(state => state.cart);
   const { total } = useCartInfo();
   const dispatch = useDispatch();
@@ -23,26 +24,38 @@ const CartMiniSidebar = () => {
   const handleCloseCartMini = () => {
     dispatch(closeCartMini());
   };
+
   return (
     <>
       <div
-        className={`cartmini__area tp-all-font-roboto ${
-          cartMiniOpen ? 'cartmini-opened' : ''
+        className={`${styles.cartMiniArea} ${
+          cartMiniOpen ? styles.cartMiniOpened : ''
         }`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="cart-title"
       >
-        <div className="cartmini__wrapper d-flex justify-content-between flex-column">
-          <div className="cartmini__top-wrapper">
-            <div className="cartmini__top p-relative">
-              <div className="cartmini__top-title">
-                <h4>Shopping cart</h4>
+        <div className={styles.cartMiniWrapper}>
+          <div className={styles.cartMiniTopWrapper}>
+            <div className={styles.cartMiniTop}>
+              <div className={styles.cartMiniTopTitle}>
+                <h4 id="cart-title">
+                  Shopping Cart
+                  {cart_products.length > 0 && (
+                    <span className={styles.itemCount}>
+                      {cart_products.length}
+                    </span>
+                  )}
+                </h4>
               </div>
-              <div className="cartmini__close">
+              <div className={styles.cartMiniClose}>
                 <button
-                  onClick={() => dispatch(closeCartMini())}
+                  onClick={handleCloseCartMini}
                   type="button"
-                  className="cartmini__close-btn cartmini-close-btn"
+                  className={styles.cartMiniCloseBtn}
+                  aria-label="Close shopping cart"
                 >
-                  <i className="fal fa-times"></i>
+                  ✕
                 </button>
               </div>
             </div>
@@ -50,26 +63,27 @@ const CartMiniSidebar = () => {
               <RenderCartProgress />
             </div> */}
             {cart_products.length > 0 && (
-              <div className="cartmini__widget">
+              <div className={styles.cartMiniWidget}>
                 {cart_products.map((item, i) => (
-                  <div key={i} className="cartmini__widget-item">
-                    <div className="cartmini__thumb">
+                  <div key={i} className={styles.cartMiniWidgetItem}>
+                    <div className={styles.cartMiniThumb}>
                       <Link href={`/product/${item._id}`}>
                         <Image
                           src={item.img}
                           width={70}
-                          height={60}
-                          alt="product img"
+                          height={70}
+                          alt={`${item.title} product image`}
+                          style={{ objectFit: 'cover' }}
                         />
                       </Link>
                     </div>
-                    <div className="cartmini__content">
-                      <h5 className="cartmini__title">
+                    <div className={styles.cartMiniContent}>
+                      <h5 className={styles.cartMiniTitle}>
                         <Link href={`/product/${item._id}`}>{item.title}</Link>
                       </h5>
-                      <div className="cartmini__price-wrapper">
+                      <div className={styles.cartMiniPriceWrapper}>
                         {item.discount > 0 ? (
-                          <span className="cartmini__price">
+                          <span className={styles.cartMiniPrice}>
                             $
                             {(
                               Number(item.price) -
@@ -77,60 +91,64 @@ const CartMiniSidebar = () => {
                             ).toFixed(2)}
                           </span>
                         ) : (
-                          <span className="cartmini__price">
-                            ${item.price.toFixed(2)}
+                          <span className={styles.cartMiniPrice}>
+                            ${Number(item.price).toFixed(2)}
                           </span>
                         )}
-                        <span className="cartmini__quantity">
-                          {' '}
-                          x{item.orderQuantity}
+                        <span className={styles.cartMiniQuantity}>
+                          Qty: {item.orderQuantity}
                         </span>
                       </div>
                     </div>
-                    <a
+                    <button
                       onClick={() =>
                         handleRemovePrd({ title: item.title, id: item._id })
                       }
-                      className="cartmini__del cursor-pointer"
+                      className={styles.cartMiniDel}
+                      aria-label={`Remove ${item.title} from cart`}
+                      type="button"
                     >
-                      <i className="fa-regular fa-xmark"></i>
-                    </a>
+                      ✕
+                    </button>
                   </div>
                 ))}
               </div>
             )}
             {/* if no item in cart */}
             {cart_products.length === 0 && (
-              <div className="cartmini__empty text-center">
-                <Image src={empty_cart_img} alt="empty-cart-img" />
-                <p>Your Cart is empty</p>
-                <Link href="/shop" className="tp-btn">
-                  Go to Shop
+              <div className={styles.cartMiniEmpty}>
+                <Image
+                  src={empty_cart_img}
+                  alt="Empty shopping cart illustration"
+                  width={120}
+                  height={120}
+                />
+                <p>Your cart is empty</p>
+                <Link href="/shop" className={styles.tpBtn}>
+                  Start Shopping
                 </Link>
               </div>
             )}
           </div>
-          <div className="cartmini__checkout">
-            <div className="cartmini__checkout-title mb-30">
+          <div className={styles.cartMiniCheckout}>
+            <div className={styles.cartMiniCheckoutTitle}>
               <h4>Subtotal:</h4>
               <span>${total.toFixed(2)}</span>
             </div>
-            <div className="cartmini__checkout-btn">
+            <div className={styles.cartMiniCheckoutBtn}>
               <Link
                 href="/cart"
                 onClick={handleCloseCartMini}
-                className="tp-btn mb-10 w-100"
+                className={styles.tpBtn}
               >
-                {' '}
-                view cart
+                View Cart
               </Link>
               <Link
                 href="/checkout"
                 onClick={handleCloseCartMini}
-                className="tp-btn tp-btn-border w-100"
+                className={`${styles.tpBtn} ${styles.tpBtnBorder}`}
               >
-                {' '}
-                checkout
+                Checkout
               </Link>
             </div>
           </div>
@@ -139,11 +157,12 @@ const CartMiniSidebar = () => {
       {/* overlay start */}
       <div
         onClick={handleCloseCartMini}
-        className={`body-overlay ${cartMiniOpen ? 'opened' : ''}`}
+        className={`${styles.bodyOverlay} ${
+          cartMiniOpen ? styles.bodyOverlayOpened : ''
+        }`}
+        aria-hidden="true"
       ></div>
       {/* overlay end */}
     </>
   );
-};
-
-export default CartMiniSidebar;
+}
