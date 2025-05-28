@@ -35,6 +35,7 @@ export default function HeaderV2() {
   const dropdownTimeoutRef = useRef(null);
   const mobileNavRef = useRef(null);
   const mobileMenuButtonRef = useRef(null);
+  const [isMobileShopOpen, setIsMobileShopOpen] = useState(false);
 
   // Fetch categories
   const { data: categories, isLoading: categoriesLoading } =
@@ -193,6 +194,11 @@ export default function HeaderV2() {
     setIsMobileSearchOpen(false);
   };
 
+  // Toggle mobile shop section
+  const toggleMobileShop = () => {
+    setIsMobileShopOpen(!isMobileShopOpen);
+  };
+
   // Create a navigation component that can be reused
   const renderNavLinks = (
     linkClassName,
@@ -271,6 +277,12 @@ export default function HeaderV2() {
   const handleMobileNavToggle = () => {
     const newState = !isMobileNavOpen;
     setIsMobileNavOpen(newState);
+
+    // Reset states when closing
+    if (!newState) {
+      setIsMobileShopOpen(false);
+      setActiveMobileCategory(null);
+    }
 
     // Focus management
     if (newState) {
@@ -521,7 +533,11 @@ export default function HeaderV2() {
             />
             <button
               className={styles.actionButton}
-              onClick={() => setIsMobileNavOpen(false)}
+              onClick={() => {
+                setIsMobileNavOpen(false);
+                setIsMobileShopOpen(false);
+                setActiveMobileCategory(null);
+              }}
               aria-label="Close menu"
             >
               <Close />
@@ -539,75 +555,126 @@ export default function HeaderV2() {
                 </Link>
               </li>
               <li>
+                <div className={styles.mobileCategory}>
+                  <button
+                    className={styles.mobileCategoryHeader}
+                    onClick={toggleMobileShop}
+                    aria-expanded={isMobileShopOpen}
+                  >
+                    <span className={styles.mobileCategoryTitle}>SHOP</span>
+                    <svg
+                      style={{ color: 'black' }}
+                      className={`${styles.mobileDropdownIcon} ${
+                        isMobileShopOpen ? styles.active : ''
+                      }`}
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+                  <div
+                    className={`${styles.mobileSubCategories} ${
+                      isMobileShopOpen ? styles.active : ''
+                    }`}
+                  >
+                    {/* All Products Link */}
+                    <button
+                      className={styles.subCategoryLink}
+                      onClick={() => {
+                        router.push('/shop');
+                        setIsMobileNavOpen(false);
+                      }}
+                    >
+                      All Products
+                    </button>
+
+                    {/* Category Links */}
+                    {filteredCategories.map(category => (
+                      <div
+                        key={category._id}
+                        className={styles.mobileSubCategory}
+                      >
+                        {category.children && category.children.length > 0 ? (
+                          <>
+                            <button
+                              className={styles.mobileSubCategoryHeader}
+                              onClick={() => toggleMobileCategory(category._id)}
+                              aria-expanded={
+                                activeMobileCategory === category._id
+                              }
+                            >
+                              <span className={styles.mobileSubCategoryTitle}>
+                                {category.parent}
+                              </span>
+                              <svg
+                                className={`${styles.mobileSubDropdownIcon} ${
+                                  activeMobileCategory === category._id
+                                    ? styles.active
+                                    : ''
+                                }`}
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M19 9l-7 7-7-7"
+                                />
+                              </svg>
+                            </button>
+                            <div
+                              className={`${styles.mobileSubSubCategories} ${
+                                activeMobileCategory === category._id
+                                  ? styles.active
+                                  : ''
+                              }`}
+                            >
+                              {category.children?.map((child, index) => (
+                                <button
+                                  key={index}
+                                  className={styles.subSubCategoryLink}
+                                  onClick={() =>
+                                    handleChildCategoryRoute(
+                                      category.parent,
+                                      child
+                                    )
+                                  }
+                                >
+                                  {child}
+                                </button>
+                              ))}
+                            </div>
+                          </>
+                        ) : (
+                          <button
+                            className={styles.subCategoryLink}
+                            onClick={() => handleCategoryRoute(category.parent)}
+                          >
+                            {category.parent}
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </li>
+              <li>
                 <Link
-                  href="/shop"
+                  href="/about"
                   className={styles.navLink}
                   onClick={() => setIsMobileNavOpen(false)}
                 >
-                  SHOP
+                  ABOUT
                 </Link>
-                {filteredCategories.map(category => (
-                  <div key={category._id} className={styles.mobileCategory}>
-                    {category.children && category.children.length > 0 ? (
-                      <>
-                        <button
-                          className={styles.mobileCategoryHeader}
-                          onClick={() => toggleMobileCategory(category._id)}
-                          aria-expanded={activeMobileCategory === category._id}
-                        >
-                          <span className={styles.mobileCategoryTitle}>
-                            {category.parent}
-                          </span>
-                          <svg
-                            className={`${styles.mobileDropdownIcon} ${
-                              activeMobileCategory === category._id
-                                ? styles.active
-                                : ''
-                            }`}
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 9l-7 7-7-7"
-                            />
-                          </svg>
-                        </button>
-                        <div
-                          className={`${styles.mobileSubCategories} ${
-                            activeMobileCategory === category._id
-                              ? styles.active
-                              : ''
-                          }`}
-                        >
-                          {category.children?.map((child, index) => (
-                            <button
-                              key={index}
-                              className={styles.subCategoryLink}
-                              onClick={() =>
-                                handleChildCategoryRoute(category.parent, child)
-                              }
-                            >
-                              {child}
-                            </button>
-                          ))}
-                        </div>
-                      </>
-                    ) : (
-                      <button
-                        className={styles.mobileCategoryHeader}
-                        onClick={() => handleCategoryRoute(category.parent)}
-                      >
-                        <span className={styles.mobileCategoryTitle}>
-                          {category.parent}
-                        </span>
-                      </button>
-                    )}
-                  </div>
-                ))}
               </li>
               <li>
                 <Link
@@ -627,7 +694,11 @@ export default function HeaderV2() {
           className={`${styles.mobileNavBackdrop} ${
             isMobileNavOpen ? styles.mobileNavBackdropActive : ''
           }`}
-          onClick={() => setIsMobileNavOpen(false)}
+          onClick={() => {
+            setIsMobileNavOpen(false);
+            setIsMobileShopOpen(false);
+            setActiveMobileCategory(null);
+          }}
           aria-hidden="true"
         />
 
