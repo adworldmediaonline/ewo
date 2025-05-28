@@ -33,6 +33,9 @@ export default function HeaderV2() {
   const prevScrollPos = useRef(0);
   const [activeDropdownButton, setActiveDropdownButton] = useState(null);
   const dropdownTimeoutRef = useRef(null);
+  const mobileNavRef = useRef(null);
+  const mobileMenuButtonRef = useRef(null);
+  const [isMobileShopOpen, setIsMobileShopOpen] = useState(false);
 
   // Fetch categories
   const { data: categories, isLoading: categoriesLoading } =
@@ -191,6 +194,11 @@ export default function HeaderV2() {
     setIsMobileSearchOpen(false);
   };
 
+  // Toggle mobile shop section
+  const toggleMobileShop = () => {
+    setIsMobileShopOpen(!isMobileShopOpen);
+  };
+
   // Create a navigation component that can be reused
   const renderNavLinks = (
     linkClassName,
@@ -265,6 +273,65 @@ export default function HeaderV2() {
     return {};
   };
 
+  // Handle mobile navigation
+  const handleMobileNavToggle = () => {
+    const newState = !isMobileNavOpen;
+    setIsMobileNavOpen(newState);
+
+    // Reset states when closing
+    if (!newState) {
+      setIsMobileShopOpen(false);
+      setActiveMobileCategory(null);
+    }
+
+    // Focus management
+    if (newState) {
+      // When opening, focus the close button inside the nav
+      setTimeout(() => {
+        const closeButton = mobileNavRef.current?.querySelector(
+          'button[aria-label="Close menu"]'
+        );
+        closeButton?.focus();
+      }, 100);
+    } else {
+      // When closing, focus the menu button
+      mobileMenuButtonRef.current?.focus();
+    }
+  };
+
+  // Handle escape key for mobile navigation
+  useEffect(() => {
+    const handleEscapeKey = event => {
+      if (event.key === 'Escape') {
+        if (isMobileNavOpen) {
+          setIsMobileNavOpen(false);
+        }
+        if (isMobileSearchOpen) {
+          setIsMobileSearchOpen(false);
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => {
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [isMobileNavOpen, isMobileSearchOpen]);
+
+  // Body scroll lock when mobile nav is open
+  useEffect(() => {
+    if (isMobileNavOpen || isMobileSearchOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileNavOpen, isMobileSearchOpen]);
+
   return (
     <>
       <header className={styles.headerWrapper}>
@@ -329,8 +396,11 @@ export default function HeaderV2() {
                     </Link>
 
                     <button
-                      className={`${styles.actionButton} ${styles.mobileMenu}`}
-                      onClick={() => setIsMobileNavOpen(true)}
+                      className={styles.actionButton}
+                      onClick={handleMobileNavToggle}
+                      aria-label="Open menu"
+                      aria-expanded={isMobileNavOpen}
+                      ref={mobileMenuButtonRef}
                     >
                       <Menu />
                     </button>
@@ -432,9 +502,10 @@ export default function HeaderV2() {
 
               {/* Add sidebar toggle for sticky header */}
               <button
-                className={`${styles.actionButton} ${styles.mobileMenu}`}
-                onClick={() => setIsMobileNavOpen(true)}
+                className={styles.actionButton}
+                onClick={handleMobileNavToggle}
                 aria-label="Open menu"
+                aria-expanded={isMobileNavOpen}
               >
                 <Menu />
               </button>
@@ -447,6 +518,9 @@ export default function HeaderV2() {
           className={`${styles.mobileNav} ${
             isMobileNavOpen ? styles.mobileNavActive : ''
           }`}
+          ref={mobileNavRef}
+          role="navigation"
+          aria-label="Mobile navigation"
         >
           <div className={styles.mobileNavHeader}>
             <Image
@@ -459,7 +533,11 @@ export default function HeaderV2() {
             />
             <button
               className={styles.actionButton}
-              onClick={() => setIsMobileNavOpen(false)}
+              onClick={() => {
+                setIsMobileNavOpen(false);
+                setIsMobileShopOpen(false);
+                setActiveMobileCategory(null);
+              }}
               aria-label="Close menu"
             >
               <Close />
@@ -477,75 +555,126 @@ export default function HeaderV2() {
                 </Link>
               </li>
               <li>
+                <div className={styles.mobileCategory}>
+                  <button
+                    className={styles.mobileCategoryHeader}
+                    onClick={toggleMobileShop}
+                    aria-expanded={isMobileShopOpen}
+                  >
+                    <span className={styles.mobileCategoryTitle}>SHOP</span>
+                    <svg
+                      style={{ color: 'black' }}
+                      className={`${styles.mobileDropdownIcon} ${
+                        isMobileShopOpen ? styles.active : ''
+                      }`}
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+                  <div
+                    className={`${styles.mobileSubCategories} ${
+                      isMobileShopOpen ? styles.active : ''
+                    }`}
+                  >
+                    {/* All Products Link */}
+                    <button
+                      className={styles.subCategoryLink}
+                      onClick={() => {
+                        router.push('/shop');
+                        setIsMobileNavOpen(false);
+                      }}
+                    >
+                      All Products
+                    </button>
+
+                    {/* Category Links */}
+                    {filteredCategories.map(category => (
+                      <div
+                        key={category._id}
+                        className={styles.mobileSubCategory}
+                      >
+                        {category.children && category.children.length > 0 ? (
+                          <>
+                            <button
+                              className={styles.mobileSubCategoryHeader}
+                              onClick={() => toggleMobileCategory(category._id)}
+                              aria-expanded={
+                                activeMobileCategory === category._id
+                              }
+                            >
+                              <span className={styles.mobileSubCategoryTitle}>
+                                {category.parent}
+                              </span>
+                              <svg
+                                className={`${styles.mobileSubDropdownIcon} ${
+                                  activeMobileCategory === category._id
+                                    ? styles.active
+                                    : ''
+                                }`}
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M19 9l-7 7-7-7"
+                                />
+                              </svg>
+                            </button>
+                            <div
+                              className={`${styles.mobileSubSubCategories} ${
+                                activeMobileCategory === category._id
+                                  ? styles.active
+                                  : ''
+                              }`}
+                            >
+                              {category.children?.map((child, index) => (
+                                <button
+                                  key={index}
+                                  className={styles.subSubCategoryLink}
+                                  onClick={() =>
+                                    handleChildCategoryRoute(
+                                      category.parent,
+                                      child
+                                    )
+                                  }
+                                >
+                                  {child}
+                                </button>
+                              ))}
+                            </div>
+                          </>
+                        ) : (
+                          <button
+                            className={styles.subCategoryLink}
+                            onClick={() => handleCategoryRoute(category.parent)}
+                          >
+                            {category.parent}
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </li>
+              <li>
                 <Link
-                  href="/shop"
+                  href="/about"
                   className={styles.navLink}
                   onClick={() => setIsMobileNavOpen(false)}
                 >
-                  SHOP
+                  ABOUT
                 </Link>
-                {filteredCategories.map(category => (
-                  <div key={category._id} className={styles.mobileCategory}>
-                    {category.children && category.children.length > 0 ? (
-                      <>
-                        <button
-                          className={styles.mobileCategoryHeader}
-                          onClick={() => toggleMobileCategory(category._id)}
-                          aria-expanded={activeMobileCategory === category._id}
-                        >
-                          <span className={styles.mobileCategoryTitle}>
-                            {category.parent}
-                          </span>
-                          <svg
-                            className={`${styles.mobileDropdownIcon} ${
-                              activeMobileCategory === category._id
-                                ? styles.active
-                                : ''
-                            }`}
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 9l-7 7-7-7"
-                            />
-                          </svg>
-                        </button>
-                        <div
-                          className={`${styles.mobileSubCategories} ${
-                            activeMobileCategory === category._id
-                              ? styles.active
-                              : ''
-                          }`}
-                        >
-                          {category.children?.map((child, index) => (
-                            <button
-                              key={index}
-                              className={styles.subCategoryLink}
-                              onClick={() =>
-                                handleChildCategoryRoute(category.parent, child)
-                              }
-                            >
-                              {child}
-                            </button>
-                          ))}
-                        </div>
-                      </>
-                    ) : (
-                      <button
-                        className={styles.mobileCategoryHeader}
-                        onClick={() => handleCategoryRoute(category.parent)}
-                      >
-                        <span className={styles.mobileCategoryTitle}>
-                          {category.parent}
-                        </span>
-                      </button>
-                    )}
-                  </div>
-                ))}
               </li>
               <li>
                 <Link
@@ -559,6 +688,19 @@ export default function HeaderV2() {
             </ul>
           </div>
         </div>
+
+        {/* Mobile Navigation Backdrop */}
+        <div
+          className={`${styles.mobileNavBackdrop} ${
+            isMobileNavOpen ? styles.mobileNavBackdropActive : ''
+          }`}
+          onClick={() => {
+            setIsMobileNavOpen(false);
+            setIsMobileShopOpen(false);
+            setActiveMobileCategory(null);
+          }}
+          aria-hidden="true"
+        />
 
         {/* Dropdown Menu (for Shop) */}
         <div
@@ -605,14 +747,12 @@ export default function HeaderV2() {
         {/* Cart Mini Sidebar */}
         <CartMiniSidebar />
 
-        {/* Add this close backdrop to the existing code with the other backdrop */}
-        {(isMobileNavOpen || isMobileSearchOpen) && (
+        {/* Mobile Search Backdrop */}
+        {isMobileSearchOpen && (
           <div
             className={styles.backdrop}
-            onClick={() => {
-              setIsMobileNavOpen(false);
-              setIsMobileSearchOpen(false);
-            }}
+            onClick={closeSearch}
+            aria-hidden="true"
           />
         )}
       </header>
