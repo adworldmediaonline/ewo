@@ -371,7 +371,7 @@
   line-height: 1.3;
   margin: 0 0 8px 0;
   color: #333;
-  min-height: 48px;
+  /* min-height: 48px; */
   height: auto;
   width: 100%;
 }
@@ -600,7 +600,7 @@
 
   .productCard :global(.tp-product-title-2) {
     font-size: 16px;
-    height: 42px;
+    /* height: 42px; */
   }
 
   .addToCartBtn {
@@ -621,7 +621,7 @@
 
   .productCard :global(.tp-product-title-2) {
     font-size: 15px;
-    height: 39px;
+    /* height: 39px; */
   }
 }
 
@@ -802,7 +802,7 @@
 
   .productCard :global(.tp-product-title-2 a) {
     font-size: 0.95rem;
-    height: 2.6em;
+    /* height: 2.6em; */
   }
 
   /* Hide tooltips on mobile */
