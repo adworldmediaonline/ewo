@@ -85,18 +85,6 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-
-          {/* Help */}
-          <div className={styles.footerColumn}>
-            <h3 className={styles.footerTitle}>Help</h3>
-            <ul className={styles.footerLinks}>
-              <li className={styles.footerLink}>
-                <Link href="#" className={styles.footerLinkAnchor}>
-                  FAQs
-                </Link>
-              </li>
-            </ul>
-          </div>
         </div>
 
         {/* Footer Bottom */}
