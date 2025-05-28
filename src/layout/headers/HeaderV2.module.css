@@ -1607,9 +1607,42 @@
 /* Hide sticky header on very small screens */
 @media (max-width: 575px) {
   .stickyHeader {
+    display: block;
+  }
+
+  .stickyHeaderContent {
+    padding: 0.25rem 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .stickyHeader .desktopLogo {
     display: none;
   }
+
+  .stickyHeader .mobileLogo {
+    width: 60px !important;
+    height: auto;
+  }
+
+  .stickyHeader .actions {
+    gap: 0.5rem;
+  }
+
+  .stickyHeader .actionButton {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+  }
+
+  .stickyHeader .actionBadge {
+    font-size: 0.7rem;
+    min-width: 16px;
+    height: 16px;
+    top: -4px;
+    right: -4px;
+  }
 }
+
 /* Adjust sticky header for medium screens */
 @media (max-width: 1023px) {
   .stickyNav {
@@ -1618,10 +1651,19 @@
 
   .stickyHeaderContent {
     padding: 0.25rem 0.75rem;
+    gap: 0.75rem;
   }
 
   .stickyHeader .desktopLogo {
     width: 80px !important;
+  }
+
+  .stickyHeader .mobileLogo {
+    width: 70px !important;
+  }
+
+  .stickyHeader .actions {
+    gap: 0.75rem;
   }
 }
 
