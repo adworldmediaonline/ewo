@@ -42,7 +42,7 @@ const ShopContent = ({
       <div className={styles.shopContentContainer}>
         <div className={styles.shopLayout}>
           {!shop_right && !hidden_sidebar && (
-            <div className={styles.shopSidebar}>
+            <div className={`d-none d-lg-block ${styles.shopSidebar}`}>
               <div className={styles.filterSection}>
                 {/* filter */}
                 <PriceFilter
@@ -114,7 +114,7 @@ const ShopContent = ({
           </div>
 
           {shop_right && (
-            <div className={styles.shopSidebar}>
+            <div className={`d-none d-lg-block ${styles.shopSidebar}`}>
               <div className={styles.filterSection}>
                 {/* filter */}
                 <PriceFilter
