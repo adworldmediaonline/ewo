@@ -161,12 +161,6 @@ export default function HeaderV2() {
     setIsMobileNavOpen(false);
   };
 
-  // Close mobile nav on route change
-  useEffect(() => {
-    setIsMobileNavOpen(false);
-    setIsMobileSearchOpen(false);
-  }, []);
-
   // Filter categories to only show ones with products and status 'Show'
   const filteredCategories =
     categories?.result?.filter(
