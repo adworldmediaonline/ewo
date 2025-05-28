@@ -57,8 +57,12 @@ export default function HeaderV2() {
       const currentScrollPos = window.scrollY;
       const scrollDelta = currentScrollPos - prevScrollPos.current;
 
+      // Use different thresholds for different screen sizes
+      const isMobile = window.innerWidth <= 768;
+      const threshold = isMobile ? 100 : 200;
+
       // Show sticky header when scrolling past threshold
-      if (currentScrollPos > 200) {
+      if (currentScrollPos > threshold) {
         setShowStickyHeader(true);
       } else {
         setShowStickyHeader(false);
