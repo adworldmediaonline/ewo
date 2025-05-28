@@ -280,28 +280,18 @@ export default function HeaderV2() {
       toggleDebounceRef.current = false;
     }, 300); // 300ms debounce
 
-    const newState = !isMobileNavOpen;
-    setIsMobileNavOpen(newState);
+    // Use functional update to ensure we get the latest state
+    setIsMobileNavOpen(prevState => {
+      const newState = !prevState;
 
-    // Reset states when closing
-    if (!newState) {
-      setIsMobileShopOpen(false);
-      setActiveMobileCategory(null);
-    }
+      // Reset states when closing
+      if (!newState) {
+        setIsMobileShopOpen(false);
+        setActiveMobileCategory(null);
+      }
 
-    // Focus management
-    if (newState) {
-      // When opening, focus the close button inside the nav
-      setTimeout(() => {
-        const closeButton = mobileNavRef.current?.querySelector(
-          'button[aria-label="Close menu"]'
-        );
-        closeButton?.focus();
-      }, 100);
-    } else {
-      // When closing, focus the menu button
-      mobileMenuButtonRef.current?.focus();
-    }
+      return newState;
+    });
   };
 
   // Handle escape key for mobile navigation
@@ -321,7 +311,7 @@ export default function HeaderV2() {
     return () => {
       document.removeEventListener('keydown', handleEscapeKey);
     };
-  }, [isMobileNavOpen, isMobileSearchOpen]);
+  }, []); // Remove dependencies to prevent re-running
 
   // Body scroll lock when mobile nav is open
   useEffect(() => {
