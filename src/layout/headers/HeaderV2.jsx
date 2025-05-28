@@ -33,6 +33,8 @@ export default function HeaderV2() {
   const prevScrollPos = useRef(0);
   const [activeDropdownButton, setActiveDropdownButton] = useState(null);
   const dropdownTimeoutRef = useRef(null);
+  const mobileNavRef = useRef(null);
+  const mobileMenuButtonRef = useRef(null);
 
   // Fetch categories
   const { data: categories, isLoading: categoriesLoading } =
@@ -265,6 +267,59 @@ export default function HeaderV2() {
     return {};
   };
 
+  // Handle mobile navigation
+  const handleMobileNavToggle = () => {
+    const newState = !isMobileNavOpen;
+    setIsMobileNavOpen(newState);
+
+    // Focus management
+    if (newState) {
+      // When opening, focus the close button inside the nav
+      setTimeout(() => {
+        const closeButton = mobileNavRef.current?.querySelector(
+          'button[aria-label="Close menu"]'
+        );
+        closeButton?.focus();
+      }, 100);
+    } else {
+      // When closing, focus the menu button
+      mobileMenuButtonRef.current?.focus();
+    }
+  };
+
+  // Handle escape key for mobile navigation
+  useEffect(() => {
+    const handleEscapeKey = event => {
+      if (event.key === 'Escape') {
+        if (isMobileNavOpen) {
+          setIsMobileNavOpen(false);
+        }
+        if (isMobileSearchOpen) {
+          setIsMobileSearchOpen(false);
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => {
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [isMobileNavOpen, isMobileSearchOpen]);
+
+  // Body scroll lock when mobile nav is open
+  useEffect(() => {
+    if (isMobileNavOpen || isMobileSearchOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileNavOpen, isMobileSearchOpen]);
+
   return (
     <>
       <header className={styles.headerWrapper}>
@@ -329,8 +384,11 @@ export default function HeaderV2() {
                     </Link>
 
                     <button
-                      className={`${styles.actionButton} ${styles.mobileMenu}`}
-                      onClick={() => setIsMobileNavOpen(true)}
+                      className={styles.actionButton}
+                      onClick={handleMobileNavToggle}
+                      aria-label="Open menu"
+                      aria-expanded={isMobileNavOpen}
+                      ref={mobileMenuButtonRef}
                     >
                       <Menu />
                     </button>
@@ -432,9 +490,10 @@ export default function HeaderV2() {
 
               {/* Add sidebar toggle for sticky header */}
               <button
-                className={`${styles.actionButton} ${styles.mobileMenu}`}
-                onClick={() => setIsMobileNavOpen(true)}
+                className={styles.actionButton}
+                onClick={handleMobileNavToggle}
                 aria-label="Open menu"
+                aria-expanded={isMobileNavOpen}
               >
                 <Menu />
               </button>
@@ -447,6 +506,9 @@ export default function HeaderV2() {
           className={`${styles.mobileNav} ${
             isMobileNavOpen ? styles.mobileNavActive : ''
           }`}
+          ref={mobileNavRef}
+          role="navigation"
+          aria-label="Mobile navigation"
         >
           <div className={styles.mobileNavHeader}>
             <Image
@@ -560,6 +622,15 @@ export default function HeaderV2() {
           </div>
         </div>
 
+        {/* Mobile Navigation Backdrop */}
+        <div
+          className={`${styles.mobileNavBackdrop} ${
+            isMobileNavOpen ? styles.mobileNavBackdropActive : ''
+          }`}
+          onClick={() => setIsMobileNavOpen(false)}
+          aria-hidden="true"
+        />
+
         {/* Dropdown Menu (for Shop) */}
         <div
           id="shop-dropdown"
@@ -605,14 +676,12 @@ export default function HeaderV2() {
         {/* Cart Mini Sidebar */}
         <CartMiniSidebar />
 
-        {/* Add this close backdrop to the existing code with the other backdrop */}
-        {(isMobileNavOpen || isMobileSearchOpen) && (
+        {/* Mobile Search Backdrop */}
+        {isMobileSearchOpen && (
           <div
             className={styles.backdrop}
-            onClick={() => {
-              setIsMobileNavOpen(false);
-              setIsMobileSearchOpen(false);
-            }}
+            onClick={closeSearch}
+            aria-hidden="true"
           />
         )}
       </header>
