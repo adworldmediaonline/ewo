@@ -1981,3 +1981,204 @@
     font-size: 0.875rem;
   }
 }
+
+/* Checkout Header Variant */
+.checkoutHeaderLayout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 0;
+  min-height: 120px;
+  height: 120px;
+}
+
+.checkoutLogoContainer {
+  flex-shrink: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.checkoutLogoContainer img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.checkoutLogo {
+  display: block !important;
+}
+
+/* Remove old desktop/mobile logo visibility rules */
+.checkoutHeaderLayout .desktopLogo,
+.checkoutHeaderLayout .mobileLogo {
+  display: none;
+}
+
+/* Responsive logo sizing */
+@media (max-width: 1023px) {
+  .checkoutLogo {
+    height: 65px !important;
+    max-width: 150px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .checkoutLogo {
+    height: 65px !important;
+    max-width: 130px !important;
+  }
+}
+
+.checkoutNav {
+  flex-shrink: 0;
+}
+
+.checkoutNavList {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  height: 40px;
+}
+
+.checkoutNavLink {
+  color: white;
+  font-weight: 500;
+  font-size: 14px;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 0;
+  height: 40px;
+  line-height: 1.2;
+}
+
+.checkoutNavLink:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.checkoutSearchContainer {
+  flex: 1;
+  max-width: 350px;
+  margin: 0 20px;
+}
+
+.checkoutSearchContainer :global(.search-form input) {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  transition: all 0.3s ease;
+  height: 40px;
+  font-size: 14px;
+  padding: 0 16px;
+}
+
+.checkoutSearchContainer :global(.search-form input::placeholder) {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.checkoutSearchContainer :global(.search-form button) {
+  color: white;
+  width: 40px;
+  height: 40px;
+}
+
+.checkoutSearchContainer :global(.search-form button:hover) {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Action buttons in checkout header */
+.checkoutHeaderLayout .actions {
+  gap: 10px;
+}
+
+.checkoutHeaderLayout .actionButton {
+  padding: 8px;
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 1024px) {
+  .checkoutHeaderLayout {
+    gap: 16px;
+    padding: 16px 0;
+    min-height: 90px;
+    height: 90px;
+  }
+
+  .checkoutSearchContainer {
+    max-width: 300px;
+    margin: 0 16px;
+  }
+
+  .checkoutNavList {
+    gap: 20px;
+    height: 36px;
+  }
+
+  .checkoutNavLink {
+    font-size: 13px;
+    height: 36px;
+    padding: 4px 0;
+  }
+
+  .checkoutHeaderLayout .actionButton {
+    min-width: 36px;
+    height: 36px;
+    padding: 6px;
+  }
+}
+
+@media (max-width: 768px) {
+  .checkoutNavList {
+    display: none;
+  }
+
+  .checkoutSearchContainer {
+    display: none;
+  }
+
+  .checkoutHeaderLayout {
+    gap: 12px;
+    padding: 16px 0;
+    min-height: 90px;
+    height: 90px;
+  }
+
+  .checkoutHeaderLayout .actionButton {
+    min-width: 36px;
+    height: 36px;
+    padding: 6px;
+  }
+}
+
+/* Desktop logo visibility in checkout header */
+.checkoutHeaderLayout .desktopLogo {
+  display: block;
+}
+
+.checkoutHeaderLayout .mobileLogo {
+  display: none;
+}
+
+/* Mobile logo visibility in checkout header */
+@media (max-width: 1023px) {
+  .checkoutHeaderLayout .desktopLogo {
+    display: none;
+  }
+
+  .checkoutHeaderLayout .mobileLogo {
+    display: block;
+  }
+}
