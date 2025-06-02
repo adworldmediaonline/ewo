@@ -12,20 +12,28 @@
 .checkoutGrid {
   display: grid;
   grid-template-columns: 1fr 400px;
-  gap: 40px;
+  gap: 0;
   align-items: start;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .leftColumn {
   background: white;
-  border-radius: 12px;
+  border-radius: 12px 0 0 12px;
   padding: 32px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-right: 1px solid #d1d5db;
 }
 
 .rightColumn {
+  background: white;
+  border-radius: 0 12px 12px 0;
+  padding: 32px;
   position: sticky;
   top: 20px;
+  border-left: 1px solid #d1d5db;
+  margin-left: -1px;
 }
 
 .guestSection {
@@ -33,8 +41,19 @@
   border: 1px solid #dee2e6;
   border-radius: 8px;
   padding: 16px 20px;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  position: relative;
+}
+
+.guestSection::after {
+  content: '';
+  position: absolute;
+  bottom: -16px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #e5e7eb;
 }
 
 .guestContent {
@@ -103,28 +122,38 @@
 
 .returnToShopBtn {
   display: inline-block;
-  background: #4f46e5;
+  background: #cb0102;
   color: white;
   padding: 12px 24px;
   border-radius: 8px;
   text-decoration: none;
   font-weight: 500;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(203, 1, 2, 0.25);
 }
 
 .returnToShopBtn:hover {
-  background: #4338ca;
+  background: #a50002;
   color: white;
   text-decoration: none;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(203, 1, 2, 0.35);
 }
 
 @media (max-width: 1024px) {
   .checkoutGrid {
     grid-template-columns: 1fr;
-    gap: 30px;
+    gap: 0;
+  }
+
+  .leftColumn {
+    border-radius: 12px 12px 0 0;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
   }
 
   .rightColumn {
+    border-radius: 0 0 12px 12px;
     position: relative;
     top: 0;
   }
@@ -136,6 +165,10 @@
   }
 
   .leftColumn {
+    padding: 24px;
+  }
+
+  .rightColumn {
     padding: 24px;
   }
 }

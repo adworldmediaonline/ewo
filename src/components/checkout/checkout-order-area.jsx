@@ -129,81 +129,57 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
       <h3 className={styles.summaryTitle}>Your Order</h3>
 
       <div className={styles.productList}>
-        <ul>
-          <li className="tp-order-info-list-header">
-            <h4>Product</h4>
-            <h4>Total</h4>
-          </li>
-
-          {cart_products.map(item => (
-            <li key={item._id} className={styles.productItem}>
-              <div className="d-flex align-items-start justify-content-between w-100">
-                <div className={styles.productDetails}>
-                  <p className={styles.productName}>
-                    {item.title}
-                    {item.selectedOption && (
-                      <span className={styles.productOption}>
-                        Option: {item.selectedOption.title} (+$
-                        {Number(item.selectedOption.price).toFixed(2)})
-                      </span>
-                    )}
-                  </p>
-
-                  <div className={styles.quantityControls}>
-                    <button
-                      type="button"
-                      onClick={() => handleDecrement(item)}
-                      className={styles.quantityBtn}
-                      disabled={
-                        isCheckoutSubmit ||
-                        processingPayment ||
-                        item.orderQuantity <= 1
-                      }
-                      title="Decrease quantity"
-                    >
-                      <Minus width={14} height={14} />
-                    </button>
-                    <span className={styles.quantityValue}>
-                      {item.orderQuantity}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => handleAddProduct(item)}
-                      className={styles.quantityBtn}
-                      disabled={isCheckoutSubmit || processingPayment}
-                      title="Increase quantity"
-                    >
-                      <Plus width={14} height={14} />
-                    </button>
-                    <span className={styles.productPrice}>
-                      ${item.price.toFixed(2)} each
-                    </span>
-                  </div>
-                </div>
-                <span className={styles.productTotal}>
-                  ${(item.price * item.orderQuantity).toFixed(2)}
+        {cart_products.map(item => (
+          <div key={item._id} className={styles.productItem}>
+            <div className={styles.productImage}>
+              <img
+                src={item.img || '/placeholder-product.png'}
+                alt={item.title}
+                className={styles.productImage}
+              />
+            </div>
+            <div className={styles.productDetails}>
+              <h4 className={styles.productName}>{item.title}</h4>
+              {item.selectedOption && (
+                <p className={styles.productOption}>
+                  {item.selectedOption.title} (+$
+                  {Number(item.selectedOption.price).toFixed(2)})
+                </p>
+              )}
+              <div className={styles.quantityControls}>
+                <button
+                  type="button"
+                  onClick={() => handleDecrement(item)}
+                  className={styles.quantityBtn}
+                  disabled={
+                    isCheckoutSubmit ||
+                    processingPayment ||
+                    item.orderQuantity <= 1
+                  }
+                >
+                  <Minus width={12} height={12} />
+                </button>
+                <span className={styles.quantityValue}>
+                  {item.orderQuantity}
                 </span>
+                <button
+                  type="button"
+                  onClick={() => handleAddProduct(item)}
+                  className={styles.quantityBtn}
+                  disabled={isCheckoutSubmit || processingPayment}
+                >
+                  <Plus width={12} height={12} />
+                </button>
               </div>
-            </li>
-          ))}
-        </ul>
+            </div>
+            <div className={styles.productTotal}>
+              ${(item.price * item.orderQuantity).toFixed(2)}
+            </div>
+          </div>
+        ))}
       </div>
 
       <div className={styles.discountSection}>
-        <div className={styles.discountHeader}>
-          <svg
-            className={styles.discountIcon}
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path
-              fillRule="evenodd"
-              d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <span className={styles.discountTitle}>Discount code</span>
-        </div>
         <div className={styles.discountForm}>
           <input
             ref={couponRef}
@@ -225,226 +201,70 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
       </div>
 
       <div className={styles.summaryBreakdown}>
-        <ul>
-          <li className="tp-order-info-list-shipping">
-            <span>Shipping</span>
-            <div className="tp-order-info-list-shipping-item d-flex flex-column align-items-end">
-              <span className="calculated-shipping">
-                <input
-                  {...register(`shippingOption`, {
-                    required: `Shipping Option is required!`,
-                  })}
-                  id="calculated_shipping"
-                  type="radio"
-                  name="shippingOption"
-                  defaultChecked
-                />
-                <label
-                  onClick={() => handleShippingCost(totalShippingCost)}
-                  htmlFor="calculated_shipping"
-                >
-                  Calculated Shipping:{' '}
-                  <span>${totalShippingCost.toFixed(2)}</span>
-                  {discountPercentage > 0 && (
-                    <span className="shipping-discount-badge text-white ms-2 badge bg-success">
-                      {discountPercentage}% off
-                    </span>
-                  )}
-                </label>
-                <ErrorMsg msg={errors?.shippingOption?.message} />
+        <div className={styles.summaryRow}>
+          <span className={styles.summaryLabel}>Subtotal</span>
+          <span className={styles.summaryValue}>${total.toFixed(2)}</span>
+        </div>
+
+        <div className={styles.summaryRow}>
+          <span className={styles.summaryLabel}>Shipping</span>
+          <span className={styles.summaryValue}>
+            ${totalShippingCost.toFixed(2)}
+            {discountPercentage > 0 && (
+              <span className={styles.discountBadge}>
+                {discountPercentage}% off
               </span>
-            </div>
-          </li>
+            )}
+          </span>
+        </div>
 
-          <li className={styles.summaryRow}>
-            <span className={styles.summaryLabel}>Subtotal</span>
-            <span className={styles.summaryValue}>${total.toFixed(2)}</span>
-          </li>
-
-          <li className={styles.summaryRow}>
-            <span className={styles.summaryLabel}>Shipping</span>
-            <span className={styles.summaryValue}>
-              ${totalShippingCost.toFixed(2)}
-            </span>
-          </li>
-
-          <li className={styles.summaryRow}>
+        {discountAmount + displayAddressDiscount > 0 && (
+          <div className={styles.summaryRow}>
             <span className={styles.summaryLabel}>Discount</span>
             <span className={`${styles.summaryValue} ${styles.discount}`}>
               -${(discountAmount + displayAddressDiscount).toFixed(2)}
             </span>
-          </li>
+          </div>
+        )}
 
-          <li className={styles.summaryRow}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span className={styles.summaryLabel}>Address Discount</span>
-              {displayDiscountMessage && (
-                <div className="ms-2" style={{ position: 'relative' }}>
-                  <div
-                    className="info-icon"
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      width: '20px',
-                      height: '20px',
-                      borderRadius: '50%',
-                      backgroundColor: displayDiscountEligible
-                        ? '#28a745'
-                        : '#f8f9fa',
-                      border: `1px solid ${
-                        displayDiscountEligible ? '#28a745' : '#dc3545'
-                      }`,
-                      color: displayDiscountEligible ? 'white' : '#dc3545',
-                      fontSize: '12px',
-                      fontWeight: 'bold',
-                      cursor: 'pointer',
-                      position: 'relative',
-                      opacity: isCheckoutSubmit ? 0.8 : 1,
-                    }}
-                    title={displayDiscountMessage}
-                  >
-                    {displayDiscountEligible ? '✓' : '!'}
-                    <span
-                      className="tooltip-text"
-                      style={{
-                        visibility: 'hidden',
-                        width: '250px',
-                        backgroundColor: displayDiscountEligible
-                          ? '#28a745'
-                          : '#6c757d',
-                        color: '#fff',
-                        textAlign: 'center',
-                        borderRadius: '6px',
-                        padding: '10px 12px',
-                        position: 'absolute',
-                        zIndex: 1,
-                        bottom: '125%',
-                        left: '50%',
-                        marginLeft: '-125px',
-                        opacity: 0,
-                        transition: 'opacity 0.3s',
-                        boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-                        fontSize: '13px',
-                        pointerEvents: isCheckoutSubmit ? 'none' : 'auto',
-                      }}
-                    >
-                      <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
-                        {displayDiscountEligible
-                          ? '✓ Eligible for Discount'
-                          : 'Not eligible'}
-                      </div>
-                      <div>{displayDiscountMessage}</div>
-                      {!displayDiscountEligible && (
-                        <div
-                          className="mt-2"
-                          style={{
-                            fontSize: '12px',
-                            backgroundColor: 'rgba(0,0,0,0.1)',
-                            padding: '5px',
-                            borderRadius: '4px',
-                          }}
-                        >
-                          <div>
-                            Try a different shipping address to qualify for the
-                            10% discount.
-                          </div>
-                        </div>
-                      )}
-                    </span>
-                  </div>
-                </div>
-              )}
-              {!displayDiscountMessage && !isCheckoutSubmit && !isGuest && (
-                <div className="ms-2">
-                  <span style={{ fontSize: '12px', color: '#6c757d' }}>
-                    (Check eligibility in billing details)
-                  </span>
-                </div>
-              )}
-            </div>
-            <span
-              className={`${styles.summaryValue} ${
-                displayAddressDiscount > 0 ? styles.discount : ''
-              }`}
-            >
-              ${displayAddressDiscount.toFixed(2)}
-              {displayAddressDiscount > 0 && (
-                <span className={styles.discountBadge}>10% OFF</span>
-              )}
-            </span>
-          </li>
-
-          <li className={`${styles.summaryRow} ${styles.summaryTotal}`}>
-            <span className={styles.totalLabel}>Total</span>
-            <span className={styles.totalValue}>
-              ${(totalWithShipping - discountAmount).toFixed(2)}
-              {displayAddressDiscount > 0 && (
-                <div
-                  style={{
-                    fontSize: '13px',
-                    color: '#28a745',
-                    opacity: isCheckoutSubmit ? 0.9 : 1,
-                  }}
-                >
-                  Include 10% discount
-                </div>
-              )}
-            </span>
-          </li>
-        </ul>
+        <div className={`${styles.summaryRow} ${styles.summaryTotal}`}>
+          <span className={styles.totalLabel}>Total</span>
+          <span className={styles.totalValue}>
+            ${(totalWithShipping - discountAmount).toFixed(2)}
+          </span>
+        </div>
       </div>
 
       <div className={styles.paymentSection}>
-        <div className={styles.paymentOption}>
-          <input
-            {...register(`payment`, {
-              required: `Payment Option is required!`,
-            })}
-            type="radio"
-            id="back_transfer"
-            name="payment"
-            value="Card"
-            className={styles.paymentRadio}
-          />
-          <label
-            onClick={() => setShowCard(true)}
-            htmlFor="back_transfer"
-            className={styles.paymentLabel}
-          >
-            Credit Card
-          </label>
-        </div>
-        {showCard && (
-          <div className={styles.cardElement}>
-            <CardElement
-              options={{
-                style: {
-                  base: {
-                    fontSize: '16px',
-                    color: '#424770',
-                    '::placeholder': {
-                      color: '#aab7c4',
-                    },
+        <h4 className={styles.paymentTitle}>Payment Information</h4>
+        <div className={styles.cardElement}>
+          <CardElement
+            options={{
+              style: {
+                base: {
+                  fontSize: '16px',
+                  color: '#424770',
+                  '::placeholder': {
+                    color: '#aab7c4',
                   },
-                  invalid: {
-                    color: '#9e2146',
-                  },
+                  fontFamily: 'var(--font-lato), "Lato", sans-serif',
                 },
-              }}
-            />
-            {cardError && (
-              <div className={styles.paymentError}>
-                <small>Payment could not be processed:</small>
-                <strong>{cardError}</strong>
-                <div>
-                  <small>Please check your card details and try again.</small>
-                </div>
+                invalid: {
+                  color: '#9e2146',
+                },
+              },
+            }}
+          />
+          {cardError && (
+            <div className={styles.paymentError}>
+              <small>Payment could not be processed:</small>
+              <strong>{cardError}</strong>
+              <div>
+                <small>Please check your card details and try again.</small>
               </div>
-            )}
-          </div>
-        )}
-        <ErrorMsg msg={errors?.payment?.message} />
+            </div>
+          )}
+        </div>
       </div>
 
       <button
@@ -465,14 +285,6 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
           'Complete Purchase'
         )}
       </button>
-
-      {cardError && (
-        <div className="text-center mt-3">
-          <small className="text-danger">
-            Please fix the payment errors above before continuing.
-          </small>
-        </div>
-      )}
 
       <div className={styles.securityBadge}>
         <svg
@@ -497,12 +309,27 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
         </div>
       </div>
 
-      <style jsx>{`
-        .info-icon:hover .tooltip-text {
-          visibility: visible;
-          opacity: 1;
-        }
-      `}</style>
+      {/* Hidden payment and shipping inputs for form validation */}
+      <div style={{ display: 'none' }}>
+        <input
+          {...register(`shippingOption`, {
+            required: `Shipping Option is required!`,
+          })}
+          type="radio"
+          name="shippingOption"
+          value="calculated"
+          defaultChecked
+        />
+        <input
+          {...register(`payment`, {
+            required: `Payment Option is required!`,
+          })}
+          type="radio"
+          name="payment"
+          value="Card"
+          defaultChecked
+        />
+      </div>
     </div>
   );
 }
