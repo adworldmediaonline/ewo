@@ -17,6 +17,7 @@ import SearchForm from '@/components/V2/common/SearchForm';
 
 export default function HeaderV2() {
   const { wishlist } = useSelector(state => state.wishlist);
+  const { user } = useSelector(state => state.auth);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [activeMobileCategory, setActiveMobileCategory] = useState(null);
@@ -331,6 +332,49 @@ export default function HeaderV2() {
     };
   }, [isMobileNavOpen, isMobileSearchOpen]);
 
+  // Helper function to get user initials
+  const getUserInitials = name => {
+    if (!name) return 'U';
+
+    const names = name.trim().split(' ');
+    if (names.length === 1) {
+      return names[0].charAt(0).toUpperCase();
+    }
+
+    return (
+      names[0].charAt(0) + names[names.length - 1].charAt(0)
+    ).toUpperCase();
+  };
+
+  // User Profile Component
+  const renderUserProfile = () => {
+    if (user) {
+      return (
+        <Link href="/profile" className={styles.userProfileSimple}>
+          {user.imageURL ? (
+            <Image
+              src={user.imageURL}
+              alt={user.name}
+              width={32}
+              height={32}
+              className={styles.userAvatar}
+            />
+          ) : (
+            <div className={styles.userInitials}>
+              {getUserInitials(user.name)}
+            </div>
+          )}
+        </Link>
+      );
+    }
+
+    return (
+      <Link href="/profile" className={styles.actionButton}>
+        <User />
+      </Link>
+    );
+  };
+
   return (
     <>
       <header className={styles.headerWrapper}>
@@ -390,9 +434,7 @@ export default function HeaderV2() {
                       )}
                     </button>
 
-                    <Link href="/profile" className={styles.actionButton}>
-                      <User />
-                    </Link>
+                    {renderUserProfile()}
 
                     <button
                       className={styles.actionButton}
@@ -500,9 +542,7 @@ export default function HeaderV2() {
                 )}
               </button>
 
-              <Link href="/profile" className={styles.actionButton}>
-                <User />
-              </Link>
+              {renderUserProfile()}
 
               {/* Add sidebar toggle for sticky header */}
               <button
