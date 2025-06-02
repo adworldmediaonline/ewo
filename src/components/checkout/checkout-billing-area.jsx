@@ -260,7 +260,9 @@ const CheckoutBillingArea = ({
         </div>
 
         <div className={styles.formGroup}>
-          <label className={styles.formLabel}>Street address</label>
+          <label className={styles.formLabel}>
+            Street address <span className={styles.required}>*</span>
+          </label>
           <input
             {...register('address', { required: `Address is required!` })}
             name="address"
@@ -275,7 +277,9 @@ const CheckoutBillingArea = ({
 
         <div className={styles.formRowThree}>
           <div className={styles.formGroup}>
-            <label className={styles.formLabel}>City</label>
+            <label className={styles.formLabel}>
+              City <span className={styles.required}>*</span>
+            </label>
             <input
               {...register('city', { required: `City is required!` })}
               name="city"
@@ -289,7 +293,9 @@ const CheckoutBillingArea = ({
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.formLabel}>State</label>
+            <label className={styles.formLabel}>
+              State <span className={styles.required}>*</span>
+            </label>
             <select
               {...register('state', {
                 required: `State is required!`,
@@ -312,7 +318,9 @@ const CheckoutBillingArea = ({
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.formLabel}>ZIP Code</label>
+            <label className={styles.formLabel}>
+              ZIP Code <span className={styles.required}>*</span>
+            </label>
             <input
               {...register('zipCode', {
                 required: `ZIP Code is required!`,
