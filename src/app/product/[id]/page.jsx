@@ -7,7 +7,8 @@ import styles from './product-details.module.css';
 // Fetch product data for metadata
 async function getProductData(id) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
+    const baseUrl =
+      process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:7000';
     const response = await fetch(
       `${baseUrl}/api/product/single-product/${id}`,
       {
@@ -36,12 +37,7 @@ export const generateMetadata = async props => {
       description: 'The requested product could not be found.',
     };
   }
-
-  const title = `${product.title} | East West Off Road`;
-  const description =
-    product.description?.replace(/<[^>]*>/g, '').slice(0, 160) ||
-    `Shop ${product.title} at East West Off Road. Premium automotive & off-road gear.`;
-
+  console.log(product);
   return {
     title: `${product.title} | East West Off Road`,
     description:
@@ -49,7 +45,7 @@ export const generateMetadata = async props => {
       `Shop ${product.title} at East West Off Road. Premium automotive & off-road gear.`,
     keywords: product.metaKeywords ?? '',
     alternates: {
-      canonical: `/product/${params.id}`,
+      canonical: `/product/${product.slug}`,
     },
     openGraph: {
       title: product.title ?? '',
