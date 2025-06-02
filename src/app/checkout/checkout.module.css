@@ -1,6 +1,8 @@
 /* Checkout Page Lato Font Styling */
 .checkoutPage {
   font-family: var(--font-lato), 'Lato', sans-serif;
+  background-color: #f8f9fa;
+  min-height: 100vh;
 }
 
 .checkoutPage * {
@@ -110,5 +112,77 @@
 @media (max-width: 576px) {
   .checkoutPage {
     font-size: 0.85rem;
+  }
+}
+
+.checkoutContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.checkoutHeader {
+  margin-bottom: 40px;
+}
+
+.checkoutTitle {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.checkoutContent {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 40px;
+  align-items: start;
+}
+
+.emptyCart {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.emptyCartTitle {
+  font-size: 24px;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.returnToShopBtn {
+  display: inline-block;
+  background: #4f46e5;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.returnToShopBtn:hover {
+  background: #4338ca;
+  color: white;
+  text-decoration: none;
+}
+
+@media (max-width: 1024px) {
+  .checkoutContent {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .checkoutContainer {
+    padding: 20px 15px;
+  }
+
+  .checkoutTitle {
+    font-size: 28px;
   }
 }

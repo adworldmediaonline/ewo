@@ -1,38 +1,44 @@
 'use client';
-import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import styles from './checkout-coupon.module.css';
 
-const CheckoutCoupon = ({ handleCouponCode, couponRef,couponApplyMsg }) => {
+const CheckoutCoupon = ({ handleCouponCode, couponRef, couponApplyMsg }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { coupon_info } = useSelector((state) => state.coupon);
+  const { coupon_info } = useSelector(state => state.coupon);
+
   return (
-    <div className="tp-checkout-verify-item">
-      <p className="tp-checkout-verify-reveal">
-        Have a coupon?{" "}
+    <div className={styles.couponSection}>
+      <p className={styles.couponTrigger}>
+        Have a coupon?
         <button
           onClick={() => setIsOpen(!isOpen)}
           type="button"
-          className="tp-checkout-coupon-form-reveal-btn"
+          className={styles.couponButton}
         >
           Click here to enter your code
         </button>
       </p>
 
       {isOpen && (
-        <div id="tpCheckoutCouponForm" className="tp-return-customer">
+        <div className={styles.couponForm}>
           <form onSubmit={handleCouponCode}>
-            <div className="tp-return-customer-input">
-              <label>Coupon Code :</label>
-              <input ref={couponRef} type="text" placeholder="Coupon" />
+            <label className={styles.couponLabel}>Coupon Code :</label>
+            <div className={styles.couponInputGroup}>
+              <input
+                ref={couponRef}
+                type="text"
+                placeholder="Coupon"
+                className={styles.couponInput}
+              />
+              <button type="submit" className={styles.couponSubmitBtn}>
+                Apply
+              </button>
             </div>
-            <button
-              type="submit"
-              className="tp-return-customer-btn tp-checkout-btn"
-            >
-              Apply
-            </button>
           </form>
-          {couponApplyMsg && <p className="p-2" style={{color:'green'}}>{couponApplyMsg}</p>}
+          {couponApplyMsg && (
+            <p className={styles.couponMessage}>{couponApplyMsg}</p>
+          )}
         </div>
       )}
     </div>

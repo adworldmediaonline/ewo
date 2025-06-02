@@ -4,6 +4,7 @@ import ErrorMsg from '../common/error-msg';
 import { useSelector, useDispatch } from 'react-redux';
 import { Country, State, City } from 'country-state-city';
 import { reset_address_discount } from '@/redux/features/order/orderSlice';
+import styles from './checkout-billing-area.module.css';
 
 const CheckoutBillingArea = ({
   register,
@@ -17,13 +18,9 @@ const CheckoutBillingArea = ({
   const [showCheckButton, setShowCheckButton] = useState(false);
   const [checkingEligibility, setCheckingEligibility] = useState(false);
 
-  // Get all countries
   const countries = Country.getAllCountries();
-
-  // Find US country for default
   const defaultCountry = countries.find(country => country.isoCode === 'US');
 
-  // States for selections with defaults
   const [selectedCountry, setSelectedCountry] = useState(
     defaultCountry || null
   );
@@ -32,7 +29,6 @@ const CheckoutBillingArea = ({
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
 
-  // Form values to track selections
   const [formValues, setFormValues] = useState({
     country: 'US',
     state: '',
@@ -41,20 +37,17 @@ const CheckoutBillingArea = ({
     zipCode: '',
   });
 
-  // Check if form has enough data to show eligibility button
   useEffect(() => {
     const { address, city, state, country } = formValues;
     setShowCheckButton(address && city && state && country);
   }, [formValues]);
 
-  // Handle manual check for eligibility
   const handleCheckEligibility = () => {
     const { address, city, state, country, zipCode } = formValues;
 
     if (address && city && state && country) {
       setCheckingEligibility(true);
 
-      // Call the eligibility check
       checkAddressDiscount({
         address,
         city,
@@ -69,13 +62,11 @@ const CheckoutBillingArea = ({
     }
   };
 
-  // Load states for default country (US) on initial render
   useEffect(() => {
     if (selectedCountry) {
       const countryStates = State.getStatesOfCountry(selectedCountry.isoCode);
       setStates(countryStates);
 
-      // Set form value
       setFormValues(prev => ({
         ...prev,
         country: selectedCountry.isoCode,
@@ -83,13 +74,11 @@ const CheckoutBillingArea = ({
     }
   }, []);
 
-  // Update states when country changes
   useEffect(() => {
     if (selectedCountry) {
       const countryStates = State.getStatesOfCountry(selectedCountry.isoCode);
       setStates(countryStates);
 
-      // Reset state and city when country changes
       if (selectedState) {
         setSelectedState(null);
         setSelectedCity('');
@@ -103,7 +92,6 @@ const CheckoutBillingArea = ({
     }
   }, [selectedCountry]);
 
-  // Update cities when state changes
   useEffect(() => {
     if (selectedCountry && selectedState) {
       const stateCities = City.getCitiesOfState(
@@ -114,20 +102,17 @@ const CheckoutBillingArea = ({
     }
   }, [selectedCountry, selectedState]);
 
-  // Handle country change
   const handleCountryChange = e => {
     if (isCheckoutSubmitting) return;
 
     const countryCode = e.target.value;
     if (!countryCode) return;
 
-    // Reset address discount eligibility
     dispatch(reset_address_discount());
 
     const country = countries.find(c => c.isoCode === countryCode);
     setSelectedCountry(country);
 
-    // Update form value for country
     setFormValues(prev => ({
       ...prev,
       country: countryCode,
@@ -136,20 +121,17 @@ const CheckoutBillingArea = ({
     }));
   };
 
-  // Handle state change
   const handleStateChange = e => {
     if (isCheckoutSubmitting) return;
 
     const stateCode = e.target.value;
     if (!stateCode) return;
 
-    // Reset address discount eligibility
     dispatch(reset_address_discount());
 
     const state = states.find(s => s.isoCode === stateCode);
     setSelectedState(state);
 
-    // Update form value for state
     setFormValues(prev => ({
       ...prev,
       state: stateCode,
@@ -157,31 +139,26 @@ const CheckoutBillingArea = ({
     }));
   };
 
-  // Handle city change
   const handleCityChange = e => {
     if (isCheckoutSubmitting) return;
 
     const cityName = e.target.value;
 
-    // Reset address discount eligibility
     dispatch(reset_address_discount());
 
     setSelectedCity(cityName);
 
-    // Update form value for city
     setFormValues(prev => ({
       ...prev,
       city: cityName,
     }));
   };
 
-  // Handle address change
   const handleAddressChange = e => {
     if (isCheckoutSubmitting) return;
 
     const address = e.target.value;
 
-    // Reset address discount eligibility
     dispatch(reset_address_discount());
 
     setFormValues(prev => ({
@@ -190,262 +167,225 @@ const CheckoutBillingArea = ({
     }));
   };
 
-  // Handle zip code change
   const handleZipCodeChange = e => {
     if (isCheckoutSubmitting) return;
 
     const zipCode = e.target.value;
 
-    // Reset address discount eligibility
     dispatch(reset_address_discount());
 
-    // Special handling for zipCode to ensure it's properly validated
-    if (zipCode && zipCode.trim() !== '') {
-      // Make sure zipCode is properly set in the form
-      // This is a fallback to ensure zipCode is captured properly
-      setTimeout(() => {
-        setFormValues(prev => ({
-          ...prev,
-          zipCode,
-        }));
-      }, 100);
-    }
+    setTimeout(() => {
+      setFormValues(prev => ({
+        ...prev,
+        zipCode,
+      }));
+    }, 100);
   };
 
   return (
-    <div className="tp-checkout-bill-area">
-      <h3 className="tp-checkout-bill-title">Billing Details</h3>
+    <div className={styles.billingArea}>
+      <h3 className={styles.sectionTitle}>Billing Details</h3>
 
-      <div className="tp-checkout-bill-form">
-        <div className="tp-checkout-bill-inner">
-          <div className="row">
-            <div className="col-md-6">
-              <div className="tp-checkout-input">
-                <label>
-                  First Name <span>*</span>
-                </label>
-                <input
-                  {...register('firstName', {
-                    required: `First Name is required!`,
-                  })}
-                  name="firstName"
-                  id="firstName"
-                  type="text"
-                  placeholder="First Name"
-                  defaultValue={user?.firstName}
-                />
-                <ErrorMsg msg={errors?.firstName?.message} />
-              </div>
-            </div>
-            <div className="col-md-6">
-              <div className="tp-checkout-input">
-                <label>
-                  Last Name <span>*</span>
-                </label>
-                <input
-                  {...register('lastName', {
-                    required: `Last Name is required!`,
-                  })}
-                  name="lastName"
-                  id="lastName"
-                  type="text"
-                  placeholder="Last Name"
-                />
-                <ErrorMsg msg={errors?.lastName?.message} />
-              </div>
-            </div>
-            <div className="col-md-12">
-              <div className="tp-checkout-input">
-                <label>
-                  Country <span>*</span>
-                </label>
-                <select
-                  {...register('country', {
-                    required: `Country is required!`,
-                  })}
-                  name="country"
-                  id="country"
-                  className="w-100 form-select"
-                  onChange={handleCountryChange}
-                  value={formValues.country}
-                >
-                  <option value="">Select Country</option>
-                  {countries.map(country => (
-                    <option key={country.isoCode} value={country.isoCode}>
-                      {country.name}
-                    </option>
-                  ))}
-                </select>
-                {!formValues.country && (
-                  <ErrorMsg msg={errors?.country?.message} />
-                )}
-              </div>
-            </div>
-            <div className="col-md-12">
-              <div className="tp-checkout-input">
-                <label>Street address</label>
-                <input
-                  {...register('address', { required: `Address is required!` })}
-                  name="address"
-                  id="address"
-                  type="text"
-                  placeholder="House number and street name"
-                  onChange={handleAddressChange}
-                />
-                <ErrorMsg msg={errors?.address?.message} />
-              </div>
-            </div>
-            <div className="col-md-6">
-              <div className="tp-checkout-input">
-                <label>
-                  State / Province <span>*</span>
-                </label>
-                <select
-                  {...register('state', {
-                    required: `State is required!`,
-                  })}
-                  name="state"
-                  id="state"
-                  className="w-100 form-select"
-                  onChange={handleStateChange}
-                  value={formValues.state}
-                  disabled={!selectedCountry}
-                >
-                  <option value="">Select State</option>
-                  {states.map(state => (
-                    <option key={state.isoCode} value={state.isoCode}>
-                      {state.name}
-                    </option>
-                  ))}
-                </select>
-                {!formValues.state && <ErrorMsg msg={errors?.state?.message} />}
-              </div>
-            </div>
-            <div className="col-md-6">
-              <div className="tp-checkout-input">
-                <label>Town / City</label>
-                <select
-                  {...register('city', {
-                    required: `City is required!`,
-                  })}
-                  name="city"
-                  id="city"
-                  className="w-100 form-select"
-                  onChange={handleCityChange}
-                  value={formValues.city}
-                  disabled={!selectedState}
-                >
-                  <option value="">Select City</option>
-                  {cities.map(city => (
-                    <option
-                      key={`${city.name}-${city.latitude}`}
-                      value={city.name}
-                    >
-                      {city.name}
-                    </option>
-                  ))}
-                </select>
-                {!formValues.city && <ErrorMsg msg={errors?.city?.message} />}
-              </div>
-            </div>
-            <div className="col-md-6">
-              <div className="tp-checkout-input">
-                <label>Postal Code</label>
-                <input
-                  {...register('zipCode', {
-                    required: `Postal Code is required!`,
-                    onChange: e => handleZipCodeChange(e),
-                  })}
-                  name="zipCode"
-                  id="zipCode"
-                  type="text"
-                  placeholder="Postal Code"
-                />
-                <ErrorMsg msg={errors?.zipCode?.message} />
-              </div>
-            </div>
-
-            {/* Add eligibility check button */}
-            {showCheckButton && !isGuest && (
-              <div className="col-md-12 mt-3 mb-3">
-                <button
-                  type="button"
-                  onClick={handleCheckEligibility}
-                  className="tp-btn-blue w-100"
-                  disabled={checkingEligibility}
-                  style={{
-                    padding: '12px',
-                    fontSize: '14px',
-                    backgroundColor: '#0989FF',
-                    border: 'none',
-                    color: 'white',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                  }}
-                >
-                  {checkingEligibility ? (
-                    <span>
-                      <span
-                        className="spinner-border spinner-border-sm me-2"
-                        role="status"
-                        aria-hidden="true"
-                      ></span>
-                      Checking Address Eligibility...
-                    </span>
-                  ) : (
-                    'Check eligibility (10% discount)'
-                  )}
-                </button>
-              </div>
-            )}
-
-            <div className="col-md-6">
-              <div className="tp-checkout-input">
-                <label>
-                  Phone <span>*</span>
-                </label>
-                <input
-                  {...register('contactNo', {
-                    required: `ContactNumber is required!`,
-                  })}
-                  name="contactNo"
-                  id="contactNo"
-                  type="text"
-                  placeholder="Phone"
-                />
-                <ErrorMsg msg={errors?.contactNo?.message} />
-              </div>
-            </div>
-            <div className="col-md-12">
-              <div className="tp-checkout-input">
-                <label>
-                  Email address <span>*</span>
-                </label>
-                <input
-                  {...register('email', { required: `Email is required!` })}
-                  name="email"
-                  id="email"
-                  type="email"
-                  placeholder="Email"
-                  defaultValue={user?.email}
-                />
-                <ErrorMsg msg={errors?.email?.message} />
-              </div>
-            </div>
-            <div className="col-md-12">
-              <div className="tp-checkout-input">
-                <label>Order notes (optional)</label>
-                <textarea
-                  {...register('orderNote', { required: false })}
-                  name="orderNote"
-                  id="orderNote"
-                  placeholder="Notes about your order, e.g. special notes for delivery."
-                />
-              </div>
-            </div>
+      <div className={styles.formGrid}>
+        <div className={styles.formRow}>
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>
+              First Name <span className={styles.required}>*</span>
+            </label>
+            <input
+              {...register('firstName', {
+                required: `First Name is required!`,
+              })}
+              name="firstName"
+              id="firstName"
+              type="text"
+              placeholder="First Name"
+              defaultValue={user?.firstName}
+              className={styles.formInput}
+            />
+            <ErrorMsg msg={errors?.firstName?.message} />
+          </div>
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>
+              Last Name <span className={styles.required}>*</span>
+            </label>
+            <input
+              {...register('lastName', {
+                required: `Last Name is required!`,
+              })}
+              name="lastName"
+              id="lastName"
+              type="text"
+              placeholder="Last Name"
+              className={styles.formInput}
+            />
+            <ErrorMsg msg={errors?.lastName?.message} />
           </div>
         </div>
+
+        <div className={styles.formGroup}>
+          <label className={styles.formLabel}>
+            Country <span className={styles.required}>*</span>
+          </label>
+          <select
+            {...register('country', {
+              required: `Country is required!`,
+            })}
+            name="country"
+            id="country"
+            className={styles.formSelect}
+            onChange={handleCountryChange}
+            value={formValues.country}
+          >
+            <option value="">Select Country</option>
+            {countries.map(country => (
+              <option key={country.isoCode} value={country.isoCode}>
+                {country.name}
+              </option>
+            ))}
+          </select>
+          {!formValues.country && <ErrorMsg msg={errors?.country?.message} />}
+        </div>
+
+        <div className={styles.formGroup}>
+          <label className={styles.formLabel}>Street address</label>
+          <input
+            {...register('address', { required: `Address is required!` })}
+            name="address"
+            id="address"
+            type="text"
+            placeholder="House number and street name"
+            onChange={handleAddressChange}
+            className={styles.formInput}
+          />
+          <ErrorMsg msg={errors?.address?.message} />
+        </div>
+
+        <div className={styles.formRowThree}>
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>City</label>
+            <input
+              {...register('city', { required: `City is required!` })}
+              name="city"
+              id="city"
+              type="text"
+              placeholder="Enter city"
+              onChange={handleCityChange}
+              value={formValues.city}
+              className={styles.formInput}
+            />
+            {!formValues.city && <ErrorMsg msg={errors?.city?.message} />}
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>State</label>
+            <select
+              {...register('state', {
+                required: `State is required!`,
+              })}
+              name="state"
+              id="state"
+              className={styles.formSelect}
+              onChange={handleStateChange}
+              value={formValues.state}
+              disabled={!selectedCountry}
+            >
+              <option value="">Enter state</option>
+              {states.map(state => (
+                <option key={state.isoCode} value={state.isoCode}>
+                  {state.name}
+                </option>
+              ))}
+            </select>
+            {!formValues.state && <ErrorMsg msg={errors?.state?.message} />}
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>ZIP Code</label>
+            <input
+              {...register('zipCode', {
+                required: `ZIP Code is required!`,
+                onChange: e => handleZipCodeChange(e),
+              })}
+              name="zipCode"
+              id="zipCode"
+              type="text"
+              placeholder="Enter ZIP code"
+              className={styles.formInput}
+            />
+            <ErrorMsg msg={errors?.zipCode?.message} />
+          </div>
+        </div>
+
+        {showCheckButton && !isGuest && (
+          <div className={styles.formGroup}>
+            <button
+              type="button"
+              onClick={handleCheckEligibility}
+              className={styles.eligibilityButton}
+              disabled={checkingEligibility}
+            >
+              {checkingEligibility ? (
+                <span>
+                  <span
+                    className={`spinner-border spinner-border-sm ${styles.spinner}`}
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
+                  Checking Address Eligibility...
+                </span>
+              ) : (
+                'Check eligibility (10% discount)'
+              )}
+            </button>
+          </div>
+        )}
+
+        <div className={styles.formGroup}>
+          <label className={styles.formLabel}>
+            Phone <span className={styles.required}>*</span>
+          </label>
+          <input
+            {...register('contactNo', {
+              required: `ContactNumber is required!`,
+            })}
+            name="contactNo"
+            id="contactNo"
+            type="text"
+            placeholder="Phone"
+            className={styles.formInput}
+          />
+          <ErrorMsg msg={errors?.contactNo?.message} />
+        </div>
+
+        <div className={styles.formGroup}>
+          <label className={styles.formLabel}>
+            Email address <span className={styles.required}>*</span>
+          </label>
+          <input
+            {...register('email', { required: `Email is required!` })}
+            name="email"
+            id="email"
+            type="email"
+            placeholder="Email"
+            defaultValue={user?.email}
+            className={styles.formInput}
+          />
+          <ErrorMsg msg={errors?.email?.message} />
+        </div>
+
+        {/* Uncomment for Order Notes feature
+        <div className={styles.formGroup}>
+          <label className={styles.formLabel}>Order notes (optional)</label>
+          <textarea
+            {...register('orderNote', { required: false })}
+            name="orderNote"
+            id="orderNote"
+            placeholder="Notes about your order, e.g. special notes for delivery."
+            className={styles.formTextarea}
+          />
+        </div>
+        */}
       </div>
     </div>
   );
