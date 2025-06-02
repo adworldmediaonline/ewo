@@ -2,7 +2,7 @@
 .registerSection {
   min-height: 100vh;
   background-color: #f8f9fa;
-  padding: 4rem 0;
+  padding: 2rem 0;
   display: flex;
   align-items: center;
 }
@@ -10,7 +10,7 @@
 .registerWrapper {
   background: #ffffff;
   border-radius: 8px;
-  padding: 3rem 2.5rem;
+  padding: 2rem 2rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e7eb;
   max-width: 420px;
@@ -19,18 +19,18 @@
 
 /* Header Section */
 .registerHeader {
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .brandSection {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 .registerTitle {
   font-size: 2rem;
   font-weight: 600;
   color: #111827;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
   letter-spacing: -0.025em;
 }
 
@@ -46,14 +46,14 @@
   background-color: #eff6ff;
   border: 1px solid #dbeafe;
   border-radius: 6px;
-  padding: 1rem;
-  margin-top: 1.5rem;
+  padding: 0.75rem;
+  margin-top: 1rem;
   text-align: center;
 }
 
 .redirectMessage p {
   color: #1e40af;
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 0.5rem 0;
   font-size: 0.875rem;
   font-weight: 500;
 }
@@ -73,13 +73,13 @@
 
 /* Form Section */
 .registerForm {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 /* Sign In Section */
 .signinSection {
   text-align: center;
-  padding-top: 1.5rem;
+  padding-top: 1rem;
   border-top: 1px solid #f3f4f6;
 }
 
@@ -103,13 +103,13 @@
 
 /* Social Section */
 .socialSection {
-  margin-top: 1.5rem;
+  margin-top: 1rem;
 }
 
 .divider {
   position: relative;
   text-align: center;
-  margin: 1.5rem 0;
+  margin: 1rem 0;
 }
 
 .divider::before {
@@ -135,7 +135,7 @@
 
 .socialPlaceholder {
   text-align: center;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 1rem;
   background-color: #f9fafb;
   border: 1px solid #e5e7eb;
   border-radius: 6px;
@@ -147,12 +147,12 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .registerSection {
-    padding: 2rem 0;
+    padding: 1.5rem 0;
     min-height: auto;
   }
 
   .registerWrapper {
-    padding: 2rem 1.5rem;
+    padding: 1.5rem 1.25rem;
     margin: 1rem;
     border-radius: 6px;
   }
@@ -162,13 +162,13 @@
   }
 
   .registerHeader {
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
   }
 }
 
 @media (max-width: 480px) {
   .registerWrapper {
-    padding: 1.5rem 1rem;
+    padding: 1.25rem 1rem;
   }
 
   .registerTitle {
@@ -176,7 +176,7 @@
   }
 
   .redirectMessage {
-    padding: 0.875rem;
+    padding: 0.625rem;
   }
 }
 
