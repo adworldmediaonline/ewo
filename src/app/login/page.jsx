@@ -16,10 +16,10 @@ export default function LoginPage() {
   return (
     <div className={styles.loginPage}>
       <Wrapper>
-        <HeaderV2 />
-        <CommonBreadcrumb title="Login" subtitle="Login" center={true} />
+        {/* <HeaderV2 /> */}
+        {/* <CommonBreadcrumb title="Login" subtitle="Login" center={true} /> */}
         <LoginArea />
-        <Footer primary_style={true} />
+        {/* <Footer primary_style={true} /> */}
       </Wrapper>
     </div>
   );

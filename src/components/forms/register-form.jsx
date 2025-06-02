@@ -15,9 +15,6 @@ const schema = Yup.object().shape({
   name: Yup.string().required().label('Name'),
   email: Yup.string().required().email().label('Email'),
   password: Yup.string().required().min(6).label('Password'),
-  remember: Yup.bool()
-    .oneOf([true], 'You must agree to the terms and conditions to proceed.')
-    .label('Terms and Conditions'),
 });
 
 export default function RegisterForm({ redirectUrl }) {
@@ -118,23 +115,6 @@ export default function RegisterForm({ redirectUrl }) {
             </div>
           </div>
           <ErrorMsg msg={errors.password?.message} />
-        </div>
-      </div>
-      <div className="tp-login-suggetions d-sm-flex align-items-center justify-content-between mb-20">
-        <div className="tp-login-remeber">
-          <input
-            {...register('remember', {
-              required: `Terms and Conditions is required!`,
-            })}
-            id="remember"
-            name="remember"
-            type="checkbox"
-            disabled={isLoading}
-          />
-          <label htmlFor="remember">
-            I accept the terms of the Service & <a href="#">Privacy Policy</a>.
-          </label>
-          <ErrorMsg msg={errors.remember?.message} />
         </div>
       </div>
       <div className="tp-login-bottom">
