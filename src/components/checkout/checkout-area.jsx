@@ -27,6 +27,7 @@ export default function CheckoutArea() {
     submitHandler,
     register,
     errors,
+    setValue,
     handleCouponCode,
     couponRef,
     couponApplyMsg,
@@ -78,6 +79,7 @@ export default function CheckoutArea() {
                 <CheckoutBillingArea
                   register={register}
                   errors={errors}
+                  setValue={setValue}
                   isGuest={isGuest}
                   checkAddressDiscount={checkAddressDiscountEligibility}
                 />

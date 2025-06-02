@@ -11,6 +11,7 @@ const CheckoutBillingArea = ({
   errors,
   isGuest = false,
   checkAddressDiscount,
+  setValue,
 }) => {
   const { user } = useSelector(state => state.auth);
   const { isCheckoutSubmitting } = useSelector(state => state.order);
@@ -113,6 +114,10 @@ const CheckoutBillingArea = ({
     const country = countries.find(c => c.isoCode === countryCode);
     setSelectedCountry(country);
 
+    setValue('country', countryCode);
+    setValue('state', '');
+    setValue('city', '');
+
     setFormValues(prev => ({
       ...prev,
       country: countryCode,
@@ -132,6 +137,9 @@ const CheckoutBillingArea = ({
     const state = states.find(s => s.isoCode === stateCode);
     setSelectedState(state);
 
+    setValue('state', stateCode);
+    setValue('city', '');
+
     setFormValues(prev => ({
       ...prev,
       state: stateCode,
@@ -148,6 +156,8 @@ const CheckoutBillingArea = ({
 
     setSelectedCity(cityName);
 
+    setValue('city', cityName);
+
     setFormValues(prev => ({
       ...prev,
       city: cityName,
@@ -160,6 +170,8 @@ const CheckoutBillingArea = ({
     const address = e.target.value;
 
     dispatch(reset_address_discount());
+
+    setValue('address', address);
 
     setFormValues(prev => ({
       ...prev,
@@ -174,12 +186,12 @@ const CheckoutBillingArea = ({
 
     dispatch(reset_address_discount());
 
-    setTimeout(() => {
-      setFormValues(prev => ({
-        ...prev,
-        zipCode,
-      }));
-    }, 100);
+    setValue('zipCode', zipCode);
+
+    setFormValues(prev => ({
+      ...prev,
+      zipCode,
+    }));
   };
 
   return (
@@ -235,7 +247,7 @@ const CheckoutBillingArea = ({
             id="country"
             className={styles.formSelect}
             onChange={handleCountryChange}
-            value={formValues.country}
+            defaultValue={formValues.country}
           >
             <option value="">Select Country</option>
             {countries.map(country => (
@@ -244,7 +256,7 @@ const CheckoutBillingArea = ({
               </option>
             ))}
           </select>
-          {!formValues.country && <ErrorMsg msg={errors?.country?.message} />}
+          <ErrorMsg msg={errors?.country?.message} />
         </div>
 
         <div className={styles.formGroup}>
@@ -271,10 +283,9 @@ const CheckoutBillingArea = ({
               type="text"
               placeholder="Enter city"
               onChange={handleCityChange}
-              value={formValues.city}
               className={styles.formInput}
             />
-            {!formValues.city && <ErrorMsg msg={errors?.city?.message} />}
+            <ErrorMsg msg={errors?.city?.message} />
           </div>
 
           <div className={styles.formGroup}>
@@ -287,7 +298,7 @@ const CheckoutBillingArea = ({
               id="state"
               className={styles.formSelect}
               onChange={handleStateChange}
-              value={formValues.state}
+              defaultValue={formValues.state}
               disabled={!selectedCountry}
             >
               <option value="">Enter state</option>
@@ -297,7 +308,7 @@ const CheckoutBillingArea = ({
                 </option>
               ))}
             </select>
-            {!formValues.state && <ErrorMsg msg={errors?.state?.message} />}
+            <ErrorMsg msg={errors?.state?.message} />
           </div>
 
           <div className={styles.formGroup}>
@@ -305,12 +316,12 @@ const CheckoutBillingArea = ({
             <input
               {...register('zipCode', {
                 required: `ZIP Code is required!`,
-                onChange: e => handleZipCodeChange(e),
               })}
               name="zipCode"
               id="zipCode"
               type="text"
               placeholder="Enter ZIP code"
+              onChange={handleZipCodeChange}
               className={styles.formInput}
             />
             <ErrorMsg msg={errors?.zipCode?.message} />

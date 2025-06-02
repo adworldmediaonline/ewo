@@ -288,10 +288,7 @@ const useCheckoutSubmit = () => {
 
   // submitHandler
   const submitHandler = async data => {
-    // Make sure the zipCode field is properly validated
-    if (!data.zipCode || data.zipCode.trim() === '') {
-      return;
-    }
+    console.log('Form submission data:', data);
 
     // Important: Mark checkout as submitting to prevent discount reset
     dispatch(begin_checkout_submission());
@@ -528,6 +525,7 @@ const useCheckoutSubmit = () => {
     setTotal,
     register,
     errors,
+    setValue,
     cardError,
     submitHandler,
     stripe,
