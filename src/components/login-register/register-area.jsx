@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 // import LoginShapes from './login-shapes';
 import RegisterForm from '../forms/register-form';
 import GoogleSignUp from './google-sign-up';
+import styles from './register-area.module.css';
 
 export default function RegisterArea() {
   const searchParams = useSearchParams();
@@ -23,60 +24,61 @@ export default function RegisterArea() {
 
   return (
     <>
-      <section className="tp-login-area pb-140 p-relative z-index-1 fix">
-        {/* <LoginShapes /> */}
+      <section className={`tp-login-area ${styles.registerSection}`}>
         <div className="container">
           <div className="row justify-content-center">
-            <div className="col-xl-6 col-lg-8">
-              <div className="tp-login-wrapper">
-                <div className="tp-login-top text-center mb-30">
-                  <h3 className="tp-login-title">Sign Up EWO.</h3>
-                  <p>
-                    Already have an account?{' '}
-                    <span>
-                      <Link
-                        href={
-                          redirectTo
-                            ? `/login?redirect=${redirectTo}`
-                            : '/login'
-                        }
-                      >
-                        Sign In
-                      </Link>
-                    </span>
-                  </p>
+            <div className="col-xl-5 col-lg-6 col-md-8">
+              <div className={`tp-login-wrapper ${styles.registerWrapper}`}>
+                {/* Clean Header */}
+                <div
+                  className={`tp-login-top text-center ${styles.registerHeader}`}
+                >
+                  <div className={styles.brandSection}>
+                    <h1 className={`tp-login-title ${styles.registerTitle}`}>
+                      Create Account
+                    </h1>
+                    <p className={styles.registerSubtitle}>Join EWO today</p>
+                  </div>
 
+                  {/* Redirect Message */}
                   {redirectMessage && (
-                    <div
-                      className="tp-login-checkout-msg mt-20 p-3"
-                      style={{
-                        backgroundColor: '#f8f9fa',
-                        borderRadius: '5px',
-                      }}
-                    >
+                    <div className={styles.redirectMessage}>
                       <p>{redirectMessage}</p>
-                      <Link href="/checkout" className="tp-login-checkout-link">
-                        Return to checkout
+                      <Link href="/checkout" className={styles.checkoutLink}>
+                        ← Return to checkout
                       </Link>
                     </div>
                   )}
                 </div>
 
-                <div className="tp-login-option">
-                  <div className="tp-login-social mb-10 d-flex flex-wrap align-items-center justify-content-center">
-                    {/* TODO: Add social login REMOVE BELOW COMMENTED CODE */}
-                    {/* <div className="tp-login-option-item has-google">
-                      <GoogleSignUp />
-                    </div> */}
-                  </div>
-                  <div className="tp-login-mail text-center mb-40">
-                    <p>
-                      Sign up with <a href="#">Email</a>
-                    </p>
-                  </div>
-                  {/* form start */}
+                {/* Register Form */}
+                <div className={`tp-login-option ${styles.registerForm}`}>
                   <RegisterForm redirectUrl={redirectTo} />
-                  {/* form end */}
+                </div>
+
+                {/* Sign In Link */}
+                <div className={styles.signinSection}>
+                  <p>
+                    Already have an account?{' '}
+                    <Link
+                      href={
+                        redirectTo ? `/login?redirect=${redirectTo}` : '/login'
+                      }
+                      className={styles.signinLink}
+                    >
+                      Sign in here
+                    </Link>
+                  </p>
+                </div>
+
+                {/* Optional: Social Login Placeholder */}
+                <div className={styles.socialSection}>
+                  <div className={styles.divider}>
+                    <span>or</span>
+                  </div>
+                  <div className={styles.socialPlaceholder}>
+                    <span>More sign-up options coming soon</span>
+                  </div>
                 </div>
               </div>
             </div>

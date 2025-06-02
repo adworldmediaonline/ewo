@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
+import { useRouter } from 'next/navigation';
 // internal
 import Wrapper from '@/layout/wrapper';
 // import LoginShapes from "@/components/login-register/login-shapes";
@@ -10,6 +11,7 @@ import ErrorMsg from '@/components/common/error-msg';
 import { useConfirmForgotPasswordMutation } from '@/redux/features/auth/authApi';
 import { CloseEye, OpenEye } from '@/svg';
 import { notifyError, notifySuccess } from '@/utils/toast';
+import styles from './forgot-password-area.module.css';
 
 // schema
 const schema = Yup.object().shape({
@@ -23,7 +25,9 @@ const schema = Yup.object().shape({
 export default function ForgotPasswordArea({ token }) {
   const [showPass, setShowPass] = useState(false);
   const [showConPass, setShowConPass] = useState(false);
-  const [confirmForgotPassword, {}] = useConfirmForgotPasswordMutation();
+  const [confirmForgotPassword, { isLoading }] =
+    useConfirmForgotPasswordMutation();
+  const router = useRouter();
   // react hook form
   const {
     register,
@@ -43,31 +47,40 @@ export default function ForgotPasswordArea({ token }) {
         notifyError(result?.error?.data?.error);
       } else {
         notifySuccess(result?.data?.message);
+        reset();
+
+        // Redirect to login page after successful password reset
+        setTimeout(() => {
+          router.push('/login?passwordReset=true');
+        }, 2000);
       }
     });
-    reset();
   };
 
   return (
     <Wrapper>
-      <section
-        className="tp-login-area d-flex align-items-center justify-content-center"
-        style={{ height: '100vh' }}
-      >
-        {/* <LoginShapes /> */}
+      <section className={styles.forgotPasswordSection}>
         <div className="container">
           <div className="row justify-content-center">
-            <div className="col-xl-6 col-lg-8">
-              <div className="tp-login-wrapper">
-                <div className="tp-login-top text-center mb-30">
-                  <h3 className="tp-login-title">Forget Password</h3>
-                  <p>Reset Your Password</p>
+            <div className="col-xl-5 col-lg-6 col-md-8">
+              <div className={styles.forgotPasswordWrapper}>
+                {/* Clean Header */}
+                <div className={styles.forgotPasswordHeader}>
+                  <div className={styles.brandSection}>
+                    <h1 className={styles.forgotPasswordTitle}>
+                      Set New Password
+                    </h1>
+                    <p className={styles.forgotPasswordSubtitle}>
+                      Enter your new password below
+                    </p>
+                  </div>
                 </div>
-                <div className="tp-login-option">
-                  {/* form start */}
+
+                {/* Password Reset Form */}
+                <div className={styles.forgotPasswordForm}>
                   <form onSubmit={handleSubmit(onSubmit)}>
                     <div className="tp-login-input-wrapper">
-                      {/* password */}
+                      {/* Password Field */}
                       <div className="tp-login-input-box">
                         <div className="p-relative">
                           <div className="tp-login-input">
@@ -79,6 +92,7 @@ export default function ForgotPasswordArea({ token }) {
                               name="password"
                               type={showPass ? 'text' : 'password'}
                               placeholder="Min. 6 character"
+                              disabled={isLoading}
                             />
                           </div>
                           <div
@@ -93,12 +107,13 @@ export default function ForgotPasswordArea({ token }) {
                             </span>
                           </div>
                           <div className="tp-login-input-title">
-                            <label htmlFor="password">Password</label>
+                            <label htmlFor="password">New Password</label>
                           </div>
                         </div>
                         <ErrorMsg msg={errors.password?.message} />
                       </div>
-                      {/* confirm password */}
+
+                      {/* Confirm Password Field */}
                       <div className="tp-login-input-box">
                         <div className="p-relative">
                           <div className="tp-login-input">
@@ -108,6 +123,7 @@ export default function ForgotPasswordArea({ token }) {
                               placeholder="Confirm Password"
                               name="confirmPassword"
                               id="confirmPassword"
+                              disabled={isLoading}
                             />
                           </div>
                           <div
@@ -132,12 +148,26 @@ export default function ForgotPasswordArea({ token }) {
                     </div>
 
                     <div className="tp-login-bottom">
-                      <button type="submit" className="tp-login-btn w-100">
-                        Confirm password
+                      <button
+                        type="submit"
+                        className="tp-login-btn w-100"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? (
+                          <span>
+                            <span
+                              className="spinner-border spinner-border-sm me-2"
+                              role="status"
+                              aria-hidden="true"
+                            ></span>
+                            Updating Password...
+                          </span>
+                        ) : (
+                          'Update Password'
+                        )}
                       </button>
                     </div>
                   </form>
-                  {/* form end */}
                 </div>
               </div>
             </div>

@@ -16,10 +16,10 @@ export default function RegisterPage() {
   return (
     <div className={styles.registerPage}>
       <Wrapper>
-        <HeaderV2 />
-        <CommonBreadcrumb title="Register" subtitle="Register" center={true} />
+        {/* <HeaderV2 /> */}
+        {/* <CommonBreadcrumb title="Register" subtitle="Register" center={true} /> */}
         <RegisterArea />
-        <Footer primary_style={true} />
+        {/* <Footer primary_style={true} /> */}
       </Wrapper>
     </div>
   );

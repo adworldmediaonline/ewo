@@ -14,14 +14,14 @@ export const metadata = {
 export default function ForgotPage() {
   return (
     <Wrapper>
-      <HeaderV2 />
-      <CommonBreadcrumb
+      {/* <HeaderV2 /> */}
+      {/* <CommonBreadcrumb
         title="Forgot Password"
         subtitle="Reset Password"
         center={true}
-      />
+      /> */}
       <ForgotArea />
-      <Footer primary_style={true} />
+      {/* <Footer primary_style={true} /> */}
     </Wrapper>
   );
 }
