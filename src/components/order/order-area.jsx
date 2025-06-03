@@ -31,6 +31,7 @@ export default function OrderArea({ orderId }) {
     city,
     contact,
     invoice,
+    orderId: orderUniqueId,
     createdAt,
     cart,
     shippingCost,
@@ -61,7 +62,9 @@ export default function OrderArea({ orderId }) {
         <div className={styles.header}>
           <h1 className={styles.title}>Order Details</h1>
           <div className={styles.orderMeta}>
-            <span className={styles.orderNumber}>Order #{invoice}</span>
+            <span className={styles.orderNumber}>
+              Order #{orderUniqueId || invoice}
+            </span>
             <span className={styles.orderDate}>
               {orderDate} at {orderTime}
             </span>
