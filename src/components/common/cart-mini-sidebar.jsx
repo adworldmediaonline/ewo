@@ -48,16 +48,14 @@ export default function CartMiniSidebar() {
                   )}
                 </h4>
               </div>
-              <div className={styles.cartMiniClose}>
-                <button
-                  onClick={handleCloseCartMini}
-                  type="button"
-                  className={styles.cartMiniCloseBtn}
-                  aria-label="Close shopping cart"
-                >
-                  ✕
-                </button>
-              </div>
+              <button
+                onClick={handleCloseCartMini}
+                type="button"
+                className={styles.cartMiniCloseBtn}
+                aria-label="Close shopping cart"
+              >
+                ✕
+              </button>
             </div>
             {/* <div className="cartmini__shipping">
               <RenderCartProgress />
@@ -67,7 +65,7 @@ export default function CartMiniSidebar() {
                 {cart_products.map((item, i) => (
                   <div key={i} className={styles.cartMiniWidgetItem}>
                     <div className={styles.cartMiniThumb}>
-                      <Link href={`/product/${item._id}`}>
+                      <Link href={`/product/${item.slug || item._id}`}>
                         <Image
                           src={item.img}
                           width={70}
@@ -79,7 +77,9 @@ export default function CartMiniSidebar() {
                     </div>
                     <div className={styles.cartMiniContent}>
                       <h5 className={styles.cartMiniTitle}>
-                        <Link href={`/product/${item._id}`}>{item.title}</Link>
+                        <Link href={`/product/${item.slug || item._id}`}>
+                          {item.title}
+                        </Link>
                       </h5>
                       <div className={styles.cartMiniPriceWrapper}>
                         {item.discount > 0 ? (
