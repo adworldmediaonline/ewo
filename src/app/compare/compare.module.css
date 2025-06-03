@@ -43,31 +43,31 @@
   font-weight: 500;
 }
 
-.comparePage th,
-.comparePage td {
+.comparePage ul,
+.comparePage li {
   font-family: var(--font-lato), 'Lato', sans-serif;
 }
 
 /* Compare Specific Styling */
-.comparePage .compare-table {
+.comparePage .compare-item {
   font-family: var(--font-lato), 'Lato', sans-serif;
 }
 
 .comparePage .product-title {
   font-family: var(--font-lato), 'Lato', sans-serif;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .comparePage .product-price {
   font-family: var(--font-lato), 'Lato', sans-serif;
-  font-weight: 600;
+  font-weight: 700;
 }
 
-.comparePage .compare-actions {
+.comparePage .product-features {
   font-family: var(--font-lato), 'Lato', sans-serif;
 }
 
-.comparePage .feature-row {
+.comparePage .compare-actions {
   font-family: var(--font-lato), 'Lato', sans-serif;
 }
 

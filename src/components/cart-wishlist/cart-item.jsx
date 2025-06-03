@@ -10,9 +10,9 @@ import {
   quantityDecrement,
   remove_product,
 } from '@/redux/features/cartSlice';
-import styles from '../../app/cart/cart.module.css';
+import styles from './cart-item.module.css';
 
-const CartItem = ({ product }) => {
+export default function CartItem({ product }) {
   const {
     _id,
     img,
@@ -39,70 +39,67 @@ const CartItem = ({ product }) => {
   };
 
   return (
-    <tr className={styles['cart-item']}>
-      <td className={styles['cart-product-col']}>
-        <div className={styles['cart-product']}>
-          <div className={styles['cart-product-img']}>
+    <div className={styles.cartItem}>
+      <div className={styles.itemContent}>
+        <div className={styles.productSection}>
+          <div className={styles.productImage}>
             <Link href={`/product/${_id}`}>
-              <Image src={img} alt={title} width={70} height={100} />
+              <Image src={img} alt={title} width={80} height={80} />
             </Link>
           </div>
-          <div className={styles['cart-product-info']}>
-            <Link
-              href={`/product/${_id}`}
-              className={styles['cart-product-title']}
-            >
+          <div className={styles.productInfo}>
+            <Link href={`/product/${_id}`} className={styles.productTitle}>
               {title}
             </Link>
             {selectedOption && (
-              <div className={styles['cart-product-option']}>
+              <div className={styles.productOption}>
                 Option: {selectedOption.title} (+$
                 {Number(selectedOption.price).toFixed(2)})
               </div>
             )}
+            <div className={styles.unitPrice}>${price.toFixed(2)} each</div>
           </div>
         </div>
-      </td>
-      <td className={styles['cart-price-col']}>
-        <span className={styles['cart-price']}>
-          ${(price * orderQuantity).toFixed(2)}
-        </span>
-      </td>
-      <td className={styles['cart-quantity-col']}>
-        <div className={styles['cart-quantity']}>
+
+        <div className={styles.quantitySection}>
+          <label className={styles.quantityLabel}>Quantity</label>
+          <div className={styles.quantityControls}>
+            <button
+              onClick={() => handleDecrement(product)}
+              className={styles.quantityBtn}
+              aria-label="Decrease quantity"
+            >
+              <Minus />
+            </button>
+            <input
+              className={styles.quantityInput}
+              type="text"
+              value={orderQuantity}
+              readOnly
+            />
+            <button
+              onClick={() => handleAddProduct(product)}
+              className={styles.quantityBtn}
+              aria-label="Increase quantity"
+            >
+              <Plus />
+            </button>
+          </div>
+        </div>
+
+        <div className={styles.priceSection}>
+          <div className={styles.totalPrice}>
+            ${(price * orderQuantity).toFixed(2)}
+          </div>
           <button
-            onClick={() => handleDecrement(product)}
-            className={styles['cart-quantity-btn']}
-            aria-label="Decrease quantity"
+            onClick={() => handleRemovePrd({ title, id: _id })}
+            className={styles.removeBtn}
+            aria-label="Remove item"
           >
-            <Minus />
-          </button>
-          <input
-            className={styles['cart-quantity-input']}
-            type="text"
-            value={orderQuantity}
-            readOnly
-          />
-          <button
-            onClick={() => handleAddProduct(product)}
-            className={styles['cart-quantity-btn']}
-            aria-label="Increase quantity"
-          >
-            <Plus />
+            <Close />
           </button>
         </div>
-      </td>
-      <td className={styles['cart-action-col']}>
-        <button
-          onClick={() => handleRemovePrd({ title, id: _id })}
-          className={styles['cart-remove-btn']}
-          aria-label="Remove item"
-        >
-          <Close />
-        </button>
-      </td>
-    </tr>
+      </div>
+    </div>
   );
-};
-
-export default CartItem;
+}
