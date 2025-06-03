@@ -17,7 +17,7 @@ export default function ComparePage() {
     <div className={styles.comparePage}>
       <Wrapper>
         <HeaderV2 />
-        <CommonBreadcrumb title="Compare" subtitle="Compare" />
+        <CommonBreadcrumb subtitle="Compare" />
         <CompareArea />
         <Footer primary_style={true} />
       </Wrapper>
