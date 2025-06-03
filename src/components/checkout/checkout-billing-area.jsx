@@ -10,14 +10,11 @@ const CheckoutBillingArea = ({
   register,
   errors,
   isGuest = false,
-  checkAddressDiscount,
   setValue,
 }) => {
   const { user } = useSelector(state => state.auth);
   const { isCheckoutSubmitting } = useSelector(state => state.order);
   const dispatch = useDispatch();
-  const [showCheckButton, setShowCheckButton] = useState(false);
-  const [checkingEligibility, setCheckingEligibility] = useState(false);
 
   const countries = Country.getAllCountries();
   const defaultCountry = countries.find(country => country.isoCode === 'US');
@@ -37,31 +34,6 @@ const CheckoutBillingArea = ({
     address: '',
     zipCode: '',
   });
-
-  useEffect(() => {
-    const { address, city, state, country } = formValues;
-    setShowCheckButton(address && city && state && country);
-  }, [formValues]);
-
-  const handleCheckEligibility = () => {
-    const { address, city, state, country, zipCode } = formValues;
-
-    if (address && city && state && country) {
-      setCheckingEligibility(true);
-
-      checkAddressDiscount({
-        address,
-        city,
-        state,
-        country,
-        zipCode,
-      });
-
-      setTimeout(() => {
-        setCheckingEligibility(false);
-      }, 1000);
-    }
-  };
 
   useEffect(() => {
     if (selectedCountry) {
@@ -335,30 +307,6 @@ const CheckoutBillingArea = ({
             <ErrorMsg msg={errors?.zipCode?.message} />
           </div>
         </div>
-
-        {showCheckButton && !isGuest && (
-          <div className={styles.formGroup}>
-            <button
-              type="button"
-              onClick={handleCheckEligibility}
-              className={styles.eligibilityButton}
-              disabled={checkingEligibility}
-            >
-              {checkingEligibility ? (
-                <span>
-                  <span
-                    className={`spinner-border spinner-border-sm ${styles.spinner}`}
-                    role="status"
-                    aria-hidden="true"
-                  ></span>
-                  Checking Address Eligibility...
-                </span>
-              ) : (
-                'Check eligibility (10% discount)'
-              )}
-            </button>
-          </div>
-        )}
 
         <div className={styles.formGroup}>
           <label className={styles.formLabel}>
