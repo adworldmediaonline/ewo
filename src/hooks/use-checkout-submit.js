@@ -77,7 +77,22 @@ const useCheckoutSubmit = () => {
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    mode: 'onSubmit',
+    reValidateMode: 'onSubmit',
+    shouldFocusError: true,
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      address: '',
+      city: '',
+      country: 'US',
+      state: '',
+      zipCode: '',
+      contactNo: '',
+    },
+  });
 
   let couponRef = useRef('');
 

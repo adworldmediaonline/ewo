@@ -91,7 +91,7 @@
 
 /* Continue Button */
 .continueButton {
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  background: #cb0102;
   color: white;
   border: none;
   border-radius: 12px;
@@ -100,14 +100,14 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 4px 12px rgba(203, 1, 2, 0.4);
   min-width: 200px;
 }
 
 .continueButton:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
-  background: linear-gradient(135deg, #2563eb, #1e40af);
+  box-shadow: 0 6px 20px rgba(203, 1, 2, 0.5);
+  background: #a50002;
 }
 
 .continueButton:active {
