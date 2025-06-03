@@ -117,6 +117,14 @@
   font-weight: 600;
 }
 
+.statusMessage {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0.5rem 0 0 0;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
 /* Grid Layout */
 .grid {
   display: grid;

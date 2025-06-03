@@ -38,7 +38,7 @@ export default function OrderArea({ orderId }) {
     discount,
     totalAmount,
     paymentMethod,
-    status = 'Processing',
+    status,
     email,
   } = order.order;
 
@@ -61,6 +61,18 @@ export default function OrderArea({ orderId }) {
     if (statusLower === 'delivered') return '✓';
     if (statusLower === 'processing') return '⏳';
     return '📦';
+  };
+
+  const getStatusMessage = () => {
+    const statusLower = status.toLowerCase();
+    if (statusLower === 'delivered')
+      return 'Your order has been delivered successfully.';
+    if (statusLower === 'processing')
+      return 'Your order is being processed and will ship soon.';
+    if (statusLower === 'pending')
+      return 'Your order has been received and is being reviewed.';
+    if (statusLower === 'cancel') return 'This order has been cancelled.';
+    return 'Your order is being processed.';
   };
 
   return (
@@ -101,6 +113,7 @@ export default function OrderArea({ orderId }) {
                 <span className={styles.statusIcon}>{getStatusIcon()}</span>
                 <span className={styles.statusText}>{status}</span>
               </div>
+              <p className={styles.statusMessage}>{getStatusMessage()}</p>
             </div>
           </div>
         </div>
