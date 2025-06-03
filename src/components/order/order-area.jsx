@@ -38,7 +38,7 @@ export default function OrderArea({ orderId }) {
     discount,
     totalAmount,
     paymentMethod,
-    status = 'Processing',
+    status,
     email,
   } = order.order;
 
@@ -51,113 +51,203 @@ export default function OrderArea({ orderId }) {
 
   const getStatusColor = () => {
     const statusLower = status.toLowerCase();
-    if (statusLower === 'delivered') return '#22c55e';
+    if (statusLower === 'delivered') return '#10b981';
     if (statusLower === 'processing') return '#f59e0b';
     return '#6b7280';
+  };
+
+  const getStatusIcon = () => {
+    const statusLower = status.toLowerCase();
+    if (statusLower === 'delivered') return '✓';
+    if (statusLower === 'processing') return '⏳';
+    return '📦';
+  };
+
+  const getStatusMessage = () => {
+    const statusLower = status.toLowerCase();
+    if (statusLower === 'delivered')
+      return 'Your order has been delivered successfully.';
+    if (statusLower === 'processing')
+      return 'Your order is being processed and will ship soon.';
+    if (statusLower === 'pending')
+      return 'Your order has been received and is being reviewed.';
+    if (statusLower === 'cancel') return 'This order has been cancelled.';
+    return 'Your order is being processed.';
   };
 
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Order Details</h1>
-          <div className={styles.orderMeta}>
-            <span className={styles.orderNumber}>
-              Order #{orderUniqueId || invoice}
-            </span>
-            <span className={styles.orderDate}>
-              {orderDate} at {orderTime}
-            </span>
-          </div>
-        </div>
-
-        <div className={styles.statusSection}>
-          <div
-            className={styles.statusBadge}
-            style={{ backgroundColor: getStatusColor() }}
-          >
-            {status}
-          </div>
-          <p className={styles.statusText}>
-            Your order has been received and is being processed.
-          </p>
-        </div>
-
-        <div className={styles.section}>
-          <h2 className={styles.sectionTitle}>Order Summary</h2>
-          <div className={styles.summaryGrid}>
-            <div className={styles.summaryRow}>
-              <span>Subtotal</span>
-              <span>${subtotal.toFixed(2)}</span>
+        {/* Header Card */}
+        <div className={styles.headerCard}>
+          <div className={styles.headerContent}>
+            <div className={styles.headerLeft}>
+              <h1 className={styles.title}>Order Confirmation</h1>
+              <p className={styles.subtitle}>Thank you for your purchase</p>
             </div>
-            <div className={styles.summaryRow}>
-              <span>Shipping</span>
-              <span>${parseFloat(shippingCost.toFixed(2)).toFixed(2)}</span>
-            </div>
-            <div className={styles.summaryRow}>
-              <span>Discount</span>
-              <span>-${parseFloat(discount.toFixed(2)).toFixed(2)}</span>
-            </div>
-            <div className={styles.summaryTotal}>
-              <span>Total</span>
-              <span>
-                $
-                {(
-                  parseFloat(subtotal.toFixed(2)) +
-                  parseFloat(shippingCost.toFixed(2)) -
-                  parseFloat(discount.toFixed(2))
-                ).toFixed(2)}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className={styles.section}>
-          <h2 className={styles.sectionTitle}>Customer Information</h2>
-          <div className={styles.infoGrid}>
-            <div className={styles.infoRow}>
-              <span className={styles.infoLabel}>Name</span>
-              <span className={styles.infoValue}>{name}</span>
-            </div>
-            <div className={styles.infoRow}>
-              <span className={styles.infoLabel}>Email</span>
-              <span className={styles.infoValue}>{email || contact}</span>
-            </div>
-            <div className={styles.infoRow}>
-              <span className={styles.infoLabel}>Phone</span>
-              <span className={styles.infoValue}>{contact}</span>
-            </div>
-            <div className={styles.infoRow}>
-              <span className={styles.infoLabel}>Location</span>
-              <span className={styles.infoValue}>
-                {city}, {country}
-              </span>
-            </div>
-            <div className={styles.infoRow}>
-              <span className={styles.infoLabel}>Payment Method</span>
-              <span className={styles.infoValue}>
-                {paymentMethod === 'COD' ? 'Cash on Delivery' : 'Credit Card'}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className={styles.section}>
-          <h2 className={styles.sectionTitle}>Order Items ({cart.length})</h2>
-          <div className={styles.itemsList}>
-            {cart.map((item, i) => (
-              <div key={i} className={styles.item}>
-                <div className={styles.itemInfo}>
-                  <h3 className={styles.itemName}>{item.title}</h3>
-                  <span className={styles.itemQuantity}>
-                    Qty: {item.orderQuantity}
-                  </span>
-                </div>
-                <span className={styles.itemPrice}>
-                  ${(item.price * item.orderQuantity).toFixed(2)}
+            <div className={styles.headerRight}>
+              <div className={styles.orderBadge}>
+                <span className={styles.orderLabel}>Order ID</span>
+                <span className={styles.orderNumber}>
+                  {orderUniqueId || invoice}
                 </span>
               </div>
-            ))}
+            </div>
+          </div>
+
+          <div className={styles.orderMeta}>
+            <div className={styles.metaItem}>
+              <span className={styles.metaLabel}>Order Date</span>
+              <span className={styles.metaValue}>{orderDate}</span>
+            </div>
+            <div className={styles.metaItem}>
+              <span className={styles.metaLabel}>Order Time</span>
+              <span className={styles.metaValue}>{orderTime}</span>
+            </div>
+            <div className={styles.metaItem}>
+              <span className={styles.metaLabel}>Status</span>
+              <div
+                className={styles.statusBadge}
+                style={{ backgroundColor: getStatusColor() }}
+              >
+                <span className={styles.statusIcon}>{getStatusIcon()}</span>
+                <span className={styles.statusText}>{status}</span>
+              </div>
+              <p className={styles.statusMessage}>{getStatusMessage()}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content Grid */}
+        <div className={styles.grid}>
+          {/* Order Summary */}
+          <div className={styles.card}>
+            <div className={styles.cardHeader}>
+              <h2 className={styles.cardTitle}>Order Summary</h2>
+              <span className={styles.itemCount}>
+                {cart.length} item{cart.length !== 1 ? 's' : ''}
+              </span>
+            </div>
+            <div className={styles.cardBody}>
+              <div className={styles.summaryList}>
+                <div className={styles.summaryRow}>
+                  <span>Subtotal</span>
+                  <span>${subtotal.toFixed(2)}</span>
+                </div>
+                <div className={styles.summaryRow}>
+                  <span>Shipping</span>
+                  <span>${parseFloat(shippingCost.toFixed(2)).toFixed(2)}</span>
+                </div>
+                {discount > 0 && (
+                  <div className={styles.summaryRow}>
+                    <span>Discount</span>
+                    <span className={styles.discount}>
+                      -${parseFloat(discount.toFixed(2)).toFixed(2)}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div className={styles.totalRow}>
+                <span className={styles.totalLabel}>Total</span>
+                <span className={styles.totalAmount}>
+                  $
+                  {(
+                    parseFloat(subtotal.toFixed(2)) +
+                    parseFloat(shippingCost.toFixed(2)) -
+                    parseFloat(discount.toFixed(2))
+                  ).toFixed(2)}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Customer Information */}
+          <div className={styles.card}>
+            <div className={styles.cardHeader}>
+              <h2 className={styles.cardTitle}>Customer Information</h2>
+            </div>
+            <div className={styles.cardBody}>
+              <div className={styles.infoGrid}>
+                <div className={styles.infoGroup}>
+                  <h3 className={styles.groupTitle}>Contact Details</h3>
+                  <div className={styles.infoList}>
+                    <div className={styles.infoRow}>
+                      <span className={styles.infoLabel}>Name</span>
+                      <span className={styles.infoValue}>{name}</span>
+                    </div>
+                    <div className={styles.infoRow}>
+                      <span className={styles.infoLabel}>Email</span>
+                      <span className={styles.infoValue}>
+                        {email || contact}
+                      </span>
+                    </div>
+                    <div className={styles.infoRow}>
+                      <span className={styles.infoLabel}>Phone</span>
+                      <span className={styles.infoValue}>{contact}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className={styles.infoGroup}>
+                  <h3 className={styles.groupTitle}>Delivery Details</h3>
+                  <div className={styles.infoList}>
+                    <div className={styles.infoRow}>
+                      <span className={styles.infoLabel}>Location</span>
+                      <span className={styles.infoValue}>
+                        {city}, {country}
+                      </span>
+                    </div>
+                    <div className={styles.infoRow}>
+                      <span className={styles.infoLabel}>Payment</span>
+                      <span className={styles.infoValue}>
+                        {paymentMethod === 'COD'
+                          ? 'Cash on Delivery'
+                          : 'Credit Card'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Order Items */}
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <h2 className={styles.cardTitle}>Order Items</h2>
+          </div>
+          <div className={styles.cardBody}>
+            <div className={styles.itemsList}>
+              {cart.map((item, i) => (
+                <div key={i} className={styles.itemCard}>
+                  <div className={styles.itemContent}>
+                    <div className={styles.itemImage}>
+                      <img
+                        src={item.img}
+                        alt={item.title}
+                        className={styles.productImage}
+                      />
+                    </div>
+                    <div className={styles.itemDetails}>
+                      <h3 className={styles.itemName}>{item.title}</h3>
+                      <span className={styles.itemQuantity}>
+                        Quantity: {item.orderQuantity}
+                      </span>
+                    </div>
+                    <div className={styles.itemPricing}>
+                      <span className={styles.itemPrice}>
+                        ${(item.price * item.orderQuantity).toFixed(2)}
+                      </span>
+                      {item.orderQuantity > 1 && (
+                        <span className={styles.unitPrice}>
+                          ${item.price.toFixed(2)} each
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
