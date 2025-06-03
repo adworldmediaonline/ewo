@@ -17,7 +17,7 @@ export default function WishlistPage() {
     <div className={styles.wishlistPage}>
       <Wrapper>
         <HeaderV2 />
-        <CommonBreadcrumb title="Wishlist" subtitle="Wishlist" />
+        <CommonBreadcrumb subtitle="Wishlist" />
         <WishlistArea />
         <Footer primary_style={true} />
       </Wrapper>
