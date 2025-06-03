@@ -35,6 +35,14 @@ const CheckoutBillingArea = ({
     zipCode: '',
   });
 
+  // Set initial form values to prevent validation errors
+  useEffect(() => {
+    if (user?.firstName) setValue('firstName', user.firstName);
+    if (user?.lastName) setValue('lastName', user.lastName);
+    if (user?.email) setValue('email', user.email);
+    if (defaultCountry) setValue('country', defaultCountry.isoCode);
+  }, [user, setValue, defaultCountry]);
+
   useEffect(() => {
     if (selectedCountry) {
       const countryStates = State.getStatesOfCountry(selectedCountry.isoCode);
@@ -214,11 +222,13 @@ const CheckoutBillingArea = ({
           <select
             {...register('country', {
               required: `Country is required!`,
+              onChange: e => {
+                handleCountryChange(e);
+              },
             })}
             name="country"
             id="country"
             className={styles.formSelect}
-            onChange={handleCountryChange}
             defaultValue={formValues.country}
           >
             <option value="">Select Country</option>
@@ -236,12 +246,16 @@ const CheckoutBillingArea = ({
             Street address <span className={styles.required}>*</span>
           </label>
           <input
-            {...register('address', { required: `Address is required!` })}
+            {...register('address', {
+              required: `Address is required!`,
+              onChange: e => {
+                handleAddressChange(e);
+              },
+            })}
             name="address"
             id="address"
             type="text"
             placeholder="House number and street name"
-            onChange={handleAddressChange}
             className={styles.formInput}
           />
           <ErrorMsg msg={errors?.address?.message} />
@@ -253,12 +267,16 @@ const CheckoutBillingArea = ({
               City <span className={styles.required}>*</span>
             </label>
             <input
-              {...register('city', { required: `City is required!` })}
+              {...register('city', {
+                required: `City is required!`,
+                onChange: e => {
+                  handleCityChange(e);
+                },
+              })}
               name="city"
               id="city"
               type="text"
               placeholder="Enter city"
-              onChange={handleCityChange}
               className={styles.formInput}
             />
             <ErrorMsg msg={errors?.city?.message} />
@@ -271,11 +289,13 @@ const CheckoutBillingArea = ({
             <select
               {...register('state', {
                 required: `State is required!`,
+                onChange: e => {
+                  handleStateChange(e);
+                },
               })}
               name="state"
               id="state"
               className={styles.formSelect}
-              onChange={handleStateChange}
               defaultValue={formValues.state}
               disabled={!selectedCountry}
             >
@@ -296,12 +316,14 @@ const CheckoutBillingArea = ({
             <input
               {...register('zipCode', {
                 required: `ZIP Code is required!`,
+                onChange: e => {
+                  handleZipCodeChange(e);
+                },
               })}
               name="zipCode"
               id="zipCode"
               type="text"
               placeholder="Enter ZIP code"
-              onChange={handleZipCodeChange}
               className={styles.formInput}
             />
             <ErrorMsg msg={errors?.zipCode?.message} />
