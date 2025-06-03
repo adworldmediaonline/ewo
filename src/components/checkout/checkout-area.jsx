@@ -6,10 +6,9 @@ import Cookies from 'js-cookie';
 import Link from 'next/link';
 // internal
 import CheckoutBillingArea from './checkout-billing-area';
-import CheckoutCoupon from './checkout-coupon';
-import CheckoutLogin from './checkout-login';
 import CheckoutOrderArea from './checkout-order-area';
 import useCheckoutSubmit from '@/hooks/use-checkout-submit';
+import styles from './checkout-area.module.css';
 
 export default function CheckoutArea() {
   const router = useRouter();
@@ -28,6 +27,7 @@ export default function CheckoutArea() {
     submitHandler,
     register,
     errors,
+    setValue,
     handleCouponCode,
     couponRef,
     couponApplyMsg,
@@ -41,74 +41,59 @@ export default function CheckoutArea() {
   };
 
   return (
-    <>
-      <section
-        className="tp-checkout-area pb-120"
-        style={{ backgroundColor: '#EFF1F5' }}
-      >
-        <div className="container">
-          {cart_products.length === 0 && (
-            <div className="text-center pt-50">
-              <h3 className="py-2">No items found in cart to checkout</h3>
-              <Link href="/shop" className="tp-checkout-btn">
-                Return to shop
-              </Link>
-            </div>
-          )}
-          {cart_products.length > 0 && (
-            <div className="row">
-              <div className="col-xl-7 col-lg-7">
-                <div className="tp-checkout-verify">
-                  {isGuest && (
-                    <div className="tp-checkout-login mb-25">
-                      <h5 className="tp-checkout-login-title">
-                        Checking out as guest
-                      </h5>
-                      <div className="tp-checkout-login-form">
-                        <div className="tp-checkout-login-form-wrapper">
-                          <div className="tp-checkout-login-btn-wrapper">
-                            <button
-                              type="button"
-                              onClick={loginWithRedirect}
-                              className="tp-checkout-btn"
-                            >
-                              Sign in instead
-                            </button>
-                          </div>
-                        </div>
+    <section className={styles.checkoutArea}>
+      <div className={styles.container}>
+        {cart_products.length === 0 && (
+          <div className={styles.emptyCart}>
+            <h3 className={styles.emptyCartTitle}>
+              No items found in cart to checkout
+            </h3>
+            <Link href="/shop" className={styles.returnToShopBtn}>
+              Return to shop
+            </Link>
+          </div>
+        )}
+        {cart_products.length > 0 && (
+          <form onSubmit={handleSubmit(submitHandler)} noValidate>
+            <div className={styles.checkoutGrid}>
+              <div className={styles.leftColumn}>
+                {isGuest && (
+                  <div className={styles.guestSection}>
+                    <div className={styles.guestContent}>
+                      <div className={styles.guestInfo}>
+                        <div className={styles.guestIcon}>?</div>
+                        <span className={styles.guestText}>
+                          Checking out as Guest
+                        </span>
                       </div>
+                      <button
+                        type="button"
+                        onClick={loginWithRedirect}
+                        className={styles.signInBtn}
+                      >
+                        Sign In Instead
+                      </button>
                     </div>
-                  )}
-                  {!isGuest && <CheckoutLogin />}
-                  <CheckoutCoupon
-                    handleCouponCode={handleCouponCode}
-                    couponRef={couponRef}
-                    couponApplyMsg={couponApplyMsg}
-                  />
-                </div>
+                  </div>
+                )}
+                <CheckoutBillingArea
+                  register={register}
+                  errors={errors}
+                  setValue={setValue}
+                  isGuest={isGuest}
+                  checkAddressDiscount={checkAddressDiscountEligibility}
+                />
               </div>
-              <form onSubmit={handleSubmit(submitHandler)} noValidate>
-                <div className="row">
-                  <div className="col-lg-7">
-                    <CheckoutBillingArea
-                      register={register}
-                      errors={errors}
-                      isGuest={isGuest}
-                      checkAddressDiscount={checkAddressDiscountEligibility}
-                    />
-                  </div>
-                  <div className="col-lg-5">
-                    <CheckoutOrderArea
-                      checkoutData={checkoutData}
-                      isGuest={isGuest}
-                    />
-                  </div>
-                </div>
-              </form>
+              <div className={styles.rightColumn}>
+                <CheckoutOrderArea
+                  checkoutData={checkoutData}
+                  isGuest={isGuest}
+                />
+              </div>
             </div>
-          )}
-        </div>
-      </section>
-    </>
+          </form>
+        )}
+      </div>
+    </section>
   );
 }

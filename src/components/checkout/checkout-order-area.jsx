@@ -10,6 +10,7 @@ import {
   add_cart_product,
   quantityDecrement,
 } from '@/redux/features/cartSlice';
+import styles from './checkout-order-area.module.css';
 
 // Custom styles for quantity controls
 const quantityStyle = {
@@ -67,12 +68,16 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
     address_discount_eligible,
     address_discount_message,
     addressDiscountAmount,
+    handleCouponCode,
+    couponRef,
+    couponApplyMsg,
   } = checkoutData;
   const { cart_products, totalShippingCost, shippingDiscount } = useSelector(
     state => state.cart
   );
   const { total, totalWithShipping } = useCartInfo();
   const { isCheckoutSubmitting } = useSelector(state => state.order);
+  const { coupon_info } = useSelector(state => state.coupon);
 
   // Save discount values when they change and we're not in checkout process
   useEffect(() => {
@@ -120,429 +125,211 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
   };
 
   return (
-    <div className="tp-checkout-place white-bg">
-      <h3 className="tp-checkout-place-title">Your Order</h3>
+    <div className={styles.orderSummary}>
+      <h3 className={styles.summaryTitle}>Your Order</h3>
 
-      <div className="tp-order-info-list">
-        <ul>
-          {/*  header */}
-          <li className="tp-order-info-list-header">
-            <h4 style={{ fontSize: '16px', fontWeight: '600' }}>Product</h4>
-            <h4 style={{ fontSize: '16px', fontWeight: '600' }}>Total</h4>
-          </li>
-
-          {/*  item list */}
-          {cart_products.map(item => (
-            <li key={item._id} className="tp-order-info-list-desc">
-              <div className="d-flex align-items-start justify-content-between w-100">
-                <div style={{ flex: 1 }}>
-                  <p
-                    style={{
-                      fontWeight: '500',
-                      marginBottom: '5px',
-                      fontSize: '15px',
-                    }}
-                  >
-                    {item.title}
-                    {item.selectedOption && (
-                      <span
-                        style={{
-                          fontWeight: 'normal',
-                          fontSize: '13px',
-                          display: 'block',
-                          color: '#666',
-                          marginTop: '2px',
-                        }}
-                      >
-                        Option: {item.selectedOption.title} (+$
-                        {Number(item.selectedOption.price).toFixed(2)})
-                      </span>
-                    )}
-                  </p>
-
-                  {/* Quantity control */}
-                  <div
-                    style={quantityStyle.container}
-                    className="quantity-control"
-                  >
-                    <button
-                      type="button"
-                      onClick={() => handleDecrement(item)}
-                      className="quantity-btn"
-                      style={quantityStyle.button}
-                      disabled={
-                        isCheckoutSubmit ||
-                        processingPayment ||
-                        item.orderQuantity <= 1
-                      }
-                      title="Decrease quantity"
-                      onMouseOver={e => {
-                        e.currentTarget.style.background = '#f5f5f5';
-                        e.currentTarget.style.borderColor = '#d5d5d5';
-                      }}
-                      onMouseOut={e => {
-                        e.currentTarget.style.background = 'white';
-                        e.currentTarget.style.borderColor = '#e5e5e5';
-                      }}
-                    >
-                      <Minus width={14} height={14} />
-                    </button>
-                    <span style={quantityStyle.quantity}>
-                      {item.orderQuantity}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => handleAddProduct(item)}
-                      className="quantity-btn"
-                      style={quantityStyle.button}
-                      disabled={isCheckoutSubmit || processingPayment}
-                      title="Increase quantity"
-                      onMouseOver={e => {
-                        e.currentTarget.style.background = '#f5f5f5';
-                        e.currentTarget.style.borderColor = '#d5d5d5';
-                      }}
-                      onMouseOut={e => {
-                        e.currentTarget.style.background = 'white';
-                        e.currentTarget.style.borderColor = '#e5e5e5';
-                      }}
-                    >
-                      <Plus width={14} height={14} />
-                    </button>
-                    <span
-                      style={{
-                        fontSize: '13px',
-                        color: '#777',
-                        marginLeft: '10px',
-                      }}
-                    >
-                      ${item.price.toFixed(2)} each
-                    </span>
-                  </div>
-                </div>
-                <span
-                  style={{
-                    fontWeight: 'bold',
-                    fontSize: '15px',
-                    minWidth: '80px',
-                    textAlign: 'right',
-                  }}
+      <div className={styles.productList}>
+        {cart_products.map(item => (
+          <div key={item._id} className={styles.productItem}>
+            <div className={styles.productImage}>
+              <img
+                src={item.img || '/placeholder-product.png'}
+                alt={item.title}
+                className={styles.productImage}
+              />
+            </div>
+            <div className={styles.productDetails}>
+              <h4 className={styles.productName}>{item.title}</h4>
+              {item.selectedOption && (
+                <p className={styles.productOption}>
+                  {item.selectedOption.title} (+$
+                  {Number(item.selectedOption.price).toFixed(2)})
+                </p>
+              )}
+              <div className={styles.quantityControls}>
+                <button
+                  type="button"
+                  onClick={() => handleDecrement(item)}
+                  className={styles.quantityBtn}
+                  disabled={
+                    isCheckoutSubmit ||
+                    processingPayment ||
+                    item.orderQuantity <= 1
+                  }
                 >
-                  ${(item.price * item.orderQuantity).toFixed(2)}
+                  <Minus width={12} height={12} />
+                </button>
+                <span className={styles.quantityValue}>
+                  {item.orderQuantity}
                 </span>
+                <button
+                  type="button"
+                  onClick={() => handleAddProduct(item)}
+                  className={styles.quantityBtn}
+                  disabled={isCheckoutSubmit || processingPayment}
+                >
+                  <Plus width={12} height={12} />
+                </button>
               </div>
-            </li>
-          ))}
-
-          {/* Shipping info - updated with better styling */}
-          <li className="tp-order-info-list-shipping">
-            <span style={{ fontWeight: '500' }}>Shipping</span>
-            <div className="tp-order-info-list-shipping-item d-flex flex-column align-items-end">
-              <span className="calculated-shipping">
-                <input
-                  {...register(`shippingOption`, {
-                    required: `Shipping Option is required!`,
-                  })}
-                  id="calculated_shipping"
-                  type="radio"
-                  name="shippingOption"
-                  defaultChecked
-                />
-                <label
-                  onClick={() => handleShippingCost(totalShippingCost)}
-                  htmlFor="calculated_shipping"
-                  style={{ marginLeft: '5px', fontWeight: 'normal' }}
-                >
-                  Calculated Shipping:{' '}
-                  <span style={{ fontWeight: '500' }}>
-                    ${totalShippingCost.toFixed(2)}
-                  </span>
-                  {discountPercentage > 0 && (
-                    <span className="shipping-discount-badge text-white ms-2 badge bg-success">
-                      {discountPercentage}% off
-                    </span>
-                  )}
-                </label>
-                <ErrorMsg msg={errors?.shippingOption?.message} />
-              </span>
             </div>
-          </li>
-
-          {/* Summary section with improved styling */}
-          <li className="tp-order-info-list-subtotal">
-            <span style={{ fontWeight: '500' }}>Subtotal</span>
-            <span style={{ fontWeight: '500' }}>${total.toFixed(2)}</span>
-          </li>
-
-          <li className="tp-order-info-list-subtotal">
-            <span style={{ fontWeight: '500' }}>Shipping Cost</span>
-            <span style={{ fontWeight: '500' }}>
-              ${totalShippingCost.toFixed(2)}
-            </span>
-          </li>
-
-          {/* Render regular discount */}
-          <li className="tp-order-info-list-subtotal">
-            <span style={{ fontWeight: '500' }}>Coupon Discount</span>
-            <span
-              style={{
-                fontWeight: '500',
-                color:
-                  discountAmount > addressDiscountAmount
-                    ? '#d04242'
-                    : 'inherit',
-              }}
-            >
-              ${(discountAmount - addressDiscountAmount).toFixed(2)}
-            </span>
-          </li>
-
-          {/* New address discount section with improved visibility - keep visible during checkout */}
-          <li className="tp-order-info-list-subtotal">
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ fontWeight: '500' }}>Discount</span>
-              {displayDiscountMessage && (
-                <div className="ms-2" style={{ position: 'relative' }}>
-                  <div
-                    className="info-icon"
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      width: '20px',
-                      height: '20px',
-                      borderRadius: '50%',
-                      backgroundColor: displayDiscountEligible
-                        ? '#28a745'
-                        : '#f8f9fa',
-                      border: `1px solid ${
-                        displayDiscountEligible ? '#28a745' : '#dc3545'
-                      }`,
-                      color: displayDiscountEligible ? 'white' : '#dc3545',
-                      fontSize: '12px',
-                      fontWeight: 'bold',
-                      cursor: 'pointer',
-                      position: 'relative',
-                      opacity: isCheckoutSubmit ? 0.8 : 1, // Keep visible but slightly dimmed during checkout
-                    }}
-                    title={displayDiscountMessage}
-                  >
-                    {displayDiscountEligible ? '✓' : '!'}
-                    <span
-                      className="tooltip-text"
-                      style={{
-                        visibility: 'hidden',
-                        width: '250px',
-                        backgroundColor: displayDiscountEligible
-                          ? '#28a745'
-                          : '#6c757d',
-                        color: '#fff',
-                        textAlign: 'center',
-                        borderRadius: '6px',
-                        padding: '10px 12px',
-                        position: 'absolute',
-                        zIndex: 1,
-                        bottom: '125%',
-                        left: '50%',
-                        marginLeft: '-125px',
-                        opacity: 0,
-                        transition: 'opacity 0.3s',
-                        boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-                        fontSize: '13px',
-                        pointerEvents: isCheckoutSubmit ? 'none' : 'auto', // Disable tooltip during checkout
-                      }}
-                    >
-                      <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
-                        {displayDiscountEligible
-                          ? '✓ Eligible for Discount'
-                          : 'Not eligible'}
-                      </div>
-                      <div>{displayDiscountMessage}</div>
-                      {!displayDiscountEligible && (
-                        <div
-                          className="mt-2"
-                          style={{
-                            fontSize: '12px',
-                            backgroundColor: 'rgba(0,0,0,0.1)',
-                            padding: '5px',
-                            borderRadius: '4px',
-                          }}
-                        >
-                          <div>
-                            Try a different shipping address to qualify for the
-                            10% discount.
-                          </div>
-                        </div>
-                      )}
-                    </span>
-                  </div>
-                </div>
-              )}
-              {!displayDiscountMessage && !isCheckoutSubmit && !isGuest && (
-                <div className="ms-2">
-                  <span style={{ fontSize: '12px', color: '#6c757d' }}>
-                    (Check eligibility in billing details)
-                  </span>
-                </div>
-              )}
+            <div className={styles.productTotal}>
+              ${(item.price * item.orderQuantity).toFixed(2)}
             </div>
-            <span
-              style={{
-                fontWeight: '500',
-                color: displayAddressDiscount > 0 ? '#28a745' : '#6c757d',
-              }}
-            >
-              ${displayAddressDiscount.toFixed(2)}
-              {displayAddressDiscount > 0 && (
-                <span
-                  className="ms-2 badge"
-                  style={{
-                    backgroundColor: '#e8f5e9',
-                    color: '#28a745',
-                    padding: '3px 6px',
-                    fontSize: '11px',
-                    borderRadius: '4px',
-                    opacity: isCheckoutSubmit ? 0.9 : 1, // Keep visible during checkout
-                  }}
-                >
-                  10% OFF
-                </span>
-              )}
-            </span>
-          </li>
-
-          <li className="tp-order-info-list-total">
-            <span style={{ fontSize: '16px', fontWeight: '600' }}>Total</span>
-            <span
-              style={{
-                fontSize: '18px',
-                fontWeight: '700',
-                color: '#222',
-                transition: 'color 0.3s ease',
-              }}
-            >
-              ${(totalWithShipping - discountAmount).toFixed(2)}
-              {displayAddressDiscount > 0 && (
-                <div
-                  className="mt-1"
-                  style={{
-                    fontSize: '13px',
-                    color: '#28a745',
-                    opacity: isCheckoutSubmit ? 0.9 : 1,
-                  }}
-                >
-                  Include 10% discount
-                </div>
-              )}
-            </span>
-          </li>
-        </ul>
-      </div>
-      <div className="tp-checkout-payment">
-        <div className="tp-checkout-payment-item">
-          <input
-            {...register(`payment`, {
-              required: `Payment Option is required!`,
-            })}
-            type="radio"
-            id="back_transfer"
-            name="payment"
-            value="Card"
-          />
-          <label
-            onClick={() => setShowCard(true)}
-            htmlFor="back_transfer"
-            data-bs-toggle="direct-bank-transfer"
-            style={{ fontWeight: '500', marginLeft: '5px' }}
-          >
-            Credit Card
-          </label>
-          {showCard && (
-            <div
-              className="direct-bank-transfer"
-              style={{
-                marginTop: '15px',
-                padding: '15px',
-                border: '1px solid #eee',
-                borderRadius: '6px',
-              }}
-            >
-              <div className="payment_card">
-                <CardElement
-                  options={{
-                    style: {
-                      base: {
-                        fontSize: '16px',
-                        color: '#424770',
-                        '::placeholder': {
-                          color: '#aab7c4',
-                        },
-                      },
-                      invalid: {
-                        color: '#9e2146',
-                      },
-                    },
-                  }}
-                />
-              </div>
-              {cardError && (
-                <div
-                  className="alert alert-danger mt-3 payment-error"
-                  role="alert"
-                >
-                  <small className="d-block mb-1">
-                    Payment could not be processed:
-                  </small>
-                  <strong>{cardError}</strong>
-                  <div className="mt-2">
-                    <small>Please check your card details and try again.</small>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-          <ErrorMsg msg={errors?.payment?.message} />
-        </div>
-      </div>
-
-      <div className="tp-checkout-btn-wrapper" style={{ marginTop: '25px' }}>
-        <button
-          type="submit"
-          disabled={!stripe || isCheckoutSubmit || processingPayment}
-          className="tp-checkout-btn w-100"
-          style={{
-            transition: 'all 0.3s ease',
-            opacity: !stripe || isCheckoutSubmit || processingPayment ? 0.7 : 1,
-          }}
-        >
-          {processingPayment ? (
-            <span>
-              <span
-                className="spinner-border spinner-border-sm me-2"
-                role="status"
-                aria-hidden="true"
-              ></span>
-              Processing Your Order...
-            </span>
-          ) : (
-            <>Complete Purchase</>
-          )}
-        </button>
-        {cardError && (
-          <div className="text-center mt-3">
-            <small className="text-danger">
-              Please fix the payment errors above before continuing.
-            </small>
           </div>
+        ))}
+      </div>
+
+      <div className={styles.discountSection}>
+        <div className={styles.discountForm}>
+          <input
+            ref={couponRef}
+            type="text"
+            placeholder="Discount code"
+            className={styles.discountInput}
+          />
+          <button
+            type="button"
+            onClick={handleCouponCode}
+            className={styles.discountButton}
+          >
+            Apply
+          </button>
+        </div>
+        {couponApplyMsg && (
+          <div className={styles.couponMessage}>{couponApplyMsg}</div>
         )}
       </div>
 
-      {/* Add CSS for tooltip hover effect */}
-      <style jsx>{`
-        .info-icon:hover .tooltip-text {
-          visibility: visible;
-          opacity: 1;
-        }
-      `}</style>
+      <div className={styles.summaryBreakdown}>
+        <div className={styles.summaryRow}>
+          <span className={styles.summaryLabel}>Subtotal</span>
+          <span className={styles.summaryValue}>${total.toFixed(2)}</span>
+        </div>
+
+        <div className={styles.summaryRow}>
+          <span className={styles.summaryLabel}>Shipping</span>
+          <span className={styles.summaryValue}>
+            ${totalShippingCost.toFixed(2)}
+            {discountPercentage > 0 && (
+              <span className={styles.discountBadge}>
+                {discountPercentage}% off
+              </span>
+            )}
+          </span>
+        </div>
+
+        {discountAmount + displayAddressDiscount > 0 && (
+          <div className={styles.summaryRow}>
+            <span className={styles.summaryLabel}>Discount</span>
+            <span className={`${styles.summaryValue} ${styles.discount}`}>
+              -${(discountAmount + displayAddressDiscount).toFixed(2)}
+            </span>
+          </div>
+        )}
+
+        <div className={`${styles.summaryRow} ${styles.summaryTotal}`}>
+          <span className={styles.totalLabel}>Total</span>
+          <span className={styles.totalValue}>
+            ${(totalWithShipping - discountAmount).toFixed(2)}
+          </span>
+        </div>
+      </div>
+
+      <div className={styles.paymentSection}>
+        <h4 className={styles.paymentTitle}>Payment Information</h4>
+        <div className={styles.cardElement}>
+          <CardElement
+            options={{
+              style: {
+                base: {
+                  fontSize: '16px',
+                  color: '#424770',
+                  '::placeholder': {
+                    color: '#aab7c4',
+                  },
+                  fontFamily: 'var(--font-lato), "Lato", sans-serif',
+                },
+                invalid: {
+                  color: '#9e2146',
+                },
+              },
+            }}
+          />
+          {cardError && (
+            <div className={styles.paymentError}>
+              <small>Payment could not be processed:</small>
+              <strong>{cardError}</strong>
+              <div>
+                <small>Please check your card details and try again.</small>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        disabled={!stripe || isCheckoutSubmit || processingPayment}
+        className={styles.checkoutButton}
+      >
+        {processingPayment ? (
+          <span>
+            <span
+              className="spinner-border spinner-border-sm me-2"
+              role="status"
+              aria-hidden="true"
+            ></span>
+            Processing Your Order...
+          </span>
+        ) : (
+          'Complete Purchase'
+        )}
+      </button>
+
+      <div className={styles.securityBadge}>
+        <svg
+          className={styles.securityIcon}
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path
+            fillRule="evenodd"
+            d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+            clipRule="evenodd"
+          />
+        </svg>
+        <div>
+          <div className={styles.securityText}>
+            Secure Checkout - SSL Encrypted
+          </div>
+          <div className={styles.securitySubtext}>
+            Ensuring your financial and personal details are secure during every
+            transaction.
+          </div>
+        </div>
+      </div>
+
+      {/* Hidden payment and shipping inputs for form validation */}
+      <div style={{ display: 'none' }}>
+        <input
+          {...register(`shippingOption`, {
+            required: `Shipping Option is required!`,
+          })}
+          type="radio"
+          name="shippingOption"
+          value="calculated"
+          defaultChecked
+        />
+        <input
+          {...register(`payment`, {
+            required: `Payment Option is required!`,
+          })}
+          type="radio"
+          name="payment"
+          value="Card"
+          defaultChecked
+        />
+      </div>
     </div>
   );
 }
