@@ -41,7 +41,7 @@ export default function CartCheckout() {
           <div className={styles['checkout-discount-section']}>
             <div className={styles['checkout-discount-item']}>
               <span className={styles['checkout-discount-label']}>
-                🎉 First-time customer discount (-{firstTimeDiscount.percentage}
+                🎉 First-time order discount (-{firstTimeDiscount.percentage}
                 %)
               </span>
               <span className={styles['checkout-discount-value']}>

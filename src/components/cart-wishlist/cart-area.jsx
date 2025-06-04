@@ -55,7 +55,7 @@ export default function CartArea() {
                   <div className={styles.discountIcon}>🎉</div>
                   <div className={styles.discountInfo}>
                     <h3 className={styles.discountTitle}>
-                      Congratulations! First-time customer discount applied
+                      Congratulations! First-time order discount applied
                     </h3>
                     <p className={styles.discountDescription}>
                       You're saving ${firstTimeDiscountAmount.toFixed(2)} (

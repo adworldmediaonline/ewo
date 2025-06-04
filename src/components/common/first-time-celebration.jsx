@@ -1,12 +1,18 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import Confetti from './confetti';
 import styles from './first-time-celebration.module.css';
 
 export default function FirstTimeCelebration({ show, onClose }) {
   const [isVisible, setIsVisible] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   console.log('🎉 FirstTimeCelebration Debug:', { show, isVisible });
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (show) {
@@ -21,11 +27,13 @@ export default function FirstTimeCelebration({ show, onClose }) {
     }
   }, [show, onClose]);
 
-  if (!show) return null;
+  if (!show || !mounted) return null;
 
-  return (
+  const celebrationContent = (
     <>
       <Confetti show={isVisible} duration={3000} pieceCount={60} />
+      {/* Commented out the modal for now - showing only confetti */}
+      {/*
       <div className={`${styles.celebration} ${isVisible ? styles.show : ''}`}>
         <div className={styles.celebrationContent}>
           <div className={styles.iconContainer}>
@@ -50,11 +58,15 @@ export default function FirstTimeCelebration({ show, onClose }) {
               You've unlocked <strong>10% OFF</strong> on your first order!
             </p>
             <div className={styles.badge}>
-              ✅ First-time customer discount applied
+              ✅ First-time order discount applied
             </div>
           </div>
         </div>
       </div>
+      */}
     </>
   );
+
+  // Use createPortal to render directly to document.body, bypassing any stacking context issues
+  return createPortal(celebrationContent, document.body);
 }

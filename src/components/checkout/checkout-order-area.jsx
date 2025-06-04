@@ -218,7 +218,7 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
             <span
               className={`${styles.summaryLabel} ${styles.firstTimeDiscountLabel}`}
             >
-              🎉 First-time customer discount (-{firstTimeDiscount.percentage}%)
+              🎉 First-time order discount (-{firstTimeDiscount.percentage}%)
             </span>
             <span className={`${styles.summaryValue} ${styles.discount}`}>
               -${firstTimeDiscountAmount.toFixed(2)}

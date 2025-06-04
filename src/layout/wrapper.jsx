@@ -7,10 +7,11 @@ if (typeof window !== 'undefined') {
 // internal
 import BackToTopCom from '@/components/common/back-to-top';
 import ProductModal from '@/components/common/product-modal';
-import DevTools from '@/components/common/dev-tools';
+import FirstTimeCelebration from '@/components/common/first-time-celebration';
 import {
   get_cart_products,
   initialOrderQuantity,
+  hideCelebration,
 } from '@/redux/features/cartSlice';
 import { get_wishlist_products } from '@/redux/features/wishlist-slice';
 import { get_compare_products } from '@/redux/features/compareSlice';
@@ -22,6 +23,7 @@ import { forceToastCenter } from '@/utils/toast-center';
 
 const Wrapper = ({ children }) => {
   const { productItem } = useSelector(state => state.productModal);
+  const { firstTimeDiscount } = useSelector(state => state.cart);
   const dispatch = useDispatch();
   const authChecked = useAuthCheck();
 
@@ -37,6 +39,12 @@ const Wrapper = ({ children }) => {
     return cleanup;
   }, [dispatch]);
 
+  // Handle closing celebration
+  const handleCloseCelebration = () => {
+    console.log('🔄 Closing celebration from wrapper');
+    dispatch(hideCelebration());
+  };
+
   return !authChecked ? (
     <div
       className="d-flex align-items-center justify-content-center"
@@ -48,10 +56,9 @@ const Wrapper = ({ children }) => {
     <div id="wrapper">
       {children}
       <BackToTopCom />
-      <DevTools />
       <ToastContainer
         position="top-center"
-        autoClose={1000}
+        autoClose={400}
         hideProgressBar={false}
         newestOnTop={true}
         closeOnClick
@@ -71,12 +78,16 @@ const Wrapper = ({ children }) => {
           width: 'auto',
           maxWidth: '400px',
           minWidth: '300px',
-          zIndex: 2147483647,
+          zIndex: 9999,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
         }}
+      />
+      <FirstTimeCelebration
+        show={firstTimeDiscount.showCelebration}
+        onClose={handleCloseCelebration}
       />
       {/* product modal start */}
       {productItem && <ProductModal />}

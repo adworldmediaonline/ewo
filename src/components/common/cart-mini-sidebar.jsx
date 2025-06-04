@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
 // internal
 import useCartInfo from '@/hooks/use-cart-info';
-import FirstTimeCelebration from './first-time-celebration';
 // import RenderCartProgress from './render-cart-progress';
 import empty_cart_img from '@assets/img/product/cartmini/empty-cart.png';
 import {
@@ -13,7 +12,6 @@ import {
   remove_product,
   add_cart_product,
   quantityDecrement,
-  hideCelebration,
 } from '@/redux/features/cartSlice';
 import styles from './cart-mini-sidebar.module.css';
 
@@ -52,18 +50,8 @@ export default function CartMiniSidebar() {
     dispatch(quantityDecrement(prd));
   };
 
-  // handle close celebration
-  const handleCloseCelebration = () => {
-    console.log('🔄 Closing celebration');
-    dispatch(hideCelebration());
-  };
-
   return (
     <>
-      <FirstTimeCelebration
-        show={firstTimeDiscount.showCelebration}
-        onClose={handleCloseCelebration}
-      />
       <div
         className={`${styles.cartMiniArea} ${
           cartMiniOpen ? styles.cartMiniOpened : ''
@@ -100,7 +88,7 @@ export default function CartMiniSidebar() {
                 <div className={styles.discountBannerContent}>
                   <span className={styles.discountIcon}>🎉</span>
                   <span className={styles.discountText}>
-                    First-time customer discount applied!
+                    First-time order discount applied!
                   </span>
                   <span className={styles.discountAmount}>
                     -{firstTimeDiscount.percentage}%
