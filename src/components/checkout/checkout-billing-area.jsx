@@ -366,13 +366,13 @@ const CheckoutBillingArea = ({
         {/* Uncomment for Order Notes feature
         <div className={styles.formGroup}>
           <label className={styles.formLabel}>Order notes (optional)</label>
-          <textarea
-            {...register('orderNote', { required: false })}
-            name="orderNote"
-            id="orderNote"
-            placeholder="Notes about your order, e.g. special notes for delivery."
+                <textarea
+                  {...register('orderNote', { required: false })}
+                  name="orderNote"
+                  id="orderNote"
+                  placeholder="Notes about your order, e.g. special notes for delivery."
             className={styles.formTextarea}
-          />
+                />
         </div>
         */}
       </div>
