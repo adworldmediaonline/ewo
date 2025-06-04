@@ -24,7 +24,7 @@ const checkFirstTimeCustomer = () => {
   return !hasReceivedDiscount; // Returns true if null/undefined (first time)
 };
 
-// Helper function to mark discount as used
+// Helper function to mark discount as used (should only be called on order completion)
 const markDiscountAsUsed = () => {
   localStorage.setItem('first_time_discount_used', 'true');
 };
@@ -68,6 +68,12 @@ const updateShippingCosts = state => {
 const updateFirstTimeDiscount = state => {
   const isFirstTime = checkFirstTimeCustomer();
   const hasProducts = state.cart_products.length > 0;
+
+  console.log('💰 First-time discount check:', {
+    isFirstTime,
+    hasProducts,
+    currentIsApplied: state.firstTimeDiscount.isApplied,
+  });
 
   state.firstTimeDiscount.isEligible = isFirstTime;
   state.firstTimeDiscount.isApplied = isFirstTime && hasProducts;
@@ -125,7 +131,7 @@ export const cartSlice = createSlice({
           console.log('🎉 Triggering first-time celebration!');
           state.firstTimeDiscount.showCelebration = true;
           state.cartMiniOpen = true; // Open cart mini to show the celebration
-          markDiscountAsUsed();
+          // DO NOT mark discount as used here - wait until order completion
         } else if (isFirstProduct) {
           // Even if not first-time customer, open cart mini for first product
           state.cartMiniOpen = true;
@@ -164,10 +170,12 @@ export const cartSlice = createSlice({
       updateShippingCosts(state);
       updateFirstTimeDiscount(state);
 
-      console.log(
-        '🔄 Updated first-time discount state:',
-        state.firstTimeDiscount
-      );
+      console.log('🔄 Updated first-time discount state:', {
+        isEligible: state.firstTimeDiscount.isEligible,
+        isApplied: state.firstTimeDiscount.isApplied,
+        showCelebration: state.firstTimeDiscount.showCelebration,
+        percentage: state.firstTimeDiscount.percentage,
+      });
 
       setLocalStorage('cart_products', state.cart_products);
       setLocalStorage('shipping_cost', state.totalShippingCost);
@@ -255,6 +263,14 @@ export const cartSlice = createSlice({
       state.firstTimeDiscount.showCelebration = false;
       console.log('🔄 First-time discount reset!');
     },
+    // Action to mark first-time discount as completed after order
+    completeFirstTimeDiscount: state => {
+      localStorage.setItem('first_time_discount_used', 'true');
+      state.firstTimeDiscount.isEligible = false;
+      state.firstTimeDiscount.isApplied = false;
+      state.firstTimeDiscount.showCelebration = false;
+      console.log('✅ First-time discount marked as completed!');
+    },
   },
 });
 
@@ -271,5 +287,6 @@ export const {
   openCartMini,
   hideCelebration,
   resetFirstTimeDiscount,
+  completeFirstTimeDiscount,
 } = cartSlice.actions;
 export default cartSlice.reducer;

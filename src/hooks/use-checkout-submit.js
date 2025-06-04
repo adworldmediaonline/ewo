@@ -21,6 +21,7 @@ import {
   useSaveOrderMutation,
 } from '@/redux/features/order/orderApi';
 import { useGetOfferCouponsQuery } from '@/redux/features/coupon/couponApi';
+import { completeFirstTimeDiscount } from '@/redux/features/cartSlice';
 
 const useCheckoutSubmit = () => {
   // offerCoupons
@@ -435,6 +436,10 @@ const useCheckoutSubmit = () => {
             // Clean up first
             localStorage.removeItem('cart_products');
             localStorage.removeItem('couponInfo');
+
+            // Mark first-time discount as used after successful payment
+            dispatch(completeFirstTimeDiscount());
+
             setIsCheckoutSubmit(false);
             setProcessingPayment(false);
 
