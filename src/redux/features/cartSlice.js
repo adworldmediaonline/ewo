@@ -8,6 +8,25 @@ const initialState = {
   cartMiniOpen: false,
   totalShippingCost: 0,
   shippingDiscount: 0,
+  // First-time discount state
+  firstTimeDiscount: {
+    isEligible: true,
+    isApplied: false,
+    percentage: 10,
+    showCelebration: false,
+  },
+};
+
+// Helper function to check if user is first-time customer
+const checkFirstTimeCustomer = () => {
+  // Use direct localStorage access to avoid the getLocalStorage function's default behavior
+  const hasReceivedDiscount = localStorage.getItem('first_time_discount_used');
+  return !hasReceivedDiscount; // Returns true if null/undefined (first time)
+};
+
+// Helper function to mark discount as used
+const markDiscountAsUsed = () => {
+  localStorage.setItem('first_time_discount_used', 'true');
 };
 
 // Helper function to calculate shipping discount
@@ -45,11 +64,31 @@ const updateShippingCosts = state => {
   );
 };
 
+// Helper to update first-time discount eligibility
+const updateFirstTimeDiscount = state => {
+  const isFirstTime = checkFirstTimeCustomer();
+  const hasProducts = state.cart_products.length > 0;
+
+  state.firstTimeDiscount.isEligible = isFirstTime;
+  state.firstTimeDiscount.isApplied = isFirstTime && hasProducts;
+};
+
 export const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
     add_cart_product: (state, { payload }) => {
+      // Check if this is the first product being added to cart
+      const isFirstProduct = state.cart_products.length === 0;
+      const isFirstTimeCustomer = checkFirstTimeCustomer();
+
+      console.log('🎯 Add to cart debug:', {
+        isFirstProduct,
+        isFirstTimeCustomer,
+        cartLength: state.cart_products.length,
+        hasDiscountUsed: localStorage.getItem('first_time_discount_used'),
+      });
+
       // Create unique identifier that includes selected option if present
       const productId = payload.selectedOption
         ? `${payload._id}-option-${payload.selectedOption.title}`
@@ -80,6 +119,17 @@ export const cartSlice = createSlice({
         message += ' added to cart';
 
         notifySuccess(message);
+
+        // Trigger celebration for first product added by first-time customer
+        if (isFirstProduct && isFirstTimeCustomer) {
+          console.log('🎉 Triggering first-time celebration!');
+          state.firstTimeDiscount.showCelebration = true;
+          state.cartMiniOpen = true; // Open cart mini to show the celebration
+          markDiscountAsUsed();
+        } else if (isFirstProduct) {
+          // Even if not first-time customer, open cart mini for first product
+          state.cartMiniOpen = true;
+        }
       } else {
         state.cart_products = state.cart_products.map(item => {
           const itemId = item.selectedOption
@@ -110,8 +160,14 @@ export const cartSlice = createSlice({
         });
       }
 
-      // Update shipping costs
+      // Update shipping costs and first-time discount
       updateShippingCosts(state);
+      updateFirstTimeDiscount(state);
+
+      console.log(
+        '🔄 Updated first-time discount state:',
+        state.firstTimeDiscount
+      );
 
       setLocalStorage('cart_products', state.cart_products);
       setLocalStorage('shipping_cost', state.totalShippingCost);
@@ -135,8 +191,9 @@ export const cartSlice = createSlice({
         return { ...item };
       });
 
-      // Update shipping costs
+      // Update shipping costs and first-time discount
       updateShippingCosts(state);
+      updateFirstTimeDiscount(state);
 
       setLocalStorage('cart_products', state.cart_products);
       setLocalStorage('shipping_cost', state.totalShippingCost);
@@ -146,8 +203,9 @@ export const cartSlice = createSlice({
         item => item._id !== payload.id
       );
 
-      // Update shipping costs
+      // Update shipping costs and first-time discount
       updateShippingCosts(state);
+      updateFirstTimeDiscount(state);
 
       setLocalStorage('cart_products', state.cart_products);
       setLocalStorage('shipping_cost', state.totalShippingCost);
@@ -156,8 +214,9 @@ export const cartSlice = createSlice({
     get_cart_products: (state, action) => {
       state.cart_products = getLocalStorage('cart_products');
 
-      // Update shipping costs when getting cart products
+      // Update shipping costs and first-time discount when getting cart products
       updateShippingCosts(state);
+      updateFirstTimeDiscount(state);
     },
     initialOrderQuantity: (state, { payload }) => {
       state.orderQuantity = 1;
@@ -170,6 +229,9 @@ export const cartSlice = createSlice({
         state.cart_products = [];
         state.totalShippingCost = 0;
         state.shippingDiscount = 0;
+
+        // Reset first-time discount state
+        updateFirstTimeDiscount(state);
       }
 
       setLocalStorage('cart_products', state.cart_products);
@@ -180,6 +242,18 @@ export const cartSlice = createSlice({
     },
     closeCartMini: (state, { payload }) => {
       state.cartMiniOpen = false;
+    },
+    // New action to hide celebration
+    hideCelebration: state => {
+      state.firstTimeDiscount.showCelebration = false;
+    },
+    // Action to reset first-time discount (for testing purposes)
+    resetFirstTimeDiscount: state => {
+      localStorage.removeItem('first_time_discount_used');
+      state.firstTimeDiscount.isEligible = true;
+      state.firstTimeDiscount.isApplied = state.cart_products.length > 0;
+      state.firstTimeDiscount.showCelebration = false;
+      console.log('🔄 First-time discount reset!');
     },
   },
 });
@@ -195,5 +269,7 @@ export const {
   clearCart,
   closeCartMini,
   openCartMini,
+  hideCelebration,
+  resetFirstTimeDiscount,
 } = cartSlice.actions;
 export default cartSlice.reducer;

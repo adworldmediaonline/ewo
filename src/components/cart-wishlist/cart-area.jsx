@@ -4,13 +4,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import Link from 'next/link';
 // internal
 import { clearCart } from '@/redux/features/cartSlice';
+import useCartInfo from '@/hooks/use-cart-info';
 import CartCheckout from './cart-checkout';
 import CartItem from './cart-item';
 import styles from './cart-area.module.css';
 // import RenderCartProgress from '../common/render-cart-progress';
 
 export default function CartArea() {
-  const { cart_products } = useSelector(state => state.cart);
+  const { cart_products, firstTimeDiscount } = useSelector(state => state.cart);
+  const { firstTimeDiscountAmount } = useCartInfo();
   const dispatch = useDispatch();
 
   return (
@@ -46,6 +48,27 @@ export default function CartArea() {
           </div>
         ) : (
           <div className={styles.cartContent}>
+            {/* First-time discount banner */}
+            {firstTimeDiscount.isApplied && (
+              <div className={styles.discountBanner}>
+                <div className={styles.discountBannerContent}>
+                  <div className={styles.discountIcon}>🎉</div>
+                  <div className={styles.discountInfo}>
+                    <h3 className={styles.discountTitle}>
+                      Congratulations! First-time customer discount applied
+                    </h3>
+                    <p className={styles.discountDescription}>
+                      You're saving ${firstTimeDiscountAmount.toFixed(2)} (
+                      {firstTimeDiscount.percentage}% off) on your first order!
+                    </p>
+                  </div>
+                  <div className={styles.discountAmount}>
+                    -{firstTimeDiscount.percentage}%
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Simple Header */}
             <div className={styles.header}>
               <div className={styles.headerLeft}>

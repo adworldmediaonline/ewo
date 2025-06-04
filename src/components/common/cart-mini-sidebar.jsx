@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
 // internal
 import useCartInfo from '@/hooks/use-cart-info';
+import FirstTimeCelebration from './first-time-celebration';
 // import RenderCartProgress from './render-cart-progress';
 import empty_cart_img from '@assets/img/product/cartmini/empty-cart.png';
 import {
@@ -12,13 +13,24 @@ import {
   remove_product,
   add_cart_product,
   quantityDecrement,
+  hideCelebration,
 } from '@/redux/features/cartSlice';
 import styles from './cart-mini-sidebar.module.css';
 
 export default function CartMiniSidebar() {
-  const { cart_products, cartMiniOpen } = useSelector(state => state.cart);
-  const { total } = useCartInfo();
+  const { cart_products, cartMiniOpen, firstTimeDiscount } = useSelector(
+    state => state.cart
+  );
+  const { total, subtotal, firstTimeDiscountAmount } = useCartInfo();
   const dispatch = useDispatch();
+
+  // Debug logging
+  console.log('🛒 Cart Mini Sidebar Debug:', {
+    showCelebration: firstTimeDiscount.showCelebration,
+    isApplied: firstTimeDiscount.isApplied,
+    cartLength: cart_products.length,
+    firstTimeDiscount,
+  });
 
   // handle remove product
   const handleRemovePrd = prd => {
@@ -40,8 +52,18 @@ export default function CartMiniSidebar() {
     dispatch(quantityDecrement(prd));
   };
 
+  // handle close celebration
+  const handleCloseCelebration = () => {
+    console.log('🔄 Closing celebration');
+    dispatch(hideCelebration());
+  };
+
   return (
     <>
+      <FirstTimeCelebration
+        show={firstTimeDiscount.showCelebration}
+        onClose={handleCloseCelebration}
+      />
       <div
         className={`${styles.cartMiniArea} ${
           cartMiniOpen ? styles.cartMiniOpened : ''
@@ -72,6 +94,20 @@ export default function CartMiniSidebar() {
                 ✕
               </button>
             </div>
+            {/* First-time discount banner */}
+            {firstTimeDiscount.isApplied && (
+              <div className={styles.discountBanner}>
+                <div className={styles.discountBannerContent}>
+                  <span className={styles.discountIcon}>🎉</span>
+                  <span className={styles.discountText}>
+                    First-time customer discount applied!
+                  </span>
+                  <span className={styles.discountAmount}>
+                    -{firstTimeDiscount.percentage}%
+                  </span>
+                </div>
+              </div>
+            )}
             {/* <div className="cartmini__shipping">
               <RenderCartProgress />
             </div> */}
@@ -203,8 +239,28 @@ export default function CartMiniSidebar() {
             )}
           </div>
           <div className={styles.cartMiniCheckout}>
+            <div className={styles.cartMiniCheckoutSummary}>
+              {/* Show subtotal if discount is applied */}
+              {firstTimeDiscount.isApplied && (
+                <div className={styles.cartMiniCheckoutLine}>
+                  <span>Subtotal:</span>
+                  <span>${subtotal.toFixed(2)}</span>
+                </div>
+              )}
+              {/* Show first-time discount */}
+              {firstTimeDiscount.isApplied && (
+                <div
+                  className={`${styles.cartMiniCheckoutLine} ${styles.discountLine}`}
+                >
+                  <span>
+                    First-time discount (-{firstTimeDiscount.percentage}%):
+                  </span>
+                  <span>-${firstTimeDiscountAmount.toFixed(2)}</span>
+                </div>
+              )}
+            </div>
             <div className={styles.cartMiniCheckoutTitle}>
-              <h4>Subtotal:</h4>
+              <h4>Total:</h4>
               <span>${total.toFixed(2)}</span>
             </div>
             <div className={styles.cartMiniCheckoutBtn}>

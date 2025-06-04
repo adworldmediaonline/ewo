@@ -9,6 +9,70 @@
   margin: 0 auto;
 }
 
+/* First-time Discount Banner */
+.discountBanner {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 10px 25px rgba(16, 185, 129, 0.2);
+  animation: slideInFromTop 0.5s ease-out;
+}
+
+.discountBannerContent {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.discountIcon {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+}
+
+.discountInfo {
+  flex: 1;
+}
+
+.discountTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.3;
+}
+
+.discountDescription {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  font-weight: 500;
+}
+
+.discountAmount {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: center;
+  min-width: 80px;
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Empty Cart Styles */
 .emptyCart {
   padding: 2rem 1rem;

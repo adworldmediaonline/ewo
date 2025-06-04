@@ -200,11 +200,18 @@
 
 .summaryLabel {
   color: #6b7280;
+  font-weight: 500;
+}
+
+.firstTimeDiscountLabel {
+  color: #059669;
+  font-weight: 600;
+  font-size: 14px;
 }
 
 .summaryValue {
-  font-weight: 500;
   color: #1a1a1a;
+  font-weight: 600;
 }
 
 .summaryValue.discount {
@@ -212,9 +219,9 @@
 }
 
 .summaryTotal {
-  padding: 16px 0;
-  border-top: 2px solid #e5e7eb;
-  margin-top: 16px;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 16px;
+  margin-top: 8px;
 }
 
 .totalLabel {

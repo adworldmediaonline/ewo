@@ -7,6 +7,7 @@ if (typeof window !== 'undefined') {
 // internal
 import BackToTopCom from '@/components/common/back-to-top';
 import ProductModal from '@/components/common/product-modal';
+import DevTools from '@/components/common/dev-tools';
 import {
   get_cart_products,
   initialOrderQuantity,
@@ -47,6 +48,7 @@ const Wrapper = ({ children }) => {
     <div id="wrapper">
       {children}
       <BackToTopCom />
+      <DevTools />
       <ToastContainer
         position="top-center"
         autoClose={1000}

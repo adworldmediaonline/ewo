@@ -72,10 +72,14 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
     couponRef,
     couponApplyMsg,
   } = checkoutData;
-  const { cart_products, totalShippingCost, shippingDiscount } = useSelector(
-    state => state.cart
-  );
-  const { total, totalWithShipping } = useCartInfo();
+  const {
+    cart_products,
+    totalShippingCost,
+    shippingDiscount,
+    firstTimeDiscount,
+  } = useSelector(state => state.cart);
+  const { total, totalWithShipping, subtotal, firstTimeDiscountAmount } =
+    useCartInfo();
   const { isCheckoutSubmitting } = useSelector(state => state.order);
   const { coupon_info } = useSelector(state => state.coupon);
 
@@ -203,8 +207,24 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
       <div className={styles.summaryBreakdown}>
         <div className={styles.summaryRow}>
           <span className={styles.summaryLabel}>Subtotal</span>
-          <span className={styles.summaryValue}>${total.toFixed(2)}</span>
+          <span className={styles.summaryValue}>
+            ${(firstTimeDiscount.isApplied ? subtotal : total).toFixed(2)}
+          </span>
         </div>
+
+        {/* First-time discount */}
+        {firstTimeDiscount.isApplied && (
+          <div className={styles.summaryRow}>
+            <span
+              className={`${styles.summaryLabel} ${styles.firstTimeDiscountLabel}`}
+            >
+              🎉 First-time customer discount (-{firstTimeDiscount.percentage}%)
+            </span>
+            <span className={`${styles.summaryValue} ${styles.discount}`}>
+              -${firstTimeDiscountAmount.toFixed(2)}
+            </span>
+          </div>
+        )}
 
         <div className={styles.summaryRow}>
           <span className={styles.summaryLabel}>Shipping</span>
@@ -220,7 +240,7 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
 
         {discountAmount + displayAddressDiscount > 0 && (
           <div className={styles.summaryRow}>
-            <span className={styles.summaryLabel}>Discount</span>
+            <span className={styles.summaryLabel}>Coupon Discount</span>
             <span className={`${styles.summaryValue} ${styles.discount}`}>
               -${(discountAmount + displayAddressDiscount).toFixed(2)}
             </span>
