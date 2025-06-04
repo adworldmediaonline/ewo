@@ -221,6 +221,10 @@ export const cartSlice = createSlice({
     },
     get_cart_products: (state, action) => {
       state.cart_products = getLocalStorage('cart_products');
+      // Always keep cartMiniOpen as false on page load for better UX
+      state.cartMiniOpen = false;
+      // Clear any lingering celebration state on page load
+      state.firstTimeDiscount.showCelebration = false;
 
       // Update shipping costs and first-time discount when getting cart products
       updateShippingCosts(state);
@@ -247,9 +251,13 @@ export const cartSlice = createSlice({
     },
     openCartMini: (state, { payload }) => {
       state.cartMiniOpen = true;
+      setLocalStorage('cartMiniOpen', true);
     },
     closeCartMini: (state, { payload }) => {
       state.cartMiniOpen = false;
+      setLocalStorage('cartMiniOpen', false);
+      // Also hide celebration when closing cart mini
+      state.firstTimeDiscount.showCelebration = false;
     },
     // New action to hide celebration
     hideCelebration: state => {

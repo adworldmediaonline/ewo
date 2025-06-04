@@ -22,12 +22,12 @@ export default function CartMiniSidebar() {
   const { total, subtotal, firstTimeDiscountAmount } = useCartInfo();
   const dispatch = useDispatch();
 
-  // Debug logging
-  console.log('🛒 Cart Mini Sidebar Debug:', {
+  // Debug logging for troubleshooting
+  console.log('🛒 Cart Mini Sidebar State:', {
+    cartMiniOpen,
     showCelebration: firstTimeDiscount.showCelebration,
     isApplied: firstTimeDiscount.isApplied,
     cartLength: cart_products.length,
-    firstTimeDiscount,
   });
 
   // handle remove product
@@ -37,6 +37,7 @@ export default function CartMiniSidebar() {
 
   // handle close cart mini
   const handleCloseCartMini = () => {
+    console.log('🔄 Closing cart mini sidebar...');
     dispatch(closeCartMini());
   };
 
