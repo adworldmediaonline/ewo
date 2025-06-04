@@ -40,6 +40,7 @@ export default function OrderArea({ orderId }) {
     paymentMethod,
     status,
     email,
+    firstTimeDiscount,
   } = order.order;
 
   const orderDate = dayjs(createdAt).format('MMMM D, YYYY');
@@ -48,6 +49,39 @@ export default function OrderArea({ orderId }) {
     (sum, item) => sum + item.price * item.orderQuantity,
     0
   );
+
+  // Debug logging to see what data we have
+  console.log('🔍 Order Debug Data:', {
+    discount,
+    firstTimeDiscount,
+    subtotal,
+    totalAmount,
+    shippingCost,
+    calculatedTotal: subtotal + parseFloat(shippingCost) - discount,
+    actualTotal: totalAmount,
+  });
+
+  // Calculate first-time discount amount if applied
+  let firstTimeDiscountAmount = 0;
+  if (firstTimeDiscount?.isApplied) {
+    // Try to use saved amount first, then calculate from percentage
+    firstTimeDiscountAmount =
+      firstTimeDiscount.amount ||
+      (subtotal * (firstTimeDiscount.percentage || 10)) / 100;
+  }
+
+  // If no specific firstTimeDiscount data but discount > 0, check if it might be the first-time discount
+  if (!firstTimeDiscount?.isApplied && discount > 0) {
+    // Check if the discount amount matches a 10% first-time discount
+    const expectedFirstTimeDiscount = subtotal * 0.1;
+    if (Math.abs(discount - expectedFirstTimeDiscount) < 0.01) {
+      console.log('💡 Detected legacy first-time discount order');
+      firstTimeDiscountAmount = discount;
+    }
+  }
+
+  // Calculate other discounts (coupon, etc.)
+  const otherDiscounts = Math.max(0, discount - firstTimeDiscountAmount);
 
   const getStatusColor = () => {
     const statusLower = status.toLowerCase();
@@ -125,11 +159,28 @@ export default function OrderArea({ orderId }) {
                   <span>Shipping</span>
                   <span>${parseFloat(shippingCost.toFixed(2)).toFixed(2)}</span>
                 </div>
-                {discount > 0 && (
+                {/* First-time discount */}
+                {(firstTimeDiscount?.isApplied ||
+                  (!firstTimeDiscount?.isApplied &&
+                    discount > 0 &&
+                    Math.abs(discount - subtotal * 0.1) < 0.01)) &&
+                  firstTimeDiscountAmount > 0 && (
+                    <div className={styles.summaryRow}>
+                      <span>
+                        🎉 First-time order discount (-
+                        {firstTimeDiscount?.percentage || 10}%)
+                      </span>
+                      <span className={styles.discount}>
+                        -${firstTimeDiscountAmount.toFixed(2)}
+                      </span>
+                    </div>
+                  )}
+                {/* Other discounts (coupons, etc.) */}
+                {otherDiscounts > 0 && (
                   <div className={styles.summaryRow}>
-                    <span>Discount</span>
+                    <span>Other Discounts</span>
                     <span className={styles.discount}>
-                      -${parseFloat(discount.toFixed(2)).toFixed(2)}
+                      -${otherDiscounts.toFixed(2)}
                     </span>
                   </div>
                 )}
@@ -139,9 +190,10 @@ export default function OrderArea({ orderId }) {
                 <span className={styles.totalAmount}>
                   $
                   {(
-                    parseFloat(subtotal.toFixed(2)) +
-                    parseFloat(shippingCost.toFixed(2)) -
-                    parseFloat(discount.toFixed(2))
+                    subtotal -
+                    firstTimeDiscountAmount +
+                    parseFloat(shippingCost) -
+                    otherDiscounts
                   ).toFixed(2)}
                 </span>
               </div>

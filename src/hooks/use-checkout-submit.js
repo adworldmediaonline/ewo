@@ -31,13 +31,13 @@ const useCheckoutSubmit = () => {
   // createPaymentIntent
   const [createPaymentIntent, {}] = useCreatePaymentIntentMutation();
   // cart_products
-  const { cart_products } = useSelector(state => state.cart);
+  const { cart_products, firstTimeDiscount } = useSelector(state => state.cart);
   // user
   const { user } = useSelector(state => state.auth);
   // shipping_info
   const { shipping_info } = useSelector(state => state.order);
   // total amount
-  const { total, setTotal } = useCartInfo();
+  const { total, setTotal, firstTimeDiscountAmount } = useCartInfo();
   // couponInfo
   const [couponInfo, setCouponInfo] = useState({});
   //cartTotal
@@ -276,6 +276,12 @@ const useCheckoutSubmit = () => {
       state: newShippingInfo.state,
       user: user ? user._id : undefined,
       paymentMethod: 'Card',
+      // Add first-time discount information
+      firstTimeDiscount: {
+        isApplied: firstTimeDiscount?.isApplied || false,
+        percentage: firstTimeDiscount?.percentage || 0,
+        amount: firstTimeDiscountAmount || 0,
+      },
     };
 
     const card = elements?.getElement(CardElement);
