@@ -7,7 +7,13 @@ import styles from '../../app/cart/cart.module.css';
 import { useSelector } from 'react-redux';
 
 export default function CartCheckout() {
-  const { total, totalWithShipping } = useCartInfo();
+  const {
+    total,
+    totalWithShipping,
+    subtotal,
+    firstTimeDiscountAmount,
+    firstTimeDiscount,
+  } = useCartInfo();
   const { totalShippingCost, shippingDiscount } = useSelector(
     state => state.cart
   );
@@ -26,9 +32,24 @@ export default function CartCheckout() {
         <div className={styles['checkout-summary-item']}>
           <span className={styles['checkout-summary-label']}>Subtotal</span>
           <span className={styles['checkout-summary-value']}>
-            ${total.toFixed(2)}
+            ${(firstTimeDiscount.isApplied ? subtotal : total).toFixed(2)}
           </span>
         </div>
+
+        {/* First-time discount section */}
+        {firstTimeDiscount.isApplied && (
+          <div className={styles['checkout-discount-section']}>
+            <div className={styles['checkout-discount-item']}>
+              <span className={styles['checkout-discount-label']}>
+                🎉 First-time order discount (-{firstTimeDiscount.percentage}
+                %)
+              </span>
+              <span className={styles['checkout-discount-value']}>
+                -${firstTimeDiscountAmount.toFixed(2)}
+              </span>
+            </div>
+          </div>
+        )}
 
         <div className={styles['checkout-shipping']}>
           <h4 className={styles['checkout-shipping-title']}>Shipping</h4>

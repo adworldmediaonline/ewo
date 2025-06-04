@@ -30,6 +30,20 @@ export default function ProductItem({ product, style_2 = false }) {
   const isAddedToWishlist = wishlist.some(prd => prd._id === _id);
   const dispatch = useDispatch();
 
+  // Calculate pricing with markup and discount
+  const increasePriceWithInPercent = 20;
+  const discountOnPrice = 15;
+  const markedUpPrice = price * (1 + increasePriceWithInPercent / 100); // 20% markup
+  const finalSellingPrice = markedUpPrice * (1 - discountOnPrice / 100); // 15% discount on marked up price
+
+  // Create product with updated price for cart/wishlist/compare
+  const productWithCalculatedPrice = {
+    ...product,
+    price: finalSellingPrice,
+    originalPrice: price,
+    markedUpPrice: markedUpPrice,
+  };
+
   useEffect(() => {
     if (reviews && reviews.length > 0) {
       const rating =
@@ -43,16 +57,16 @@ export default function ProductItem({ product, style_2 = false }) {
 
   // handle add product
   const handleAddProduct = prd => {
-    dispatch(add_cart_product(prd));
+    dispatch(add_cart_product(productWithCalculatedPrice));
   };
   // handle wishlist product
   const handleWishlistProduct = prd => {
-    dispatch(add_to_wishlist(prd));
+    dispatch(add_to_wishlist(productWithCalculatedPrice));
   };
 
   // handle compare product
   const handleCompareProduct = prd => {
-    dispatch(add_to_compare(prd));
+    dispatch(add_to_compare(productWithCalculatedPrice));
   };
 
   return (
@@ -145,22 +159,54 @@ export default function ProductItem({ product, style_2 = false }) {
           />
         </div>
         <div className="tp-product-price-wrapper-2">
-          {discount > 0 ? (
-            <>
-              <div className="tp-product-price-info">
-                <span className="tp-product-price-2 new-price">
-                  ${(price - (price * discount) / 100).toFixed(2)}
-                </span>
-                <span className="tp-product-price-2 old-price">
-                  ${price.toFixed(2)}
-                </span>
-              </div>
-            </>
-          ) : (
-            <span className="tp-product-price-2 new-price">
-              ${price.toFixed(2)}
+          <div
+            className="tp-product-price-info"
+            style={{
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: '8px',
+              flexWrap: 'wrap',
+            }}
+          >
+            {/* Original Price */}
+            <span
+              className="tp-product-price-2 old-price"
+              style={{
+                color: '#dc3545',
+                fontSize: '14px',
+                fontWeight: '400',
+                textDecoration: 'none',
+              }}
+            >
+              $
+              <span style={{ textDecoration: 'line-through' }}>
+                {markedUpPrice.toFixed(2)}
+              </span>
             </span>
-          )}
+
+            {/* Current Selling Price */}
+            <span
+              className="tp-product-price-2 new-price"
+              style={{
+                fontSize: '22px',
+                fontWeight: '700',
+                color: '#2c3e50',
+                lineHeight: '1.1',
+              }}
+            >
+              ${finalSellingPrice.toFixed(2)}
+            </span>
+
+            {/* Savings Information */}
+            {/* <div style={{
+              fontSize: '11px',
+              color: '#28a745',
+              fontWeight: '500',
+              opacity: '0.9'
+            }}>
+              You save ${(markedUpPrice - finalSellingPrice).toFixed(2)}
+            </div> */}
+          </div>
         </div>
       </div>
     </div>

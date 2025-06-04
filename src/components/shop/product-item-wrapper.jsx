@@ -24,6 +24,20 @@ export default function ProductItemWrapper({ product }) {
   const isAddedToCart = cart_products.some(prd => prd._id === product._id);
   const cardRef = useRef(null);
 
+  // Calculate pricing with markup and discount (same as ProductItem)
+  const increasePriceWithInPercent = 20;
+  const discountOnPrice = 15;
+  const markedUpPrice = product.price * (1 + increasePriceWithInPercent / 100); // 20% markup
+  const finalSellingPrice = markedUpPrice * (1 - discountOnPrice / 100); // 15% discount on marked up price
+
+  // Create product with updated price for cart
+  const productWithCalculatedPrice = {
+    ...product,
+    price: finalSellingPrice,
+    originalPrice: product.price,
+    markedUpPrice: markedUpPrice,
+  };
+
   // Create a shallow copy of the product to modify the title safely
   const formattedProduct = {
     ...product,
@@ -33,7 +47,7 @@ export default function ProductItemWrapper({ product }) {
 
   const handleAddToCart = () => {
     if (product.status !== 'out-of-stock') {
-      dispatch(add_cart_product(product));
+      dispatch(add_cart_product(productWithCalculatedPrice));
     }
   };
 

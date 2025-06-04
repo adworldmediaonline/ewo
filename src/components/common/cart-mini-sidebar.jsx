@@ -7,13 +7,28 @@ import { useDispatch, useSelector } from 'react-redux';
 import useCartInfo from '@/hooks/use-cart-info';
 // import RenderCartProgress from './render-cart-progress';
 import empty_cart_img from '@assets/img/product/cartmini/empty-cart.png';
-import { closeCartMini, remove_product } from '@/redux/features/cartSlice';
+import {
+  closeCartMini,
+  remove_product,
+  add_cart_product,
+  quantityDecrement,
+} from '@/redux/features/cartSlice';
 import styles from './cart-mini-sidebar.module.css';
 
 export default function CartMiniSidebar() {
-  const { cart_products, cartMiniOpen } = useSelector(state => state.cart);
-  const { total } = useCartInfo();
+  const { cart_products, cartMiniOpen, firstTimeDiscount } = useSelector(
+    state => state.cart
+  );
+  const { total, subtotal, firstTimeDiscountAmount } = useCartInfo();
   const dispatch = useDispatch();
+
+  // Debug logging
+  console.log('🛒 Cart Mini Sidebar Debug:', {
+    showCelebration: firstTimeDiscount.showCelebration,
+    isApplied: firstTimeDiscount.isApplied,
+    cartLength: cart_products.length,
+    firstTimeDiscount,
+  });
 
   // handle remove product
   const handleRemovePrd = prd => {
@@ -23,6 +38,16 @@ export default function CartMiniSidebar() {
   // handle close cart mini
   const handleCloseCartMini = () => {
     dispatch(closeCartMini());
+  };
+
+  // handle increment quantity
+  const handleIncrement = prd => {
+    dispatch(add_cart_product(prd));
+  };
+
+  // handle decrement quantity
+  const handleDecrement = prd => {
+    dispatch(quantityDecrement(prd));
   };
 
   return (
@@ -57,6 +82,20 @@ export default function CartMiniSidebar() {
                 ✕
               </button>
             </div>
+            {/* First-time discount banner */}
+            {firstTimeDiscount.isApplied && (
+              <div className={styles.discountBanner}>
+                <div className={styles.discountBannerContent}>
+                  <span className={styles.discountIcon}>🎉</span>
+                  <span className={styles.discountText}>
+                    First-time order discount applied!
+                  </span>
+                  <span className={styles.discountAmount}>
+                    -{firstTimeDiscount.percentage}%
+                  </span>
+                </div>
+              </div>
+            )}
             {/* <div className="cartmini__shipping">
               <RenderCartProgress />
             </div> */}
@@ -82,22 +121,79 @@ export default function CartMiniSidebar() {
                         </Link>
                       </h5>
                       <div className={styles.cartMiniPriceWrapper}>
-                        {item.discount > 0 ? (
-                          <span className={styles.cartMiniPrice}>
+                        {/* Unit Price and Calculation Display */}
+                        <div className={styles.priceCalculation}>
+                          <span className={styles.unitPrice}>
                             $
-                            {(
-                              Number(item.price) -
-                              (Number(item.price) * Number(item.discount)) / 100
-                            ).toFixed(2)}
+                            {item.discount > 0
+                              ? (
+                                  Number(item.price) -
+                                  (Number(item.price) * Number(item.discount)) /
+                                    100
+                                ).toFixed(2)
+                              : Number(item.price).toFixed(2)}
                           </span>
-                        ) : (
-                          <span className={styles.cartMiniPrice}>
-                            ${Number(item.price).toFixed(2)}
+                          <span className={styles.multiply}>×</span>
+                          <span className={styles.quantity}>
+                            {item.orderQuantity}
                           </span>
-                        )}
-                        <span className={styles.cartMiniQuantity}>
-                          Qty: {item.orderQuantity}
-                        </span>
+                          <span className={styles.equals}>=</span>
+                          <span className={styles.totalPrice}>
+                            $
+                            {item.discount > 0
+                              ? (
+                                  (Number(item.price) -
+                                    (Number(item.price) *
+                                      Number(item.discount)) /
+                                      100) *
+                                  item.orderQuantity
+                                ).toFixed(2)
+                              : (
+                                  Number(item.price) * item.orderQuantity
+                                ).toFixed(2)}
+                          </span>
+                        </div>
+
+                        {/* Quantity Controls */}
+                        <div className={styles.quantityControls}>
+                          <button
+                            onClick={() => handleDecrement(item)}
+                            className={styles.quantityBtn}
+                            disabled={item.orderQuantity <= 1}
+                            aria-label="Decrease quantity"
+                          >
+                            <svg
+                              width="10"
+                              height="10"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                            >
+                              <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                          </button>
+                          <span className={styles.quantityValue}>
+                            {item.orderQuantity}
+                          </span>
+                          <button
+                            onClick={() => handleIncrement(item)}
+                            className={styles.quantityBtn}
+                            aria-label="Increase quantity"
+                          >
+                            <svg
+                              width="10"
+                              height="10"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                            >
+                              <line x1="12" y1="5" x2="12" y2="19"></line>
+                              <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                          </button>
+                        </div>
                       </div>
                     </div>
                     <button
@@ -131,8 +227,28 @@ export default function CartMiniSidebar() {
             )}
           </div>
           <div className={styles.cartMiniCheckout}>
+            <div className={styles.cartMiniCheckoutSummary}>
+              {/* Show subtotal if discount is applied */}
+              {firstTimeDiscount.isApplied && (
+                <div className={styles.cartMiniCheckoutLine}>
+                  <span>Subtotal:</span>
+                  <span>${subtotal.toFixed(2)}</span>
+                </div>
+              )}
+              {/* Show first-time discount */}
+              {firstTimeDiscount.isApplied && (
+                <div
+                  className={`${styles.cartMiniCheckoutLine} ${styles.discountLine}`}
+                >
+                  <span>
+                    First-time discount (-{firstTimeDiscount.percentage}%):
+                  </span>
+                  <span>-${firstTimeDiscountAmount.toFixed(2)}</span>
+                </div>
+              )}
+            </div>
             <div className={styles.cartMiniCheckoutTitle}>
-              <h4>Subtotal:</h4>
+              <h4>Total:</h4>
               <span>${total.toFixed(2)}</span>
             </div>
             <div className={styles.cartMiniCheckoutBtn}>

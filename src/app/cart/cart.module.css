@@ -532,6 +532,55 @@
   text-decoration: none;
 }
 
+/* First-time discount section styles */
+.checkout-discount-section {
+  background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  animation: fadeInSlide 0.3s ease-out;
+}
+
+.checkout-discount-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.checkout-discount-label {
+  color: #166534;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.checkout-discount-value {
+  color: #15803d;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+@keyframes fadeInSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.checkout-shipping {
+  margin: 1.5rem 0;
+  padding: 1rem 0;
+  border-top: 1px solid #eaeaea;
+  border-bottom: 1px solid #eaeaea;
+}
+
 /* Media Queries */
 @media (max-width: 991px) {
   .cart-content {
