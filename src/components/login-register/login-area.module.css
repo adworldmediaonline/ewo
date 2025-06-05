@@ -22,6 +22,36 @@
   margin-bottom: 1.5rem;
 }
 
+/* Back Button */
+.backButton {
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6b7280;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  padding: 0.5rem 0;
+}
+
+.backLink:hover {
+  color: #2563eb;
+}
+
+.backLink svg {
+  transition: transform 0.2s ease;
+}
+
+.backLink:hover svg {
+  transform: translateX(-2px);
+}
+
 .brandSection {
   margin-bottom: 1rem;
 }

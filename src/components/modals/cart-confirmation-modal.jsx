@@ -1,12 +1,13 @@
+'use client';
 import React, { useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { hideCartConfirmation } from '@/redux/features/cartSlice';
+import useGuestCartNavigation from '@/hooks/useGuestCartNavigation';
 import Image from 'next/image';
 
 export default function CartConfirmationModal() {
-  const router = useRouter();
   const dispatch = useDispatch();
+  const { navigateToCart } = useGuestCartNavigation();
   const { cart_products, showCartConfirmation, lastAddedProduct } = useSelector(
     state => state.cart
   );
@@ -38,9 +39,13 @@ export default function CartConfirmationModal() {
     };
   }, [showCartConfirmation, handleScroll]);
 
-  const handleClick = () => {
+  const handleViewCart = () => {
     dispatch(hideCartConfirmation());
-    router.push('/cart');
+    navigateToCart();
+  };
+
+  const handleContinueShopping = () => {
+    dispatch(hideCartConfirmation());
   };
 
   if (!showCartConfirmation) return null;
@@ -54,12 +59,12 @@ export default function CartConfirmationModal() {
     <div className="cart-confirmation-overlay">
       <div
         className="cart-confirmation-modal"
-        onClick={handleClick}
+        onClick={handleViewCart}
         role="button"
         tabIndex={0}
         onKeyDown={e => {
           if (e.key === 'Enter' || e.key === ' ') {
-            handleClick();
+            handleViewCart();
           }
         }}
       >

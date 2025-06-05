@@ -14,14 +14,14 @@
 
 .modalContent {
   background: white;
-  border-radius: 12px;
-  max-width: 500px;
+  border-radius: 16px;
+  max-width: 420px;
   width: 100%;
-  max-height: 90vh;
+  max-height: 85vh;
   overflow-y: auto;
   position: relative;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15),
+    0 10px 10px -5px rgba(0, 0, 0, 0.08);
   animation: modalSlideIn 0.3s ease-out;
 }
 
@@ -56,31 +56,31 @@
 }
 
 .modalHeader {
-  padding: 32px 32px 0;
+  padding: 24px 24px 0;
   text-align: center;
 }
 
 .modalTitle {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 700;
   color: #111827;
-  margin: 0 0 8px;
+  margin: 0 0 4px;
   line-height: 1.2;
 }
 
 .modalSubtitle {
-  font-size: 16px;
+  font-size: 14px;
   color: #6b7280;
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 .modalBody {
-  padding: 32px;
+  padding: 20px 24px 24px;
 }
 
 .optionSection {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .optionSection:last-child {
@@ -88,30 +88,30 @@
 }
 
 .optionTitle {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   color: #111827;
-  margin: 0 0 8px;
+  margin: 0 0 12px;
   line-height: 1.3;
 }
 
 .optionDescription {
-  font-size: 14px;
+  font-size: 13px;
   color: #6b7280;
-  margin: 0 0 20px;
-  line-height: 1.5;
+  margin: 0 0 16px;
+  line-height: 1.4;
 }
 
 .emailForm {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .inputGroup {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .inputLabel {
@@ -121,10 +121,10 @@
 }
 
 .emailInput {
-  padding: 12px 16px;
+  padding: 10px 14px;
   border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 16px;
+  border-radius: 10px;
+  font-size: 15px;
   transition: all 0.2s ease;
   background: white;
 }
@@ -157,7 +157,7 @@
 
 .buttonGroup {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   flex-direction: column;
 }
 
@@ -171,17 +171,17 @@
   background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
   color: white;
   border: none;
-  padding: 14px 24px;
-  border-radius: 8px;
-  font-size: 16px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-height: 52px;
+  gap: 6px;
+  min-height: 44px;
   flex: 1;
   box-shadow: 0 4px 12px rgba(55, 65, 81, 0.25);
 }
@@ -201,17 +201,17 @@
   background: linear-gradient(135deg, #cb0102 0%, #a50002 100%);
   color: white;
   border: none;
-  padding: 14px 24px;
-  border-radius: 8px;
-  font-size: 16px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-height: 52px;
+  gap: 6px;
+  min-height: 44px;
   flex: 1;
   box-shadow: 0 4px 12px rgba(203, 1, 2, 0.25);
 }
@@ -249,7 +249,7 @@
 .divider {
   position: relative;
   text-align: center;
-  margin: 24px 0;
+  margin: 20px 0;
 }
 
 .divider::before {
@@ -276,14 +276,14 @@
   background: linear-gradient(135deg, #cb0102 0%, #a50002 100%);
   color: white;
   border: none;
-  padding: 14px 24px;
-  border-radius: 8px;
-  font-size: 16px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   width: 100%;
-  min-height: 52px;
+  min-height: 44px;
   box-shadow: 0 4px 12px rgba(203, 1, 2, 0.25);
 }
 
@@ -294,8 +294,8 @@
 
 .registerPrompt {
   text-align: center;
-  margin-top: 16px;
-  font-size: 14px;
+  margin-top: 12px;
+  font-size: 13px;
   color: #6b7280;
 }
 
@@ -312,28 +312,32 @@
 /* Mobile responsiveness */
 @media (max-width: 640px) {
   .modalContent {
-    margin: 16px;
+    margin: 12px;
     max-width: none;
-    width: calc(100% - 32px);
+    width: calc(100% - 24px);
   }
 
   .modalHeader {
-    padding: 24px 24px 0;
+    padding: 20px 20px 0;
   }
 
   .modalBody {
-    padding: 24px;
+    padding: 16px 20px 20px;
   }
 
   .modalTitle {
-    font-size: 24px;
+    font-size: 20px;
   }
 
   .modalSubtitle {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .optionTitle {
-    font-size: 18px;
+    font-size: 16px;
+  }
+
+  .emailInput {
+    font-size: 16px; /* Prevents zoom on iOS */
   }
 }
