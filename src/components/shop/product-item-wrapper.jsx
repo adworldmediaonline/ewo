@@ -6,6 +6,7 @@ import styles from '../../app/shop/shop.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { add_cart_product } from '@/redux/features/cartSlice';
 import { useRouter } from 'next/navigation';
+import useGuestCartNavigation from '@/hooks/useGuestCartNavigation';
 
 // Function to convert text to title case (first letter of each word capitalized)
 // const toTitleCase = str => {
@@ -20,6 +21,7 @@ import { useRouter } from 'next/navigation';
 export default function ProductItemWrapper({ product }) {
   const router = useRouter();
   const dispatch = useDispatch();
+  const { navigateToCart } = useGuestCartNavigation();
   const { cart_products } = useSelector(state => state.cart);
   const isAddedToCart = cart_products.some(prd => prd._id === product._id);
   const cardRef = useRef(null);
@@ -52,8 +54,7 @@ export default function ProductItemWrapper({ product }) {
   };
 
   const handleViewCart = () => {
-    // window.location.href = '/cart';
-    router.push('/cart');
+    navigateToCart();
   };
 
   return (
