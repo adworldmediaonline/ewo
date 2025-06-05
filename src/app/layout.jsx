@@ -72,7 +72,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <GoogleTagManager gtmId="GTM-MB34NG65" />
       <body
-        className={`${lato.variable} ${lato.className}`}
+        className={`${lato.variable} ${lato.className} antialiased`}
         suppressHydrationWarning
       >
         <Providers>{children}</Providers>
