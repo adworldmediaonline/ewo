@@ -48,7 +48,7 @@ export default function HeaderV2() {
   // Add debounce ref to prevent double clicks
   const toggleDebounceRef = useRef(false);
 
-  // Simple and effective scroll handling
+  // Modern scroll handling - show sticky header when scrolling up
   useEffect(() => {
     // Disable sticky header on checkout page
     if (isCheckoutPage) {
@@ -70,12 +70,24 @@ export default function HeaderV2() {
       // Use different thresholds for different screen sizes
       const isMobile = window.innerWidth <= 768;
       const threshold = isMobile ? 100 : 200;
+      const hideThreshold = 50; // Minimum scroll distance to trigger hide/show
 
-      // Show sticky header when scrolling past threshold
-      if (currentScrollPos > threshold) {
-        setShowStickyHeader(true);
-      } else {
+      // At the top of the page - always hide sticky header
+      if (currentScrollPos <= threshold) {
         setShowStickyHeader(false);
+      }
+      // Past threshold - show/hide based on scroll direction
+      else if (currentScrollPos > threshold) {
+        // Only change state if there's significant scroll movement
+        if (Math.abs(scrollDelta) > hideThreshold) {
+          if (scrollDelta < 0) {
+            // Scrolling up - show sticky header
+            setShowStickyHeader(true);
+          } else {
+            // Scrolling down - hide sticky header
+            setShowStickyHeader(false);
+          }
+        }
       }
 
       prevScrollPos.current = currentScrollPos;
