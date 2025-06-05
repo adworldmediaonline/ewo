@@ -129,14 +129,7 @@ export const cartSlice = createSlice({
           orderQuantity: state.orderQuantity,
         };
 
-        // Create notification message that includes option if selected
-        let message = `${state.orderQuantity} ${payload.title}`;
-        if (payload.selectedOption) {
-          message += ` (${payload.selectedOption.title})`;
-        }
-        message += ' added to cart';
-
-        notifySuccess(message);
+        // Cart confirmation modal will handle user feedback - no toast needed
 
         // Trigger celebration for first product added by first-time customer
         if (isFirstProduct && isFirstTimeCustomer) {
@@ -170,14 +163,7 @@ export const cartSlice = createSlice({
                 orderQuantity: state.orderQuantity,
               };
 
-              // Create notification message that includes option if selected
-              let message = `${state.orderQuantity} ${item.title}`;
-              if (item.selectedOption) {
-                message += ` (${item.selectedOption.title})`;
-              }
-              message += ' added to cart';
-
-              notifySuccess(message);
+              // Cart confirmation modal will handle user feedback - no toast needed
             } else {
               notifyError('No more quantity available for this product!');
               state.orderQuantity = 1;
