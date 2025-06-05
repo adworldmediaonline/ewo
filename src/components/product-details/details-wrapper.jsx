@@ -48,17 +48,29 @@ export default function DetailsWrapper({
     }
   }, [reviews]);
 
-  // Calculate final price based on base price, discount, and selected option
+  // Calculate final price based on markup, discount, and selected option (same logic as product-item-wrapper)
   const calculateFinalPrice = () => {
-    const basePrice = Number(price);
-    const discountedPrice =
-      discount > 0
-        ? basePrice - (basePrice * Number(discount)) / 100
-        : basePrice;
+    // Apply 20% markup and 15% discount (same as product-item-wrapper)
+    const increasePriceWithInPercent = 20;
+    const discountOnPrice = 15;
+    const originalPrice = Number(price);
+    const markedUpPrice =
+      originalPrice * (1 + increasePriceWithInPercent / 100); // 20% markup
+    const finalSellingPrice = markedUpPrice * (1 - discountOnPrice / 100); // 15% discount on marked up price
 
     // Add option price if an option is selected
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    return (discountedPrice + optionPrice).toFixed(2);
+    return (finalSellingPrice + optionPrice).toFixed(2);
+  };
+
+  // Calculate original marked up price for display
+  const calculateMarkedUpPrice = () => {
+    const increasePriceWithInPercent = 20;
+    const originalPrice = Number(price);
+    const markedUpPrice =
+      originalPrice * (1 + increasePriceWithInPercent / 100);
+    const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+    return (markedUpPrice + optionPrice).toFixed(2);
   };
 
   // Handle option selection
@@ -97,8 +109,19 @@ export default function DetailsWrapper({
       return;
     }
 
+    // Apply same pricing logic as product-item-wrapper
+    const increasePriceWithInPercent = 20;
+    const discountOnPrice = 15;
+    const originalPrice = Number(prd.price);
+    const markedUpPrice =
+      originalPrice * (1 + increasePriceWithInPercent / 100);
+    const finalSellingPrice = markedUpPrice * (1 - discountOnPrice / 100);
+
     const productToAdd = {
       ...prd,
+      price: finalSellingPrice,
+      originalPrice: originalPrice,
+      markedUpPrice: markedUpPrice,
       selectedOption,
       // If an option is selected, update the final price to include the option price
       finalPrice: selectedOption ? calculateFinalPrice() : undefined,
@@ -161,22 +184,15 @@ export default function DetailsWrapper({
       </div>
 
       <div className={styles.productPrice}>
-        {discount > 0 ? (
-          <>
-            <span className={styles.currentPrice}>
-              ${calculateFinalPrice()}
-            </span>
-            <span className={styles.oldPrice}>${price?.toFixed(2)}</span>
-            <span className={styles.discount}>{discount}% OFF</span>
-          </>
-        ) : (
-          <span className={styles.currentPrice}>${calculateFinalPrice()}</span>
-        )}
+        <span className={styles.oldPrice}>
+          $
+          <span className={styles.oldPriceValue}>
+            {calculateMarkedUpPrice()}
+          </span>
+        </span>
+        <span className={styles.currentPrice}>${calculateFinalPrice()}</span>
         {selectedOption && (
-          <div className={styles.optionPriceInfo}>
-            {/* Includes ${selectedOption.price} for option: {selectedOption.title} */}
-            {selectedOption.title}
-          </div>
+          <div className={styles.optionPriceInfo}>{selectedOption.title}</div>
         )}
       </div>
 

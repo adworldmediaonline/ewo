@@ -426,7 +426,11 @@
 
 .oldPrice {
   font-size: 1.25rem;
-  color: #6c757d;
+  color: #cb0102;
+  margin-left: 0.5rem;
+}
+
+.oldPriceValue {
   text-decoration: line-through;
 }
 
@@ -434,9 +438,11 @@
   font-size: 0.875rem;
   font-weight: 500;
   color: #fff;
-  background-color: #28a745;
+  background: linear-gradient(135deg, #cb0102 0%, #a50002 100%);
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
+  margin-left: 0.5rem;
+  box-shadow: 0 2px 4px rgba(203, 1, 2, 0.2);
 }
 
 .productDescription {
@@ -528,7 +534,7 @@
 .addToCartButton {
   height: 45px;
   padding: 0 1.25rem;
-  background-color: #193264;
+  background: linear-gradient(135deg, #cb0102 0%, #a50002 100%);
   color: #fff;
   font-weight: 600;
   border: none;
@@ -539,10 +545,12 @@
   justify-content: center;
   gap: 0.5rem;
   transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(203, 1, 2, 0.25);
 }
 
 .addToCartButton:hover {
-  background-color: #0f2044;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(203, 1, 2, 0.3);
 }
 
 .addToCartDisabled {
