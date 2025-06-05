@@ -156,7 +156,7 @@
 }
 
 .continueButton {
-  background: #0989ff;
+  background: linear-gradient(135deg, #cb0102 0%, #a50002 100%);
   color: white;
   border: none;
   padding: 14px 24px;
@@ -170,11 +170,12 @@
   justify-content: center;
   gap: 8px;
   min-height: 52px;
+  box-shadow: 0 4px 12px rgba(203, 1, 2, 0.25);
 }
 
 .continueButton:hover:not(:disabled) {
-  background: #0876dd;
   transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(203, 1, 2, 0.3);
 }
 
 .continueButton:disabled {
@@ -229,7 +230,7 @@
 }
 
 .signInButton {
-  background: #374151;
+  background: linear-gradient(135deg, #cb0102 0%, #a50002 100%);
   color: white;
   border: none;
   padding: 14px 24px;
@@ -240,11 +241,12 @@
   transition: all 0.2s ease;
   width: 100%;
   min-height: 52px;
+  box-shadow: 0 4px 12px rgba(203, 1, 2, 0.25);
 }
 
 .signInButton:hover {
-  background: #1f2937;
   transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(203, 1, 2, 0.3);
 }
 
 .registerPrompt {
@@ -255,7 +257,7 @@
 }
 
 .registerLink {
-  color: #0989ff;
+  color: #cb0102;
   text-decoration: none;
   font-weight: 500;
 }
