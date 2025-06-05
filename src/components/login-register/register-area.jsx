@@ -33,6 +33,27 @@ export default function RegisterArea() {
                 <div
                   className={`tp-login-top text-center ${styles.registerHeader}`}
                 >
+                  {/* Back Button */}
+                  <div className={styles.backButton}>
+                    <Link href="/" className={styles.backLink}>
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <path
+                          d="M19 12H5M12 19L5 12L12 5"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      Back to Home
+                    </Link>
+                  </div>
+
                   <div className={styles.brandSection}>
                     <h1 className={`tp-login-title ${styles.registerTitle}`}>
                       Create Account
@@ -69,16 +90,6 @@ export default function RegisterArea() {
                       Sign in here
                     </Link>
                   </p>
-                </div>
-
-                {/* Optional: Social Login Placeholder */}
-                <div className={styles.socialSection}>
-                  <div className={styles.divider}>
-                    <span>or</span>
-                  </div>
-                  <div className={styles.socialPlaceholder}>
-                    <span>More sign-up options coming soon</span>
-                  </div>
                 </div>
               </div>
             </div>
