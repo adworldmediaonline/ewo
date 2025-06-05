@@ -15,6 +15,9 @@ const initialState = {
     percentage: 10,
     showCelebration: false,
   },
+  // Cart confirmation modal state
+  showCartConfirmation: false,
+  lastAddedProduct: null,
 };
 
 // Helper function to check if user is first-time customer
@@ -117,6 +120,15 @@ export const cartSlice = createSlice({
         };
         state.cart_products.push(newItem);
 
+        // Show cart confirmation modal
+        state.showCartConfirmation = true;
+        state.lastAddedProduct = {
+          title: payload.title,
+          img: payload.img,
+          selectedOption: payload.selectedOption,
+          orderQuantity: state.orderQuantity,
+        };
+
         // Create notification message that includes option if selected
         let message = `${state.orderQuantity} ${payload.title}`;
         if (payload.selectedOption) {
@@ -148,6 +160,15 @@ export const cartSlice = createSlice({
                 state.orderQuantity !== 1
                   ? state.orderQuantity + item.orderQuantity
                   : item.orderQuantity + 1;
+
+              // Show cart confirmation modal
+              state.showCartConfirmation = true;
+              state.lastAddedProduct = {
+                title: item.title,
+                img: item.img,
+                selectedOption: item.selectedOption,
+                orderQuantity: state.orderQuantity,
+              };
 
               // Create notification message that includes option if selected
               let message = `${state.orderQuantity} ${item.title}`;
@@ -225,6 +246,9 @@ export const cartSlice = createSlice({
       state.cartMiniOpen = false;
       // Clear any lingering celebration state on page load
       state.firstTimeDiscount.showCelebration = false;
+      // Clear cart confirmation modal state on page load
+      state.showCartConfirmation = false;
+      state.lastAddedProduct = null;
 
       // Update shipping costs and first-time discount when getting cart products
       updateShippingCosts(state);
@@ -263,6 +287,11 @@ export const cartSlice = createSlice({
     hideCelebration: state => {
       state.firstTimeDiscount.showCelebration = false;
     },
+    // Action to hide cart confirmation modal
+    hideCartConfirmation: state => {
+      state.showCartConfirmation = false;
+      state.lastAddedProduct = null;
+    },
     // Action to reset first-time discount (for testing purposes)
     resetFirstTimeDiscount: state => {
       localStorage.removeItem('first_time_discount_used');
@@ -294,6 +323,7 @@ export const {
   closeCartMini,
   openCartMini,
   hideCelebration,
+  hideCartConfirmation,
   resetFirstTimeDiscount,
   completeFirstTimeDiscount,
 } = cartSlice.actions;
