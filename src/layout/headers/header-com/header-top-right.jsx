@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { userLoggedOut } from '@/redux/features/auth/authSlice';
+import useGuestCartNavigation from '@/hooks/useGuestCartNavigation';
 
 // language
 function Language({ active, handleActive }) {
@@ -63,6 +64,7 @@ function Currency({ active, handleActive }) {
 // setting
 function ProfileSetting({ active, handleActive }) {
   const { user } = useSelector(state => state.auth);
+  const { navigateToCart } = useGuestCartNavigation();
   const dispatch = useDispatch();
   const router = useRouter();
   // handle logout
@@ -87,7 +89,19 @@ function ProfileSetting({ active, handleActive }) {
           <Link href="/wishlist">Wishlist</Link>
         </li>
         <li>
-          <Link href="/cart">Cart</Link>
+          <button
+            onClick={navigateToCart}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'inherit',
+              cursor: 'pointer',
+              padding: 0,
+              font: 'inherit',
+            }}
+          >
+            Cart
+          </button>
         </li>
         <li>
           {!user?.name && (

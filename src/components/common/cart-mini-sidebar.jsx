@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
 // internal
 import useCartInfo from '@/hooks/use-cart-info';
+import useGuestCartNavigation from '@/hooks/useGuestCartNavigation';
 // import RenderCartProgress from './render-cart-progress';
 import empty_cart_img from '@assets/img/product/cartmini/empty-cart.png';
 import {
@@ -20,6 +21,7 @@ export default function CartMiniSidebar() {
     state => state.cart
   );
   const { total, subtotal, firstTimeDiscountAmount } = useCartInfo();
+  const { navigateToCart, navigateToCheckout } = useGuestCartNavigation();
   const dispatch = useDispatch();
 
   // Debug logging for troubleshooting
@@ -253,20 +255,24 @@ export default function CartMiniSidebar() {
               <span>${total.toFixed(2)}</span>
             </div>
             <div className={styles.cartMiniCheckoutBtn}>
-              <Link
-                href="/cart"
-                onClick={handleCloseCartMini}
+              <button
+                onClick={() => {
+                  handleCloseCartMini();
+                  navigateToCart();
+                }}
                 className={styles.tpBtn}
               >
                 View Cart
-              </Link>
-              <Link
-                href="/checkout"
-                onClick={handleCloseCartMini}
+              </button>
+              <button
+                onClick={() => {
+                  handleCloseCartMini();
+                  navigateToCheckout();
+                }}
                 className={`${styles.tpBtn} ${styles.tpBtnBorder}`}
               >
                 Checkout
-              </Link>
+              </button>
             </div>
           </div>
         </div>

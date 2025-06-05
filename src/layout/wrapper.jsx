@@ -8,6 +8,7 @@ if (typeof window !== 'undefined') {
 import BackToTopCom from '@/components/common/back-to-top';
 import ProductModal from '@/components/common/product-modal';
 import FirstTimeCelebration from '@/components/common/first-time-celebration';
+import GuestCartModal from '@/components/modals/guest-cart-modal';
 import {
   get_cart_products,
   initialOrderQuantity,
@@ -89,6 +90,7 @@ const Wrapper = ({ children }) => {
         show={firstTimeDiscount.showCelebration}
         onClose={handleCloseCelebration}
       />
+      <GuestCartModal />
       {/* product modal start */}
       {productItem && <ProductModal />}
       {/* product modal end */}
