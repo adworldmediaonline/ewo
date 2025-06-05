@@ -256,17 +256,38 @@ export default function CartConfirmationModal() {
           }
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 768px) {
+          @keyframes slideUp {
+            from {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        }
+
+        @media (max-width: 768px) {
           .cart-confirmation-overlay {
-            left: 20px;
-            right: 20px;
+            bottom: 16px;
+            left: 16px;
+            right: 16px;
             transform: none;
+            width: calc(100% - 32px);
           }
 
           .cart-confirmation-modal {
             min-width: auto;
             max-width: none;
             width: 100%;
+            height: 60px;
+            padding: 14px 20px;
+          }
+
+          .cart-text-content {
+            gap: 6px;
           }
 
           .view-cart-text {
@@ -275,6 +296,69 @@ export default function CartConfirmationModal() {
 
           .item-count {
             font-size: 13px;
+            padding: 3px 6px;
+          }
+
+          .product-images-container {
+            width: 44px;
+            height: 28px;
+          }
+
+          .product-image-wrapper {
+            width: 28px;
+            height: 28px;
+          }
+
+          .arrow-icon {
+            width: 20px;
+            height: 20px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .cart-confirmation-overlay {
+            bottom: 12px;
+            left: 12px;
+            right: 12px;
+            width: calc(100% - 24px);
+          }
+
+          .cart-confirmation-modal {
+            height: 56px;
+            padding: 12px 16px;
+          }
+
+          .cart-text-content {
+            gap: 4px;
+          }
+
+          .view-cart-text {
+            font-size: 14px;
+          }
+
+          .item-count {
+            font-size: 12px;
+            padding: 2px 5px;
+          }
+
+          .product-images-container {
+            width: 40px;
+            height: 26px;
+          }
+
+          .product-image-wrapper {
+            width: 26px;
+            height: 26px;
+          }
+
+          .arrow-icon {
+            width: 18px;
+            height: 18px;
+          }
+
+          .arrow-icon svg {
+            width: 14px;
+            height: 14px;
           }
         }
       `}</style>
