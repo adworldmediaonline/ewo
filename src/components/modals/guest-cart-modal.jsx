@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
 import {
@@ -14,6 +14,7 @@ import styles from '@/components/modals/guest-cart-modal.module.css';
 export default function GuestCartModal() {
   const dispatch = useDispatch();
   const router = useRouter();
+  const pathname = usePathname();
   const { showModal } = useSelector(state => state.guestCart);
   const { cart_products } = useSelector(state => state.cart);
 
@@ -22,6 +23,19 @@ export default function GuestCartModal() {
 
   // RTK Query mutation
   const [saveGuestCart, { isLoading, error }] = useSaveGuestCartMutation();
+
+  // Don't show modal on auth pages (login, register, etc.)
+  const isAuthPage =
+    pathname.includes('/login') ||
+    pathname.includes('/register') ||
+    pathname.includes('/email-verify') ||
+    pathname.includes('/forgot') ||
+    pathname.includes('/forget-password');
+
+  // If we're on an auth page, don't render the modal even if showModal is true
+  if (isAuthPage) {
+    return null;
+  }
 
   const validateEmail = email => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
