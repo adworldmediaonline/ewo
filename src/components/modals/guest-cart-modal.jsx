@@ -91,6 +91,47 @@ export default function GuestCartModal() {
     }
   };
 
+  const handleViewCart = async () => {
+    if (!email.trim()) {
+      setEmailError('Please enter your email address');
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+
+    if (cart_products.length === 0) {
+      toast.error('Your cart is empty');
+      return;
+    }
+
+    try {
+      // Save cart using RTK Query (same API call as continue to checkout)
+      const result = await saveGuestCart({
+        email,
+        cartItems: cart_products,
+      }).unwrap();
+
+      // Store email for future use
+      dispatch(setGuestEmail(email));
+      localStorage.setItem('guestEmail', email);
+
+      dispatch(hideGuestCartModal());
+      toast.success('Cart saved! Redirecting to cart...');
+
+      // Redirect to cart page
+      router.push('/cart');
+    } catch (error) {
+      console.error('Error saving guest cart:', error);
+      const errorMessage =
+        error?.data?.message || error?.message || 'Failed to save cart';
+      setEmailError(errorMessage);
+      toast.error(`${errorMessage}. Please try again.`);
+    }
+  };
+
   const handleSignIn = () => {
     dispatch(hideGuestCartModal());
     router.push('/login?redirect=/checkout');
@@ -167,33 +208,63 @@ export default function GuestCartModal() {
                 </div>
               )}
 
-              <button
-                onClick={handleContinueAsGuest}
-                disabled={isLoading || !email.trim()}
-                className={styles.continueButton}
-              >
-                {isLoading ? (
-                  <span className={styles.loadingSpinner}>
-                    <svg width="20" height="20" viewBox="0 0 24 24">
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeDasharray="31.416"
-                        strokeDashoffset="31.416"
-                        className={styles.spinner}
-                      />
-                    </svg>
-                    Saving...
-                  </span>
-                ) : (
-                  'Continue to Checkout'
-                )}
-              </button>
+              <div className={styles.buttonGroup}>
+                <button
+                  onClick={handleViewCart}
+                  disabled={isLoading || !email.trim()}
+                  className={styles.viewCartButton}
+                >
+                  {isLoading ? (
+                    <span className={styles.loadingSpinner}>
+                      <svg width="20" height="20" viewBox="0 0 24 24">
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          fill="none"
+                          strokeLinecap="round"
+                          strokeDasharray="31.416"
+                          strokeDashoffset="31.416"
+                          className={styles.spinner}
+                        />
+                      </svg>
+                      Saving...
+                    </span>
+                  ) : (
+                    'View Cart'
+                  )}
+                </button>
+
+                <button
+                  onClick={handleContinueAsGuest}
+                  disabled={isLoading || !email.trim()}
+                  className={styles.continueButton}
+                >
+                  {isLoading ? (
+                    <span className={styles.loadingSpinner}>
+                      <svg width="20" height="20" viewBox="0 0 24 24">
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          fill="none"
+                          strokeLinecap="round"
+                          strokeDasharray="31.416"
+                          strokeDashoffset="31.416"
+                          className={styles.spinner}
+                        />
+                      </svg>
+                      Saving...
+                    </span>
+                  ) : (
+                    'Continue to Checkout'
+                  )}
+                </button>
+              </div>
             </div>
           </div>
 
