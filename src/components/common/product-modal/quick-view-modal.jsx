@@ -136,7 +136,7 @@ export default function QuickViewModal() {
     };
 
     dispatch(add_cart_product(productToAdd));
-    notifySuccess('Product added to cart successfully!');
+    // Cart confirmation modal will handle user feedback - no toast needed
   };
 
   const handleWishlistProduct = prd => {

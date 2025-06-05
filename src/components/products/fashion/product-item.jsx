@@ -148,7 +148,12 @@ export default function ProductItem({ product, style_2 = false }) {
           </div>
         )}
         <h3 className="tp-product-title-2">
-          <Link href={`/product/${slug}`}>{title}</Link>
+          <Link
+            href={`/product/${slug}`}
+            style={{ fontWeight: '700 !important' }}
+          >
+            {title}
+          </Link>
         </h3>
         <div className="tp-product-rating-icon tp-product-rating-icon-2">
           <Rating
