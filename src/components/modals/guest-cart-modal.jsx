@@ -163,10 +163,7 @@ export default function GuestCartModal() {
 
         {/* Header */}
         <div className={styles.modalHeader}>
-          <h2 className={styles.modalTitle}>Continue Your Purchase</h2>
-          <p className={styles.modalSubtitle}>
-            Choose how you'd like to proceed with your order
-          </p>
+          <h2 className={styles.modalTitle}>Choose Your Option</h2>
         </div>
 
         {/* Content */}
@@ -175,15 +172,11 @@ export default function GuestCartModal() {
           <div className={styles.optionSection}>
             <h3 className={styles.optionTitle}>Continue as Guest</h3>
             <p className={styles.optionDescription}>
-              Continue as guest by entering your email. We'll save your cart and
-              send order updates.
+              Enter your email to save your cart and proceed to checkout.
             </p>
 
             <div className={styles.emailForm}>
               <div className={styles.inputGroup}>
-                <label htmlFor="guest-email" className={styles.inputLabel}>
-                  Email Address
-                </label>
                 <input
                   id="guest-email"
                   type="email"
@@ -216,7 +209,7 @@ export default function GuestCartModal() {
                 >
                   {isLoading ? (
                     <span className={styles.loadingSpinner}>
-                      <svg width="20" height="20" viewBox="0 0 24 24">
+                      <svg width="16" height="16" viewBox="0 0 24 24">
                         <circle
                           cx="12"
                           cy="12"
@@ -244,7 +237,7 @@ export default function GuestCartModal() {
                 >
                   {isLoading ? (
                     <span className={styles.loadingSpinner}>
-                      <svg width="20" height="20" viewBox="0 0 24 24">
+                      <svg width="16" height="16" viewBox="0 0 24 24">
                         <circle
                           cx="12"
                           cy="12"
@@ -277,7 +270,7 @@ export default function GuestCartModal() {
           <div className={styles.optionSection}>
             <h3 className={styles.optionTitle}>Sign In</h3>
             <p className={styles.optionDescription}>
-              Sign in to your account for faster checkout and order tracking.
+              Access your account for faster checkout and order history.
             </p>
 
             <button onClick={handleSignIn} className={styles.signInButton}>
@@ -290,7 +283,7 @@ export default function GuestCartModal() {
                 href="/register?redirect=/checkout"
                 className={styles.registerLink}
               >
-                Create one here
+                Create one
               </Link>
             </p>
           </div>
