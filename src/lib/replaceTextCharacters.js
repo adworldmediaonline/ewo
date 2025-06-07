@@ -10,3 +10,11 @@ export const replaceTextCharacters = (
   const escapedChar = charToReplace.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   return text.replace(new RegExp(escapedChar, 'g'), replacementChar);
 };
+
+export const formatParenthesesText = text => {
+  if (!text) return '';
+  if (typeof text !== 'string') return String(text);
+
+  // Match text inside parentheses and wrap it with bold and italic tags while keeping the parentheses
+  return text.replace(/\((.*?)\)/g, '(<strong><em>$1</em></strong>)');
+};
