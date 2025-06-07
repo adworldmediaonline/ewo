@@ -9,6 +9,7 @@ import { handleProductModal } from '@/redux/features/productModalSlice';
 import { add_cart_product } from '@/redux/features/cartSlice';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { add_to_compare } from '@/redux/features/compareSlice';
+import { replaceTextCharacters } from '@/lib/replaceTextCharacters';
 
 export default function ProductItem({ product, style_2 = false }) {
   const {
@@ -152,7 +153,7 @@ export default function ProductItem({ product, style_2 = false }) {
             href={`/product/${slug}`}
             style={{ fontWeight: '700 !important' }}
           >
-            {title}
+            {replaceTextCharacters(title, '*', '')}
           </Link>
         </h3>
         <div className="tp-product-rating-icon tp-product-rating-icon-2">

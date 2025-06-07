@@ -11,6 +11,7 @@ import { add_cart_product } from '@/redux/features/cartSlice';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { add_to_compare } from '@/redux/features/compareSlice';
 import { notifyError } from '@/utils/toast';
+import { replaceTextCharacters } from '@/lib/replaceTextCharacters';
 // import { titleCaseFirstLetterOfEveryWord } from '@/lib/titleCaseFirstLetterOfEveryWord';
 
 export default function DetailsWrapper({
@@ -154,7 +155,7 @@ export default function DetailsWrapper({
       )}
 
       <h1 className={styles.productTitle}>
-        {title}
+        {replaceTextCharacters(title, '*', '')}
         {/* {titleCaseFirstLetterOfEveryWord(title)} */}
       </h1>
 

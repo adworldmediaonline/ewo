@@ -6,6 +6,7 @@ import { useCallback, useState, useRef, useEffect } from 'react';
 import { debounce } from 'lodash';
 import { useRouter } from 'next/navigation';
 import CloudinaryImage from '@/components/common/CloudinaryImage';
+import { replaceTextCharacters } from '@/lib/replaceTextCharacters';
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:7000';
 
@@ -181,7 +182,7 @@ export default function SearchForm({ inputRef }) {
                 )}
                 <div className={styles.suggestionInfo}>
                   <div className={styles.suggestionTitle}>
-                    {suggestion.title}
+                    {replaceTextCharacters(suggestion.title, '*', '')}
                   </div>
                   {suggestion.price && (
                     <div className={styles.suggestionPrice}>
