@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import Pagination from '@/ui/Pagination';
 import CategoryFilter from './shop-filter/category-filter';
-import PriceFilter from './shop-filter/price-filter';
+// import PriceFilter from './shop-filter/price-filter';
 import StatusFilter from './shop-filter/status-filter';
 import TopRatedProducts from './shop-filter/top-rated-products';
 // import ShopListItem from './shop-list-item';
@@ -45,10 +45,10 @@ const ShopContent = ({
             <div className={`d-none d-lg-block ${styles.shopSidebar}`}>
               <div className={styles.filterSection}>
                 {/* filter */}
-                <PriceFilter
+                {/* <PriceFilter
                   priceFilterValues={priceFilterValues}
                   maxPrice={maxPrice}
-                />
+                /> */}
                 {/* status */}
                 <StatusFilter setCurrPage={setCurrPage} />
                 {/* categories */}
@@ -117,10 +117,10 @@ const ShopContent = ({
             <div className={`d-none d-lg-block ${styles.shopSidebar}`}>
               <div className={styles.filterSection}>
                 {/* filter */}
-                <PriceFilter
+                {/* <PriceFilter
                   priceFilterValues={priceFilterValues}
                   maxPrice={maxPrice}
-                />
+                /> */}
                 {/* status */}
                 <StatusFilter setCurrPage={setCurrPage} />
                 {/* categories */}
