@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import CategoryFilter from '../shop/shop-filter/category-filter';
-import PriceFilter from '../shop/shop-filter/price-filter';
+// import PriceFilter from '../shop/shop-filter/price-filter';
 import StatusFilter from '../shop/shop-filter/status-filter';
 import TopRatedProducts from '../shop/shop-filter/top-rated-products';
 import {
@@ -43,10 +43,10 @@ const ShopFilterOffCanvas = ({
           </div>
           <div className="tp-shop-sidebar">
             {/* filter */}
-            <PriceFilter
+            {/* <PriceFilter
               priceFilterValues={priceFilterValues}
               maxPrice={maxPrice}
-            />
+            /> */}
             {/* status */}
             <StatusFilter setCurrPage={setCurrPage} shop_right={right_side} />
             {/* categories */}
