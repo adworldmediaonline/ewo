@@ -9,7 +9,7 @@ export default function BannerWithDiscount() {
     <div className={styles.bannerContainer}>
       <Link href="/profile">
         <CldImage
-          src="discount_sallbi"
+          src="EWO_Website_Block_Image_01_omtnwa"
           width={1680}
           height={401}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1680px"
