@@ -33,5 +33,6 @@ export const apiSlice = createApi({
     'PopularProducts',
     'TopRatedProducts',
     'GuestCart',
+    'CartAnalytics',
   ],
 });

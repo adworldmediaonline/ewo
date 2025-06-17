@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import ProductItem from '../products/fashion/product-item';
 import styles from '../../app/shop/shop.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { add_cart_product } from '@/redux/features/cartSlice';
 import { useRouter } from 'next/navigation';
 import useGuestCartNavigation from '@/hooks/useGuestCartNavigation';
+import useCartTracking from '@/hooks/useCartTracking';
 
 // Function to convert text to title case (first letter of each word capitalized)
 // const toTitleCase = str => {
@@ -25,6 +26,12 @@ export default function ProductItemWrapper({ product }) {
   const { cart_products } = useSelector(state => state.cart);
   const isAddedToCart = cart_products.some(prd => prd._id === product._id);
   const cardRef = useRef(null);
+  const { trackAddToCart, resetPageLoadTime } = useCartTracking();
+
+  // Reset page load time when component mounts (when viewing a product)
+  useEffect(() => {
+    resetPageLoadTime();
+  }, [product._id, resetPageLoadTime]);
 
   // Calculate pricing with markup and discount (same as ProductItem)
   const increasePriceWithInPercent = 20;
@@ -47,8 +54,24 @@ export default function ProductItemWrapper({ product }) {
     title: product.title,
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (product.status !== 'out-of-stock') {
+      // First, track the add to cart event
+      try {
+        await trackAddToCart(product, {
+          quantity: 1,
+          source: 'shop-page',
+          originalPrice: product.price,
+          markedUpPrice: markedUpPrice,
+          finalPrice: finalSellingPrice,
+          discountPercentage: discountOnPrice,
+        });
+      } catch (error) {
+        console.error('Cart tracking failed:', error);
+        // Continue with adding to cart even if tracking fails
+      }
+
+      // Then add to cart as usual
       dispatch(add_cart_product(productWithCalculatedPrice));
     }
   };
