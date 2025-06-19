@@ -24,14 +24,14 @@ export default function DetailsWrapper({
     title,
     imageURLs,
     category,
-    description,
-    discount,
     price,
     status,
     reviews,
     tags,
     offerDate,
     options,
+    updatedPrice,
+    finalPriceDiscount,
   } = productItem || {};
   const [ratingVal, setRatingVal] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -49,29 +49,24 @@ export default function DetailsWrapper({
     }
   }, [reviews]);
 
-  // Calculate final price based on markup, discount, and selected option (same logic as product-item-wrapper)
+  // Calculate final price using pre-calculated database values
   const calculateFinalPrice = () => {
-    // Apply 20% markup and 15% discount (same as product-item-wrapper)
-    const increasePriceWithInPercent = 20;
-    const discountOnPrice = 15;
-    const originalPrice = Number(price);
-    const markedUpPrice =
-      originalPrice * (1 + increasePriceWithInPercent / 100); // 20% markup
-    const finalSellingPrice = markedUpPrice * (1 - discountOnPrice / 100); // 15% discount on marked up price
+    // Use pre-calculated finalPriceDiscount from database, fallback to original price
+    const baseFinalPrice = finalPriceDiscount || price;
 
     // Add option price if an option is selected
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    return (finalSellingPrice + optionPrice).toFixed(2);
+    return (Number(baseFinalPrice) + optionPrice).toFixed(2);
   };
 
-  // Calculate original marked up price for display
+  // Calculate marked up price for display using pre-calculated database values
   const calculateMarkedUpPrice = () => {
-    const increasePriceWithInPercent = 20;
-    const originalPrice = Number(price);
-    const markedUpPrice =
-      originalPrice * (1 + increasePriceWithInPercent / 100);
+    // Use pre-calculated updatedPrice from database, fallback to original price
+    const baseMarkedUpPrice = updatedPrice || price;
+
+    // Add option price if an option is selected
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    return (markedUpPrice + optionPrice).toFixed(2);
+    return (Number(baseMarkedUpPrice) + optionPrice).toFixed(2);
   };
 
   // Handle option selection
@@ -110,13 +105,10 @@ export default function DetailsWrapper({
       return;
     }
 
-    // Apply same pricing logic as product-item-wrapper
-    const increasePriceWithInPercent = 20;
-    const discountOnPrice = 15;
+    // Use pre-calculated prices from database
+    const finalSellingPrice = prd.finalPriceDiscount || prd.price;
+    const markedUpPrice = prd.updatedPrice || prd.price;
     const originalPrice = Number(prd.price);
-    const markedUpPrice =
-      originalPrice * (1 + increasePriceWithInPercent / 100);
-    const finalSellingPrice = markedUpPrice * (1 - discountOnPrice / 100);
 
     const productToAdd = {
       ...prd,

@@ -250,6 +250,16 @@ const useCheckoutSubmit = () => {
       return;
     }
 
+    // Calculate correct subtotal (before any discounts)
+    const rawSubTotal =
+      cart_products?.reduce(
+        (acc, item) => acc + item.price * item.orderQuantity,
+        0
+      ) || 0;
+
+    // Calculate total discount amount (coupon + first-time discount)
+    const totalDiscount = discountAmount + (firstTimeDiscountAmount || 0);
+
     const orderInfo = {
       cart: cart_products?.map(item => {
         const {
@@ -262,9 +272,9 @@ const useCheckoutSubmit = () => {
         } = item;
         return otherProperties;
       }),
-      subTotal: total,
+      subTotal: rawSubTotal, // Raw subtotal before any discounts
       shippingCost: shippingCost,
-      discount: discountAmount,
+      discount: discountAmount, // Coupon discount only
       totalAmount: cartTotal,
       name: newShippingInfo.name,
       email: newShippingInfo.email,
@@ -299,6 +309,14 @@ const useCheckoutSubmit = () => {
     // COD logic
     if (newShippingInfo.shippingOption === 'COD') {
       orderInfo.paymentMethod = 'COD';
+
+      console.log('📦 COD Order Info:', {
+        subTotal: orderInfo.subTotal,
+        shippingCost: orderInfo.shippingCost,
+        discount: orderInfo.discount,
+        firstTimeDiscount: orderInfo.firstTimeDiscount,
+        totalAmount: orderInfo.totalAmount,
+      });
 
       saveOrder(orderInfo)
         .then(res => {
@@ -448,6 +466,14 @@ const useCheckoutSubmit = () => {
 
             setIsCheckoutSubmit(false);
             setProcessingPayment(false);
+
+            console.log('💳 Card Order Info:', {
+              subTotal: orderInfo.subTotal,
+              shippingCost: orderInfo.shippingCost,
+              discount: orderInfo.discount,
+              firstTimeDiscount: orderInfo.firstTimeDiscount,
+              totalAmount: orderInfo.totalAmount,
+            });
 
             // Save order and show Thank You modal
             saveOrder({

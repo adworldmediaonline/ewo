@@ -7,7 +7,7 @@ import DetailsThumbWrapper from './details-thumb-wrapper';
 import styles from '../../app/product/[id]/product-details.module.css';
 
 export default function ProductDetailsContent({ productItem }) {
-  const { _id, img, imageURLs, videoId, status, title } = productItem || {};
+  const { _id, img, imageURLs, videoId, status } = productItem || {};
   const [activeImg, setActiveImg] = useState(imageURLs?.[0] || img);
 
   useEffect(() => {
