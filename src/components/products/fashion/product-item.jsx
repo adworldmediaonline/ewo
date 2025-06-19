@@ -26,6 +26,8 @@ export default function ProductItem({ product, style_2 = false }) {
     tags,
     status,
     slug,
+    updatedPrice,
+    finalPriceDiscount,
   } = product || {};
   const [ratingVal, setRatingVal] = useState(0);
   const { cart_products } = useSelector(state => state.cart);
@@ -34,11 +36,9 @@ export default function ProductItem({ product, style_2 = false }) {
   const isAddedToWishlist = wishlist.some(prd => prd._id === _id);
   const dispatch = useDispatch();
 
-  // Calculate pricing with markup and discount
-  const increasePriceWithInPercent = 20;
-  const discountOnPrice = 15;
-  const markedUpPrice = price * (1 + increasePriceWithInPercent / 100); // 20% markup
-  const finalSellingPrice = markedUpPrice * (1 - discountOnPrice / 100); // 15% discount on marked up price
+  // Use pre-calculated values from database
+  const markedUpPrice = updatedPrice || price; // fallback to original price if updatedPrice not available
+  const finalSellingPrice = finalPriceDiscount || price; // fallback to original price if finalPriceDiscount not available
 
   // Create product with updated price for cart/wishlist/compare
   const productWithCalculatedPrice = {
