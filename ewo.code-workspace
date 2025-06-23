@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "../ewo-backend"
+		},
+		{
+			"path": "../ewo-admin"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {}
+}
