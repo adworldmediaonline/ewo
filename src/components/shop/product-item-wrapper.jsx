@@ -89,12 +89,22 @@ export default function ProductItemWrapper({ product }) {
         // Also trigger client-side Meta pixel AddToCart event
         if (typeof window !== 'undefined' && window.fbq) {
           console.log('🎯 [FRONTEND] Triggering client-side Meta AddToCart...');
-          window.fbq('track', 'AddToCart', {
+          
+          // Add test event code for Meta testing
+          const eventData = {
             content_ids: [product._id],
             content_type: 'product',
             value: finalSellingPrice,
             currency: 'USD'
-          });
+          };
+          
+          // Add test event code if in development
+          if (process.env.NODE_ENV !== 'production') {
+            eventData.test_event_code = 'TEST75064';
+            console.log('🧪 [FRONTEND] Added test event code: TEST75064');
+          }
+          
+          window.fbq('track', 'AddToCart', eventData);
           console.log('✅ [FRONTEND] Client-side Meta AddToCart sent');
         }
       } catch (error) {
