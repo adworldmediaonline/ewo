@@ -67,7 +67,15 @@ const useCartTracking = () => {
   // Track add to cart event
   const trackAddToCart = useCallback(
     async (product, quantityOrOptions = 1, source = 'product-page') => {
-      if (!sessionId || !product) return null;
+      console.log('🎯 [HOOK] trackAddToCart called');
+      console.log('📋 [HOOK] sessionId:', sessionId);
+      console.log('👤 [HOOK] user:', user ? { id: user.id, email: user.email } : 'No user');
+      console.log('📦 [HOOK] product:', product ? { id: product._id, title: product.title } : 'No product');
+      
+      if (!sessionId || !product) {
+        console.log('❌ [HOOK] Missing sessionId or product, returning null');
+        return null;
+      }
 
       try {
         // Handle if second parameter is an object (options) or a number (quantity)
@@ -100,11 +108,14 @@ const useCartTracking = () => {
           ...options, // Include any additional options
         };
 
+        console.log('📊 [HOOK] Final tracking data:', trackingData);
+        console.log('🚀 [HOOK] Making API call...');
+
         const result = await trackAddToCartMutation(trackingData).unwrap();
-        console.log('Cart tracking successful:', result);
+        console.log('✅ [HOOK] Cart tracking successful:', result);
         return result;
       } catch (error) {
-        console.error('Cart tracking error:', error);
+        console.error('❌ [HOOK] Cart tracking error:', error);
         return null;
       }
     },

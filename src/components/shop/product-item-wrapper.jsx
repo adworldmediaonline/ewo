@@ -55,10 +55,18 @@ export default function ProductItemWrapper({ product }) {
   };
 
   const handleAddToCart = async () => {
+    console.log('🛒 [FRONTEND] handleAddToCart clicked for product:', product._id);
+    
     if (product.status !== 'out-of-stock') {
       // First, track the add to cart event
       try {
-        await trackAddToCart(product, {
+        console.log('🎯 [FRONTEND] Calling trackAddToCart...');
+        console.log('📦 [FRONTEND] Product data:', {
+          id: product._id,
+          title: product.title,
+          price: product.price
+        });
+        console.log('⚙️ [FRONTEND] Tracking options:', {
           quantity: 1,
           source: 'shop-page',
           originalPrice: product.price,
@@ -66,13 +74,40 @@ export default function ProductItemWrapper({ product }) {
           finalPrice: finalSellingPrice,
           discountPercentage: discountOnPrice,
         });
+        
+        const trackingResult = await trackAddToCart(product, {
+          quantity: 1,
+          source: 'shop-page',
+          originalPrice: product.price,
+          markedUpPrice: markedUpPrice,
+          finalPrice: finalSellingPrice,
+          discountPercentage: discountOnPrice,
+        });
+        
+        console.log('✅ [FRONTEND] trackAddToCart result:', trackingResult);
+        
+        // Also trigger client-side Meta pixel AddToCart event
+        if (typeof window !== 'undefined' && window.fbq) {
+          console.log('🎯 [FRONTEND] Triggering client-side Meta AddToCart...');
+          window.fbq('track', 'AddToCart', {
+            content_ids: [product._id],
+            content_type: 'product',
+            value: finalSellingPrice,
+            currency: 'USD'
+          });
+          console.log('✅ [FRONTEND] Client-side Meta AddToCart sent');
+        }
       } catch (error) {
-        console.error('Cart tracking failed:', error);
+        console.error('❌ [FRONTEND] Cart tracking failed:', error);
         // Continue with adding to cart even if tracking fails
       }
 
       // Then add to cart as usual
+      console.log('🛍️ [FRONTEND] Adding to Redux cart...');
       dispatch(add_cart_product(productWithCalculatedPrice));
+      console.log('✅ [FRONTEND] Added to Redux cart successfully');
+    } else {
+      console.log('❌ [FRONTEND] Product is out of stock');
     }
   };
 
