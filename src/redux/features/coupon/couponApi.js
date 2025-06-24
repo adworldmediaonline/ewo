@@ -9,7 +9,30 @@ export const authApi = apiSlice.injectEndpoints({
       providesTags:['Coupon'],
       keepUnusedDataFor: 600,
     }),
+    
+    // validate coupon - Enhanced coupon validation
+    validateCoupon: builder.mutation({
+      query: (data) => ({
+        url: 'api/coupon/validate',
+        method: 'POST',
+        body: data,
+      }),
+    }),
+    
+    // get valid coupons for user
+    getValidCoupons: builder.query({
+      query: (userId) => {
+        const params = userId ? `?userId=${userId}` : '';
+        return `api/coupon/valid/list${params}`;
+      },
+      providesTags: ['Coupon'],
+      keepUnusedDataFor: 300,
+    }),
   }),
 });
 
-export const { useGetOfferCouponsQuery } = authApi;
+export const { 
+  useGetOfferCouponsQuery, 
+  useValidateCouponMutation,
+  useGetValidCouponsQuery 
+} = authApi;

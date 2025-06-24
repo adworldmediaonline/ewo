@@ -10,6 +10,7 @@ import {
   add_cart_product,
   quantityDecrement,
 } from '@/redux/features/cartSlice';
+import { load_applied_coupon } from '@/redux/features/coupon/couponSlice';
 import styles from './checkout-order-area.module.css';
 
 // Custom styles for quantity controls
@@ -72,16 +73,31 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
     couponRef,
     couponApplyMsg,
   } = checkoutData;
+  
   const {
     cart_products,
     totalShippingCost,
     shippingDiscount,
     firstTimeDiscount,
   } = useSelector(state => state.cart);
+  
   const { total, totalWithShipping, subtotal, firstTimeDiscountAmount } =
     useCartInfo();
+    
   const { isCheckoutSubmitting } = useSelector(state => state.order);
-  const { coupon_info } = useSelector(state => state.coupon);
+  
+  // Enhanced coupon state
+  const { 
+    applied_coupon, 
+    coupon_discount, 
+    coupon_error, 
+    coupon_loading 
+  } = useSelector(state => state.coupon);
+
+  // Load applied coupon on component mount
+  useEffect(() => {
+    dispatch(load_applied_coupon());
+  }, [dispatch]);
 
   // Save discount values when they change and we're not in checkout process
   useEffect(() => {
@@ -118,6 +134,63 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
   const discountPercentage =
     shippingDiscount > 0 ? (shippingDiscount * 100).toFixed(0) : 0;
 
+  // Calculate final total with all discounts
+  const calculateFinalTotal = () => {
+    // Ensure we have a valid base total
+    const baseTotal = Number(totalWithShipping);
+    
+    // If totalWithShipping is NaN or invalid, calculate it manually
+    if (isNaN(baseTotal) || baseTotal <= 0) {
+      const cartTotal = cart_products?.reduce(
+        (sum, item) => sum + (Number(item.price) * Number(item.orderQuantity)),
+        0
+      ) || 0;
+      
+      const shipping = Number(totalShippingCost) || 0;
+      const firstTimeDiscountAmt = Number(firstTimeDiscountAmount) || 0;
+      
+      const manualTotal = cartTotal + shipping - firstTimeDiscountAmt;
+      console.log('🔧 Manual total calculation:', { cartTotal, shipping, firstTimeDiscountAmt, manualTotal });
+      
+      let finalTotal = manualTotal;
+      
+      // Subtract enhanced coupon discount
+      if (applied_coupon && Number(coupon_discount) > 0) {
+        finalTotal -= Number(coupon_discount);
+      } else if (Number(discountAmount) > 0) {
+        finalTotal -= Number(discountAmount);
+      }
+      
+      // Subtract address discount
+      const addressDiscount = Number(displayAddressDiscount) || 0;
+      if (addressDiscount > 0) {
+        finalTotal -= addressDiscount;
+      }
+      
+      return Math.max(0, finalTotal);
+    }
+    
+    let finalTotal = baseTotal;
+    
+    // Subtract enhanced coupon discount
+    if (applied_coupon && Number(coupon_discount) > 0) {
+      finalTotal -= Number(coupon_discount);
+    } else if (Number(discountAmount) > 0) {
+      // Fall back to legacy discount amount
+      finalTotal -= Number(discountAmount);
+    }
+    
+    // Subtract address discount
+    const addressDiscount = Number(displayAddressDiscount) || 0;
+    if (addressDiscount > 0) {
+      finalTotal -= addressDiscount;
+    }
+    
+    // Ensure total doesn't go below 0 and is a valid number
+    const result = Math.max(0, finalTotal);
+    return isNaN(result) ? 0 : result;
+  };
+
   // handle add product quantity
   const handleAddProduct = product => {
     dispatch(add_cart_product(product));
@@ -127,6 +200,32 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
   const handleDecrement = product => {
     dispatch(quantityDecrement(product));
   };
+
+  // Get coupon display information
+  const getCouponDisplayInfo = () => {
+    if (applied_coupon && Number(coupon_discount) > 0) {
+      return {
+        discount: Number(coupon_discount),
+        title: applied_coupon.title || 'Coupon Discount',
+        code: applied_coupon.couponCode || '',
+        type: applied_coupon.discountType || 'percentage'
+      };
+    }
+    
+    // Fall back to legacy discount
+    if (Number(discountAmount) > 0) {
+      return {
+        discount: Number(discountAmount),
+        title: 'Coupon Discount',
+        code: '',
+        type: 'legacy'
+      };
+    }
+    
+    return null;
+  };
+
+  const couponDisplay = getCouponDisplayInfo();
 
   return (
     <div className={styles.orderSummary}>
@@ -190,17 +289,50 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
             type="text"
             placeholder="Discount code"
             className={styles.discountInput}
+            disabled={coupon_loading || isCheckoutSubmit || processingPayment}
           />
           <button
             type="button"
             onClick={handleCouponCode}
             className={styles.discountButton}
+            disabled={coupon_loading || isCheckoutSubmit || processingPayment}
           >
-            Apply
+            {coupon_loading ? 'Applying...' : 'Apply'}
           </button>
         </div>
+        
+        {/* Enhanced coupon messages */}
         {couponApplyMsg && (
-          <div className={styles.couponMessage}>{couponApplyMsg}</div>
+          <div className={`${styles.couponMessage} ${
+            coupon_error ? styles.couponError : styles.couponSuccess
+          }`}>
+            {couponApplyMsg}
+          </div>
+        )}
+        
+        {/* Display applied coupon info */}
+        {applied_coupon && (
+          <div className={styles.appliedCouponInfo}>
+            <div className={styles.appliedCouponDetails}>
+              <span className={styles.appliedCouponCode}>
+                {applied_coupon.couponCode}
+              </span>
+              <span className={styles.appliedCouponTitle}>
+                {applied_coupon.title}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                dispatch({ type: 'coupon/clear_coupon' });
+                if (couponRef.current) couponRef.current.value = '';
+              }}
+              className={styles.removeCouponBtn}
+              disabled={isCheckoutSubmit || processingPayment}
+            >
+              Remove
+            </button>
+          </div>
         )}
       </div>
 
@@ -208,7 +340,7 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
         <div className={styles.summaryRow}>
           <span className={styles.summaryLabel}>Subtotal</span>
           <span className={styles.summaryValue}>
-            ${(firstTimeDiscount.isApplied ? subtotal : total).toFixed(2)}
+            ${(Number(firstTimeDiscount.isApplied ? subtotal : total) || 0).toFixed(2)}
           </span>
         </div>
 
@@ -221,7 +353,7 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
               🎉 First-time order discount (-{firstTimeDiscount.percentage}%)
             </span>
             <span className={`${styles.summaryValue} ${styles.discount}`}>
-              -${firstTimeDiscountAmount.toFixed(2)}
+              -${(Number(firstTimeDiscountAmount) || 0).toFixed(2)}
             </span>
           </div>
         )}
@@ -229,7 +361,7 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
         <div className={styles.summaryRow}>
           <span className={styles.summaryLabel}>Shipping</span>
           <span className={styles.summaryValue}>
-            ${totalShippingCost.toFixed(2)}
+            ${(Number(totalShippingCost) || 0).toFixed(2)}
             {discountPercentage > 0 && (
               <span className={styles.discountBadge}>
                 {discountPercentage}% off
@@ -238,11 +370,29 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
           </span>
         </div>
 
-        {discountAmount + displayAddressDiscount > 0 && (
+        {/* Enhanced coupon discount display */}
+        {couponDisplay && Number(couponDisplay.discount) > 0 && (
           <div className={styles.summaryRow}>
-            <span className={styles.summaryLabel}>Coupon Discount</span>
+            <span className={styles.summaryLabel}>
+              {couponDisplay.title}
+              {couponDisplay.code && (
+                <span className={styles.couponCodeBadge}>
+                  {couponDisplay.code}
+                </span>
+              )}
+            </span>
             <span className={`${styles.summaryValue} ${styles.discount}`}>
-              -${(discountAmount + displayAddressDiscount).toFixed(2)}
+              -${Number(couponDisplay.discount).toFixed(2)}
+            </span>
+          </div>
+        )}
+
+        {/* Address discount */}
+        {Number(displayAddressDiscount) > 0 && (
+          <div className={styles.summaryRow}>
+            <span className={styles.summaryLabel}>Address Discount</span>
+            <span className={`${styles.summaryValue} ${styles.discount}`}>
+              -${Number(displayAddressDiscount).toFixed(2)}
             </span>
           </div>
         )}
@@ -250,7 +400,7 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
         <div className={`${styles.summaryRow} ${styles.summaryTotal}`}>
           <span className={styles.totalLabel}>Total</span>
           <span className={styles.totalValue}>
-            ${(totalWithShipping - discountAmount).toFixed(2)}
+            ${calculateFinalTotal().toFixed(2)}
           </span>
         </div>
       </div>
@@ -302,7 +452,7 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
             Processing Your Order...
           </span>
         ) : (
-          'Complete Purchase'
+          `Complete Purchase - $${calculateFinalTotal().toFixed(2)}`
         )}
       </button>
 
