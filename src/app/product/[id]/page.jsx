@@ -8,7 +8,7 @@ import styles from './product-details.module.css';
 async function getProductData(id) {
   try {
     const baseUrl =
-      process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:7000';
+      process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
     const response = await fetch(
       `${baseUrl}/api/product/single-product/${id}`,
       {
@@ -38,12 +38,15 @@ export const generateMetadata = async props => {
     };
   }
   console.log(product);
+  
+  const seo = product?.seo;
+
   return {
-    title: `${product.title} | East West Off Road`,
+    title: `${seo?.metaTitle || product.title}`,
     description:
-      product.description?.replace(/<[^>]*>/g, '').slice(0, 160) ||
-      `Shop ${product.title} at East West Off Road. Premium automotive & off-road gear.`,
-    keywords: product.metaKeywords ?? '',
+      seo?.metaDescription ||
+      product.description?.replace(/<[^>]*>/g, '').slice(0, 160) || '',
+    keywords: seo?.metaKeywords || '',
     alternates: {
       canonical: `/product/${product.slug}`,
     },
