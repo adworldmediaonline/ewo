@@ -37,7 +37,7 @@ export const generateMetadata = async props => {
       description: 'The requested product could not be found.',
     };
   }
-  console.log(product);
+
   
   const seo = product?.seo;
 
