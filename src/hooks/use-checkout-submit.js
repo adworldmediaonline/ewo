@@ -14,18 +14,25 @@ import {
   begin_checkout_submission,
   end_checkout_submission,
 } from '@/redux/features/order/orderSlice';
-import { set_coupon } from '@/redux/features/coupon/couponSlice';
+import { 
+  set_applied_coupon, 
+  set_coupon_error, 
+  set_coupon_loading,
+  clear_coupon,
+  load_applied_coupon
+} from '@/redux/features/coupon/couponSlice';
 import { notifyError, notifySuccess } from '@/utils/toast';
 import {
   useCreatePaymentIntentMutation,
   useSaveOrderMutation,
 } from '@/redux/features/order/orderApi';
-import { useGetOfferCouponsQuery } from '@/redux/features/coupon/couponApi';
+import { useValidateCouponMutation } from '@/redux/features/coupon/couponApi';
 import { completeFirstTimeDiscount } from '@/redux/features/cartSlice';
 
 const useCheckoutSubmit = () => {
-  // offerCoupons
-  const { data: offerCoupons, isError, isLoading } = useGetOfferCouponsQuery();
+  // Enhanced coupon validation
+  const [validateCoupon, { isLoading: couponValidationLoading }] = useValidateCouponMutation();
+  
   // addOrder
   const [saveOrder, {}] = useSaveOrderMutation();
   // createPaymentIntent
@@ -38,7 +45,11 @@ const useCheckoutSubmit = () => {
   const { shipping_info } = useSelector(state => state.order);
   // total amount
   const { total, setTotal, firstTimeDiscountAmount } = useCartInfo();
-  // couponInfo
+  
+  // Enhanced coupon state from Redux
+  const { applied_coupon, coupon_discount, coupon_error, coupon_loading } = useSelector(state => state.coupon);
+  
+  // Legacy coupon state (keeping for backward compatibility)
   const [couponInfo, setCouponInfo] = useState({});
   //cartTotal
   const [cartTotal, setCartTotal] = useState('');
@@ -46,7 +57,7 @@ const useCheckoutSubmit = () => {
   const [minimumAmount, setMinimumAmount] = useState(0);
   // shippingCost
   const [shippingCost, setShippingCost] = useState(0);
-  // discountAmount
+  // discountAmount - now using enhanced coupon discount
   const [discountAmount, setDiscountAmount] = useState(0);
   // discountPercentage
   const [discountPercentage, setDiscountPercentage] = useState(0);
@@ -97,6 +108,17 @@ const useCheckoutSubmit = () => {
 
   let couponRef = useRef('');
 
+  // Load applied coupon on component mount
+  useEffect(() => {
+    dispatch(load_applied_coupon());
+  }, [dispatch]);
+
+  // Update discount amount when enhanced coupon changes
+  useEffect(() => {
+    setDiscountAmount(coupon_discount);
+  }, [coupon_discount]);
+
+  // Legacy coupon loading (keeping for backward compatibility)
   useEffect(() => {
     if (localStorage.getItem('couponInfo')) {
       const data = localStorage.getItem('couponInfo');
@@ -117,22 +139,27 @@ const useCheckoutSubmit = () => {
 
   // Calculate total and discount value
   useEffect(() => {
-    const result = cart_products?.filter(
-      p => p.productType === discountProductType
-    );
-    const discountProductTotal = result?.reduce(
-      (preValue, currentValue) =>
-        preValue + currentValue.price * currentValue.orderQuantity,
-      0
-    );
     let totalValue = '';
     let subTotal = Number((total + shippingCost).toFixed(2));
-    let discountTotal = Number(
-      discountProductTotal * (discountPercentage / 100)
-    );
+    
+    // Use enhanced coupon discount if available, otherwise fall back to legacy
+    let totalDiscount = coupon_discount;
+    
+    // Legacy calculation for backward compatibility
+    if (!applied_coupon && discountPercentage > 0) {
+      const result = cart_products?.filter(
+        p => p.productType === discountProductType
+      );
+      const discountProductTotal = result?.reduce(
+        (preValue, currentValue) =>
+          preValue + currentValue.price * currentValue.orderQuantity,
+        0
+      );
+      totalDiscount = Number(discountProductTotal * (discountPercentage / 100));
+    }
 
-    totalValue = Number(subTotal - discountTotal);
-    setDiscountAmount(discountTotal);
+    totalValue = Number(subTotal - totalDiscount);
+    setDiscountAmount(totalDiscount);
     setCartTotal(totalValue);
   }, [
     total,
@@ -140,43 +167,92 @@ const useCheckoutSubmit = () => {
     discountPercentage,
     cart_products,
     discountProductType,
-    discountAmount,
+    coupon_discount,
+    applied_coupon,
     cartTotal,
   ]);
 
-  // handleCouponCode
-  const handleCouponCode = e => {
+  // Enhanced handleCouponCode function
+  const handleCouponCode = async (e) => {
     e.preventDefault();
 
     if (!couponRef.current?.value) {
       notifyError('Please Input a Coupon Code!');
       return;
     }
-    if (isLoading) {
-      return <h3>Loading...</h3>;
+
+    const couponCode = couponRef.current.value.trim();
+    
+    if (!couponCode) {
+      notifyError('Please Input a Coupon Code!');
+      return;
     }
-    if (isError) {
-      return notifyError('Something went wrong');
-    }
-    const result = offerCoupons?.filter(
-      coupon => coupon.couponCode === couponRef.current?.value
-    );
-    if (result?.length > 0) {
-      localStorage.setItem('couponInfo', JSON.stringify(result[0]));
-      setCouponInfo(result[0]);
-      setMinimumAmount(result[0].minimumAmount);
-      setDiscountPercentage(result[0].discountPercentage);
-      setDiscountProductType(result[0].productType);
-      couponRef.current.value = '';
-      setCouponApplyMsg(
-        `Your Coupon is Applied! You got ${result[0].discountPercentage}% discount.`
+
+    // Set loading state
+    dispatch(set_coupon_loading(true));
+    setCouponApplyMsg('Validating coupon...');
+
+    try {
+      // Prepare cart data for validation
+      const cartItems = cart_products.map(item => ({
+        productId: item._id,
+        quantity: item.orderQuantity,
+        price: item.price,
+        title: item.title,
+        category: item.category?.name || item.category,
+        brand: item.brand?.name || item.brand,
+      }));
+
+      const cartSubtotal = cart_products.reduce(
+        (sum, item) => sum + (item.price * item.orderQuantity),
+        0
       );
-      notifySuccess(
-        `Your Coupon is Applied! You got ${result[0].discountPercentage}% discount.`
-      );
-    } else {
-      setCouponApplyMsg('Please Input a Valid Coupon!');
-      notifyError('Please Input a Valid Coupon!');
+      
+      // For now, calculate full total including shipping for coupon validation
+      // In the future, this can be changed to use only cartSubtotal
+      const fullTotal = cartSubtotal + (shippingCost || 0);
+
+      const validationData = {
+        couponCode,
+        cartItems,
+        cartTotal: fullTotal, // Send full total for now
+        cartSubtotal: cartSubtotal, // Also send subtotal for future use
+        shippingCost: shippingCost || 0,
+        userId: user?._id,
+      };
+
+      const result = await validateCoupon(validationData).unwrap();
+      
+      if (result.success) {
+        // Store the validated coupon data
+        dispatch(set_applied_coupon(result.data));
+        
+        // Clear the input
+        couponRef.current.value = '';
+        
+        // Show success message
+        const discountText = result.data.discountType === 'percentage' 
+          ? `${result.data.discount}% discount`
+          : `$${result.data.discount} discount`;
+          
+        setCouponApplyMsg(
+          `✅ Coupon applied! You got ${discountText}.`
+        );
+        notifySuccess(
+          `Coupon applied successfully! You got ${discountText}.`
+        );
+      } else {
+        throw new Error(result.message || 'Invalid coupon code');
+      }
+    } catch (error) {
+      console.error('Coupon validation error:', error);
+      const errorMessage = error?.data?.message || error?.message || 'Invalid coupon code';
+      
+      dispatch(set_coupon_error(errorMessage));
+      setCouponApplyMsg(`❌ ${errorMessage}`);
+      notifyError(errorMessage);
+    } finally {
+      dispatch(set_coupon_loading(false));
     }
   };
 
@@ -189,17 +265,24 @@ const useCheckoutSubmit = () => {
   const createStripePaymentIntent = async orderData => {
     try {
       const response = await createPaymentIntent({
-        price: parseInt(cartTotal),
+        price: parseInt(Math.max(0, cartTotal)), // Ensure never negative
         email: orderData.email,
         cart: cart_products,
         orderData: {
           ...orderData,
-          totalAmount: cartTotal,
+          totalAmount: Math.max(0, cartTotal), // Ensure never negative
           isGuestOrder: !user,
         },
       });
 
       console.log('Payment intent response:', response);
+
+      // Check if this is a free order
+      const responseData = response.data || response;
+      if (responseData.isFreeOrder) {
+        console.log('🎁 Free order detected, skipping Stripe payment');
+        return { isFreeOrder: true, totalAmount: responseData.totalAmount };
+      }
 
       // The backend returns: { clientSecret: '...', paymentIntentId: '...' }
       // But RTK Query wraps it in { data: { clientSecret: '...', paymentIntentId: '...' } }
@@ -260,6 +343,9 @@ const useCheckoutSubmit = () => {
     // Calculate total discount amount (coupon + first-time discount)
     const totalDiscount = discountAmount + (firstTimeDiscountAmount || 0);
 
+    // Ensure total amount is never negative (for 100% discount coupons)
+    const finalTotalAmount = Math.max(0, cartTotal);
+
     const orderInfo = {
       cart: cart_products?.map(item => {
         const {
@@ -275,7 +361,7 @@ const useCheckoutSubmit = () => {
       subTotal: rawSubTotal, // Raw subtotal before any discounts
       shippingCost: shippingCost,
       discount: discountAmount, // Coupon discount only
-      totalAmount: cartTotal,
+      totalAmount: finalTotalAmount, // Ensure never negative
       name: newShippingInfo.name,
       email: newShippingInfo.email,
       address: newShippingInfo.address,
@@ -292,6 +378,15 @@ const useCheckoutSubmit = () => {
         percentage: firstTimeDiscount?.percentage || 0,
         amount: firstTimeDiscountAmount || 0,
       },
+      // Add enhanced coupon information
+      appliedCoupon: applied_coupon ? {
+        couponId: applied_coupon._id,
+        couponCode: applied_coupon.couponCode,
+        title: applied_coupon.title,
+        discountType: applied_coupon.discountType,
+        discountAmount: coupon_discount,
+        originalDiscount: applied_coupon.discountPercentage || applied_coupon.discountAmount,
+      } : null,
     };
 
     const card = elements?.getElement(CardElement);
@@ -340,6 +435,10 @@ const useCheckoutSubmit = () => {
           // Clean up
           localStorage.removeItem('cart_products');
           localStorage.removeItem('couponInfo');
+          
+          // Clear enhanced coupon
+          dispatch(clear_coupon());
+          
           setIsCheckoutSubmit(false);
           setProcessingPayment(false);
           dispatch(end_checkout_submission());
@@ -396,11 +495,83 @@ const useCheckoutSubmit = () => {
 
         // Step 2: Create payment intent with order data
         try {
-          const secret = await createStripePaymentIntent({
+          const paymentResult = await createStripePaymentIntent({
             ...orderInfo,
             cardInfo: paymentMethod,
           });
 
+          // Handle free orders (100% discount coupons)
+          if (paymentResult.isFreeOrder) {
+            console.log('🎁 Processing free order due to 100% discount');
+            
+            // Clean up first
+            localStorage.removeItem('cart_products');
+            localStorage.removeItem('couponInfo');
+            
+            // Clear enhanced coupon
+            dispatch(clear_coupon());
+
+            // Mark first-time discount as used after successful free order
+            dispatch(completeFirstTimeDiscount());
+
+            setIsCheckoutSubmit(false);
+            setProcessingPayment(false);
+
+            console.log('🎁 Free Order Info:', {
+              subTotal: orderInfo.subTotal,
+              shippingCost: orderInfo.shippingCost,
+              discount: orderInfo.discount,
+              firstTimeDiscount: orderInfo.firstTimeDiscount,
+              totalAmount: orderInfo.totalAmount,
+            });
+
+            // Save free order
+            saveOrder({
+              ...orderInfo,
+              paymentMethod: 'Free Order (100% Discount)',
+              isPaid: true,
+              paidAt: new Date(),
+              paymentInfo: {
+                id: `free_order_${Date.now()}`,
+                status: 'succeeded',
+                amount_received: 0,
+                currency: 'usd',
+                payment_method_types: ['coupon'],
+              },
+            })
+              .then(res => {
+                console.log('Free Order response:', res);
+
+                // Extract MongoDB ObjectId for the redirect
+                const orderId =
+                  res.data?.order?._id ||
+                  res.order?._id ||
+                  res.data?.order?.invoice ||
+                  res.order?.invoice;
+
+                console.log('Extracted Free Order ID (ObjectId):', orderId);
+
+                // Set order data and show Thank You modal
+                setOrderDataForModal({
+                  orderId: orderId,
+                });
+                setShowThankYouModal(true);
+
+                notifySuccess('🎉 Your free order has been placed successfully!');
+              })
+              .catch(err => {
+                console.error('Free Order error:', err);
+                notifyError('Something went wrong with your free order. Please try again.');
+                setIsCheckoutSubmit(false);
+                setProcessingPayment(false);
+                dispatch(end_checkout_submission());
+              });
+
+            dispatch(end_checkout_submission());
+            return;
+          }
+
+          const secret = paymentResult;
           console.log('Payment intent created, client secret received');
 
           // Step 3: Confirm the payment with Stripe
@@ -460,6 +631,9 @@ const useCheckoutSubmit = () => {
             // Clean up first
             localStorage.removeItem('cart_products');
             localStorage.removeItem('couponInfo');
+            
+            // Clear enhanced coupon
+            dispatch(clear_coupon());
 
             // Mark first-time discount as used after successful payment
             dispatch(completeFirstTimeDiscount());
