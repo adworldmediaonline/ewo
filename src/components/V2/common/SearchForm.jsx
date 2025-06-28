@@ -186,7 +186,7 @@ export default function SearchForm({ inputRef }) {
                   </div>
                   {suggestion.price && (
                     <div className={styles.suggestionPrice}>
-                      ${suggestion?.finalPriceDiscount?.toFixed(2)}
+                      ${suggestion.price.toFixed(2)}
                     </div>
                   )}
                 </div>
