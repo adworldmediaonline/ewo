@@ -1,10 +1,8 @@
 'use client';
-import React from 'react';
-import Link from 'next/link';
 import useCartInfo from '@/hooks/use-cart-info';
-import { useState } from 'react';
-import styles from '../../app/cart/cart.module.css';
+import Link from 'next/link';
 import { useSelector } from 'react-redux';
+import styles from '../../app/cart/cart.module.css';
 
 export default function CartCheckout() {
   const {
@@ -36,21 +34,6 @@ export default function CartCheckout() {
           </span>
         </div>
 
-        {/* First-time discount section */}
-        {firstTimeDiscount.isApplied && (
-          <div className={styles['checkout-discount-section']}>
-            <div className={styles['checkout-discount-item']}>
-              <span className={styles['checkout-discount-label']}>
-                🎉 First-time order discount (-{firstTimeDiscount.percentage}
-                %)
-              </span>
-              <span className={styles['checkout-discount-value']}>
-                -${firstTimeDiscountAmount.toFixed(2)}
-              </span>
-            </div>
-          </div>
-        )}
-
         <div className={styles['checkout-shipping']}>
           <h4 className={styles['checkout-shipping-title']}>Shipping</h4>
 
@@ -72,6 +55,21 @@ export default function CartCheckout() {
             </div>
           </div>
         </div>
+
+        {/* First-time discount section */}
+        {firstTimeDiscount.isApplied && (
+          <div className={styles['checkout-discount-section']}>
+            <div className={styles['checkout-discount-item']}>
+              <span className={styles['checkout-discount-label']}>
+                🎉 First-time order discount (-{firstTimeDiscount.percentage}
+                %)
+              </span>
+              <span className={styles['checkout-discount-value']}>
+                -${firstTimeDiscountAmount.toFixed(2)}
+              </span>
+            </div>
+          </div>
+        )}
 
         <div className={styles['checkout-total']}>
           <span className={styles['checkout-total-label']}>Total</span>
