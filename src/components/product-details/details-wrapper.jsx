@@ -1,17 +1,22 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import { Rating } from 'react-simple-star-rating';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Rating } from 'react-simple-star-rating';
 // import DOMPurify from 'isomorphic-dompurify';
 // import ShowMoreText from 'react-show-more-text';
+import { replaceTextCharacters } from '@/lib/replaceTextCharacters';
+import {
+  add_cart_product,
+  increment,
+  initialOrderQuantity,
+  update_product_option,
+} from '@/redux/features/cartSlice';
+import { add_to_compare } from '@/redux/features/compareSlice';
+import { add_to_wishlist } from '@/redux/features/wishlist-slice';
+import { notifyError, notifySuccess } from '@/utils/toast';
 import styles from '../../app/product/[id]/product-details.module.css';
 import ProductDetailsCountdown from './product-details-countdown';
 import ProductQuantity from './product-quantity';
-import { add_cart_product } from '@/redux/features/cartSlice';
-import { add_to_wishlist } from '@/redux/features/wishlist-slice';
-import { add_to_compare } from '@/redux/features/compareSlice';
-import { notifyError } from '@/utils/toast';
-import { replaceTextCharacters } from '@/lib/replaceTextCharacters';
 // import { titleCaseFirstLetterOfEveryWord } from '@/lib/titleCaseFirstLetterOfEveryWord';
 
 export default function DetailsWrapper({
@@ -89,20 +94,49 @@ export default function DetailsWrapper({
       return;
     }
 
-    // Check if product already exists in cart
+    // Check if product already exists in cart (regardless of option)
     const existingProduct = cart_products.find(item => item._id === prd._id);
 
-    // Get total current quantity (existing + new)
+    // If product exists, check if option has changed
+    const optionChanged =
+      existingProduct &&
+      JSON.stringify(existingProduct.selectedOption) !==
+        JSON.stringify(selectedOption);
+
+    // Get current quantity from existing product
     const currentQty = existingProduct ? existingProduct.orderQuantity : 0;
-    const totalRequestedQty = currentQty + orderQuantity;
+
+    // Determine final quantity based on whether option changed
+    const finalQuantity = optionChanged
+      ? currentQty
+      : currentQty + orderQuantity;
 
     // If product has quantity limitation and requested quantity exceeds available
-    if (prd.quantity && totalRequestedQty > prd.quantity) {
-      // Show error notification
+    if (prd.quantity && finalQuantity > prd.quantity) {
       notifyError(
-        `Sorry, only ${prd.quantity} items available. You already have ${currentQty} in your cart.`
+        `Sorry, only ${prd.quantity} items available. ${
+          existingProduct ? `You already have ${currentQty} in your cart.` : ''
+        }`
       );
       return;
+    }
+
+    // If option changed, remove the existing product first
+    if (optionChanged) {
+      dispatch(
+        update_product_option({
+          id: existingProduct._id,
+          title: existingProduct.title,
+        })
+      );
+
+      // Reset order quantity to 1
+      dispatch(initialOrderQuantity());
+
+      // Increment to match the existing quantity
+      for (let i = 1; i < currentQty; i++) {
+        dispatch(increment());
+      }
     }
 
     // Use pre-calculated prices from database
@@ -119,7 +153,18 @@ export default function DetailsWrapper({
       // If an option is selected, update the final price to include the option price
       finalPrice: selectedOption ? calculateFinalPrice() : undefined,
     };
+
     dispatch(add_cart_product(productToAdd));
+
+    // Show appropriate success message
+    if (optionChanged) {
+      notifySuccess(`Option updated to "${selectedOption?.title}"`);
+    }
+
+    // Reset the order quantity back to 1 for future additions
+    if (optionChanged) {
+      dispatch(initialOrderQuantity());
+    }
   };
 
   // handle wishlist product
@@ -188,22 +233,6 @@ export default function DetailsWrapper({
           <div className={styles.optionPriceInfo}>{selectedOption.title}</div>
         )}
       </div>
-
-      {/* <div className={styles.productDescription}>
-        {description && (
-          <ShowMoreText
-            lines={2}
-            more="Read More"
-            less="Read Less"
-            className={styles.showMoreText}
-            anchorClass={styles.readMoreBtn}
-            expanded={false}
-            truncatedEndingComponent={'... '}
-          >
-            <div dangerouslySetInnerHTML={createSanitizedHTML(description)} />
-          </ShowMoreText>
-        )}
-      </div> */}
 
       {imageURLs?.some(item => item?.color && item?.color?.name) && (
         <div className={styles.optionsContainer}>

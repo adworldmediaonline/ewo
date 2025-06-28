@@ -1,6 +1,6 @@
-import { createSlice } from '@reduxjs/toolkit';
 import { getLocalStorage, setLocalStorage } from '@/utils/localstorage';
-import { notifyError, notifySuccess } from '@/utils/toast';
+import { notifyError } from '@/utils/toast';
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   cart_products: [],
@@ -226,6 +226,19 @@ export const cartSlice = createSlice({
       setLocalStorage('shipping_cost', state.totalShippingCost);
       notifyError(`${payload.title} Remove from cart`);
     },
+    update_product_option: (state, { payload }) => {
+      state.cart_products = state.cart_products.filter(
+        item => item._id !== payload.id
+      );
+
+      // Update shipping costs and first-time discount
+      updateShippingCosts(state);
+      updateFirstTimeDiscount(state);
+
+      setLocalStorage('cart_products', state.cart_products);
+      setLocalStorage('shipping_cost', state.totalShippingCost);
+      // No toast notification for option updates - will be handled when new item is added
+    },
     get_cart_products: (state, action) => {
       state.cart_products = getLocalStorage('cart_products');
       // Always keep cartMiniOpen as false on page load for better UX
@@ -312,5 +325,6 @@ export const {
   hideCartConfirmation,
   resetFirstTimeDiscount,
   completeFirstTimeDiscount,
+  update_product_option,
 } = cartSlice.actions;
 export default cartSlice.reducer;

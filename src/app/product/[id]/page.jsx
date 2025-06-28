@@ -1,7 +1,7 @@
-import Wrapper from '@/layout/wrapper';
-import HeaderV2 from '@/layout/headers/HeaderV2';
 import ProductDetailsArea from '@/components/product-details/product-details-area';
 import Footer from '@/layout/footers/footer';
+import HeaderV2 from '@/layout/headers/HeaderV2';
+import Wrapper from '@/layout/wrapper';
 import styles from './product-details.module.css';
 
 // Fetch product data for metadata
@@ -38,14 +38,14 @@ export const generateMetadata = async props => {
     };
   }
 
-  
   const seo = product?.seo;
 
   return {
     title: `${seo?.metaTitle || product.title}`,
     description:
       seo?.metaDescription ||
-      product.description?.replace(/<[^>]*>/g, '').slice(0, 160) || '',
+      product.description?.replace(/<[^>]*>/g, '').slice(0, 160) ||
+      '',
     keywords: seo?.metaKeywords || '',
     alternates: {
       canonical: `/product/${product.slug}`,
