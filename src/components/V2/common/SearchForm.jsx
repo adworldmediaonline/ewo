@@ -184,9 +184,9 @@ export default function SearchForm({ inputRef }) {
                   <div className={styles.suggestionTitle}>
                     {replaceTextCharacters(suggestion.title, '*', '')}
                   </div>
-                  {suggestion.price && (
+                  {suggestion.finalPriceDiscount && (
                     <div className={styles.suggestionPrice}>
-                      ${suggestion.price.toFixed(2)}
+                      ${suggestion.finalPriceDiscount.toFixed(2)}
                     </div>
                   )}
                 </div>
