@@ -1,12 +1,12 @@
 'use client';
-import Form from 'next/form';
-import styles from '@/styleModules/Search.module.css';
-import SearchButton from './SearchButton';
-import { useCallback, useState, useRef, useEffect } from 'react';
-import { debounce } from 'lodash';
-import { useRouter } from 'next/navigation';
 import CloudinaryImage from '@/components/common/CloudinaryImage';
 import { replaceTextCharacters } from '@/lib/replaceTextCharacters';
+import styles from '@/styleModules/Search.module.css';
+import { debounce } from 'lodash';
+import Form from 'next/form';
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import SearchButton from './SearchButton';
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:7000';
 
@@ -186,7 +186,7 @@ export default function SearchForm({ inputRef }) {
                   </div>
                   {suggestion.price && (
                     <div className={styles.suggestionPrice}>
-                      ${suggestion.price.toFixed(2)}
+                      ${suggestion?.finalPriceDiscount?.toFixed(2)}
                     </div>
                   )}
                 </div>
