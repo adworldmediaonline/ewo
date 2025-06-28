@@ -1,20 +1,20 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import CartMiniSidebar from '@/components/common/cart-mini-sidebar';
+import useCartInfo from '@/hooks/use-cart-info';
+import useSticky from '@/hooks/use-sticky';
+import { openCartMini } from '@/redux/features/cartSlice';
+import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useDispatch, useSelector } from 'react-redux';
 import { usePathname } from 'next/navigation';
-import useSticky from '@/hooks/use-sticky';
-import useCartInfo from '@/hooks/use-cart-info';
-import { openCartMini } from '@/redux/features/cartSlice';
-import CartMiniSidebar from '@/components/common/cart-mini-sidebar';
-import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
+import { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 // import logo from '@assets/img/logo/logo.webp';
-import logo from '@assets/img/logo/logo.png';
-import { CartTwo, Close, Compare, Menu, Search, User, Wishlist } from '@/svg';
-import styles from './HeaderV2.module.css';
-import { useRouter } from 'next/navigation';
 import SearchForm from '@/components/V2/common/SearchForm';
+import { CartTwo, Close, Compare, Menu, Search, User, Wishlist } from '@/svg';
+import logo from '@assets/img/logo/logo.png';
+import { useRouter } from 'next/navigation';
+import styles from './HeaderV2.module.css';
 
 export default function HeaderV2() {
   const { wishlist } = useSelector(state => state.wishlist);
