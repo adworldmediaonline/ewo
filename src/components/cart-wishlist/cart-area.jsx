@@ -1,13 +1,12 @@
 'use client';
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import Link from 'next/link';
+import { useDispatch, useSelector } from 'react-redux';
 // internal
-import { clearCart } from '@/redux/features/cartSlice';
 import useCartInfo from '@/hooks/use-cart-info';
+import { clearCart } from '@/redux/features/cartSlice';
+import styles from './cart-area.module.css';
 import CartCheckout from './cart-checkout';
 import CartItem from './cart-item';
-import styles from './cart-area.module.css';
 // import RenderCartProgress from '../common/render-cart-progress';
 
 export default function CartArea() {
