@@ -1,15 +1,15 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 // internal
+import useCheckoutSubmit from '@/hooks/use-checkout-submit';
+import ThankYouModal from '../common/thank-you-modal';
+import styles from './checkout-area.module.css';
 import CheckoutBillingArea from './checkout-billing-area';
 import CheckoutOrderArea from './checkout-order-area';
-import ThankYouModal from '../common/thank-you-modal';
-import useCheckoutSubmit from '@/hooks/use-checkout-submit';
-import styles from './checkout-area.module.css';
 
 export default function CheckoutArea() {
   const router = useRouter();

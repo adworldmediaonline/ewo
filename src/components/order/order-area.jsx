@@ -1,9 +1,8 @@
 'use client';
-import React from 'react';
-import dayjs from 'dayjs';
 import ErrorMsg from '@/components/common/error-msg';
-import { useGetUserOrderByIdQuery } from '@/redux/features/order/orderApi';
 import PrdDetailsLoader from '@/components/loader/prd-details-loader';
+import { useGetUserOrderByIdQuery } from '@/redux/features/order/orderApi';
+import dayjs from 'dayjs';
 import styles from './order-area.module.css';
 
 export default function OrderArea({ orderId }) {
@@ -41,6 +40,8 @@ export default function OrderArea({ orderId }) {
     status,
     email,
     firstTimeDiscount,
+    appliedCoupons = [], // Enhanced: Multiple coupons support
+    appliedCoupon, // Legacy: Single coupon support
   } = order.order;
 
   const orderDate = dayjs(createdAt).format('MMMM D, YYYY');
@@ -63,25 +64,48 @@ export default function OrderArea({ orderId }) {
 
   // Calculate first-time discount amount if applied
   let firstTimeDiscountAmount = 0;
-  if (firstTimeDiscount?.isApplied) {
-    // Try to use saved amount first, then calculate from percentage
-    firstTimeDiscountAmount =
-      firstTimeDiscount.amount ||
-      (subtotal * (firstTimeDiscount.percentage || 10)) / 100;
+  if (firstTimeDiscount?.isApplied && firstTimeDiscount?.amount > 0) {
+    // Only use first-time discount if it's explicitly applied AND has an amount
+    firstTimeDiscountAmount = firstTimeDiscount.amount;
+    console.log('✅ First-time discount applied:', firstTimeDiscountAmount);
+  } else {
+    console.log('❌ No first-time discount for this order:', {
+      isApplied: firstTimeDiscount?.isApplied,
+      amount: firstTimeDiscount?.amount,
+    });
   }
 
-  // If no specific firstTimeDiscount data but discount > 0, check if it might be the first-time discount
-  if (!firstTimeDiscount?.isApplied && discount > 0) {
-    // Check if the discount amount matches a 10% first-time discount
-    const expectedFirstTimeDiscount = subtotal * 0.1;
-    if (Math.abs(discount - expectedFirstTimeDiscount) < 0.01) {
-      console.log('💡 Detected legacy first-time discount order');
-      firstTimeDiscountAmount = discount;
+  // Calculate coupon discounts
+  let couponDiscounts = 0;
+  let couponDisplayText = '';
+
+  // Handle multiple coupons first (enhanced)
+  if (appliedCoupons && appliedCoupons.length > 0) {
+    couponDiscounts = appliedCoupons.reduce(
+      (sum, coupon) => sum + (coupon.discount || coupon.discountAmount || 0),
+      0
+    );
+
+    if (appliedCoupons.length === 1) {
+      const coupon = appliedCoupons[0];
+      couponDisplayText = `🎫 ${coupon.couponCode} (${coupon.title})`;
+    } else {
+      couponDisplayText = `🎫 ${appliedCoupons.length} Coupons Applied`;
     }
+  } else if (
+    appliedCoupon &&
+    (appliedCoupon.discount > 0 || appliedCoupon.discountAmount > 0)
+  ) {
+    // Legacy single coupon support
+    couponDiscounts = appliedCoupon.discount || appliedCoupon.discountAmount;
+    couponDisplayText = `🎫 ${appliedCoupon.couponCode} (${appliedCoupon.title})`;
   }
 
-  // Calculate other discounts (coupon, etc.)
-  const otherDiscounts = Math.max(0, discount - firstTimeDiscountAmount);
+  // Calculate other discounts (remaining after first-time and coupon discounts)
+  const otherDiscounts = Math.max(
+    0,
+    discount - firstTimeDiscountAmount - couponDiscounts
+  );
 
   const getStatusColor = () => {
     const statusLower = status.toLowerCase();
@@ -139,6 +163,109 @@ export default function OrderArea({ orderId }) {
           </div>
         </div>
 
+        {/* Coupon Success Message */}
+        {(appliedCoupons.length > 0 ||
+          (appliedCoupon &&
+            (appliedCoupon.discount > 0 ||
+              appliedCoupon.discountAmount > 0))) && (
+          <div
+            className={styles.card}
+            style={{
+              marginBottom: '20px',
+              background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+              border: '2px solid #0ea5e9',
+            }}
+          >
+            <div className={styles.cardBody}>
+              {appliedCoupons.length > 0 ? (
+                appliedCoupons.length === 1 ? (
+                  <div style={{ textAlign: 'center' }}>
+                    <h3 style={{ color: '#0c4a6e', margin: '0 0 10px 0' }}>
+                      🎫 Coupon Applied Successfully!
+                    </h3>
+                    <p
+                      style={{
+                        color: '#075985',
+                        margin: '0',
+                        fontSize: '16px',
+                      }}
+                    >
+                      <strong>{appliedCoupons[0].couponCode}</strong> -{' '}
+                      {appliedCoupons[0].title}
+                      <br />
+                      <span style={{ fontSize: '14px' }}>
+                        You saved $
+                        {(
+                          appliedCoupons[0].discount ||
+                          appliedCoupons[0].discountAmount ||
+                          0
+                        ).toFixed(2)}{' '}
+                        on this order!
+                      </span>
+                    </p>
+                  </div>
+                ) : (
+                  <div style={{ textAlign: 'center' }}>
+                    <h3 style={{ color: '#0c4a6e', margin: '0 0 10px 0' }}>
+                      🎫 {appliedCoupons.length} Coupons Applied Successfully!
+                    </h3>
+                    <div
+                      style={{
+                        color: '#075985',
+                        margin: '0',
+                        fontSize: '16px',
+                      }}
+                    >
+                      {appliedCoupons.map((coupon, index) => (
+                        <div key={index} style={{ marginBottom: '5px' }}>
+                          <strong>{coupon.couponCode}</strong> - {coupon.title}
+                        </div>
+                      ))}
+                      <div
+                        style={{
+                          fontSize: '14px',
+                          fontWeight: 'bold',
+                          marginTop: '10px',
+                        }}
+                      >
+                        Total savings: ${couponDiscounts.toFixed(2)}!
+                      </div>
+                    </div>
+                  </div>
+                )
+              ) : (
+                appliedCoupon && (
+                  <div style={{ textAlign: 'center' }}>
+                    <h3 style={{ color: '#0c4a6e', margin: '0 0 10px 0' }}>
+                      🎫 Coupon Applied Successfully!
+                    </h3>
+                    <p
+                      style={{
+                        color: '#075985',
+                        margin: '0',
+                        fontSize: '16px',
+                      }}
+                    >
+                      <strong>{appliedCoupon.couponCode}</strong> -{' '}
+                      {appliedCoupon.title}
+                      <br />
+                      <span style={{ fontSize: '14px' }}>
+                        You saved $
+                        {(
+                          appliedCoupon.discount ||
+                          appliedCoupon.discountAmount ||
+                          0
+                        ).toFixed(2)}{' '}
+                        on this order!
+                      </span>
+                    </p>
+                  </div>
+                )
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Main Content Grid */}
         <div className={styles.grid}>
           {/* Order Summary */}
@@ -175,7 +302,16 @@ export default function OrderArea({ orderId }) {
                       </span>
                     </div>
                   )}
-                {/* Other discounts (coupons, etc.) */}
+                {/* Coupon discounts */}
+                {couponDiscounts > 0 && (
+                  <div className={styles.summaryRow}>
+                    <span>{couponDisplayText}</span>
+                    <span className={styles.discount}>
+                      -${couponDiscounts.toFixed(2)}
+                    </span>
+                  </div>
+                )}
+                {/* Other discounts (if any remaining) */}
                 {otherDiscounts > 0 && (
                   <div className={styles.summaryRow}>
                     <span>Other Discounts</span>
@@ -191,7 +327,8 @@ export default function OrderArea({ orderId }) {
                   $
                   {(
                     subtotal -
-                    firstTimeDiscountAmount +
+                    firstTimeDiscountAmount -
+                    couponDiscounts +
                     parseFloat(shippingCost) -
                     otherDiscounts
                   ).toFixed(2)}

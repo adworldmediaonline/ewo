@@ -1,5 +1,4 @@
 'use client';
-import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,13 +6,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import useCartInfo from '@/hooks/use-cart-info';
 import useGuestCartNavigation from '@/hooks/useGuestCartNavigation';
 // import RenderCartProgress from './render-cart-progress';
-import empty_cart_img from '@assets/img/product/cartmini/empty-cart.png';
 import {
-  closeCartMini,
-  remove_product,
   add_cart_product,
+  closeCartMini,
   quantityDecrement,
+  remove_product,
 } from '@/redux/features/cartSlice';
+import empty_cart_img from '@assets/img/product/cartmini/empty-cart.png';
 import styles from './cart-mini-sidebar.module.css';
 
 export default function CartMiniSidebar() {

@@ -1,38 +1,40 @@
 'use client';
-import * as dayjs from 'dayjs';
-import { useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
-import Cookies from 'js-cookie';
+import { useEffect, useRef, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
 //internal import
-import useCartInfo from './use-cart-info';
+import { completeFirstTimeDiscount } from '@/redux/features/cartSlice';
+import { useValidateCouponMutation } from '@/redux/features/coupon/couponApi';
 import {
-  set_shipping,
-  set_client_secret,
-  begin_checkout_submission,
-  end_checkout_submission,
-} from '@/redux/features/order/orderSlice';
-import { 
-  set_applied_coupon, 
-  set_coupon_error, 
-  set_coupon_loading,
+  add_applied_coupon,
+  clear_all_coupons,
   clear_coupon,
-  load_applied_coupon
+  load_applied_coupons,
+  remove_applied_coupon,
+  set_applied_coupons,
+  set_coupon_error,
+  set_coupon_loading,
 } from '@/redux/features/coupon/couponSlice';
-import { notifyError, notifySuccess } from '@/utils/toast';
 import {
   useCreatePaymentIntentMutation,
   useSaveOrderMutation,
 } from '@/redux/features/order/orderApi';
-import { useValidateCouponMutation } from '@/redux/features/coupon/couponApi';
-import { completeFirstTimeDiscount } from '@/redux/features/cartSlice';
+import {
+  begin_checkout_submission,
+  end_checkout_submission,
+  set_client_secret,
+  set_shipping,
+} from '@/redux/features/order/orderSlice';
+import { notifyError, notifySuccess } from '@/utils/toast';
+import useCartInfo from './use-cart-info';
 
 const useCheckoutSubmit = () => {
   // Enhanced coupon validation
-  const [validateCoupon, { isLoading: couponValidationLoading }] = useValidateCouponMutation();
-  
+  const [validateCoupon, { isLoading: couponValidationLoading }] =
+    useValidateCouponMutation();
+
   // addOrder
   const [saveOrder, {}] = useSaveOrderMutation();
   // createPaymentIntent
@@ -45,10 +47,16 @@ const useCheckoutSubmit = () => {
   const { shipping_info } = useSelector(state => state.order);
   // total amount
   const { total, setTotal, firstTimeDiscountAmount } = useCartInfo();
-  
+
   // Enhanced coupon state from Redux
-  const { applied_coupon, coupon_discount, coupon_error, coupon_loading } = useSelector(state => state.coupon);
-  
+  const {
+    applied_coupons,
+    total_coupon_discount,
+    coupon_error,
+    coupon_loading,
+    last_applied_coupon,
+  } = useSelector(state => state.coupon);
+
   // Legacy coupon state (keeping for backward compatibility)
   const [couponInfo, setCouponInfo] = useState({});
   //cartTotal
@@ -108,15 +116,23 @@ const useCheckoutSubmit = () => {
 
   let couponRef = useRef('');
 
-  // Load applied coupon on component mount
+  // Load applied coupons on component mount
   useEffect(() => {
-    dispatch(load_applied_coupon());
+    dispatch(load_applied_coupons());
   }, [dispatch]);
 
   // Update discount amount when enhanced coupon changes
   useEffect(() => {
-    setDiscountAmount(coupon_discount);
-  }, [coupon_discount]);
+    setDiscountAmount(total_coupon_discount);
+  }, [total_coupon_discount]);
+
+  // Clear success message when coupon is removed or when there's an error
+  useEffect(() => {
+    if (applied_coupons.length === 0) {
+      setCouponApplyMsg('');
+      dispatch(set_coupon_error(null));
+    }
+  }, [applied_coupons.length, dispatch]);
 
   // Legacy coupon loading (keeping for backward compatibility)
   useEffect(() => {
@@ -141,12 +157,12 @@ const useCheckoutSubmit = () => {
   useEffect(() => {
     let totalValue = '';
     let subTotal = Number((total + shippingCost).toFixed(2));
-    
+
     // Use enhanced coupon discount if available, otherwise fall back to legacy
-    let totalDiscount = coupon_discount;
-    
+    let totalDiscount = total_coupon_discount;
+
     // Legacy calculation for backward compatibility
-    if (!applied_coupon && discountPercentage > 0) {
+    if (applied_coupons.length === 0 && discountPercentage > 0) {
       const result = cart_products?.filter(
         p => p.productType === discountProductType
       );
@@ -167,13 +183,76 @@ const useCheckoutSubmit = () => {
     discountPercentage,
     cart_products,
     discountProductType,
-    coupon_discount,
-    applied_coupon,
+    total_coupon_discount,
+    applied_coupons,
     cartTotal,
   ]);
 
-  // Enhanced handleCouponCode function
-  const handleCouponCode = async (e) => {
+  // Update coupon message when new coupon is applied
+  useEffect(() => {
+    if (last_applied_coupon && last_applied_coupon.applicableProductNames) {
+      const productNames =
+        last_applied_coupon.applicableProductNames.join(', ');
+      const discountPercentage =
+        last_applied_coupon.discountPercentage ||
+        last_applied_coupon.discountAmount;
+
+      setCouponApplyMsg(
+        `Coupon "${last_applied_coupon.couponCode}" applied! ${discountPercentage}% discount on ${productNames}.`
+      );
+    }
+  }, [last_applied_coupon]);
+
+  // Calculate cart totals including multiple coupon discounts
+  const calculateTotals = () => {
+    // Add safety check for cart_products
+    if (
+      !cart_products ||
+      !Array.isArray(cart_products) ||
+      cart_products.length === 0
+    ) {
+      console.warn('Cart products is empty or invalid:', cart_products);
+      return {
+        cartSubtotal: 0,
+        totalDiscount: 0,
+        finalTotal: 0,
+      };
+    }
+
+    try {
+      const cartSubtotal = cart_products.reduce((total, item) => {
+        // Add safety checks for item properties
+        const quantity = Number(item?.orderQuantity || 0);
+        const price = Number(item?.price || 0);
+
+        if (isNaN(quantity) || isNaN(price)) {
+          console.warn('Invalid item data:', item);
+          return total;
+        }
+
+        return total + quantity * price;
+      }, 0);
+
+      const totalDiscount = Number(total_coupon_discount || 0);
+      const finalTotal = Math.max(0, cartSubtotal - totalDiscount);
+
+      return {
+        cartSubtotal: Math.round(cartSubtotal * 100) / 100,
+        totalDiscount: Math.round(totalDiscount * 100) / 100,
+        finalTotal: Math.round(finalTotal * 100) / 100,
+      };
+    } catch (error) {
+      console.error('Error calculating totals:', error);
+      return {
+        cartSubtotal: 0,
+        totalDiscount: 0,
+        finalTotal: 0,
+      };
+    }
+  };
+
+  // Apply a new coupon
+  const handleCouponSubmit = async e => {
     e.preventDefault();
 
     if (!couponRef.current?.value) {
@@ -182,75 +261,249 @@ const useCheckoutSubmit = () => {
     }
 
     const couponCode = couponRef.current.value.trim();
-    
+
     if (!couponCode) {
       notifyError('Please Input a Coupon Code!');
       return;
     }
 
-    // Set loading state
+    // Check if API URL is configured
+    if (!process.env.NEXT_PUBLIC_API_BASE_URL) {
+      const errorMsg = 'API configuration error. Please contact support.';
+      console.error('NEXT_PUBLIC_API_BASE_URL is not configured');
+      notifyError(errorMsg);
+      dispatch(set_coupon_error(errorMsg));
+      return;
+    }
+
+    // Check if cart has products
+    if (!cart_products || cart_products.length === 0) {
+      notifyError('Your cart is empty. Add products before applying coupons.');
+      return;
+    }
+
+    // Check if coupon is already applied
+    const existingCoupon = applied_coupons.find(
+      coupon =>
+        coupon.couponCode.toUpperCase() === couponCode.trim().toUpperCase()
+    );
+
+    if (existingCoupon) {
+      notifyError(`Coupon "${couponCode}" is already applied`);
+      dispatch(set_coupon_error(`Coupon "${couponCode}" is already applied`));
+      return;
+    }
+
     dispatch(set_coupon_loading(true));
-    setCouponApplyMsg('Validating coupon...');
+    dispatch(set_coupon_error(null));
+    setCouponApplyMsg('');
 
     try {
-      // Prepare cart data for validation
-      const cartItems = cart_products.map(item => ({
-        productId: item._id,
-        quantity: item.orderQuantity,
-        price: item.price,
-        title: item.title,
-        category: item.category?.name || item.category,
-        brand: item.brand?.name || item.brand,
-      }));
+      // Debug logging
+      console.log('🔍 Debug - Coupon application attempt:', {
+        couponCode: couponCode,
+        cart_products: cart_products,
+        cart_products_length: cart_products?.length,
+        applied_coupons: applied_coupons,
+        total_coupon_discount: total_coupon_discount,
+        api_url: process.env.NEXT_PUBLIC_API_BASE_URL,
+      });
 
-      const cartSubtotal = cart_products.reduce(
-        (sum, item) => sum + (item.price * item.orderQuantity),
-        0
-      );
-      
-      // For now, calculate full total including shipping for coupon validation
-      // In the future, this can be changed to use only cartSubtotal
-      const fullTotal = cartSubtotal + (shippingCost || 0);
+      const { cartSubtotal } = calculateTotals();
 
-      const validationData = {
-        couponCode,
-        cartItems,
-        cartTotal: fullTotal, // Send full total for now
-        cartSubtotal: cartSubtotal, // Also send subtotal for future use
-        shippingCost: shippingCost || 0,
-        userId: user?._id,
-      };
+      console.log('💰 Cart calculation result:', { cartSubtotal });
 
-      const result = await validateCoupon(validationData).unwrap();
-      
-      if (result.success) {
-        // Store the validated coupon data
-        dispatch(set_applied_coupon(result.data));
-        
-        // Clear the input
-        couponRef.current.value = '';
-        
-        // Show success message
-        const discountText = result.data.discountType === 'percentage' 
-          ? `${result.data.discount}% discount`
-          : `$${result.data.discount} discount`;
-          
-        setCouponApplyMsg(
-          `✅ Coupon applied! You got ${discountText}.`
+      // Additional validation for cart subtotal
+      if (cartSubtotal <= 0) {
+        throw new Error(
+          'Cart total must be greater than zero to apply coupons.'
         );
-        notifySuccess(
-          `Coupon applied successfully! You got ${discountText}.`
+      }
+
+      // If this is the first coupon, use single validation for backward compatibility
+      if (applied_coupons.length === 0) {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/coupon/validate`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              couponCode: couponCode.trim(),
+              cartItems: cart_products,
+              cartTotal: cartSubtotal,
+              cartSubtotal: cartSubtotal,
+              shippingCost: 0,
+            }),
+          }
         );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || 'Failed to validate coupon');
+        }
+
+        if (result.success && result.data) {
+          dispatch(add_applied_coupon(result.data));
+          couponRef.current.value = '';
+          notifySuccess(
+            `Coupon "${result.data.couponCode}" applied successfully!`
+          );
+        } else {
+          throw new Error(result.message || 'Coupon validation failed');
+        }
       } else {
-        throw new Error(result.message || 'Invalid coupon code');
+        // Use multiple coupon validation for additional coupons
+        const newCouponCodes = [couponCode.trim()];
+        const excludeAppliedCoupons = applied_coupons.map(c => c.couponCode);
+
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/coupon/validate-multiple`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              couponCodes: newCouponCodes,
+              cartItems: cart_products,
+              cartTotal: cartSubtotal,
+              cartSubtotal: cartSubtotal,
+              shippingCost: 0,
+              excludeAppliedCoupons: excludeAppliedCoupons,
+            }),
+          }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || 'Failed to validate coupons');
+        }
+
+        if (result.success && result.data.appliedCoupons.length > 0) {
+          // Add each new coupon to the existing list
+          result.data.appliedCoupons.forEach(couponData => {
+            dispatch(add_applied_coupon(couponData));
+          });
+
+          couponRef.current.value = '';
+          notifySuccess(
+            `${result.data.appliedCoupons.length} coupon(s) applied successfully!`
+          );
+        } else {
+          const failureReason =
+            result.data?.validationResults?.[0]?.message ||
+            result.message ||
+            'Coupon validation failed';
+          throw new Error(failureReason);
+        }
       }
     } catch (error) {
       console.error('Coupon validation error:', error);
-      const errorMessage = error?.data?.message || error?.message || 'Invalid coupon code';
-      
+
+      // Provide more specific error messages based on error type
+      let errorMessage;
+
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        errorMessage =
+          'Network error. Please check your connection and try again.';
+      } else if (error.message.includes('API configuration')) {
+        errorMessage = 'Configuration error. Please contact support.';
+      } else if (error.message.includes('Cart total must be greater')) {
+        errorMessage = 'Cart total must be greater than zero to apply coupons.';
+      } else if (error.message.includes('Failed to fetch')) {
+        errorMessage = 'Unable to connect to server. Please try again.';
+      } else {
+        errorMessage =
+          error.message || 'Failed to apply coupon. Please try again.';
+      }
+
+      setCouponApplyMsg(errorMessage);
       dispatch(set_coupon_error(errorMessage));
-      setCouponApplyMsg(`❌ ${errorMessage}`);
       notifyError(errorMessage);
+    } finally {
+      dispatch(set_coupon_loading(false));
+    }
+  };
+
+  // Remove a specific coupon
+  const handleRemoveCoupon = couponCode => {
+    const removedCoupon = applied_coupons.find(
+      c => c.couponCode === couponCode
+    );
+    dispatch(remove_applied_coupon(couponCode));
+
+    if (removedCoupon) {
+      notifySuccess(`Coupon "${couponCode}" removed successfully!`);
+    }
+
+    // Clear message if this was the last coupon
+    if (applied_coupons.length === 1) {
+      setCouponApplyMsg('');
+    }
+  };
+
+  // Clear all applied coupons
+  const handleClearAllCoupons = () => {
+    dispatch(clear_all_coupons());
+    setCouponApplyMsg('');
+    notifySuccess('All coupons removed successfully!');
+  };
+
+  // Re-validate all applied coupons (useful when cart changes)
+  const revalidateAllCoupons = async () => {
+    if (applied_coupons.length === 0) return;
+
+    dispatch(set_coupon_loading(true));
+
+    try {
+      const { cartSubtotal } = calculateTotals();
+      const couponCodes = applied_coupons.map(c => c.couponCode);
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/coupon/validate-multiple`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            couponCodes: couponCodes,
+            cartItems: cart_products,
+            cartTotal: cartSubtotal,
+            cartSubtotal: cartSubtotal,
+            shippingCost: 0,
+            excludeAppliedCoupons: [], // Don't exclude any since we're revalidating
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (result.success && result.data.appliedCoupons) {
+        dispatch(set_applied_coupons(result.data.appliedCoupons));
+
+        // Show notification if some coupons were removed
+        const removedCount =
+          applied_coupons.length - result.data.appliedCoupons.length;
+        if (removedCount > 0) {
+          notifyError(
+            `${removedCount} coupon(s) are no longer valid and have been removed.`
+          );
+        }
+      } else {
+        // All coupons invalid, clear them
+        dispatch(clear_all_coupons());
+        notifyError(
+          'All applied coupons are no longer valid and have been removed.'
+        );
+      }
+    } catch (error) {
+      console.error('Coupon revalidation error:', error);
+      // Keep existing coupons on revalidation error
     } finally {
       dispatch(set_coupon_loading(false));
     }
@@ -379,14 +632,7 @@ const useCheckoutSubmit = () => {
         amount: firstTimeDiscountAmount || 0,
       },
       // Add enhanced coupon information
-      appliedCoupon: applied_coupon ? {
-        couponId: applied_coupon._id,
-        couponCode: applied_coupon.couponCode,
-        title: applied_coupon.title,
-        discountType: applied_coupon.discountType,
-        discountAmount: coupon_discount,
-        originalDiscount: applied_coupon.discountPercentage || applied_coupon.discountAmount,
-      } : null,
+      appliedCoupons: applied_coupons,
     };
 
     const card = elements?.getElement(CardElement);
@@ -435,10 +681,10 @@ const useCheckoutSubmit = () => {
           // Clean up
           localStorage.removeItem('cart_products');
           localStorage.removeItem('couponInfo');
-          
+
           // Clear enhanced coupon
           dispatch(clear_coupon());
-          
+
           setIsCheckoutSubmit(false);
           setProcessingPayment(false);
           dispatch(end_checkout_submission());
@@ -503,11 +749,11 @@ const useCheckoutSubmit = () => {
           // Handle free orders (100% discount coupons)
           if (paymentResult.isFreeOrder) {
             console.log('🎁 Processing free order due to 100% discount');
-            
+
             // Clean up first
             localStorage.removeItem('cart_products');
             localStorage.removeItem('couponInfo');
-            
+
             // Clear enhanced coupon
             dispatch(clear_coupon());
 
@@ -557,11 +803,15 @@ const useCheckoutSubmit = () => {
                 });
                 setShowThankYouModal(true);
 
-                notifySuccess('🎉 Your free order has been placed successfully!');
+                notifySuccess(
+                  '🎉 Your free order has been placed successfully!'
+                );
               })
               .catch(err => {
                 console.error('Free Order error:', err);
-                notifyError('Something went wrong with your free order. Please try again.');
+                notifyError(
+                  'Something went wrong with your free order. Please try again.'
+                );
                 setIsCheckoutSubmit(false);
                 setProcessingPayment(false);
                 dispatch(end_checkout_submission());
@@ -631,7 +881,7 @@ const useCheckoutSubmit = () => {
             // Clean up first
             localStorage.removeItem('cart_products');
             localStorage.removeItem('couponInfo');
-            
+
             // Clear enhanced coupon
             dispatch(clear_coupon());
 
@@ -750,7 +1000,10 @@ const useCheckoutSubmit = () => {
   };
 
   return {
-    handleCouponCode,
+    handleCouponSubmit,
+    handleRemoveCoupon,
+    handleClearAllCoupons,
+    revalidateAllCoupons,
     couponRef,
     handleShippingCost,
     discountAmount,
@@ -772,6 +1025,7 @@ const useCheckoutSubmit = () => {
     cartTotal,
     isCheckoutSubmit,
     couponApplyMsg,
+    setCouponApplyMsg,
     showCard,
     setShowCard,
     processingPayment,
@@ -780,6 +1034,11 @@ const useCheckoutSubmit = () => {
     orderDataForModal,
     handleThankYouModalClose,
     handleThankYouModalContinue,
+    applied_coupons,
+    total_coupon_discount,
+    coupon_error,
+    coupon_loading,
+    calculateTotals,
   };
 };
 

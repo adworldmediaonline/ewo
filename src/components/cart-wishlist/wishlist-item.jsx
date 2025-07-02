@@ -1,13 +1,12 @@
 'use client';
-import React from 'react';
-import Image from 'next/image';
-import { useDispatch, useSelector } from 'react-redux';
-import Link from 'next/link';
 import {
   add_cart_product,
   quantityDecrement,
 } from '@/redux/features/cartSlice';
 import { remove_wishlist_product } from '@/redux/features/wishlist-slice';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useDispatch, useSelector } from 'react-redux';
 import styles from './wishlist-item.module.css';
 
 export default function WishlistItem({ product }) {
