@@ -8,7 +8,7 @@ import {
   add_cart_product,
   quantityDecrement,
 } from '@/redux/features/cartSlice';
-import { load_applied_coupon } from '@/redux/features/coupon/couponSlice';
+import { load_applied_coupons } from '@/redux/features/coupon/couponSlice';
 import { Minus, Plus } from '@/svg';
 import styles from './checkout-order-area.module.css';
 
@@ -68,7 +68,9 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
     address_discount_eligible,
     address_discount_message,
     addressDiscountAmount,
-    handleCouponCode,
+    handleCouponSubmit,
+    handleRemoveCoupon,
+    handleClearAllCoupons,
     couponRef,
     couponApplyMsg,
   } = checkoutData;
@@ -85,13 +87,17 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
 
   const { isCheckoutSubmitting } = useSelector(state => state.order);
 
-  // Enhanced coupon state
-  const { applied_coupon, coupon_discount, coupon_error, coupon_loading } =
-    useSelector(state => state.coupon);
+  // Enhanced multiple coupon state
+  const {
+    applied_coupons,
+    total_coupon_discount,
+    coupon_error,
+    coupon_loading,
+  } = useSelector(state => state.coupon);
 
-  // Load applied coupon on component mount
+  // Load applied coupons on component mount
   useEffect(() => {
-    dispatch(load_applied_coupon());
+    dispatch(load_applied_coupons());
   }, [dispatch]);
 
   // Save discount values when they change and we're not in checkout process
@@ -155,10 +161,11 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
 
       let finalTotal = manualTotal;
 
-      // Subtract enhanced coupon discount
-      if (applied_coupon && Number(coupon_discount) > 0) {
-        finalTotal -= Number(coupon_discount);
+      // Subtract multiple coupon discounts
+      if (Number(total_coupon_discount) > 0) {
+        finalTotal -= Number(total_coupon_discount);
       } else if (Number(discountAmount) > 0) {
+        // Fall back to legacy discount amount
         finalTotal -= Number(discountAmount);
       }
 
@@ -173,9 +180,9 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
 
     let finalTotal = baseTotal;
 
-    // Subtract enhanced coupon discount
-    if (applied_coupon && Number(coupon_discount) > 0) {
-      finalTotal -= Number(coupon_discount);
+    // Subtract multiple coupon discounts
+    if (Number(total_coupon_discount) > 0) {
+      finalTotal -= Number(total_coupon_discount);
     } else if (Number(discountAmount) > 0) {
       // Fall back to legacy discount amount
       finalTotal -= Number(discountAmount);
@@ -201,32 +208,6 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
   const handleDecrement = product => {
     dispatch(quantityDecrement(product));
   };
-
-  // Get coupon display information
-  const getCouponDisplayInfo = () => {
-    if (applied_coupon && Number(coupon_discount) > 0) {
-      return {
-        discount: Number(coupon_discount),
-        title: applied_coupon.title || 'Coupon Discount',
-        code: applied_coupon.couponCode || '',
-        type: applied_coupon.discountType || 'percentage',
-      };
-    }
-
-    // Fall back to legacy discount
-    if (Number(discountAmount) > 0) {
-      return {
-        discount: Number(discountAmount),
-        title: 'Coupon Discount',
-        code: '',
-        type: 'legacy',
-      };
-    }
-
-    return null;
-  };
-
-  const couponDisplay = getCouponDisplayInfo();
 
   return (
     <div className={styles.orderSummary}>
@@ -288,13 +269,13 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
           <input
             ref={couponRef}
             type="text"
-            placeholder="Discount code"
+            placeholder="Add another coupon code"
             className={styles.discountInput}
             disabled={coupon_loading || isCheckoutSubmit || processingPayment}
           />
           <button
             type="button"
-            onClick={handleCouponCode}
+            onClick={handleCouponSubmit}
             className={styles.discountButton}
             disabled={coupon_loading || isCheckoutSubmit || processingPayment}
           >
@@ -313,28 +294,64 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
           </div>
         )}
 
-        {/* Display applied coupon info */}
-        {applied_coupon && (
-          <div className={styles.appliedCouponInfo}>
-            <div className={styles.appliedCouponDetails}>
-              <span className={styles.appliedCouponCode}>
-                {applied_coupon.couponCode}
-              </span>
-              <span className={styles.appliedCouponTitle}>
-                {applied_coupon.title}
-              </span>
+        {/* Display multiple applied coupons */}
+        {applied_coupons.length > 0 && (
+          <div className={styles.appliedCouponsSection}>
+            <div className={styles.appliedCouponsHeader}>
+              <h4 className={styles.appliedCouponsTitle}>
+                Applied Coupons ({applied_coupons.length})
+              </h4>
+              {applied_coupons.length > 1 && (
+                <button
+                  type="button"
+                  onClick={handleClearAllCoupons}
+                  className={styles.clearAllCouponsBtn}
+                  disabled={isCheckoutSubmit || processingPayment}
+                >
+                  Remove All
+                </button>
+              )}
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                dispatch({ type: 'coupon/clear_coupon' });
-                if (couponRef.current) couponRef.current.value = '';
-              }}
-              className={styles.removeCouponBtn}
-              disabled={isCheckoutSubmit || processingPayment}
-            >
-              Remove
-            </button>
+
+            <div className={styles.appliedCouponsList}>
+              {applied_coupons.map((coupon, index) => (
+                <div
+                  key={coupon.couponCode || index}
+                  className={styles.appliedCouponItem}
+                >
+                  <div className={styles.appliedCouponDetails}>
+                    <span className={styles.appliedCouponCode}>
+                      {coupon.couponCode}
+                    </span>
+                    <span className={styles.appliedCouponTitle}>
+                      {coupon.title}
+                    </span>
+                    <span className={styles.appliedCouponDiscount}>
+                      -${Number(coupon.discount || 0).toFixed(2)}
+                    </span>
+                    {coupon.applicableProductNames &&
+                      coupon.applicableProductNames.length > 0 && (
+                        <span className={styles.appliedCouponProducts}>
+                          Applied to:{' '}
+                          {coupon.applicableProductNames.slice(0, 2).join(', ')}
+                          {coupon.applicableProductNames.length > 2 &&
+                            ` +${
+                              coupon.applicableProductNames.length - 2
+                            } more`}
+                        </span>
+                      )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveCoupon(coupon.couponCode)}
+                    className={styles.removeCouponBtn}
+                    disabled={isCheckoutSubmit || processingPayment}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
@@ -362,19 +379,29 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
           </span>
         </div>
 
-        {/* Enhanced coupon discount display */}
-        {couponDisplay && Number(couponDisplay.discount) > 0 && (
+        {/* Multiple coupon discounts display */}
+        {Number(total_coupon_discount) > 0 && (
           <div className={styles.summaryRow}>
             <span className={styles.summaryLabel}>
-              {couponDisplay.title}
-              {couponDisplay.code && (
-                <span className={styles.couponCodeBadge}>
-                  {couponDisplay.code}
+              Coupon Discounts
+              {applied_coupons.length > 1 && (
+                <span className={styles.couponCountBadge}>
+                  {applied_coupons.length} coupons
                 </span>
               )}
             </span>
             <span className={`${styles.summaryValue} ${styles.discount}`}>
-              -${Number(couponDisplay.discount).toFixed(2)}
+              -${Number(total_coupon_discount).toFixed(2)}
+            </span>
+          </div>
+        )}
+
+        {/* Legacy fallback for single coupon */}
+        {Number(total_coupon_discount) === 0 && Number(discountAmount) > 0 && (
+          <div className={styles.summaryRow}>
+            <span className={styles.summaryLabel}>Coupon Discount</span>
+            <span className={`${styles.summaryValue} ${styles.discount}`}>
+              -${Number(discountAmount).toFixed(2)}
             </span>
           </div>
         )}

@@ -1,15 +1,14 @@
 'use client';
-import React from 'react';
 import Image from 'next/image';
-import { useDispatch } from 'react-redux';
 import Link from 'next/link';
+import { useDispatch } from 'react-redux';
 // internal
-import { Close, Minus, Plus } from '@/svg';
 import {
   add_cart_product,
   quantityDecrement,
   remove_product,
 } from '@/redux/features/cartSlice';
+import { Close, Minus, Plus } from '@/svg';
 import styles from './cart-item.module.css';
 
 export default function CartItem({ product }) {
