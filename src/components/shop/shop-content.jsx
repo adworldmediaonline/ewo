@@ -1,16 +1,16 @@
 'use client';
-import React, { useState } from 'react';
 import Pagination from '@/ui/Pagination';
+import { useState } from 'react';
 import CategoryFilter from './shop-filter/category-filter';
 // import PriceFilter from './shop-filter/price-filter';
 import StatusFilter from './shop-filter/status-filter';
 import TopRatedProducts from './shop-filter/top-rated-products';
 // import ShopListItem from './shop-list-item';
-import ShopTopLeft from './shop-top-left';
-import ShopTopRight from './shop-top-right';
-import ResetButton from './shop-filter/reset-button';
 import styles from '../../app/shop/shop.module.css';
 import ProductItemWrapper from './product-item-wrapper';
+import ResetButton from './shop-filter/reset-button';
+import ShopTopLeft from './shop-top-left';
+import ShopTopRight from './shop-top-right';
 
 const ShopContent = ({
   all_products,
@@ -25,6 +25,11 @@ const ShopContent = ({
   const [filteredRows, setFilteredRows] = useState(products);
   const [pageStart, setPageStart] = useState(0);
   const [countOfPage, setCountOfPage] = useState(50);
+
+  // TODO: Implement coupon fetching functionality
+  // const productIds = products.map(product => product._id);
+  // const { coupons: productCoupons, loading: couponsLoading } = useProductCoupons(productIds);
+  const productCoupons = {}; // Temporary placeholder
 
   const paginatedData = (items, startPage, pageCount) => {
     setFilteredRows(items);
@@ -93,7 +98,10 @@ const ShopContent = ({
                     .slice(pageStart, pageStart + countOfPage)
                     .map((item, i) => (
                       <div key={i} className={styles.productGridItem}>
-                        <ProductItemWrapper product={item} />
+                        <ProductItemWrapper
+                          product={item}
+                          coupons={productCoupons[item._id] || []}
+                        />
                       </div>
                     ))}
                 </div>

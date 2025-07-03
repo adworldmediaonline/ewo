@@ -1,12 +1,12 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import parentCategoryModified from '@/lib/parentCategory';
+import { useGetAllProductsQuery } from '@/redux/features/productApi';
 import { useSearchParams } from 'next/navigation';
-import ShopLoader from '../loader/shop/shop-loader';
+import { useEffect, useState } from 'react';
 import ErrorMsg from '../common/error-msg';
 import ShopFilterOffCanvas from '../common/shop-filter-offcanvas';
-import { useGetAllProductsQuery } from '@/redux/features/productApi';
+import ShopLoader from '../loader/shop/shop-loader';
 import ShopContent from './shop-content';
-import parentCategoryModified from '@/lib/parentCategory';
 
 const ShopArea = ({ shop_right = false, hidden_sidebar = false }) => {
   const searchParams = useSearchParams();
