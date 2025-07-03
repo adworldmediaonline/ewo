@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
-import ProductItem from '../products/fashion/product-item';
-import styles from '../../app/shop/shop.module.css';
-import { useDispatch, useSelector } from 'react-redux';
+import useCartTracking from '@/hooks/useCartTracking';
+import useGuestCartNavigation from '@/hooks/useGuestCartNavigation';
 import { add_cart_product } from '@/redux/features/cartSlice';
 import { useRouter } from 'next/navigation';
-import useGuestCartNavigation from '@/hooks/useGuestCartNavigation';
-import useCartTracking from '@/hooks/useCartTracking';
+import { useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import styles from '../../app/shop/shop.module.css';
+import ProductItem from '../products/fashion/product-item';
 
 // Function to convert text to title case (first letter of each word capitalized)
 // const toTitleCase = str => {
@@ -19,7 +19,7 @@ import useCartTracking from '@/hooks/useCartTracking';
 //     .join(' ');
 // };
 
-export default function ProductItemWrapper({ product }) {
+export default function ProductItemWrapper({ product, coupons = [] }) {
   const router = useRouter();
   const dispatch = useDispatch();
   const { navigateToCart } = useGuestCartNavigation();
@@ -55,8 +55,11 @@ export default function ProductItemWrapper({ product }) {
   };
 
   const handleAddToCart = async () => {
-    console.log('🛒 [FRONTEND] handleAddToCart clicked for product:', product._id);
-    
+    console.log(
+      '🛒 [FRONTEND] handleAddToCart clicked for product:',
+      product._id
+    );
+
     if (product.status !== 'out-of-stock') {
       // First, track the add to cart event
       try {
@@ -64,7 +67,7 @@ export default function ProductItemWrapper({ product }) {
         console.log('📦 [FRONTEND] Product data:', {
           id: product._id,
           title: product.title,
-          price: product.price
+          price: product.price,
         });
         console.log('⚙️ [FRONTEND] Tracking options:', {
           quantity: 1,
@@ -74,7 +77,7 @@ export default function ProductItemWrapper({ product }) {
           finalPrice: finalSellingPrice,
           discountPercentage: discountOnPrice,
         });
-        
+
         const trackingResult = await trackAddToCart(product, {
           quantity: 1,
           source: 'shop-page',
@@ -83,27 +86,27 @@ export default function ProductItemWrapper({ product }) {
           finalPrice: finalSellingPrice,
           discountPercentage: discountOnPrice,
         });
-        
+
         console.log('✅ [FRONTEND] trackAddToCart result:', trackingResult);
-        
+
         // Also trigger client-side Meta pixel AddToCart event
         if (typeof window !== 'undefined' && window.fbq) {
           console.log('🎯 [FRONTEND] Triggering client-side Meta AddToCart...');
-          
+
           // Add test event code for Meta testing
           const eventData = {
             content_ids: [product._id],
             content_type: 'product',
             value: finalSellingPrice,
-            currency: 'USD'
+            currency: 'USD',
           };
-          
+
           // Add test event code if in development
           if (process.env.NODE_ENV !== 'production') {
             eventData.test_event_code = 'TEST75064';
             console.log('🧪 [FRONTEND] Added test event code: TEST75064');
           }
-          
+
           window.fbq('track', 'AddToCart', eventData);
           console.log('✅ [FRONTEND] Client-side Meta AddToCart sent');
         }
@@ -128,7 +131,7 @@ export default function ProductItemWrapper({ product }) {
   return (
     <div className={styles.productCard}>
       <div className={styles.productCardInner}>
-        <ProductItem product={formattedProduct} />
+        <ProductItem product={formattedProduct} coupons={coupons} />
 
         <div className={styles.productCardActions}>
           <button

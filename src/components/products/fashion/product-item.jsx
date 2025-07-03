@@ -1,20 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Rating } from 'react-simple-star-rating';
-import Link from 'next/link';
 // internal
-import { Cart, CompareThree, QuickView, Wishlist } from '@/svg';
 import CloudinaryImage from '@/components/common/CloudinaryImage';
-import { handleProductModal } from '@/redux/features/productModalSlice';
-import { add_cart_product } from '@/redux/features/cartSlice';
-import { add_to_wishlist } from '@/redux/features/wishlist-slice';
-import { add_to_compare } from '@/redux/features/compareSlice';
+import CouponBadge from '@/components/common/CouponBadge';
 import {
   formatParenthesesText,
   replaceTextCharacters,
 } from '@/lib/replaceTextCharacters';
+import { add_cart_product } from '@/redux/features/cartSlice';
+import { add_to_compare } from '@/redux/features/compareSlice';
+import { handleProductModal } from '@/redux/features/productModalSlice';
+import { add_to_wishlist } from '@/redux/features/wishlist-slice';
+import { CompareThree, QuickView, Wishlist } from '@/svg';
 
-export default function ProductItem({ product, style_2 = false }) {
+export default function ProductItem({
+  product,
+  style_2 = false,
+  coupons = [],
+}) {
   const {
     _id,
     img,
@@ -106,6 +111,7 @@ export default function ProductItem({ product, style_2 = false }) {
             <span className="product-hot">Out of Stock</span>
           </div>
         )}
+        <CouponBadge coupons={coupons} />
         {/* product action */}
         <div className="tp-product-action-2">
           <div className="tp-product-action-item-2 d-flex flex-column">

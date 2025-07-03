@@ -15,7 +15,7 @@ export default function IndependenceDayBanner() {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <Link href="/shop" className={styles.bannerLink}>
+        <Link href="/coupon" className={styles.bannerLink}>
           <div className={styles.imageWrapper}>
             <CldImage
               src="INDEPENDENCE_DAY_SALE_UP_TO_70_25_OFF_SHOP_NOW_20250702_131612_0000_1_wfztyr"
@@ -25,7 +25,7 @@ export default function IndependenceDayBanner() {
               className={`${styles.bannerImage} ${
                 isHovered ? styles.hovered : ''
               }`}
-              alt="Independence Day Sale - Up to 70% Off - Shop Now!"
+              alt="Independence Day Sale - Up to 20% Off - Shop Now!"
               crop="scale"
               quality={95}
               priority
@@ -35,10 +35,6 @@ export default function IndependenceDayBanner() {
             {/* Overlay with call-to-action */}
             <div className={styles.bannerOverlay}>
               <div className={styles.overlayContent}>
-                <div className={styles.saleBadge}>
-                  <span className={styles.saleText}>SALE</span>
-                  <span className={styles.discountText}>UP TO 70% OFF</span>
-                </div>
                 <div className={styles.ctaButton}>
                   <span>SHOP NOW</span>
                   <svg
