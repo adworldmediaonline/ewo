@@ -1,6 +1,7 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // internal
 import useCartInfo from '@/hooks/use-cart-info';
@@ -12,24 +13,287 @@ import {
   quantityDecrement,
   remove_product,
 } from '@/redux/features/cartSlice';
+import {
+  add_applied_coupon,
+  clear_all_coupons,
+  load_applied_coupons,
+  remove_applied_coupon,
+  set_coupon_error,
+  set_coupon_loading,
+} from '@/redux/features/coupon/couponSlice';
+import { notifyError, notifySuccess } from '@/utils/toast';
 import empty_cart_img from '@assets/img/product/cartmini/empty-cart.png';
 import styles from './cart-mini-sidebar.module.css';
 
 export default function CartMiniSidebar() {
-  const { cart_products, cartMiniOpen, firstTimeDiscount } = useSelector(
-    state => state.cart
-  );
+  const {
+    cart_products,
+    cartMiniOpen,
+    firstTimeDiscount,
+    totalShippingCost,
+    shippingDiscount,
+  } = useSelector(state => state.cart);
+
+  // Enhanced coupon state
+  const {
+    applied_coupons,
+    total_coupon_discount,
+    coupon_error,
+    coupon_loading,
+  } = useSelector(state => state.coupon);
+
+  // Order state for address discount
+  const {
+    address_discount_eligible,
+    address_discount_message,
+    address_discount_percentage,
+  } = useSelector(state => state.order);
+
+  // Local state for coupon application
+  const [couponApplyMsg, setCouponApplyMsg] = useState('');
+  const [couponFormVisible, setCouponFormVisible] = useState(false);
+  const couponRef = useRef(null);
+
   const { total, subtotal, firstTimeDiscountAmount } = useCartInfo();
   const { navigateToCart, navigateToCheckout } = useGuestCartNavigation();
   const dispatch = useDispatch();
 
-  // Debug logging for troubleshooting
-  console.log('🛒 Cart Mini Sidebar State:', {
-    cartMiniOpen,
-    showCelebration: firstTimeDiscount.showCelebration,
-    isApplied: firstTimeDiscount.isApplied,
-    cartLength: cart_products.length,
-  });
+  // Load applied coupons on component mount
+  useEffect(() => {
+    dispatch(load_applied_coupons());
+  }, [dispatch]);
+
+  // Clear success message when coupon is removed or when there's an error
+  useEffect(() => {
+    if (applied_coupons.length === 0) {
+      setCouponApplyMsg('');
+      dispatch(set_coupon_error(null));
+    }
+  }, [applied_coupons.length, dispatch]);
+
+  // Calculate discount percentage to display for shipping
+  const discountPercentage =
+    shippingDiscount > 0 ? (shippingDiscount * 100).toFixed(0) : 0;
+
+  // Calculate address discount amount
+  const addressDiscountAmount = address_discount_eligible
+    ? subtotal * (address_discount_percentage / 100)
+    : 0;
+
+  // Calculate final total with all discounts
+  const calculateFinalTotal = () => {
+    let finalTotal = Number(total) + Number(totalShippingCost);
+
+    // Subtract coupon discounts
+    if (Number(total_coupon_discount) > 0) {
+      finalTotal -= Number(total_coupon_discount);
+    }
+
+    // Subtract address discount
+    if (Number(addressDiscountAmount) > 0) {
+      finalTotal -= Number(addressDiscountAmount);
+    }
+
+    return Math.max(0, finalTotal);
+  };
+
+  // Calculate cart totals for coupon validation
+  const calculateTotals = () => {
+    if (
+      !cart_products ||
+      !Array.isArray(cart_products) ||
+      cart_products.length === 0
+    ) {
+      return { cartSubtotal: 0 };
+    }
+
+    try {
+      const cartSubtotal = cart_products.reduce((total, item) => {
+        const quantity = Number(item?.orderQuantity || 0);
+        const price = Number(item?.price || 0);
+        return total + quantity * price;
+      }, 0);
+
+      return {
+        cartSubtotal: Math.round(cartSubtotal * 100) / 100,
+      };
+    } catch (error) {
+      console.error('Error calculating totals:', error);
+      return { cartSubtotal: 0 };
+    }
+  };
+
+  // Apply a new coupon
+  const handleCouponSubmit = async e => {
+    e.preventDefault();
+
+    if (!couponRef.current?.value) {
+      notifyError('Please enter a coupon code!');
+      return;
+    }
+
+    const couponCode = couponRef.current.value.trim();
+
+    if (!couponCode) {
+      notifyError('Please enter a coupon code!');
+      return;
+    }
+
+    // Check if API URL is configured
+    if (!process.env.NEXT_PUBLIC_API_BASE_URL) {
+      const errorMsg = 'API configuration error. Please contact support.';
+      console.error('NEXT_PUBLIC_API_BASE_URL is not configured');
+      notifyError(errorMsg);
+      dispatch(set_coupon_error(errorMsg));
+      return;
+    }
+
+    // Check if cart has products
+    if (!cart_products || cart_products.length === 0) {
+      notifyError('Your cart is empty. Add products before applying coupons.');
+      return;
+    }
+
+    // Check if coupon is already applied
+    const existingCoupon = applied_coupons.find(
+      coupon =>
+        coupon.couponCode.toUpperCase() === couponCode.trim().toUpperCase()
+    );
+
+    if (existingCoupon) {
+      notifyError(`Coupon "${couponCode}" is already applied`);
+      dispatch(set_coupon_error(`Coupon "${couponCode}" is already applied`));
+      return;
+    }
+
+    dispatch(set_coupon_loading(true));
+    dispatch(set_coupon_error(null));
+    setCouponApplyMsg('');
+
+    try {
+      const { cartSubtotal } = calculateTotals();
+
+      // Additional validation for cart subtotal
+      if (cartSubtotal <= 0) {
+        throw new Error(
+          'Cart total must be greater than zero to apply coupons.'
+        );
+      }
+
+      // If this is the first coupon, use single validation for backward compatibility
+      if (applied_coupons.length === 0) {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/coupon/validate`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              couponCode: couponCode.trim(),
+              cartItems: cart_products,
+              cartTotal: cartSubtotal,
+              cartSubtotal: cartSubtotal,
+              shippingCost: 0,
+            }),
+          }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || 'Failed to validate coupon');
+        }
+
+        if (result.success && result.data) {
+          dispatch(add_applied_coupon(result.data));
+          couponRef.current.value = '';
+          setCouponApplyMsg(
+            `Coupon "${result.data.couponCode}" applied successfully!`
+          );
+          notifySuccess(
+            `Coupon "${result.data.couponCode}" applied successfully!`
+          );
+        } else {
+          throw new Error(result.message || 'Coupon validation failed');
+        }
+      } else {
+        // Use multiple coupon validation for additional coupons
+        const newCouponCodes = [couponCode.trim()];
+        const excludeAppliedCoupons = applied_coupons.map(c => c.couponCode);
+
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/coupon/validate-multiple`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              couponCodes: newCouponCodes,
+              cartItems: cart_products,
+              cartTotal: cartSubtotal,
+              cartSubtotal: cartSubtotal,
+              shippingCost: 0,
+              excludeAppliedCoupons: excludeAppliedCoupons,
+            }),
+          }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || 'Failed to validate coupons');
+        }
+
+        if (result.success && result.data.appliedCoupons.length > 0) {
+          // Add each new coupon to the existing list
+          result.data.appliedCoupons.forEach(couponData => {
+            dispatch(add_applied_coupon(couponData));
+          });
+
+          couponRef.current.value = '';
+          setCouponApplyMsg(
+            `${result.data.appliedCoupons.length} coupon(s) applied successfully!`
+          );
+          notifySuccess(
+            `${result.data.appliedCoupons.length} coupon(s) applied successfully!`
+          );
+        } else {
+          const failureReason =
+            result.data?.validationResults?.[0]?.message ||
+            result.message ||
+            'Coupon validation failed';
+          throw new Error(failureReason);
+        }
+      }
+    } catch (error) {
+      console.error('Coupon validation error:', error);
+
+      // Provide more specific error messages based on error type
+      let errorMessage;
+
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        errorMessage =
+          'Network error. Please check your connection and try again.';
+      } else if (error.message.includes('API configuration')) {
+        errorMessage = 'Configuration error. Please contact support.';
+      } else if (error.message.includes('Cart total must be greater')) {
+        errorMessage = 'Cart total must be greater than zero to apply coupons.';
+      } else if (error.message.includes('Failed to fetch')) {
+        errorMessage = 'Unable to connect to server. Please try again.';
+      } else {
+        errorMessage =
+          error.message || 'Failed to apply coupon. Please try again.';
+      }
+
+      setCouponApplyMsg(errorMessage);
+      dispatch(set_coupon_error(errorMessage));
+      notifyError(errorMessage);
+    } finally {
+      dispatch(set_coupon_loading(false));
+    }
+  };
 
   // handle remove product
   const handleRemovePrd = prd => {
@@ -50,6 +314,35 @@ export default function CartMiniSidebar() {
   // handle decrement quantity
   const handleDecrement = prd => {
     dispatch(quantityDecrement(prd));
+  };
+
+  // Handle remove individual coupon
+  const handleRemoveCoupon = couponCode => {
+    const removedCoupon = applied_coupons.find(
+      c => c.couponCode === couponCode
+    );
+    dispatch(remove_applied_coupon(couponCode));
+
+    if (removedCoupon) {
+      notifySuccess(`Coupon "${couponCode}" removed successfully!`);
+    }
+
+    // Clear message if this was the last coupon
+    if (applied_coupons.length === 1) {
+      setCouponApplyMsg('');
+    }
+  };
+
+  // Handle clear all coupons
+  const handleClearAllCoupons = () => {
+    dispatch(clear_all_coupons());
+    setCouponApplyMsg('');
+    notifySuccess('All coupons removed successfully!');
+  };
+
+  // Toggle coupon form
+  const toggleCouponForm = () => {
+    setCouponFormVisible(!couponFormVisible);
   };
 
   return (
@@ -98,9 +391,7 @@ export default function CartMiniSidebar() {
                 </div>
               </div>
             )}
-            {/* <div className="cartmini__shipping">
-              <RenderCartProgress />
-            </div> */}
+
             {cart_products.length > 0 && (
               <div className={styles.cartMiniWidget}>
                 {cart_products.map((item, i) => (
@@ -228,16 +519,176 @@ export default function CartMiniSidebar() {
               </div>
             )}
           </div>
+
+          {/* Essential Checkout Section - Always Visible */}
           <div className={styles.cartMiniCheckout}>
+            {/* Apply Coupon Toggle */}
+            {cart_products.length > 0 && (
+              <>
+                <button
+                  type="button"
+                  onClick={toggleCouponForm}
+                  className={styles.detailsToggle}
+                  aria-expanded={couponFormVisible}
+                  aria-controls="coupon-form"
+                >
+                  <span>
+                    {couponFormVisible ? 'Hide Coupon Form' : 'Apply Coupon'}
+                  </span>
+                  <span
+                    className={`${styles.toggleIcon} ${
+                      couponFormVisible ? styles.toggleIconRotated : ''
+                    }`}
+                  >
+                    ▼
+                  </span>
+                </button>
+
+                {/* Collapsible Coupon Form */}
+                <div
+                  id="coupon-form"
+                  className={`${styles.detailsSection} ${
+                    couponFormVisible
+                      ? styles.detailsSectionVisible
+                      : styles.detailsSectionHidden
+                  }`}
+                >
+                  <div className={styles.detailsContent}>
+                    {/* Apply Coupon Section */}
+                    <div className={styles.couponSection}>
+                      <div className={styles.couponForm}>
+                        <input
+                          ref={couponRef}
+                          type="text"
+                          placeholder="Enter coupon code"
+                          className={styles.couponInput}
+                          disabled={coupon_loading}
+                        />
+                        <button
+                          type="button"
+                          onClick={handleCouponSubmit}
+                          className={styles.couponButton}
+                          disabled={coupon_loading}
+                        >
+                          {coupon_loading ? 'Applying...' : 'Apply'}
+                        </button>
+                      </div>
+
+                      {/* Coupon messages */}
+                      {couponApplyMsg && (
+                        <div
+                          className={`${styles.couponMessage} ${
+                            coupon_error
+                              ? styles.couponError
+                              : styles.couponSuccess
+                          }`}
+                        >
+                          {couponApplyMsg}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* Applied Coupons Section - Always visible when coupons exist */}
+            {applied_coupons.length > 0 && (
+              <div className={styles.appliedCouponsSection}>
+                <div className={styles.appliedCouponsHeader}>
+                  <h4 className={styles.appliedCouponsTitle}>
+                    Applied Coupons ({applied_coupons.length})
+                  </h4>
+                  {applied_coupons.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={handleClearAllCoupons}
+                      className={styles.clearAllCouponsBtn}
+                    >
+                      Remove All
+                    </button>
+                  )}
+                </div>
+
+                <div className={styles.appliedCouponsList}>
+                  {applied_coupons.map((coupon, index) => (
+                    <div
+                      key={coupon.couponCode || index}
+                      className={styles.appliedCouponItem}
+                    >
+                      <div className={styles.appliedCouponDetails}>
+                        <span className={styles.appliedCouponCode}>
+                          {coupon.couponCode}
+                        </span>
+                        <span className={styles.appliedCouponDiscount}>
+                          -${Number(coupon.discount || 0).toFixed(2)}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveCoupon(coupon.couponCode)}
+                        className={styles.removeCouponBtn}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Order Details Summary - Always visible */}
             <div className={styles.cartMiniCheckoutSummary}>
-              {/* Show subtotal if discount is applied */}
-              {firstTimeDiscount.isApplied && (
-                <div className={styles.cartMiniCheckoutLine}>
-                  <span>Subtotal:</span>
-                  <span>${subtotal.toFixed(2)}</span>
+              <div className={styles.cartMiniCheckoutLine}>
+                <span>Subtotal:</span>
+                <span>
+                  $
+                  {(
+                    Number(firstTimeDiscount.isApplied ? subtotal : total) || 0
+                  ).toFixed(2)}
+                </span>
+              </div>
+
+              <div className={styles.cartMiniCheckoutLine}>
+                <span>Shipping:</span>
+                <span>
+                  ${(Number(totalShippingCost) || 0).toFixed(2)}
+                  {discountPercentage > 0 && (
+                    <span className={styles.discountBadge}>
+                      {discountPercentage}% off
+                    </span>
+                  )}
+                </span>
+              </div>
+
+              {/* Multiple coupon discounts display */}
+              {Number(total_coupon_discount) > 0 && (
+                <div
+                  className={`${styles.cartMiniCheckoutLine} ${styles.discountLine}`}
+                >
+                  <span>
+                    Coupon Discounts:
+                    {applied_coupons.length > 1 && (
+                      <span className={styles.couponCountBadge}>
+                        {applied_coupons.length} coupons
+                      </span>
+                    )}
+                  </span>
+                  <span>-${Number(total_coupon_discount).toFixed(2)}</span>
                 </div>
               )}
-              {/* Show first-time discount */}
+
+              {/* Address discount */}
+              {Number(addressDiscountAmount) > 0 && (
+                <div
+                  className={`${styles.cartMiniCheckoutLine} ${styles.discountLine}`}
+                >
+                  <span>Address Discount:</span>
+                  <span>-${Number(addressDiscountAmount).toFixed(2)}</span>
+                </div>
+              )}
+
+              {/* First-time discount */}
               {firstTimeDiscount.isApplied && (
                 <div
                   className={`${styles.cartMiniCheckoutLine} ${styles.discountLine}`}
@@ -245,21 +696,27 @@ export default function CartMiniSidebar() {
                   <span>
                     First-time discount (-{firstTimeDiscount.percentage}%):
                   </span>
-                  <span>-${firstTimeDiscountAmount.toFixed(2)}</span>
+                  <span>
+                    -${(Number(firstTimeDiscountAmount) || 0).toFixed(2)}
+                  </span>
                 </div>
               )}
             </div>
+
+            {/* Essential Total - Always visible */}
             <div className={styles.cartMiniCheckoutTitle}>
               <h4>Total:</h4>
-              <span>${total.toFixed(2)}</span>
+              <span>${calculateFinalTotal().toFixed(2)}</span>
             </div>
+
+            {/* Action Buttons - Single row with 50% width each */}
             <div className={styles.cartMiniCheckoutBtn}>
               <button
                 onClick={() => {
                   handleCloseCartMini();
                   navigateToCart();
                 }}
-                className={styles.tpBtn}
+                className={`${styles.tpBtn} ${styles.tpBtnBorder}`}
               >
                 View Cart
               </button>
@@ -268,7 +725,7 @@ export default function CartMiniSidebar() {
                   handleCloseCartMini();
                   navigateToCheckout();
                 }}
-                className={`${styles.tpBtn} ${styles.tpBtnBorder}`}
+                className={styles.tpBtn}
               >
                 Checkout
               </button>
