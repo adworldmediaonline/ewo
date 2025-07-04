@@ -138,7 +138,7 @@ export default function DetailsWrapper({
         dispatch(increment());
       }
     }
-
+    //
     // Use pre-calculated prices from database
     const finalSellingPrice = prd.finalPriceDiscount || prd.price;
     const markedUpPrice = prd.updatedPrice || prd.price;
