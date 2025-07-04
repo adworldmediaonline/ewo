@@ -150,6 +150,8 @@ export default function DetailsWrapper({
       originalPrice: originalPrice,
       markedUpPrice: markedUpPrice,
       selectedOption,
+      // Replace the options array with only the selected option
+      options: selectedOption ? [selectedOption] : [],
       // If an option is selected, update the final price to include the option price
       finalPrice: selectedOption ? calculateFinalPrice() : undefined,
     };
