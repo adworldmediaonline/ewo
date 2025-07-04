@@ -1,6 +1,7 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // internal
 import useCartInfo from '@/hooks/use-cart-info';
@@ -12,24 +13,72 @@ import {
   quantityDecrement,
   remove_product,
 } from '@/redux/features/cartSlice';
+import {
+  clear_all_coupons,
+  load_applied_coupons,
+  remove_applied_coupon,
+} from '@/redux/features/coupon/couponSlice';
 import empty_cart_img from '@assets/img/product/cartmini/empty-cart.png';
 import styles from './cart-mini-sidebar.module.css';
 
 export default function CartMiniSidebar() {
-  const { cart_products, cartMiniOpen, firstTimeDiscount } = useSelector(
-    state => state.cart
-  );
+  const {
+    cart_products,
+    cartMiniOpen,
+    firstTimeDiscount,
+    totalShippingCost,
+    shippingDiscount,
+  } = useSelector(state => state.cart);
+
+  // Enhanced coupon state
+  const {
+    applied_coupons,
+    total_coupon_discount,
+    coupon_error,
+    coupon_loading,
+  } = useSelector(state => state.coupon);
+
+  // Order state for address discount
+  const {
+    address_discount_eligible,
+    address_discount_message,
+    address_discount_percentage,
+  } = useSelector(state => state.order);
+
   const { total, subtotal, firstTimeDiscountAmount } = useCartInfo();
   const { navigateToCart, navigateToCheckout } = useGuestCartNavigation();
   const dispatch = useDispatch();
 
-  // Debug logging for troubleshooting
-  console.log('🛒 Cart Mini Sidebar State:', {
-    cartMiniOpen,
-    showCelebration: firstTimeDiscount.showCelebration,
-    isApplied: firstTimeDiscount.isApplied,
-    cartLength: cart_products.length,
-  });
+  // Load applied coupons on component mount
+  useEffect(() => {
+    dispatch(load_applied_coupons());
+  }, [dispatch]);
+
+  // Calculate discount percentage to display for shipping
+  const discountPercentage =
+    shippingDiscount > 0 ? (shippingDiscount * 100).toFixed(0) : 0;
+
+  // Calculate address discount amount
+  const addressDiscountAmount = address_discount_eligible
+    ? subtotal * (address_discount_percentage / 100)
+    : 0;
+
+  // Calculate final total with all discounts
+  const calculateFinalTotal = () => {
+    let finalTotal = Number(total) + Number(totalShippingCost);
+
+    // Subtract coupon discounts
+    if (Number(total_coupon_discount) > 0) {
+      finalTotal -= Number(total_coupon_discount);
+    }
+
+    // Subtract address discount
+    if (Number(addressDiscountAmount) > 0) {
+      finalTotal -= Number(addressDiscountAmount);
+    }
+
+    return Math.max(0, finalTotal);
+  };
 
   // handle remove product
   const handleRemovePrd = prd => {
@@ -50,6 +99,16 @@ export default function CartMiniSidebar() {
   // handle decrement quantity
   const handleDecrement = prd => {
     dispatch(quantityDecrement(prd));
+  };
+
+  // Handle remove individual coupon
+  const handleRemoveCoupon = couponCode => {
+    dispatch(remove_applied_coupon(couponCode));
+  };
+
+  // Handle clear all coupons
+  const handleClearAllCoupons = () => {
+    dispatch(clear_all_coupons());
   };
 
   return (
@@ -98,9 +157,7 @@ export default function CartMiniSidebar() {
                 </div>
               </div>
             )}
-            {/* <div className="cartmini__shipping">
-              <RenderCartProgress />
-            </div> */}
+
             {cart_products.length > 0 && (
               <div className={styles.cartMiniWidget}>
                 {cart_products.map((item, i) => (
@@ -228,16 +285,106 @@ export default function CartMiniSidebar() {
               </div>
             )}
           </div>
+
+          {/* Enhanced Checkout Summary Section */}
           <div className={styles.cartMiniCheckout}>
+            {/* Applied Coupons Section */}
+            {applied_coupons.length > 0 && (
+              <div className={styles.appliedCouponsSection}>
+                <div className={styles.appliedCouponsHeader}>
+                  <h4 className={styles.appliedCouponsTitle}>
+                    Applied Coupons ({applied_coupons.length})
+                  </h4>
+                  {applied_coupons.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={handleClearAllCoupons}
+                      className={styles.clearAllCouponsBtn}
+                    >
+                      Remove All
+                    </button>
+                  )}
+                </div>
+
+                <div className={styles.appliedCouponsList}>
+                  {applied_coupons.map((coupon, index) => (
+                    <div
+                      key={coupon.couponCode || index}
+                      className={styles.appliedCouponItem}
+                    >
+                      <div className={styles.appliedCouponDetails}>
+                        <span className={styles.appliedCouponCode}>
+                          {coupon.couponCode}
+                        </span>
+                        <span className={styles.appliedCouponDiscount}>
+                          -${Number(coupon.discount || 0).toFixed(2)}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveCoupon(coupon.couponCode)}
+                        className={styles.removeCouponBtn}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Detailed Summary Breakdown */}
             <div className={styles.cartMiniCheckoutSummary}>
-              {/* Show subtotal if discount is applied */}
-              {firstTimeDiscount.isApplied && (
-                <div className={styles.cartMiniCheckoutLine}>
-                  <span>Subtotal:</span>
-                  <span>${subtotal.toFixed(2)}</span>
+              <div className={styles.cartMiniCheckoutLine}>
+                <span>Subtotal:</span>
+                <span>
+                  $
+                  {(
+                    Number(firstTimeDiscount.isApplied ? subtotal : total) || 0
+                  ).toFixed(2)}
+                </span>
+              </div>
+
+              <div className={styles.cartMiniCheckoutLine}>
+                <span>Shipping:</span>
+                <span>
+                  ${(Number(totalShippingCost) || 0).toFixed(2)}
+                  {discountPercentage > 0 && (
+                    <span className={styles.discountBadge}>
+                      {discountPercentage}% off
+                    </span>
+                  )}
+                </span>
+              </div>
+
+              {/* Multiple coupon discounts display */}
+              {Number(total_coupon_discount) > 0 && (
+                <div
+                  className={`${styles.cartMiniCheckoutLine} ${styles.discountLine}`}
+                >
+                  <span>
+                    Coupon Discounts:
+                    {applied_coupons.length > 1 && (
+                      <span className={styles.couponCountBadge}>
+                        {applied_coupons.length} coupons
+                      </span>
+                    )}
+                  </span>
+                  <span>-${Number(total_coupon_discount).toFixed(2)}</span>
                 </div>
               )}
-              {/* Show first-time discount */}
+
+              {/* Address discount */}
+              {Number(addressDiscountAmount) > 0 && (
+                <div
+                  className={`${styles.cartMiniCheckoutLine} ${styles.discountLine}`}
+                >
+                  <span>Address Discount:</span>
+                  <span>-${Number(addressDiscountAmount).toFixed(2)}</span>
+                </div>
+              )}
+
+              {/* First-time discount */}
               {firstTimeDiscount.isApplied && (
                 <div
                   className={`${styles.cartMiniCheckoutLine} ${styles.discountLine}`}
@@ -245,13 +392,16 @@ export default function CartMiniSidebar() {
                   <span>
                     First-time discount (-{firstTimeDiscount.percentage}%):
                   </span>
-                  <span>-${firstTimeDiscountAmount.toFixed(2)}</span>
+                  <span>
+                    -${(Number(firstTimeDiscountAmount) || 0).toFixed(2)}
+                  </span>
                 </div>
               )}
             </div>
+
             <div className={styles.cartMiniCheckoutTitle}>
               <h4>Total:</h4>
-              <span>${total.toFixed(2)}</span>
+              <span>${calculateFinalTotal().toFixed(2)}</span>
             </div>
             <div className={styles.cartMiniCheckoutBtn}>
               <button
