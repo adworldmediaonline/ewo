@@ -825,54 +825,89 @@
 /* Tablet and smaller desktop screens */
 @media (max-width: 768px) {
   .cartMiniArea {
-    width: 100%;
-    right: -100%;
+    width: 420px;
+    right: -420px;
+    box-shadow: -8px 0 25px rgba(0, 0, 0, 0.15);
   }
 
   .cartMiniTop {
-    padding: 0.875rem 1rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 2px solid #f1f5f9;
+  }
+
+  .cartMiniTopTitle h4 {
+    font-size: 1.125rem;
+    font-weight: 700;
+  }
+
+  .itemCount {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .cartMiniCloseBtn {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
   }
 
   .cartMiniWidget {
-    max-height: 40vh;
+    max-height: 45vh;
+    padding: 0.5rem 0;
   }
 
   .cartMiniWidgetItem {
-    padding: 0.625rem 1rem;
-    gap: 0.625rem;
+    padding: 0.875rem 1.25rem;
+    gap: 0.875rem;
   }
 
   .cartMiniCheckout {
-    padding: 0.875rem 1rem 1rem 1rem;
+    padding: 1rem 1.25rem 1.25rem 1.25rem;
   }
 
   .cartMiniThumb {
-    width: 55px;
-    height: 55px;
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
   }
 
+  .quantityBtn {
+    width: 32px;
+    height: 32px;
+    font-size: 0.875rem;
+  }
+
+  .quantityValue {
+    width: 40px;
+    height: 32px;
+    font-size: 0.875rem;
+  }
+
+  .cartMiniDel {
+    width: 28px;
+    height: 28px;
+    font-size: 0.875rem;
+  }
+
+  /* Coupon section tablet optimization */
   .couponSection {
-    padding: 0.625rem;
+    padding: 0.875rem;
+    margin-bottom: 0.875rem;
   }
 
   .couponForm {
-    gap: 0.3rem;
+    gap: 0.5rem;
   }
 
   .couponInput {
-    padding: 0.45rem 0.5rem;
-    font-size: 0.75rem;
+    padding: 0.625rem 0.75rem;
+    font-size: 0.875rem;
   }
 
   .couponButton {
-    padding: 0.45rem 0.6rem;
-    font-size: 0.75rem;
-    min-width: 55px;
-  }
-
-  .couponMessage {
-    font-size: 0.65rem;
-    padding: 0.45rem;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    min-width: 80px;
   }
 
   .appliedCouponsSection {
@@ -880,55 +915,47 @@
     margin-bottom: 0.875rem;
   }
 
-  .appliedCouponsHeader {
-    margin-bottom: 0.75rem;
-    padding-bottom: 0.375rem;
-  }
-
-  .appliedCouponsTitle {
-    font-size: 0.8rem;
-  }
-
-  .clearAllCouponsBtn {
-    padding: 0.2rem 0.4rem;
-    font-size: 0.7rem;
-  }
-
-  .appliedCouponsList {
-    gap: 0.625rem;
-  }
-
   .appliedCouponItem {
-    padding: 0.625rem;
-  }
-
-  .appliedCouponCode {
-    font-size: 0.75rem;
-    padding: 0.2rem 0.4rem;
-  }
-
-  .appliedCouponDiscount {
-    font-size: 0.8rem;
+    padding: 0.75rem;
   }
 
   .removeCouponBtn {
-    width: 20px;
-    height: 20px;
-    font-size: 0.7rem;
-    margin-left: 0.5rem;
+    width: 24px;
+    height: 24px;
+    font-size: 0.75rem;
+  }
+
+  /* Button optimization */
+  .tpBtn {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.875rem;
+    min-height: 44px;
+  }
+
+  .detailsToggle {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.8rem;
+    min-height: 40px;
   }
 }
 
-/* Mobile screens */
+/* Mobile screens - Enhanced UX */
 @media (max-width: 480px) {
   .cartMiniArea {
     width: 100vw;
+    height: 100vh;
     right: -100vw;
     left: 0;
+    top: 0;
+    border-radius: 0;
     box-shadow: none;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    overflow: hidden;
+    background: white;
+    position: fixed;
   }
 
   .cartMiniOpened {
@@ -939,221 +966,569 @@
     pointer-events: auto;
   }
 
+  .cartMiniWrapper {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    overflow: hidden;
+  }
+
   .cartMiniTop {
-    padding: 0.75rem 1rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 2px solid #f1f5f9;
+    background: white;
+    color: #111827;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
   }
 
-  .cartMiniWidget {
-    max-height: 35vh;
-    padding: 0.375rem 0;
+  .cartMiniTopTitle h4 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111827;
   }
 
-  .cartMiniWidgetItem {
-    padding: 0.5rem 1rem;
-    gap: 0.5rem;
-    margin-bottom: 0.2rem;
-  }
-
-  .cartMiniCheckout {
-    padding: 0.75rem 1rem 1rem 1rem;
-  }
-
-  .cartMiniThumb {
-    width: 50px;
-    height: 50px;
-  }
-
-  .cartMiniTitle a {
+  .itemCount {
+    background: #f3f4f6;
+    color: #374151;
     font-size: 0.75rem;
-    line-height: 1.2;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid #d1d5db;
   }
 
+  .cartMiniCloseBtn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+    background: #f9fafb;
+    color: #6b7280;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+  }
+
+  .cartMiniCloseBtn:hover {
+    background: #f3f4f6;
+    color: #374151;
+    transform: scale(1.05);
+  }
+
+  /* First-time discount banner - keep original styling */
   .discountBanner {
-    margin: 0.375rem 1rem;
-    padding: 0.5rem;
+    margin: 0;
+    border-radius: 0;
+    padding: 0.875rem 1.25rem;
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    flex-shrink: 0;
   }
 
   .discountText {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
+    line-height: 1.3;
   }
 
   .discountAmount {
-    font-size: 0.65rem;
-    padding: 0.15rem 0.3rem;
+    font-size: 1rem;
+    font-weight: 700;
   }
 
-  .quantityBtn {
-    width: 28px;
-    height: 28px;
-    min-width: 28px;
+  /* Fixed scrollable content area for mobile */
+  .cartMiniWidget {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0;
+    background: white;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    position: relative;
   }
 
-  .quantityValue {
-    font-size: 0.8rem;
-    min-width: 26px;
+  .cartMiniWidgetItem {
+    padding: 1.25rem;
+    gap: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    margin: 0;
+    background: white;
+    display: flex;
+    align-items: flex-start;
+    min-height: auto;
+  }
+
+  .cartMiniWidgetItem:first-child {
+    padding-top: 1.5rem;
+  }
+
+  .cartMiniWidgetItem:last-child {
+    border-bottom: none;
+    padding-bottom: 1.5rem;
+  }
+
+  .cartMiniThumb {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+
+  .cartMiniContent {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .cartMiniTitle a {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    font-weight: 600;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    color: #111827;
+    margin-bottom: 0.5rem;
   }
 
   .priceCalculation {
-    font-size: 0.75rem;
+    font-size: 0.85rem;
+    margin: 0.75rem 0;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    color: #6b7280;
   }
 
+  .quantityControls {
+    margin: 0.875rem 0;
+    gap: 0.75rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .quantityBtn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
+    border-radius: 10px;
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    color: #374151;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .quantityBtn:hover:not(:disabled) {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+    transform: scale(1.05);
+  }
+
+  .quantityBtn:active:not(:disabled) {
+    transform: scale(0.95);
+  }
+
+  .quantityValue {
+    width: 50px;
+    height: 40px;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    text-align: center;
+  }
+
+  .cartMiniDel {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+    border-radius: 10px;
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+
+  .cartMiniDel:hover {
+    background: #fecaca;
+    border-color: #fca5a5;
+    transform: scale(1.05);
+  }
+
+  .cartMiniDel:active {
+    transform: scale(0.95);
+  }
+
+  /* Empty cart message for mobile */
+  .cartMiniEmpty {
+    padding: 2rem 1.25rem;
+    text-align: center;
+    color: #6b7280;
+  }
+
+  /* Checkout section - keep original white theme */
+  .cartMiniCheckout {
+    flex-shrink: 0;
+    padding: 1.25rem;
+    background: white;
+    border-top: 2px solid #f1f5f9;
+    max-height: 60vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Enhanced coupon section for mobile - keep original colors */
   .couponSection {
-    padding: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 12px;
+    background: white;
+    border: 2px solid #e2e8f0;
+  }
+
+  .couponToggleBtn {
+    width: 100%;
+    padding: 1rem;
+    font-size: 0.9rem;
+    border-radius: 12px;
+    min-height: 52px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    background: linear-gradient(135deg, #193264 0%, #2563eb 100%);
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .couponToggleBtn:active {
+    transform: scale(0.98);
+  }
+
+  .couponFormContainer {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
   }
 
   .couponForm {
     flex-direction: column;
-    gap: 0.375rem;
+    gap: 1rem;
   }
 
   .couponInput {
-    padding: 0.5rem;
-    font-size: 0.8rem;
+    padding: 1rem;
+    font-size: 1rem;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    min-height: 52px;
+    touch-action: manipulation;
+    background: white;
   }
 
-  .couponButton {
-    padding: 0.5rem;
-    font-size: 0.8rem;
-    min-width: auto;
+  .couponInput:focus {
+    border-color: #193264;
+    box-shadow: 0 0 0 4px rgba(25, 50, 100, 0.1);
   }
 
-  .couponMessage {
-    font-size: 0.7rem;
-    padding: 0.5rem;
+  .couponApplyBtn {
+    padding: 1rem;
+    font-size: 0.9rem;
+    border-radius: 12px;
+    min-height: 52px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    background: #193264;
+    color: white;
+    border: none;
+    font-weight: 600;
   }
 
+  .couponApplyBtn:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  /* Applied coupons - keep original white theme */
   .appliedCouponsSection {
-    padding: 0.75rem;
-    margin-bottom: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 12px;
+    background: white;
+    border: 1px solid #e2e8f0;
   }
 
   .appliedCouponsHeader {
-    margin-bottom: 0.625rem;
-    padding-bottom: 0.25rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #f1f5f9;
   }
 
   .appliedCouponsTitle {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #111827;
   }
 
   .clearAllCouponsBtn {
-    padding: 0.2rem 0.375rem;
-    font-size: 0.7rem;
+    padding: 0.5rem 0.875rem;
+    font-size: 0.8rem;
+    border-radius: 10px;
+    min-height: 36px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
   }
 
-  .appliedCouponsList {
-    gap: 0.5rem;
+  .clearAllCouponsBtn:active {
+    transform: scale(0.95);
   }
 
   .appliedCouponItem {
-    padding: 0.5rem;
-    gap: 0.25rem;
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
   }
 
   .appliedCouponCode {
-    font-size: 0.75rem;
-    padding: 0.2rem 0.375rem;
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    background: #e2e8f0;
+    color: #111827;
+    font-weight: 600;
   }
 
   .appliedCouponDiscount {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #059669;
   }
 
   .removeCouponBtn {
-    width: 20px;
-    height: 20px;
-    font-size: 0.7rem;
-    margin-left: 0.5rem;
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+    border-radius: 50%;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  .discountBadge,
-  .couponCountBadge {
-    font-size: 0.5rem;
-    padding: 0.08rem 0.2rem;
+  .removeCouponBtn:active {
+    transform: scale(0.9);
+  }
+
+  /* Order summary mobile optimization - keep original colors */
+  .cartMiniCheckoutSummary {
+    padding: 1.25rem;
+    border-radius: 12px;
+    margin-bottom: 1.25rem;
+    background: white;
+    border: 1px solid #e2e8f0;
+  }
+
+  .cartMiniCheckoutLine {
+    padding: 0.75rem 0;
+    font-size: 0.9rem;
   }
 
   .cartMiniCheckoutTitle {
-    padding: 0.625rem 0.75rem;
+    margin-bottom: 1.25rem;
   }
 
   .cartMiniCheckoutTitle h4 {
-    font-size: 1rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111827;
   }
 
   .cartMiniCheckoutTitle span {
-    font-size: 1.1rem;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #dc2626;
+  }
+
+  /* Buttons - keep original button styling with mobile optimizations */
+  .cartMiniCheckoutBtn {
+    flex-direction: column;
+    gap: 1rem;
   }
 
   .tpBtn {
-    padding: 0.625rem 1rem;
-    min-height: 36px;
+    width: 100%;
+    padding: 1.25rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 12px;
+    min-height: 56px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  .detailsToggle {
-    font-size: 0.75rem;
-    padding: 0.375rem;
+  .tpBtn:active {
+    transform: scale(0.98);
+  }
+
+  .tpBtn:not(.tpBtnBorder) {
+    background: linear-gradient(135deg, #193264 0%, #2563eb 100%);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 15px rgba(25, 50, 100, 0.3);
+  }
+
+  .tpBtn:not(.tpBtnBorder):hover {
+    box-shadow: 0 6px 20px rgba(25, 50, 100, 0.4);
+    transform: translateY(-2px);
+  }
+
+  .tpBtnBorder {
+    background: white;
+    border: 2px solid #193264;
+    color: #193264;
+  }
+
+  .tpBtnBorder:hover {
+    background: #193264;
+    color: white;
+  }
+
+  /* Better scrollbar for mobile */
+  .cartMiniWidget::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .cartMiniWidget::-webkit-scrollbar-track {
+    background: #f8fafc;
+    border-radius: 3px;
+  }
+
+  .cartMiniWidget::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+  }
+
+  .cartMiniWidget::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+
+  .cartMiniCheckout::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .cartMiniCheckout::-webkit-scrollbar-track {
+    background: #f8fafc;
+    border-radius: 3px;
+  }
+
+  .cartMiniCheckout::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
   }
 }
 
-/* Additional responsive breakpoint for very small screens */
+/* Extra small mobile screens */
 @media (max-width: 360px) {
-  .cartMiniArea {
-    width: 100vw;
-    right: -100vw;
-  }
-
-  .cartMiniOpened {
-    right: 0;
-  }
-
   .cartMiniTop {
-    padding: 0.625rem 0.75rem;
+    padding: 0.875rem 1rem;
   }
 
-  .cartMiniWidget {
-    max-height: 30vh;
+  .cartMiniTopTitle h4 {
+    font-size: 1.125rem;
+  }
+
+  .cartMiniCloseBtn {
+    width: 36px;
+    height: 36px;
+    font-size: 1.125rem;
   }
 
   .cartMiniWidgetItem {
-    padding: 0.5rem 0.75rem;
-    gap: 0.375rem;
+    padding: 0.875rem 1rem;
+    gap: 0.875rem;
   }
 
   .cartMiniCheckout {
-    padding: 0.625rem 0.75rem 0.875rem 0.75rem;
+    padding: 0.875rem 1rem 1rem 1rem;
   }
 
   .cartMiniThumb {
-    width: 45px;
-    height: 45px;
+    width: 60px;
+    height: 60px;
   }
 
   .cartMiniTitle a {
-    font-size: 0.7rem;
+    font-size: 0.8rem;
   }
 
-  .discountBanner {
-    margin: 0.3rem 0.75rem;
-    padding: 0.4rem;
+  .quantityBtn {
+    width: 32px;
+    height: 32px;
+    font-size: 0.875rem;
+  }
+
+  .quantityValue {
+    width: 40px;
+    height: 32px;
+    font-size: 0.8rem;
   }
 
   .couponSection {
-    padding: 0.45rem;
+    padding: 0.875rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .couponInput {
+    padding: 0.75rem 0.875rem;
+    font-size: 0.875rem;
+    min-height: 44px;
+  }
+
+  .couponApplyBtn {
+    padding: 0.75rem 0.875rem;
+    font-size: 0.8rem;
+    min-height: 44px;
   }
 
   .appliedCouponsSection {
-    padding: 0.45rem;
+    padding: 0.875rem;
+    margin-bottom: 0.875rem;
   }
 
-  .cartMiniCheckoutTitle {
-    padding: 0.5rem;
+  .tpBtn {
+    padding: 0.875rem 1rem;
+    font-size: 0.875rem;
+    min-height: 48px;
   }
 
   .cartMiniCheckoutTitle h4 {
-    font-size: 0.95rem;
+    font-size: 1rem;
   }
 
   .cartMiniCheckoutTitle span {
-    font-size: 1rem;
+    font-size: 1.125rem;
   }
 }

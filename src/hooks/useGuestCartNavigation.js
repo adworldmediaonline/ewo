@@ -1,7 +1,6 @@
 'use client';
-import { useSelector, useDispatch } from 'react-redux';
-import { useRouter, usePathname } from 'next/navigation';
-import { showGuestCartModal } from '@/redux/features/guestCart/guestCartSlice';
+import { usePathname, useRouter } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function useGuestCartNavigation() {
   const dispatch = useDispatch();
@@ -19,49 +18,13 @@ export default function useGuestCartNavigation() {
     pathname.includes('/forget-password');
 
   const navigateToCart = () => {
-    // If user is authenticated, navigate directly
-    if (user) {
-      router.push('/cart');
-      return;
-    }
-
-    // If cart is empty, navigate directly (let cart page handle empty state)
-    if (cart_products.length === 0) {
-      router.push('/cart');
-      return;
-    }
-
-    // If on auth page, navigate directly (don't show modal)
-    if (isAuthPage) {
-      router.push('/cart');
-      return;
-    }
-
-    // If guest with items in cart, show modal
-    dispatch(showGuestCartModal());
+    router.push('/cart');
+    return;
   };
 
   const navigateToCheckout = () => {
-    // If user is authenticated, navigate directly
-    if (user) {
-      router.push('/checkout');
-      return;
-    }
-
-    // If cart is empty, navigate to cart page instead
-    if (cart_products.length === 0) {
-      router.push('/cart');
-      return;
-    }
-
-    // If on auth page, navigate directly (don't show modal)
-    if (isAuthPage) {
-      router.push('/checkout');
-      return;
-    }
-
-    // If guest with items in cart, show modal
-    dispatch(showGuestCartModal());
+    router.push('/checkout');
+    return;
   };
 
   return {

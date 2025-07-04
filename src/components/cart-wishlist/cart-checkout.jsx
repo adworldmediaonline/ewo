@@ -129,7 +129,9 @@ export default function CartCheckout() {
       } else {
         // Multiple coupons - use multiple validation endpoint
         const allCouponCodes = [couponCode]; // Only validate the new coupon
-        const excludeAppliedCoupons = applied_coupons.map(c => c.couponCode);
+        const excludeAppliedCoupons = Array.isArray(applied_coupons)
+          ? applied_coupons.map(c => c.couponCode)
+          : [];
 
         // Check for duplicates locally first
         if (
@@ -206,6 +208,8 @@ export default function CartCheckout() {
 
   // Handle coupon removal
   const handleRemoveCoupon = couponId => {
+    if (!Array.isArray(applied_coupons)) return;
+
     const coupon = applied_coupons.find(c => c._id === couponId);
     if (coupon) {
       dispatch(remove_applied_coupon(coupon.couponCode));
@@ -268,7 +272,7 @@ export default function CartCheckout() {
         </div>
 
         {/* Applied Coupons Section */}
-        {applied_coupons.length > 0 && (
+        {Array.isArray(applied_coupons) && applied_coupons.length > 0 && (
           <div className={styles['applied-coupons-section']}>
             <div className={styles['applied-coupons-header']}>
               <h4 className={styles['applied-coupons-title']}>
@@ -283,14 +287,17 @@ export default function CartCheckout() {
               </button>
             </div>
             <div className={styles['applied-coupons-list']}>
-              {applied_coupons.map(coupon => (
-                <div key={coupon._id} className={styles['applied-coupon-item']}>
+              {applied_coupons.map((coupon, index) => (
+                <div
+                  key={coupon._id || coupon.couponCode || index}
+                  className={styles['applied-coupon-item']}
+                >
                   <div className={styles['applied-coupon-details']}>
                     <span className={styles['applied-coupon-code']}>
                       {coupon.couponCode}
                     </span>
                     <span className={styles['applied-coupon-discount']}>
-                      -${coupon.discount.toFixed(2)}
+                      -${coupon.discount ? coupon.discount.toFixed(2) : '0.00'}
                     </span>
                   </div>
                   <button
