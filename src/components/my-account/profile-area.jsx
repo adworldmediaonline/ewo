@@ -1,20 +1,20 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import ProfileNavTab from './profile-nav-tab';
-import ProfileShape from './profile-shape';
-import NavProfileTab from './nav-profile-tab';
-import ProfileInfo from './profile-info';
+import { useGetUserOrdersQuery } from '@/redux/features/order/orderApi';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import ErrorMsg from '../common/error-msg';
+import Loader from '../loader/loader';
 import ChangePassword from './change-password';
 import MyOrders from './my-orders';
-import { useGetUserOrdersQuery } from '@/redux/features/order/orderApi';
-import Loader from '../loader/loader';
-import { useRouter } from 'next/navigation';
-import ErrorMsg from '../common/error-msg';
-import Cookies from 'js-cookie';
+import NavProfileTab from './nav-profile-tab';
+import ProfileInfo from './profile-info';
+import ProfileNavTab from './profile-nav-tab';
 
 export default function ProfileArea() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(null); // null = checking, true/false = result
+  const [activeTab, setActiveTab] = useState('profile'); // Add tab state management
 
   // Check authentication first
   useEffect(() => {
@@ -75,23 +75,27 @@ export default function ProfileArea() {
     );
   }
 
-  // Render the profile for authenticated users with data
+  // Render the enhanced profile for authenticated users with data
   return (
     <section className="profile__area pt-120 pb-120">
       <div className="container">
         <div className="profile__inner p-relative">
-          {/* <ProfileShape /> */}
           <div className="row">
             <div className="col-xxl-4 col-lg-4">
               <div className="profile__tab mr-40">
-                <ProfileNavTab />
+                <ProfileNavTab
+                  activeTab={activeTab}
+                  setActiveTab={setActiveTab}
+                />
               </div>
             </div>
             <div className="col-xxl-8 col-lg-8">
               <div className="profile__tab-content">
                 <div className="tab-content" id="profile-tabContent">
                   <div
-                    className="tab-pane fade show active"
+                    className={`tab-pane fade ${
+                      activeTab === 'profile' ? 'show active' : ''
+                    }`}
                     id="nav-profile"
                     role="tabpanel"
                     aria-labelledby="nav-profile-tab"
@@ -100,7 +104,9 @@ export default function ProfileArea() {
                   </div>
 
                   <div
-                    className="tab-pane fade"
+                    className={`tab-pane fade ${
+                      activeTab === 'information' ? 'show active' : ''
+                    }`}
                     id="nav-information"
                     role="tabpanel"
                     aria-labelledby="nav-information-tab"
@@ -109,7 +115,9 @@ export default function ProfileArea() {
                   </div>
 
                   <div
-                    className="tab-pane fade"
+                    className={`tab-pane fade ${
+                      activeTab === 'password' ? 'show active' : ''
+                    }`}
                     id="nav-password"
                     role="tabpanel"
                     aria-labelledby="nav-password-tab"
@@ -118,7 +126,9 @@ export default function ProfileArea() {
                   </div>
 
                   <div
-                    className="tab-pane fade"
+                    className={`tab-pane fade ${
+                      activeTab === 'order' ? 'show active' : ''
+                    }`}
                     id="nav-order"
                     role="tabpanel"
                     aria-labelledby="nav-order-tab"
