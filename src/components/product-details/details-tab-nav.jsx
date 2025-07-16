@@ -1,9 +1,10 @@
 'use client';
-import React, { useState } from 'react';
 import DOMPurify from 'isomorphic-dompurify';
+import { useState } from 'react';
+import { Rating } from 'react-simple-star-rating';
+import styles from '../../app/product/[id]/product-details.module.css';
 import ReviewForm from '../forms/review-form';
 import ReviewItem from './review-item';
-import styles from '../../app/product/[id]/product-details.module.css';
 
 const DetailsTabNav = ({ product }) => {
   const { _id, description, additionalInformation, reviews } = product || {};
@@ -80,27 +81,95 @@ const DetailsTabNav = ({ product }) => {
 
         {activeTab === 'review' && (
           <div className={`${styles.reviewsContainer} ${styles.fadeIn}`}>
-            <div className={styles.reviewsList}>
-              <h3>
-                {reviews && reviews.length > 0
-                  ? 'Customer Reviews'
-                  : 'No Reviews Yet'}
-              </h3>
-
-              {reviews && reviews.length > 0 ? (
-                reviews.map(item => <ReviewItem key={item._id} review={item} />)
-              ) : (
-                <p>Be the first to review this product!</p>
-              )}
+            {/* Reviews Summary Header */}
+            <div className={styles.reviewsSummaryHeader}>
+              <div className={styles.reviewsSummaryLeft}>
+                <h3 className={styles.reviewsTitle}>
+                  {reviews && reviews.length > 0
+                    ? 'Customer Reviews'
+                    : 'No Reviews Yet'}
+                </h3>
+                <div className={styles.reviewsCount}>
+                  {reviews && reviews.length > 0 ? (
+                    <span className={styles.reviewsBadge}>
+                      {reviews.length} review{reviews.length !== 1 ? 's' : ''}
+                    </span>
+                  ) : (
+                    <span className={styles.noReviewsBadge}>
+                      Be the first to review!
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className={styles.reviewsSummaryRight}>
+                <div className={styles.overallRating}>
+                  {reviews && reviews.length > 0 && (
+                    <>
+                      <div className={styles.ratingNumber}>
+                        {(
+                          reviews.reduce(
+                            (sum, review) => sum + review.rating,
+                            0
+                          ) / reviews.length
+                        ).toFixed(1)}
+                      </div>
+                      <div className={styles.ratingStars}>
+                        <Rating
+                          allowFraction
+                          size={20}
+                          initialValue={
+                            reviews.reduce(
+                              (sum, review) => sum + review.rating,
+                              0
+                            ) / reviews.length
+                          }
+                          readonly={true}
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
 
-            <div className={styles.reviewForm}>
-              <h3>Add a Review</h3>
-              <p>
-                Your email address will not be published. Required fields are
-                marked *
-              </p>
-              <ReviewForm product_id={_id} />
+            {/* Reviews Content Layout - Desktop Aside, Mobile Below */}
+            <div className={styles.reviewsContentLayout}>
+              {/* Reviews List */}
+              <div className={styles.reviewsListSection}>
+                {reviews && reviews.length > 0 ? (
+                  <div className={styles.reviewsGrid}>
+                    {reviews.map(item => (
+                      <ReviewItem key={item._id} review={item} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className={styles.noReviewsPlaceholder}>
+                    <div className={styles.noReviewsIcon}>⭐</div>
+                    <h4>No reviews yet</h4>
+                    <p>
+                      Be the first to share your experience with this product!
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Review Form Aside */}
+              <div className={styles.reviewFormAside}>
+                <div className={styles.reviewFormSection}>
+                  <div className={styles.reviewFormHeader}>
+                    <h3 className={styles.reviewFormTitle}>
+                      Share Your Experience
+                    </h3>
+                    <p className={styles.reviewFormSubtitle}>
+                      Your email address will not be published. Required fields
+                      are marked *
+                    </p>
+                  </div>
+                  <div className={styles.reviewFormWrapper}>
+                    <ReviewForm product_id={_id} />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
