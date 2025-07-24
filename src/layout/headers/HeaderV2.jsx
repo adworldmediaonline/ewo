@@ -263,6 +263,11 @@ export default function HeaderV2() {
             PRODUCTS
           </Link>
         </li>
+        <li>
+          <Link href="/contact" className={linkClassName}>
+            CONTACT
+          </Link>
+        </li>
       </ul>
     </div>
   );
@@ -396,6 +401,17 @@ export default function HeaderV2() {
     );
   };
 
+  // Phone number component
+  const renderPhoneNumber = (className = '') => (
+    <a
+      href="tel:1-866-396-7623"
+      className={`${styles.phoneNumber} ${className}`}
+      aria-label="Call us at 1-866-396-7623"
+    >
+      1-866-396-7623
+    </a>
+  );
+
   // Checkout header variant - single header with all functionality
   const renderCheckoutHeader = () => (
     <div className={styles.headerContainer}>
@@ -447,12 +463,22 @@ export default function HeaderV2() {
                       PRODUCTS
                     </Link>
                   </li>
+                  <li>
+                    <Link href="/contact" className={styles.checkoutNavLink}>
+                      CONTACT
+                    </Link>
+                  </li>
                 </ul>
               </nav>
 
               {/* Search */}
               <div className={styles.checkoutSearchContainer}>
                 <SearchForm />
+              </div>
+
+              {/* Phone Number */}
+              <div className={styles.checkoutPhoneContainer}>
+                {renderPhoneNumber(styles.checkoutPhoneNumber)}
               </div>
 
               {/* Action Buttons */}
@@ -543,6 +569,11 @@ export default function HeaderV2() {
               </button>
             </div>
             <div className={styles.mobileNavContent}>
+              {/* Mobile Phone Number */}
+              <div className={styles.mobilePhoneContainer}>
+                {renderPhoneNumber(styles.mobilePhoneNumber)}
+              </div>
+
               <ul className={styles.mobileNavigation}>
                 <li>
                   <Link
@@ -686,6 +717,15 @@ export default function HeaderV2() {
                     onClick={() => setIsMobileNavOpen(false)}
                   >
                     PRODUCTS
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/contact"
+                    className={styles.navLink}
+                    onClick={() => setIsMobileNavOpen(false)}
+                  >
+                    CONTACT
                   </Link>
                 </li>
               </ul>
@@ -843,6 +883,10 @@ export default function HeaderV2() {
 
                         {renderUserProfile()}
 
+                        <div className={styles.actionPhoneNumberWrapper}>
+                          {renderPhoneNumber(styles.actionPhoneNumber)}
+                        </div>
+
                         <button
                           className={styles.actionButton}
                           onClick={handleMobileNavToggle}
@@ -920,6 +964,11 @@ export default function HeaderV2() {
                 {/* Sticky Header Search */}
                 <div className={styles.stickySearchContainer}>
                   <SearchForm />
+                </div>
+
+                {/* Phone Number */}
+                <div className={styles.stickyPhoneContainer}>
+                  {renderPhoneNumber(styles.stickyPhoneNumber)}
                 </div>
 
                 {/* Action Buttons */}
@@ -1000,6 +1049,11 @@ export default function HeaderV2() {
                 </button>
               </div>
               <div className={styles.mobileNavContent}>
+                {/* Mobile Phone Number */}
+                <div className={styles.mobilePhoneContainer}>
+                  {renderPhoneNumber(styles.mobilePhoneNumber)}
+                </div>
+
                 <ul className={styles.mobileNavigation}>
                   <li>
                     <Link
@@ -1150,6 +1204,15 @@ export default function HeaderV2() {
                       onClick={() => setIsMobileNavOpen(false)}
                     >
                       PRODUCTS
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/contact"
+                      className={styles.navLink}
+                      onClick={() => setIsMobileNavOpen(false)}
+                    >
+                      CONTACT
                     </Link>
                   </li>
                 </ul>

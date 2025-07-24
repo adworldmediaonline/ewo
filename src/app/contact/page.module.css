@@ -1,0 +1,131 @@
+.contactPage {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.contactContainer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  min-height: 60vh;
+}
+
+.contactContent {
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+  background: white;
+  padding: 3rem 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.contactTitle {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.comingSoonSection {
+  margin-top: 2rem;
+}
+
+.comingSoonTitle {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #3b82f6;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.comingSoonText {
+  font-size: 1.1rem;
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.contactInfo {
+  background: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  border-left: 4px solid #3b82f6;
+}
+
+.phoneInfo,
+.emailInfo {
+  font-size: 1rem;
+  color: #374151;
+  margin: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.phoneInfo strong,
+.emailInfo strong {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.contactLink {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  margin-left: 0.5rem;
+}
+
+.contactLink:hover {
+  color: #1d4ed8;
+  background-color: rgba(59, 130, 246, 0.1);
+  text-decoration: underline;
+}
+
+.contactLink:active {
+  transform: scale(0.98);
+}
+
+@media (max-width: 768px) {
+  .contactContainer {
+    padding: 2rem 1rem;
+  }
+
+  .contactContent {
+    padding: 2rem 1.5rem;
+  }
+
+  .contactTitle {
+    font-size: 2rem;
+  }
+
+  .comingSoonTitle {
+    font-size: 1.5rem;
+  }
+
+  .comingSoonText {
+    font-size: 1rem;
+  }
+
+  .contactInfo {
+    padding: 1rem;
+  }
+
+  .phoneInfo,
+  .emailInfo {
+    font-size: 0.9rem;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}

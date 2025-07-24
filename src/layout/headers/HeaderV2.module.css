@@ -2182,3 +2182,122 @@
     display: block;
   }
 }
+
+/* Phone Number Styles */
+.phoneNumber {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.phoneNumber:hover {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+}
+
+.phoneNumber::before {
+  content: '📞';
+  font-size: 1.1rem;
+}
+
+/* Header Phone Container */
+.headerPhoneContainer {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .headerPhoneContainer {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.headerPhoneNumber {
+  font-size: 1.1rem;
+}
+
+/* Sticky Header Phone Container */
+.stickyPhoneContainer {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .stickyPhoneContainer {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.stickyPhoneNumber {
+  font-size: 1rem;
+}
+
+/* Checkout Phone Container */
+.checkoutPhoneContainer {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .checkoutPhoneContainer {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.checkoutPhoneNumber {
+  font-size: 1.1rem;
+}
+
+/* Mobile Phone Container */
+.mobilePhoneContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1rem;
+}
+
+.mobilePhoneNumber {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+@media (max-width: 1023px) {
+  .headerPhoneContainer,
+  .stickyPhoneContainer,
+  .checkoutPhoneContainer {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .mobilePhoneNumber {
+    font-size: 1.1rem;
+  }
+}
+
+.actionPhoneNumberWrapper {
+  display: flex;
+  align-items: center;
+  margin-left: 1.25rem;
+}
+
+.actionPhoneNumber {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  margin-left: 0.25rem;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 1023px) {
+  .actionPhoneNumberWrapper {
+    display: none;
+  }
+}
