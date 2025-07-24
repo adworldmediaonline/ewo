@@ -142,3 +142,23 @@
 .contactDetail {
   color: #4b5563;
 }
+
+.contactLink {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  margin-left: 0.5rem;
+}
+
+.contactLink:hover {
+  color: #1d4ed8;
+  background-color: rgba(59, 130, 246, 0.1);
+  text-decoration: underline;
+}
+
+.contactLink:active {
+  transform: scale(0.98);
+}

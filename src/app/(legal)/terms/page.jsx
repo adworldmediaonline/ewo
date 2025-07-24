@@ -171,8 +171,21 @@ export default function TermsPage() {
                 <p className={styles.companyName}>
                   East West Offroad Products LLC
                 </p>
-                <p className={styles.contactDetail}>Email: TBA</p>
-                <p className={styles.contactDetail}>Phone: +1 (866) 396 7623</p>
+                <p className={styles.contactDetail}>
+                  Email:{' '}
+                  <a
+                    href="mailto:info@eastwestoffroad.com"
+                    className={styles.contactLink}
+                  >
+                    info@eastwestoffroad.com
+                  </a>
+                </p>
+                <p className={styles.contactDetail}>
+                  Phone:{' '}
+                  <a href="tel:1-866-396-7623" className={styles.contactLink}>
+                    1-866-396-7623
+                  </a>
+                </p>
                 <p className={styles.contactDetail}>
                   Address: PO Box 2644 Everett WA 98213
                 </p>
