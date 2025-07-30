@@ -408,7 +408,10 @@ export default function HeaderV2() {
       className={`${styles.phoneNumber} ${className}`}
       aria-label="Call us at 1-866-396-7623"
     >
-      1-866-396-7623
+      <div className={styles.phoneNumberWrapper}>
+        <span className={styles.phoneNumberText}>1-866-396-7623</span>
+        <span className={styles.phoneNumberSubtext}>(EWO ROAD)</span>
+      </div>
     </a>
   );
 

@@ -2200,9 +2200,23 @@
   text-decoration: none;
 }
 
-.phoneNumber::before {
-  content: '📞';
-  font-size: 1.1rem;
+.phoneNumberWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.05rem;
+}
+
+.phoneNumberText {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.phoneNumberSubtext {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 0.5px;
 }
 
 /* Header Phone Container */
