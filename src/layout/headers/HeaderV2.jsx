@@ -1075,6 +1075,7 @@ export default function HeaderV2() {
                         aria-expanded={isMobileShopOpen}
                       >
                         <span className={styles.mobileCategoryTitle}>SHOP</span>
+                        {/*  */}
                         <svg
                           style={{ color: 'black' }}
                           className={`${styles.mobileDropdownIcon} ${
