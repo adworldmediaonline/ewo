@@ -183,7 +183,7 @@ export default function TermsPage() {
                 <p className={styles.contactDetail}>
                   Phone:{' '}
                   <a href="tel:1-866-396-7623" className={styles.contactLink}>
-                    1-866-396-7623
+                    1-866-396-7623 (EWO ROAD)
                   </a>
                 </p>
                 <p className={styles.contactDetail}>
