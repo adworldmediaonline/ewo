@@ -1,5 +1,5 @@
-import Cookies from 'js-cookie';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import Cookies from 'js-cookie';
 
 export const apiSlice = createApi({
   reducerPath: 'api',
@@ -34,5 +34,6 @@ export const apiSlice = createApi({
     'TopRatedProducts',
     'GuestCart',
     'CartAnalytics',
+    'Contact',
   ],
 });
