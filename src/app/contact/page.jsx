@@ -100,8 +100,27 @@ export default function ContactPage() {
       router.push('/contact/thank-you');
     } catch (error) {
       console.error('Contact form submission error:', error);
-      const errorMessage =
-        error?.data?.message || 'Failed to send message. Please try again.';
+
+      let errorMessage = 'Failed to send message. Please try again.';
+
+      // Handle different types of errors with user-friendly messages
+      if (error?.status === 429) {
+        errorMessage =
+          'You have submitted too many messages recently. Please wait before submitting again.';
+      } else if (error?.status === 400) {
+        errorMessage =
+          error?.data?.message ||
+          'Please check all required fields and try again.';
+      } else if (error?.status === 500) {
+        errorMessage =
+          'Server error occurred. Please try again or contact us directly.';
+      } else if (error?.status === 0 || error?.name === 'TypeError') {
+        errorMessage =
+          'Connection error. Please check your internet connection and try again.';
+      } else if (error?.data?.message) {
+        errorMessage = error.data.message;
+      }
+
       setSubmitMessage(errorMessage);
     }
   };
