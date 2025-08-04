@@ -1,9 +1,9 @@
+import Providers from '@/components/provider';
+import { GoogleTagManager } from '@next/third-parties/google';
+import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Lato } from 'next/font/google';
 import './globals.scss';
 import './toast-fix.css';
-import { SpeedInsights } from '@vercel/speed-insights/next';
-import { GoogleTagManager } from '@next/third-parties/google';
-import { Lato } from 'next/font/google';
-import Providers from '@/components/provider';
 
 export const metadata = {
   title: 'East West Off Road | Premium Automotive & Off-Road Gear USA',
