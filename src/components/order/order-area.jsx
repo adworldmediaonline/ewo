@@ -88,9 +88,9 @@ export default function OrderArea({ orderId }) {
 
     if (appliedCoupons.length === 1) {
       const coupon = appliedCoupons[0];
-      couponDisplayText = `🎫 ${coupon.couponCode} (${coupon.title})`;
+      couponDisplayText = `${coupon.couponCode} (${coupon.title})`;
     } else {
-      couponDisplayText = `🎫 ${appliedCoupons.length} Coupons Applied`;
+      couponDisplayText = `${appliedCoupons.length} Coupons Applied`;
     }
   } else if (
     appliedCoupon &&
@@ -98,7 +98,7 @@ export default function OrderArea({ orderId }) {
   ) {
     // Legacy single coupon support
     couponDiscounts = appliedCoupon.discount || appliedCoupon.discountAmount;
-    couponDisplayText = `🎫 ${appliedCoupon.couponCode} (${appliedCoupon.title})`;
+    couponDisplayText = `${appliedCoupon.couponCode} (${appliedCoupon.title})`;
   }
 
   // Calculate other discounts (remaining after first-time and coupon discounts)
@@ -115,10 +115,7 @@ export default function OrderArea({ orderId }) {
   };
 
   const getStatusIcon = () => {
-    const statusLower = status.toLowerCase();
-    if (statusLower === 'delivered') return '✓';
-    if (statusLower === 'processing') return '⏳';
-    return '📦';
+    return '';
   };
 
   return (
@@ -181,7 +178,7 @@ export default function OrderArea({ orderId }) {
                 appliedCoupons.length === 1 ? (
                   <div style={{ textAlign: 'center' }}>
                     <h3 style={{ color: '#0c4a6e', margin: '0 0 10px 0' }}>
-                      🎫 Coupon Applied Successfully!
+                      Coupon Applied Successfully!
                     </h3>
                     <p
                       style={{
@@ -207,7 +204,7 @@ export default function OrderArea({ orderId }) {
                 ) : (
                   <div style={{ textAlign: 'center' }}>
                     <h3 style={{ color: '#0c4a6e', margin: '0 0 10px 0' }}>
-                      🎫 {appliedCoupons.length} Coupons Applied Successfully!
+                      {appliedCoupons.length} Coupons Applied Successfully!
                     </h3>
                     <div
                       style={{
@@ -237,7 +234,7 @@ export default function OrderArea({ orderId }) {
                 appliedCoupon && (
                   <div style={{ textAlign: 'center' }}>
                     <h3 style={{ color: '#0c4a6e', margin: '0 0 10px 0' }}>
-                      🎫 Coupon Applied Successfully!
+                      Coupon Applied Successfully!
                     </h3>
                     <p
                       style={{

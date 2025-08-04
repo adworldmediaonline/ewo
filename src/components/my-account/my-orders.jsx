@@ -461,7 +461,7 @@ export default function MyOrders({ orderData }) {
                                 className={`${styles.pricingRow} ${styles.discountRow}`}
                               >
                                 <span className={styles.pricingLabel}>
-                                  🎫 Coupon {coupon.couponCode} ({coupon.title}
+                                  Coupon {coupon.couponCode} ({coupon.title}
                                   ):
                                 </span>
                                 <span
@@ -487,7 +487,7 @@ export default function MyOrders({ orderData }) {
                             className={`${styles.pricingRow} ${styles.discountRow}`}
                           >
                             <span className={styles.pricingLabel}>
-                              🎫 Coupon {order.appliedCoupon.couponCode} (
+                              Coupon {order.appliedCoupon.couponCode} (
                               {order.appliedCoupon.title}):
                             </span>
                             <span

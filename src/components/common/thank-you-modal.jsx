@@ -1,21 +1,8 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styles from './thank-you-modal.module.css';
 
 const ThankYouModal = ({ isOpen, onClose, orderData = {}, onContinue }) => {
-  const [showConfetti, setShowConfetti] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) {
-      setShowConfetti(true);
-      // Auto close confetti after animation
-      const timer = setTimeout(() => {
-        setShowConfetti(false);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
-
   if (!isOpen) return null;
 
   const handleContinue = () => {
@@ -30,29 +17,6 @@ const ThankYouModal = ({ isOpen, onClose, orderData = {}, onContinue }) => {
       {/* Backdrop */}
       <div className={styles.backdrop} onClick={handleContinue}>
         <div className={styles.modal} onClick={e => e.stopPropagation()}>
-          {/* Confetti Animation */}
-          {showConfetti && (
-            <div className={styles.confetti}>
-              {[...Array(50)].map((_, i) => (
-                <div
-                  key={i}
-                  className={styles.confettiPiece}
-                  style={{
-                    left: `${Math.random() * 100}%`,
-                    animationDelay: `${Math.random() * 3}s`,
-                    backgroundColor: [
-                      '#ff6b6b',
-                      '#4ecdc4',
-                      '#45b7d1',
-                      '#f9ca24',
-                      '#6c5ce7',
-                      '#a55eea',
-                    ][Math.floor(Math.random() * 6)],
-                  }}
-                />
-              ))}
-            </div>
-          )}
 
           {/* Main Content */}
           <div className={styles.content}>

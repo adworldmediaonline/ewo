@@ -13,7 +13,6 @@ const initialState = {
     isEligible: true,
     isApplied: false,
     percentage: 10,
-    showCelebration: false,
   },
   // Cart confirmation modal state
   showCartConfirmation: false,
@@ -131,14 +130,8 @@ export const cartSlice = createSlice({
 
         // Cart confirmation modal will handle user feedback - no toast needed
 
-        // Trigger celebration for first product added by first-time customer
-        if (isFirstProduct && isFirstTimeCustomer) {
-          console.log('🎉 Triggering first-time celebration!');
-          state.firstTimeDiscount.showCelebration = true;
-          state.cartMiniOpen = true; // Open cart mini to show the celebration
-          // DO NOT mark discount as used here - wait until order completion
-        } else if (isFirstProduct) {
-          // Even if not first-time customer, open cart mini for first product
+        if (isFirstProduct) {
+          // Open cart mini for first product
           state.cartMiniOpen = true;
         }
       } else {
@@ -180,7 +173,6 @@ export const cartSlice = createSlice({
       console.log('🔄 Updated first-time discount state:', {
         isEligible: state.firstTimeDiscount.isEligible,
         isApplied: state.firstTimeDiscount.isApplied,
-        showCelebration: state.firstTimeDiscount.showCelebration,
         percentage: state.firstTimeDiscount.percentage,
       });
 
@@ -279,13 +271,8 @@ export const cartSlice = createSlice({
     closeCartMini: (state, { payload }) => {
       state.cartMiniOpen = false;
       setLocalStorage('cartMiniOpen', false);
-      // Also hide celebration when closing cart mini
-      state.firstTimeDiscount.showCelebration = false;
     },
-    // New action to hide celebration
-    hideCelebration: state => {
-      state.firstTimeDiscount.showCelebration = false;
-    },
+
     // Action to hide cart confirmation modal
     hideCartConfirmation: state => {
       state.showCartConfirmation = false;
@@ -296,7 +283,6 @@ export const cartSlice = createSlice({
       localStorage.removeItem('first_time_discount_used');
       state.firstTimeDiscount.isEligible = true;
       state.firstTimeDiscount.isApplied = state.cart_products.length > 0;
-      state.firstTimeDiscount.showCelebration = false;
       console.log('🔄 First-time discount reset!');
     },
     // Action to mark first-time discount as completed after order
@@ -304,7 +290,6 @@ export const cartSlice = createSlice({
       localStorage.setItem('first_time_discount_used', 'true');
       state.firstTimeDiscount.isEligible = false;
       state.firstTimeDiscount.isApplied = false;
-      state.firstTimeDiscount.showCelebration = false;
       console.log('✅ First-time discount marked as completed!');
     },
   },
@@ -321,7 +306,6 @@ export const {
   clearCart,
   closeCartMini,
   openCartMini,
-  hideCelebration,
   hideCartConfirmation,
   resetFirstTimeDiscount,
   completeFirstTimeDiscount,
