@@ -535,10 +535,22 @@ export default function HeaderV2() {
     </div>
   );
 
+  // Modern Professional Banner Component
+  const renderScrollingBanner = () => (
+    <div className={styles.scrollingBanner}>
+      <div className={styles.scrollingBannerContent}>
+        <span className={styles.scrollingText}>
+          Join EWO Army and stay connected for deals and discounts
+        </span>
+      </div>
+    </div>
+  );
+
   return (
     <>
       {isCheckoutPage ? (
         <>
+          {renderScrollingBanner()}
           {renderCheckoutHeader()}
 
           {/* Mobile Navigation (shared) */}
@@ -825,6 +837,7 @@ export default function HeaderV2() {
         </>
       ) : (
         <>
+          {renderScrollingBanner()}
           <header className={styles.headerWrapper}>
             {/* Main Header (always static) */}
             <div className={styles.headerContainer}>
