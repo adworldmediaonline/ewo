@@ -406,11 +406,11 @@ export default function HeaderV2() {
     <a
       href="tel:1-866-396-7623"
       className={`${styles.phoneNumber} ${className}`}
-      aria-label="Call us at 1-866-396-7623"
+      aria-label="Call us at 1-866-EWO-ROAD"
     >
       <div className={styles.phoneNumberWrapper}>
-        <span className={styles.phoneNumberText}>1-866-396-7623</span>
-        <span className={styles.phoneNumberSubtext}>(EWO ROAD)</span>
+        <span className={styles.phoneNumberText}>1-866-EWO-ROAD</span>
+        <span className={styles.phoneNumberSubtext}>(396-7623)</span>
       </div>
     </a>
   );

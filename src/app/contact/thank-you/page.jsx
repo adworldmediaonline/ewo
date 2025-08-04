@@ -113,9 +113,9 @@ export default function ThankYouPage() {
             <div className={styles.contactInfo}>
               <p className={styles.contactText}>Need immediate assistance?</p>
               <div className={styles.contactButtons}>
-                <a href="tel:1-866-396-7623" className={styles.phoneButton}>
-                  Call 1-866-396-7623 (EWO ROAD)
-                </a>
+                            <a href="tel:1-866-396-7623" className={styles.phoneButton}>
+              Call 1-866-EWO-ROAD (396-7623)
+            </a>
                 <a
                   href="mailto:info@eastwestoffroad.com"
                   className={styles.emailButton}

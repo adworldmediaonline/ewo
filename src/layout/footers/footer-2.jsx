@@ -1,12 +1,11 @@
 'use client';
-import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 // internal
 import social_data from '@/data/social-data';
 import { Email, Location } from '@/svg';
-import logo from '@assets/img/logo/logo.webp';
 import pay from '@assets/img/footer/footer-pay.png';
+import logo from '@assets/img/logo/logo.webp';
 
 const FooterTwo = () => {
   return (
@@ -31,7 +30,11 @@ const FooterTwo = () => {
                       <div className="tp-footer-talk mb-20">
                         <span>Got Questions? Call us</span>
                         <h4>
-                          <a href="tel:670-413-90-762">+670 413 90 762</a>
+                          <a href="tel:1-866-396-7623">
+                            1-866-EWO-ROAD
+                            <br />
+                            (396-7623)
+                          </a>
                         </h4>
                       </div>
                       <div className="tp-footer-contact">

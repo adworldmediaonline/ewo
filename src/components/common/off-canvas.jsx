@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
+import Link from 'next/link';
+import { useState } from 'react';
 // internal
+import MobileCategory from '@/layout/headers/header-com/mobile-category';
 import { CloseTwo } from '@/svg';
-import logo from '@assets/img/logo/logo.webp';
 import contact_img from '@assets/img/icon/contact.png';
 import language_img from '@assets/img/icon/language-flag.png';
-import MobileCategory from '@/layout/headers/header-com/mobile-category';
+import logo from '@assets/img/logo/logo.webp';
 import MobileMenus from './mobile-menus';
 
 const OffCanvas = ({
@@ -85,7 +85,7 @@ const OffCanvas = ({
               </div>
               <div className="offcanvas__contact-content">
                 <h3 className="offcanvas__contact-title">
-                  <a href="tel:098-852-987">004524865</a>
+                  <a href="tel:1-866-396-7623">1-866-EWO-ROAD (396-7623)</a>
                 </h3>
               </div>
             </div>
