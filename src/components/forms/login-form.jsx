@@ -1,15 +1,15 @@
 'use client';
-import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
-import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import * as Yup from 'yup';
 // internal
-import { CloseEye, OpenEye } from '@/svg';
-import ErrorMsg from '../common/error-msg';
 import { useLoginUserMutation } from '@/redux/features/auth/authApi';
+import { CloseEye, OpenEye } from '@/svg';
 import { notifyError, notifySuccess } from '@/utils/toast';
+import ErrorMsg from '../common/error-msg';
 
 // schema
 const schema = Yup.object().shape({
@@ -36,14 +36,6 @@ export default function LoginForm() {
     resolver: yupResolver(schema),
   });
 
-  // Check if user just registered
-  useEffect(() => {
-    const justRegistered = searchParams.get('registered');
-    if (justRegistered === 'true') {
-      notifySuccess('Registration successful! Please log in');
-    }
-  }, [searchParams]);
-
   // onSubmit
   const onSubmit = async data => {
     try {
@@ -63,7 +55,31 @@ export default function LoginForm() {
         }, 800);
       }
     } catch (error) {
-      notifyError(error?.data?.error || 'Login failed');
+      const errorMessage = error?.data?.error || 'Login failed';
+
+      // Check if this is an inactive account error
+      if (
+        errorMessage.includes('activation link') ||
+        errorMessage.includes('activate your account')
+      ) {
+        notifyError(`${errorMessage}`, {
+          duration: 6000,
+          style: {
+            backgroundColor: '#fff3cd',
+            color: '#856404',
+            border: '1px solid #ffeaa7',
+          },
+        });
+
+        // Redirect to resend verification page after a delay
+        setTimeout(() => {
+          router.push(
+            `/resend-verification?email=${encodeURIComponent(data.email)}`
+          );
+        }, 3000);
+      } else {
+        notifyError(errorMessage);
+      }
     }
   };
 

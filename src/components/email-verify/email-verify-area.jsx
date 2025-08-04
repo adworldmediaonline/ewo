@@ -1,10 +1,10 @@
 'use client';
-import { useEffect } from 'react';
 import Wrapper from '@/layout/wrapper';
-import ErrorMsg from '../common/error-msg';
-import { useRouter } from 'next/navigation';
 import { useConfirmEmailQuery } from '@/redux/features/auth/authApi';
 import { notifySuccess } from '@/utils/toast';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import ErrorMsg from '../common/error-msg';
 
 export default function EmailVerifyArea({ token }) {
   const router = useRouter();
@@ -14,7 +14,7 @@ export default function EmailVerifyArea({ token }) {
   useEffect(() => {
     if (isSuccess) {
       router.push('/checkout');
-      notifySuccess('Register Success!');
+      notifySuccess('Account activated successfully!');
     }
   }, [router, isSuccess]);
 

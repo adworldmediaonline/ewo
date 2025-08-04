@@ -1,14 +1,14 @@
 'use client';
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import * as Yup from 'yup';
 // internal
-import { CloseEye, OpenEye } from '@/svg';
-import ErrorMsg from '../common/error-msg';
-import { notifyError, notifySuccess } from '@/utils/toast';
 import { useRegisterUserMutation } from '@/redux/features/auth/authApi';
+import { CloseEye, OpenEye } from '@/svg';
+import { notifyError, notifySuccess } from '@/utils/toast';
+import ErrorMsg from '../common/error-msg';
 
 // schema
 const schema = Yup.object().shape({
@@ -41,20 +41,47 @@ export default function RegisterForm({ redirectUrl }) {
         password: data.password,
       }).unwrap();
 
-      notifySuccess('please check your email to verify your account!');
+      notifySuccess(
+        'Registration successful! Please check your email to activate your account.'
+      );
       reset();
 
       // Slight delay before redirect for better UX
       setTimeout(() => {
         // If redirectUrl is provided, add it to the login redirect
         if (redirectUrl) {
-          router.push(`/login?registered=true&redirect=${redirectUrl}`);
+          router.push(`/login?redirect=${redirectUrl}`);
         } else {
-          router.push('/login?registered=true');
+          router.push('/login');
         }
       }, 1500);
     } catch (error) {
-      notifyError(error?.data?.message || 'Registration failed');
+      const errorMessage =
+        error?.data?.error || error?.data?.message || 'Registration failed';
+
+      // Check if this is an unverified account error
+      if (error?.data?.resendAvailable) {
+        notifyError(
+          `${errorMessage} You can request a new verification link.`,
+          {
+            duration: 6000,
+            style: {
+              backgroundColor: '#fff3cd',
+              color: '#856404',
+              border: '1px solid #ffeaa7',
+            },
+          }
+        );
+
+        // Redirect to resend verification page after a delay
+        setTimeout(() => {
+          router.push(
+            `/resend-verification?email=${encodeURIComponent(data.email)}`
+          );
+        }, 2000);
+      } else {
+        notifyError(errorMessage);
+      }
     }
   };
 

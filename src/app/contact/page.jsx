@@ -307,7 +307,9 @@ export default function ContactPage() {
                         href="tel:1-866-396-7623"
                         className={styles.contactLink}
                       >
-                        1-866-396-7623 (EWO ROAD)
+                        1-866-EWO-ROAD
+                        <br />
+                        (396-7623)
                       </a>
                     </div>
                   </div>
