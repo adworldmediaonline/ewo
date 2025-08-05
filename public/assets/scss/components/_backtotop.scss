@@ -6,7 +6,7 @@
 
 .back-to-top-wrapper {
   position: fixed;
-  right: 50px;
+  left: 50px;
   bottom: 0;
   height: 44px;
   width: 44px;
@@ -19,7 +19,7 @@
   @extend %tp-transition-common;
 
   @media #{$xs} {
-    right: 20px;
+    left: 20px;
     bottom: 20px;
   }
   &.back-to-top-btn-show {

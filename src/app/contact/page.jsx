@@ -1,4 +1,4 @@
-import Script from 'next/script';
+// import Script from 'next/script';
 import ContactPage from './contact-form';
 
 export default function Contact() {
@@ -6,7 +6,7 @@ export default function Contact() {
     <>
       <ContactPage />
       {/* Tawk.to Live Chat Script */}
-      <Script
+      {/* <Script
         id={`${process.env.TAWK_TO_CHAT_ID}`}
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
@@ -22,7 +22,7 @@ export default function Contact() {
               })();
             `,
         }}
-      />
+      /> */}
     </>
   );
 }

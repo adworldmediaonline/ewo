@@ -5,7 +5,10 @@ import HeroBanner from '@/components/V2/heroBanner/HeroBanner';
 import Footer from '@/layout/footers/footer';
 import HeaderV2 from '@/layout/headers/HeaderV2';
 import Wrapper from '@/layout/wrapper';
-import Script from 'next/script';
+// import Script from 'next/script';
+// import TawkMessengerReact from '@tawk.to/tawk-messenger-react';
+
+// import TawkToChat from '@/components/tawk-to-chat';
 import styles from './page.module.css';
 
 export default async function HomePage() {
@@ -22,7 +25,7 @@ export default async function HomePage() {
         </Wrapper>
       </div>
       {/* Tawk.to Live Chat Script */}
-      <Script
+      {/* <Script
         id={`${process.env.TAWK_TO_CHAT_ID}`}
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
@@ -38,7 +41,9 @@ export default async function HomePage() {
               })();
             `,
         }}
-      />
+      /> */}
+
+      {/* <TawkToChat /> */}
     </>
   );
 }
