@@ -1,25 +1,23 @@
 'use client';
-import React from "react";
-import Image from "next/image";
-import { GoogleLogin } from "@react-oauth/google";
-import { useRouter,redirect } from "next/navigation";
+import { GoogleLogin } from '@react-oauth/google';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 // internal
-import google_icon from "@assets/img/icon/login/google.svg";
-import { useSignUpProviderMutation } from "@/redux/features/auth/authApi";
-import { notifyError, notifySuccess } from "@/utils/toast";
+import { useSignUpProviderMutation } from '@/redux/features/auth/authApi';
+import { notifyError, notifySuccess } from '@/utils/toast';
+import google_icon from '@assets/img/icon/login/google.svg';
 
 const GoogleSignUp = () => {
   const [signUpProvider, {}] = useSignUpProviderMutation();
   const router = useRouter();
   // handleGoogleSignIn
-  const handleGoogleSignIn = (user) => {
+  const handleGoogleSignIn = user => {
     if (user) {
-      signUpProvider(user?.credential).then((res) => {
+      signUpProvider(user?.credential).then(res => {
         if (res?.data) {
-          notifySuccess("Login success!");
+          notifySuccess('Login success!');
           router.push('/checkout');
         } else {
-          console.log("result error -->", res.error);
           notifyError(res.error?.message);
         }
       });
@@ -27,7 +25,7 @@ const GoogleSignUp = () => {
   };
   return (
     <GoogleLogin
-      render={(renderProps) => (
+      render={renderProps => (
         <a
           className="cursor-pointer"
           onClick={renderProps.onClick}
@@ -38,10 +36,10 @@ const GoogleSignUp = () => {
         </a>
       )}
       onSuccess={handleGoogleSignIn}
-      onFailure={(err) =>
-        notifyError(err?.message || "Something wrong on your auth setup!")
+      onFailure={err =>
+        notifyError(err?.message || 'Something wrong on your auth setup!')
       }
-      cookiePolicy={"single_host_origin"}
+      cookiePolicy={'single_host_origin'}
     />
   );
 };

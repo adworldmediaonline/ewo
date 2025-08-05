@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useSelector } from 'react-redux';
 import {
   useTrackAddToCartMutation,
   useTrackCartActionMutation,
   useTrackConversionMutation,
 } from '@/redux/features/cart/cartTrackingApi';
+import { useCallback, useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 const useCartTracking = () => {
   const [sessionId, setSessionId] = useState(null);
@@ -67,13 +67,7 @@ const useCartTracking = () => {
   // Track add to cart event
   const trackAddToCart = useCallback(
     async (product, quantityOrOptions = 1, source = 'product-page') => {
-      console.log('🎯 [HOOK] trackAddToCart called');
-      console.log('📋 [HOOK] sessionId:', sessionId);
-      console.log('👤 [HOOK] user:', user ? { id: user.id, email: user.email } : 'No user');
-      console.log('📦 [HOOK] product:', product ? { id: product._id, title: product.title } : 'No product');
-      
       if (!sessionId || !product) {
-        console.log('❌ [HOOK] Missing sessionId or product, returning null');
         return null;
       }
 
@@ -108,14 +102,10 @@ const useCartTracking = () => {
           ...options, // Include any additional options
         };
 
-        console.log('📊 [HOOK] Final tracking data:', trackingData);
-        console.log('🚀 [HOOK] Making API call...');
-
         const result = await trackAddToCartMutation(trackingData).unwrap();
-        console.log('✅ [HOOK] Cart tracking successful:', result);
+
         return result;
       } catch (error) {
-        console.error('❌ [HOOK] Cart tracking error:', error);
         return null;
       }
     },
@@ -145,10 +135,9 @@ const useCartTracking = () => {
         };
 
         const result = await trackCartActionMutation(trackingData).unwrap();
-        console.log('Cart action tracking successful:', result);
+
         return result;
       } catch (error) {
-        console.error('Cart action tracking error:', error);
         return null;
       }
     },
@@ -175,10 +164,9 @@ const useCartTracking = () => {
         };
 
         const result = await trackConversionMutation(conversionData).unwrap();
-        console.log('Conversion tracking successful:', result);
+
         return result;
       } catch (error) {
-        console.error('Conversion tracking error:', error);
         return null;
       }
     },
@@ -191,7 +179,6 @@ const useCartTracking = () => {
       try {
         return await trackAddToCart(product, quantity, source);
       } catch (error) {
-        console.warn('Cart tracking failed silently:', error);
         return null;
       }
     },

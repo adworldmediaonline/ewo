@@ -48,7 +48,6 @@ export default function SearchForm({ inputRef }) {
       setError(null);
       setMessage('');
 
-      console.log('Fetching suggestions for:', term);
       const response = await fetch(
         `${API_URL}/api/product/suggestions?term=${encodeURIComponent(term)}`,
         {
@@ -62,25 +61,22 @@ export default function SearchForm({ inputRef }) {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Error response:', errorText);
+
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
-      console.log('Suggestions response:', data);
 
       if (data?.success) {
         setSuggestions(data.suggestions);
         setShowSuggestions(true);
         setMessage(data.message || '');
       } else {
-        console.warn('Invalid response format:', data);
         setSuggestions([]);
         setShowSuggestions(false);
         setMessage('');
       }
     } catch (error) {
-      console.error('Search error:', error);
       setError(error.message);
       setSuggestions([]);
       setShowSuggestions(false);

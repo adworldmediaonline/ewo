@@ -24,7 +24,6 @@ async function fetchProducts() {
 
     return products;
   } catch (error) {
-    console.error('Error fetching products for sitemap:', error);
     // Return empty array to ensure sitemap still works with static pages
     return [];
   }
@@ -37,12 +36,7 @@ export default async function sitemap() {
   // Fetch all products from the database
   const products = await fetchProducts();
 
-  // Debug logging
-  console.log('🔍 Sitemap Debug Info:');
-  console.log(`📦 Products fetched: ${products.length}`);
   if (products.length > 0) {
-    console.log(`🔗 First product ID: ${products[0]._id}`);
-    console.log(`📝 Sample product:`, JSON.stringify(products[0], null, 2));
   }
 
   // Static pages
@@ -107,9 +101,6 @@ export default async function sitemap() {
 
   // Debug final sitemap
   const finalSitemap = [...staticPages, ...productPages];
-  console.log(`🗺️ Total sitemap entries: ${finalSitemap.length}`);
-  console.log(`📄 Static pages: ${staticPages.length}`);
-  console.log(`📦 Product pages: ${productPages.length}`);
 
   // Combine static pages and product pages
   return finalSitemap;

@@ -52,27 +52,13 @@ export default function OrderArea({ orderId }) {
   );
 
   // Debug logging to see what data we have
-  console.log('🔍 Order Debug Data:', {
-    discount,
-    firstTimeDiscount,
-    subtotal,
-    totalAmount,
-    shippingCost,
-    calculatedTotal: subtotal + parseFloat(shippingCost) - discount,
-    actualTotal: totalAmount,
-  });
 
   // Calculate first-time discount amount if applied
   let firstTimeDiscountAmount = 0;
   if (firstTimeDiscount?.isApplied && firstTimeDiscount?.amount > 0) {
     // Only use first-time discount if it's explicitly applied AND has an amount
     firstTimeDiscountAmount = firstTimeDiscount.amount;
-    console.log('✅ First-time discount applied:', firstTimeDiscountAmount);
   } else {
-    console.log('❌ No first-time discount for this order:', {
-      isApplied: firstTimeDiscount?.isApplied,
-      amount: firstTimeDiscount?.amount,
-    });
   }
 
   // Calculate coupon discounts

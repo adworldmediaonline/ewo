@@ -14,9 +14,7 @@ export const apiSlice = createApi({
             headers.set('Authorization', `Bearer ${user.accessToken}`);
           }
         }
-      } catch (error) {
-        console.error('Error parsing user info:', error);
-      }
+      } catch (error) {}
       return headers;
     },
   }),

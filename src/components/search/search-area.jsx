@@ -1,11 +1,11 @@
 'use client';
-import { useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import NiceSelect from '@/ui/nice-select';
 import ErrorMsg from '@/components/common/error-msg';
 import SearchPrdLoader from '@/components/loader/search-prd-loader';
 import ProductItem from '@/components/products/fashion/product-item';
 import { useGetAllProductsQuery } from '@/redux/features/productApi';
+import NiceSelect from '@/ui/nice-select';
+import { useSearchParams } from 'next/navigation';
+import { useState } from 'react';
 
 export default function SearchArea() {
   const searchParams = useSearchParams();
@@ -33,7 +33,6 @@ export default function SearchArea() {
   }
 
   if (!isLoading && isError) {
-    console.log('isError', isError);
     content = <ErrorMsg msg="There was an error" />;
   }
 

@@ -1,5 +1,5 @@
 import { apiSlice } from '../../api/apiSlice';
-import { set_client_secret, set_address_discount_eligible } from './orderSlice';
+import { set_address_discount_eligible, set_client_secret } from './orderSlice';
 
 export const authApi = apiSlice.injectEndpoints({
   overrideExisting: true,
@@ -26,9 +26,7 @@ export const authApi = apiSlice.injectEndpoints({
               );
             }
           }
-        } catch (err) {
-          console.error('Payment intent creation failed:', err);
-        }
+        } catch (err) {}
       },
     }),
     // checkAddressDiscount
@@ -46,7 +44,6 @@ export const authApi = apiSlice.injectEndpoints({
             dispatch(set_address_discount_eligible(result.data.eligible));
           }
         } catch (err) {
-          console.error('Address discount check failed:', err);
           dispatch(set_address_discount_eligible(false));
         }
       },

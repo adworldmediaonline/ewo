@@ -184,7 +184,7 @@ export default function DetailsWrapper({
   //   const sanitizedHTML = DOMPurify.sanitize(text);
   //   return { __html: sanitizedHTML };
   // };
-  console.log('Options', options);
+
   return (
     <>
       {category?.name && (
