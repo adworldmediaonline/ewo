@@ -1,4 +1,5 @@
 import Providers from '@/components/provider';
+import TawkToChat from '@/components/tawk-to-chat';
 import { GoogleTagManager } from '@next/third-parties/google';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Lato } from 'next/font/google';
@@ -105,6 +106,7 @@ export default function RootLayout({ children }) {
       >
         <Providers>{children}</Providers>
         <SpeedInsights />
+        <TawkToChat />
       </body>
     </html>
   );
