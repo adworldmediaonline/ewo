@@ -17,9 +17,7 @@ export default function CouponCard({ coupon }) {
       await navigator.clipboard.writeText(coupon.couponCode);
       setCopySuccess(true);
       setTimeout(() => setCopySuccess(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy: ', err);
-    }
+    } catch (err) {}
   };
 
   const formatDate = dateString => {

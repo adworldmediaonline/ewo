@@ -120,7 +120,6 @@ export const couponSlice = createSlice({
             );
           }
         } catch (error) {
-          console.error('Error loading applied coupons:', error);
           localStorage.removeItem('appliedCoupons');
         }
       }
@@ -175,7 +174,6 @@ export const couponSlice = createSlice({
             );
           }
         } catch (error) {
-          console.error('Error loading applied coupons:', error);
           localStorage.removeItem('appliedCoupons');
         }
       }
@@ -193,7 +191,6 @@ export const couponSlice = createSlice({
             JSON.stringify(state.applied_coupons)
           );
         } catch (error) {
-          console.error('Error migrating legacy coupon:', error);
           localStorage.removeItem('appliedCoupon');
         }
       }

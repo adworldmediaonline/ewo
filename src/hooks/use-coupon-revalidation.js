@@ -36,7 +36,6 @@ export default function useCouponRevalidation() {
         cartSubtotal: Math.round(cartSubtotal * 100) / 100,
       };
     } catch (error) {
-      console.error('Error calculating totals:', error);
       return { cartSubtotal: 0 };
     }
   }, [cart_products]);
@@ -44,12 +43,10 @@ export default function useCouponRevalidation() {
   // Re-validate all applied coupons
   const revalidateAllCoupons = useCallback(async () => {
     if (applied_coupons.length === 0) {
-      console.log('🔄 No applied coupons to revalidate');
       return;
     }
 
     if (isRevalidatingRef.current) {
-      console.log('🔄 Coupon revalidation already in progress, skipping...');
       return;
     }
 
@@ -59,13 +56,6 @@ export default function useCouponRevalidation() {
     try {
       const { cartSubtotal } = calculateTotals();
       const couponCodes = applied_coupons.map(c => c.couponCode);
-
-      console.log('🔄 Revalidating coupons after cart change:', {
-        couponCodes,
-        cartSubtotal,
-        cartItemsCount: cart_products.length,
-        appliedCouponsCount: applied_coupons.length,
-      });
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/coupon/validate-multiple`,
@@ -88,12 +78,6 @@ export default function useCouponRevalidation() {
       const result = await response.json();
 
       if (result.success && result.data.appliedCoupons) {
-        console.log('✅ Coupon revalidation successful:', {
-          originalCount: applied_coupons.length,
-          newCount: result.data.appliedCoupons.length,
-          totalDiscount: result.data.totalDiscount,
-        });
-
         dispatch(set_applied_coupons(result.data.appliedCoupons));
 
         // Show notification if some coupons were removed
@@ -105,7 +89,6 @@ export default function useCouponRevalidation() {
           );
         }
       } else {
-        console.log('❌ All coupons invalid during revalidation');
         // All coupons invalid, clear them
         dispatch(clear_all_coupons());
         notifyError(
@@ -113,7 +96,6 @@ export default function useCouponRevalidation() {
         );
       }
     } catch (error) {
-      console.error('❌ Coupon revalidation error:', error);
       // Keep existing coupons on revalidation error
     } finally {
       dispatch(set_coupon_loading(false));
@@ -124,15 +106,10 @@ export default function useCouponRevalidation() {
   // Check if cart has changed significantly (quantity changes)
   const hasCartChanged = useCallback((currentCart, previousCart) => {
     if (!previousCart) {
-      console.log('🔄 First cart load, no previous cart to compare');
       return false;
     }
 
     if (currentCart.length !== previousCart.length) {
-      console.log('🔄 Cart length changed:', {
-        previous: previousCart.length,
-        current: currentCart.length,
-      });
       return true;
     }
 
@@ -142,27 +119,16 @@ export default function useCouponRevalidation() {
       const previousItem = previousCart[i];
 
       if (!previousItem) {
-        console.log('🔄 New item added to cart');
         return true;
       }
 
       // Check if quantity changed
       if (currentItem.orderQuantity !== previousItem.orderQuantity) {
-        console.log('🔄 Quantity changed for product:', {
-          productId: currentItem._id,
-          title: currentItem.title,
-          previousQuantity: previousItem.orderQuantity,
-          currentQuantity: currentItem.orderQuantity,
-        });
         return true;
       }
 
       // Check if product ID changed (product was replaced)
       if (currentItem._id !== previousItem._id) {
-        console.log('🔄 Product ID changed:', {
-          previousId: previousItem._id,
-          currentId: currentItem._id,
-        });
         return true;
       }
     }
@@ -179,7 +145,6 @@ export default function useCouponRevalidation() {
 
     // Set new timeout for debounced revalidation
     revalidationTimeoutRef.current = setTimeout(() => {
-      console.log('🔄 Executing debounced coupon revalidation...');
       revalidateAllCoupons();
     }, 500); // 500ms debounce delay
   }, [revalidateAllCoupons]);
@@ -194,7 +159,6 @@ export default function useCouponRevalidation() {
       hasCartChanged(currentCart, previousCart) &&
       applied_coupons.length > 0
     ) {
-      console.log('🔄 Cart changed, scheduling coupon revalidation...');
       debouncedRevalidation();
     }
 

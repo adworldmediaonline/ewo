@@ -17,8 +17,9 @@ declare module '@tawk.to/tawk-messenger-react' {
     onChatSatisfaction?: (data: any) => void;
     onChatMessageVisitor?: (data: any) => void;
     onAgentJoinChat?: (data: any) => void;
+    onChatMessageSystem?: (data: any) => void;
   }
-
+  
   const TawkMessengerReact: React.FC<TawkMessengerReactProps>;
   export default TawkMessengerReact;
 }

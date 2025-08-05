@@ -152,12 +152,6 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
       const firstTimeDiscountAmt = Number(firstTimeDiscountAmount) || 0;
 
       const manualTotal = cartTotal + shipping - firstTimeDiscountAmt;
-      console.log('🔧 Manual total calculation:', {
-        cartTotal,
-        shipping,
-        firstTimeDiscountAmt,
-        manualTotal,
-      });
 
       let finalTotal = manualTotal;
 

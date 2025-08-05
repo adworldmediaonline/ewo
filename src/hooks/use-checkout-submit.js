@@ -211,7 +211,6 @@ const useCheckoutSubmit = () => {
       !Array.isArray(cart_products) ||
       cart_products.length === 0
     ) {
-      console.warn('Cart products is empty or invalid:', cart_products);
       return {
         cartSubtotal: 0,
         totalDiscount: 0,
@@ -226,7 +225,6 @@ const useCheckoutSubmit = () => {
         const price = Number(item?.price || 0);
 
         if (isNaN(quantity) || isNaN(price)) {
-          console.warn('Invalid item data:', item);
           return total;
         }
 
@@ -242,7 +240,6 @@ const useCheckoutSubmit = () => {
         finalTotal: Math.round(finalTotal * 100) / 100,
       };
     } catch (error) {
-      console.error('Error calculating totals:', error);
       return {
         cartSubtotal: 0,
         totalDiscount: 0,
@@ -270,7 +267,7 @@ const useCheckoutSubmit = () => {
     // Check if API URL is configured
     if (!process.env.NEXT_PUBLIC_API_BASE_URL) {
       const errorMsg = 'API configuration error. Please contact support.';
-      console.error('NEXT_PUBLIC_API_BASE_URL is not configured');
+
       notifyError(errorMsg);
       dispatch(set_coupon_error(errorMsg));
       return;
@@ -300,18 +297,8 @@ const useCheckoutSubmit = () => {
 
     try {
       // Debug logging
-      console.log('🔍 Debug - Coupon application attempt:', {
-        couponCode: couponCode,
-        cart_products: cart_products,
-        cart_products_length: cart_products?.length,
-        applied_coupons: applied_coupons,
-        total_coupon_discount: total_coupon_discount,
-        api_url: process.env.NEXT_PUBLIC_API_BASE_URL,
-      });
 
       const { cartSubtotal } = calculateTotals();
-
-      console.log('💰 Cart calculation result:', { cartSubtotal });
 
       // Additional validation for cart subtotal
       if (cartSubtotal <= 0) {
@@ -402,8 +389,6 @@ const useCheckoutSubmit = () => {
         }
       }
     } catch (error) {
-      console.error('Coupon validation error:', error);
-
       // Provide more specific error messages based on error type
       let errorMessage;
 
@@ -502,7 +487,6 @@ const useCheckoutSubmit = () => {
         );
       }
     } catch (error) {
-      console.error('Coupon revalidation error:', error);
       // Keep existing coupons on revalidation error
     } finally {
       dispatch(set_coupon_loading(false));
@@ -528,12 +512,9 @@ const useCheckoutSubmit = () => {
         },
       });
 
-      console.log('Payment intent response:', response);
-
       // Check if this is a free order
       const responseData = response.data || response;
       if (responseData.isFreeOrder) {
-        console.log('🎁 Free order detected, skipping Stripe payment');
         return { isFreeOrder: true, totalAmount: responseData.totalAmount };
       }
 
@@ -542,7 +523,6 @@ const useCheckoutSubmit = () => {
       const clientSecret = response.data?.clientSecret || response.clientSecret;
 
       if (!clientSecret) {
-        console.error('No client secret received:', response);
         throw new Error('Failed to get client secret from payment intent');
       }
 
@@ -550,7 +530,6 @@ const useCheckoutSubmit = () => {
       dispatch(set_client_secret(clientSecret));
       return clientSecret;
     } catch (error) {
-      console.error('Error creating payment intent:', error);
       throw error;
     }
   };
@@ -579,7 +558,6 @@ const useCheckoutSubmit = () => {
       !data.zipCode ||
       !data.contactNo
     ) {
-      console.log('Missing required form fields:', data);
       notifyError('Please fill in all required fields');
       setIsCheckoutSubmit(false);
       dispatch(end_checkout_submission());
@@ -651,26 +629,14 @@ const useCheckoutSubmit = () => {
     if (newShippingInfo.shippingOption === 'COD') {
       orderInfo.paymentMethod = 'COD';
 
-      console.log('📦 COD Order Info:', {
-        subTotal: orderInfo.subTotal,
-        shippingCost: orderInfo.shippingCost,
-        discount: orderInfo.discount,
-        firstTimeDiscount: orderInfo.firstTimeDiscount,
-        totalAmount: orderInfo.totalAmount,
-      });
-
       saveOrder(orderInfo)
         .then(res => {
-          console.log('COD Order response:', res);
-
           // Extract MongoDB ObjectId for the redirect (backend expects _id, not invoice)
           const orderId =
             res.data?.order?._id ||
             res.order?._id ||
             res.data?.order?.invoice ||
             res.order?.invoice;
-
-          console.log('Extracted COD Order ID (ObjectId):', orderId);
 
           // Show Thank You Modal for COD orders
           setOrderDataForModal({
@@ -690,7 +656,6 @@ const useCheckoutSubmit = () => {
           dispatch(end_checkout_submission());
         })
         .catch(err => {
-          console.error('COD Order error:', err);
           notifyError(
             'Something went wrong with your order. Please try again.'
           );
@@ -716,7 +681,6 @@ const useCheckoutSubmit = () => {
         });
 
         if (error) {
-          console.error('Card validation error:', error);
           setCardError(error.message);
 
           // Create a summary of attempted purchase
@@ -737,8 +701,6 @@ const useCheckoutSubmit = () => {
           return;
         }
 
-        console.log('Payment method created:', paymentMethod);
-
         // Step 2: Create payment intent with order data
         try {
           const paymentResult = await createStripePaymentIntent({
@@ -748,8 +710,6 @@ const useCheckoutSubmit = () => {
 
           // Handle free orders (100% discount coupons)
           if (paymentResult.isFreeOrder) {
-            console.log('🎁 Processing free order due to 100% discount');
-
             // Clean up first
             localStorage.removeItem('cart_products');
             localStorage.removeItem('couponInfo');
@@ -762,14 +722,6 @@ const useCheckoutSubmit = () => {
 
             setIsCheckoutSubmit(false);
             setProcessingPayment(false);
-
-            console.log('🎁 Free Order Info:', {
-              subTotal: orderInfo.subTotal,
-              shippingCost: orderInfo.shippingCost,
-              discount: orderInfo.discount,
-              firstTimeDiscount: orderInfo.firstTimeDiscount,
-              totalAmount: orderInfo.totalAmount,
-            });
 
             // Save free order
             saveOrder({
@@ -786,16 +738,12 @@ const useCheckoutSubmit = () => {
               },
             })
               .then(res => {
-                console.log('Free Order response:', res);
-
                 // Extract MongoDB ObjectId for the redirect
                 const orderId =
                   res.data?.order?._id ||
                   res.order?._id ||
                   res.data?.order?.invoice ||
                   res.order?.invoice;
-
-                console.log('Extracted Free Order ID (ObjectId):', orderId);
 
                 // Set order data and show Thank You modal
                 setOrderDataForModal({
@@ -808,7 +756,6 @@ const useCheckoutSubmit = () => {
                 );
               })
               .catch(err => {
-                console.error('Free Order error:', err);
                 notifyError(
                   'Something went wrong with your free order. Please try again.'
                 );
@@ -822,7 +769,6 @@ const useCheckoutSubmit = () => {
           }
 
           const secret = paymentResult;
-          console.log('Payment intent created, client secret received');
 
           // Step 3: Confirm the payment with Stripe
           const { paymentIntent, error: confirmError } =
@@ -837,7 +783,6 @@ const useCheckoutSubmit = () => {
             });
 
           if (confirmError) {
-            console.error('Payment confirmation error:', confirmError);
             let errorMessage = confirmError.message;
             // Add more user-friendly error messages based on error types
             if (confirmError.type === 'card_error') {
@@ -874,8 +819,6 @@ const useCheckoutSubmit = () => {
             return;
           }
 
-          console.log('Payment intent status:', paymentIntent.status);
-
           // Step 4: Payment confirmed by Stripe
           if (paymentIntent.status === 'succeeded') {
             // Clean up first
@@ -891,14 +834,6 @@ const useCheckoutSubmit = () => {
             setIsCheckoutSubmit(false);
             setProcessingPayment(false);
 
-            console.log('💳 Card Order Info:', {
-              subTotal: orderInfo.subTotal,
-              shippingCost: orderInfo.shippingCost,
-              discount: orderInfo.discount,
-              firstTimeDiscount: orderInfo.firstTimeDiscount,
-              totalAmount: orderInfo.totalAmount,
-            });
-
             // Save order and show Thank You modal
             saveOrder({
               ...orderInfo,
@@ -907,16 +842,12 @@ const useCheckoutSubmit = () => {
               paidAt: new Date(),
             })
               .then(res => {
-                console.log('Card Order response:', res);
-
                 // Extract MongoDB ObjectId for the redirect (backend expects _id, not invoice)
                 const orderId =
                   res.data?.order?._id ||
                   res.order?._id ||
                   res.data?.order?.invoice ||
                   res.order?.invoice;
-
-                console.log('Extracted Card Order ID (ObjectId):', orderId);
 
                 // Set order data and show Thank You modal
                 setOrderDataForModal({
@@ -925,7 +856,6 @@ const useCheckoutSubmit = () => {
                 setShowThankYouModal(true);
               })
               .catch(err => {
-                console.error('Order error:', err);
                 const productSummary =
                   cart_products.length > 1
                     ? `${cart_products[0].title} and ${
@@ -951,7 +881,6 @@ const useCheckoutSubmit = () => {
             dispatch(end_checkout_submission());
           }
         } catch (err) {
-          console.error('Payment intent error:', err);
           notifyError(
             'Error creating payment: Please check your payment details and try again.'
           );
@@ -960,7 +889,6 @@ const useCheckoutSubmit = () => {
           dispatch(end_checkout_submission());
         }
       } catch (err) {
-        console.error('Payment error:', err);
         notifyError(
           'There was a problem processing your payment. Please try again.'
         );
@@ -977,24 +905,17 @@ const useCheckoutSubmit = () => {
   };
 
   const handleThankYouModalContinue = () => {
-    console.log(
-      'Thank you modal continue clicked, orderData:',
-      orderDataForModal
-    );
-
     setShowThankYouModal(false);
 
     // Try to redirect to order details page
     const orderId = orderDataForModal?.orderId;
-    console.log('Attempting to redirect with order ID:', orderId);
 
     if (orderId) {
       // Use invoice number for URL if available, otherwise use _id
       const redirectPath = `/order/${orderId}`;
-      console.log('Redirecting to:', redirectPath);
+
       router.push(redirectPath);
     } else {
-      console.warn('No order ID found, redirecting to orders list');
       router.push('/order');
     }
   };

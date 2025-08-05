@@ -43,18 +43,6 @@ const useCartInfo = () => {
     const finalTotal = cart.total - discountAmount;
     setTotal(finalTotal);
     setTotalWithShipping(finalTotal + totalShippingCost);
-
-    // Debug logging
-    console.log('💰 Cart Info Debug:', {
-      cartTotal: cart.total,
-      subtotal: cart.total,
-      firstTimeDiscountApplied: firstTimeDiscount.isApplied,
-      firstTimeDiscountPercentage: firstTimeDiscount.percentage,
-      discountAmount,
-      finalTotal,
-      totalWithShipping: finalTotal + totalShippingCost,
-      cartProducts: cart_products.length,
-    });
   }, [cart_products, totalShippingCost, firstTimeDiscount]);
 
   return {

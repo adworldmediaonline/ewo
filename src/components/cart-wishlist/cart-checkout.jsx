@@ -199,7 +199,6 @@ export default function CartCheckout() {
         }
       }
     } catch (error) {
-      console.error('Coupon application error:', error);
       notifyError('Failed to apply coupon. Please try again.');
     } finally {
       setIsApplyingCoupon(false);

@@ -118,7 +118,6 @@ export default function CartMiniSidebar() {
         cartSubtotal: Math.round(cartSubtotal * 100) / 100,
       };
     } catch (error) {
-      console.error('Error calculating totals:', error);
       return { cartSubtotal: 0 };
     }
   };
@@ -142,7 +141,7 @@ export default function CartMiniSidebar() {
     // Check if API URL is configured
     if (!process.env.NEXT_PUBLIC_API_BASE_URL) {
       const errorMsg = 'API configuration error. Please contact support.';
-      console.error('NEXT_PUBLIC_API_BASE_URL is not configured');
+
       notifyError(errorMsg);
       dispatch(set_coupon_error(errorMsg));
       return;
@@ -268,8 +267,6 @@ export default function CartMiniSidebar() {
         }
       }
     } catch (error) {
-      console.error('Coupon validation error:', error);
-
       // Provide more specific error messages based on error type
       let errorMessage;
 
@@ -302,7 +299,6 @@ export default function CartMiniSidebar() {
 
   // handle close cart mini
   const handleCloseCartMini = () => {
-    console.log('🔄 Closing cart mini sidebar...');
     dispatch(closeCartMini());
   };
 

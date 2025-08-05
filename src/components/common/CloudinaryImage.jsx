@@ -23,7 +23,6 @@ const CloudinaryImage = ({
   // Ensure src has version number if it's a full URL
   const hasVersion = src?.includes('/v');
   if (src?.startsWith('http') && !hasVersion) {
-    console.warn('Cloudinary URL must include version number (/v1234/)');
   }
 
   // Don't pass loading prop if priority is true

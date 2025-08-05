@@ -1,15 +1,15 @@
 'use client';
-import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useRouter, usePathname } from 'next/navigation';
-import Link from 'next/link';
-import { toast } from 'react-toastify';
+import styles from '@/components/modals/guest-cart-modal.module.css';
+import { useSaveGuestCartMutation } from '@/redux/features/cart/cartApi';
 import {
   hideGuestCartModal,
   setGuestEmail,
 } from '@/redux/features/guestCart/guestCartSlice';
-import { useSaveGuestCartMutation } from '@/redux/features/cart/cartApi';
-import styles from '@/components/modals/guest-cart-modal.module.css';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 
 export default function GuestCartModal() {
   const dispatch = useDispatch();
@@ -83,7 +83,6 @@ export default function GuestCartModal() {
       // Redirect to checkout
       router.push('/checkout');
     } catch (error) {
-      console.error('Error saving guest cart:', error);
       const errorMessage =
         error?.data?.message || error?.message || 'Failed to save cart';
       setEmailError(errorMessage);
@@ -124,7 +123,6 @@ export default function GuestCartModal() {
       // Redirect to cart page
       router.push('/cart');
     } catch (error) {
-      console.error('Error saving guest cart:', error);
       const errorMessage =
         error?.data?.message || error?.message || 'Failed to save cart';
       setEmailError(errorMessage);

@@ -12,7 +12,7 @@ const initialState = {
   firstTimeDiscount: {
     isEligible: true,
     isApplied: false,
-    percentage: 10,
+    percentage: 15,
   },
   // Cart confirmation modal state
   showCartConfirmation: false,
@@ -71,12 +71,6 @@ const updateFirstTimeDiscount = state => {
   const isFirstTime = checkFirstTimeCustomer();
   const hasProducts = state.cart_products.length > 0;
 
-  console.log('💰 First-time discount check:', {
-    isFirstTime,
-    hasProducts,
-    currentIsApplied: state.firstTimeDiscount.isApplied,
-  });
-
   state.firstTimeDiscount.isEligible = isFirstTime;
   state.firstTimeDiscount.isApplied = isFirstTime && hasProducts;
 };
@@ -89,13 +83,6 @@ export const cartSlice = createSlice({
       // Check if this is the first product being added to cart
       const isFirstProduct = state.cart_products.length === 0;
       const isFirstTimeCustomer = checkFirstTimeCustomer();
-
-      console.log('🎯 Add to cart debug:', {
-        isFirstProduct,
-        isFirstTimeCustomer,
-        cartLength: state.cart_products.length,
-        hasDiscountUsed: localStorage.getItem('first_time_discount_used'),
-      });
 
       // Create unique identifier that includes selected option if present
       const productId = payload.selectedOption
@@ -169,12 +156,6 @@ export const cartSlice = createSlice({
       // Update shipping costs and first-time discount
       updateShippingCosts(state);
       updateFirstTimeDiscount(state);
-
-      console.log('🔄 Updated first-time discount state:', {
-        isEligible: state.firstTimeDiscount.isEligible,
-        isApplied: state.firstTimeDiscount.isApplied,
-        percentage: state.firstTimeDiscount.percentage,
-      });
 
       setLocalStorage('cart_products', state.cart_products);
       setLocalStorage('shipping_cost', state.totalShippingCost);
@@ -283,14 +264,12 @@ export const cartSlice = createSlice({
       localStorage.removeItem('first_time_discount_used');
       state.firstTimeDiscount.isEligible = true;
       state.firstTimeDiscount.isApplied = state.cart_products.length > 0;
-      console.log('🔄 First-time discount reset!');
     },
     // Action to mark first-time discount as completed after order
     completeFirstTimeDiscount: state => {
       localStorage.setItem('first_time_discount_used', 'true');
       state.firstTimeDiscount.isEligible = false;
       state.firstTimeDiscount.isApplied = false;
-      console.log('✅ First-time discount marked as completed!');
     },
   },
 });
