@@ -63,7 +63,7 @@ const SearchBar = ({ isSearchOpen, setIsSearchOpen }) => {
       {/* body overlay */}
       <div
         onClick={() => setIsSearchOpen(false)}
-        className={`body-overlay ${isSearchOpen ? "opened" : ""}`}
+        className="body-overlay ${isSearchOpen ? "opened" : ""}"
       ></div>
     </>
   );

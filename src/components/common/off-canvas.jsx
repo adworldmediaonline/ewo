@@ -149,7 +149,7 @@ const OffCanvas = ({
       {/* body overlay start */}
       <div
         onClick={() => setIsCanvasOpen(false)}
-        className={`body-overlay ${isOffCanvasOpen ? 'opened' : ''}`}
+        className="body-overlay ${isOffCanvasOpen ? 'opened' : ''}"
       ></div>
       {/* body overlay end */}
     </>

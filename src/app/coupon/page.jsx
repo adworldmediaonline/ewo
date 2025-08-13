@@ -4,20 +4,19 @@ import CouponCard from '@/components/coupon/CouponCard';
 import CouponProductGrid from '@/components/coupon/CouponProductGrid';
 import { useGetAllActiveCouponsQuery } from '@/redux/features/coupon/couponApi';
 import Link from 'next/link';
-import styles from './Coupon.module.css';
 
 export default function CouponPage() {
   const { data: coupons, isLoading, error } = useGetAllActiveCouponsQuery();
 
   if (isLoading) {
     return (
-      <div className={styles.couponPage}>
-        <div className={styles.container}>
-          <div className={styles.loadingContainer}>
-            <div className={styles.loadingSpinner}></div>
-            <div className={styles.loadingContent}>
-              <h3 className={styles.loadingTitle}>Finding the best deals...</h3>
-              <p className={styles.loadingText}>
+      <div className="">
+        <div className="">
+          <div className="">
+            <div className=""></div>
+            <div className="">
+              <h3 className="">Finding the best deals...</h3>
+              <p className="">
                 Please wait while we load your exclusive offers
               </p>
             </div>
@@ -29,19 +28,16 @@ export default function CouponPage() {
 
   if (error) {
     return (
-      <div className={styles.couponPage}>
-        <div className={styles.container}>
-          <div className={styles.errorContainer}>
-            <div className={styles.errorIcon}>⚠️</div>
-            <h3 className={styles.errorTitle}>Oops! Something went wrong</h3>
-            <p className={styles.errorMessage}>
+      <div className="">
+        <div className="">
+          <div className="">
+            <div className="">⚠️</div>
+            <h3 className="">Oops! Something went wrong</h3>
+            <p className="">
               We couldn't load the coupons right now. Please check your
               connection and try again.
             </p>
-            <button
-              className={styles.retryBtn}
-              onClick={() => window.location.reload()}
-            >
+            <button className="" onClick={() => window.location.reload()}>
               Try Again
             </button>
           </div>
@@ -52,18 +48,18 @@ export default function CouponPage() {
 
   if (!coupons?.data || coupons.data.length === 0) {
     return (
-      <div className={styles.couponPage}>
-        <div className={styles.container}>
-          <div className={styles.noCouponsContainer}>
-            <div className={styles.noCouponsIcon}>🎟️</div>
-            <h2 className={styles.noCouponsTitle}>No Active Deals Right Now</h2>
-            <p className={styles.noCouponsMessage}>
+      <div className="">
+        <div className="">
+          <div className="">
+            <div className="">🎟️</div>
+            <h2 className="">No Active Deals Right Now</h2>
+            <p className="">
               Don't worry! We're constantly adding new deals and discounts.
               Check back soon or browse our products to find great automotive
               parts.
             </p>
-            <div className={styles.noCouponsActions}>
-              <Link href="/shop" className={styles.browseProductsBtn}>
+            <div className="">
+              <Link href="/shop" className="">
                 <svg
                   width="20"
                   height="20"
@@ -81,7 +77,7 @@ export default function CouponPage() {
                 </svg>
                 Browse Products
               </Link>
-              <Link href="/contact" className={styles.notifyBtn}>
+              <Link href="/contact" className="">
                 🔔 Notify Me of Deals
               </Link>
             </div>
@@ -92,13 +88,13 @@ export default function CouponPage() {
   }
 
   return (
-    <div className={styles.couponPage}>
-      <div className={styles.container}>
+    <div className="">
+      <div className="">
         {/* Coupons List */}
-        <div className={styles.couponsGrid}>
+        <div className="">
           {coupons.data.map((coupon, index) => (
-            <div key={coupon._id || index} className={styles.couponSection}>
-              <div className={styles.couponWrapper}>
+            <div key={coupon._id || index} className="">
+              <div className="">
                 <CouponCard coupon={coupon} />
                 <CouponProductGrid
                   products={coupon.applicableProducts}

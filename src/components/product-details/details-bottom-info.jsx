@@ -1,15 +1,13 @@
 'use client';
-import React from 'react';
-import Image from 'next/image';
 import payment_option_img from '@assets/img/product/icons/payment-option.png';
+import Image from 'next/image';
 import DetailsTabNav from './details-tab-nav';
-import styles from '../../app/product/[id]/product-details.module.css';
 
 const DetailsBottomInfo = ({ productItem }) => {
   const { sku, category } = productItem || {};
 
   return (
-    <div className={styles.tabsContainer}>
+    <div className="">
       <DetailsTabNav product={productItem} />
 
       {/* product-details-query */}

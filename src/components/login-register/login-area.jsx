@@ -1,12 +1,10 @@
 'use client';
-import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 // internal
 import LoginForm from '../forms/login-form';
 // import LoginShapes from './login-shapes';
-import GoogleSignUp from './google-sign-up';
-import styles from './login-area.module.css';
 
 export default function LoginArea() {
   const searchParams = useSearchParams();
@@ -24,18 +22,16 @@ export default function LoginArea() {
 
   return (
     <>
-      <section className={`tp-login-area ${styles.loginSection}`}>
+      <section className="tp-login-area ">
         <div className="container">
           <div className="row justify-content-center">
             <div className="col-xl-5 col-lg-6 col-md-8">
-              <div className={`tp-login-wrapper ${styles.loginWrapper}`}>
+              <div className="tp-login-wrapper ">
                 {/* Clean Header */}
-                <div
-                  className={`tp-login-top text-center ${styles.loginHeader}`}
-                >
+                <div className="tp-login-top text-center ">
                   {/* Back Button */}
-                  <div className={styles.backButton}>
-                    <Link href="/" className={styles.backLink}>
+                  <div className="">
+                    <Link href="/" className="">
                       <svg
                         width="20"
                         height="20"
@@ -54,18 +50,16 @@ export default function LoginArea() {
                     </Link>
                   </div>
 
-                  <div className={styles.brandSection}>
-                    <h1 className={`tp-login-title ${styles.loginTitle}`}>
-                      Sign In
-                    </h1>
-                    <p className={styles.loginSubtitle}>Welcome back to EWO</p>
+                  <div className="">
+                    <h1 className="tp-login-title ">Sign In</h1>
+                    <p className="">Welcome back to EWO</p>
                   </div>
 
                   {/* Redirect Message */}
                   {redirectMessage && (
-                    <div className={styles.redirectMessage}>
+                    <div className="">
                       <p>{redirectMessage}</p>
-                      <Link href="/checkout" className={styles.checkoutLink}>
+                      <Link href="/checkout" className="">
                         ← Return to checkout
                       </Link>
                     </div>
@@ -73,15 +67,15 @@ export default function LoginArea() {
                 </div>
 
                 {/* Login Form */}
-                <div className={`tp-login-option ${styles.loginForm}`}>
+                <div className="tp-login-option ">
                   <LoginForm />
                 </div>
 
                 {/* Sign Up Link */}
-                <div className={styles.signupSection}>
+                <div className="">
                   <p>
                     Don't have an account?{' '}
-                    <Link href="/register" className={styles.signupLink}>
+                    <Link href="/register" className="">
                       Create one here
                     </Link>
                   </p>

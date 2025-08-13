@@ -10,7 +10,7 @@ export default function OrderArea({ orderId }) {
 
   if (isLoading) {
     return (
-      <div className={styles.container}>
+      <div className="">
         <PrdDetailsLoader loading={isLoading} />
       </div>
     );
@@ -18,7 +18,7 @@ export default function OrderArea({ orderId }) {
 
   if (isError) {
     return (
-      <div className={styles.container}>
+      <div className="">
         <ErrorMsg msg="There was an error fetching your order details" />
       </div>
     );
@@ -105,42 +105,42 @@ export default function OrderArea({ orderId }) {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.content}>
+    <div className="">
+      <div className="">
         {/* Header Card */}
-        <div className={styles.headerCard}>
-          <div className={styles.headerContent}>
-            <div className={styles.headerLeft}>
-              <h1 className={styles.title}>Order Confirmation</h1>
-              <p className={styles.subtitle}>Thank you for your purchase</p>
+        <div className="">
+          <div className="">
+            <div className="">
+              <h1 className="">Order Confirmation</h1>
+              <p className="">Thank you for your purchase</p>
             </div>
-            <div className={styles.headerRight}>
-              <div className={styles.orderBadge}>
-                <span className={styles.orderLabel}>Order ID</span>
-                <span className={styles.orderNumber}>
+            <div className="">
+              <div className="">
+                <span className="">Order ID</span>
+                <span className="">
                   {orderUniqueId || invoice}
                 </span>
               </div>
             </div>
           </div>
 
-          <div className={styles.orderMeta}>
-            <div className={styles.metaItem}>
-              <span className={styles.metaLabel}>Order Date</span>
-              <span className={styles.metaValue}>{orderDate}</span>
+          <div className="">
+            <div className="">
+              <span className="">Order Date</span>
+              <span className="">{orderDate}</span>
             </div>
-            <div className={styles.metaItem}>
-              <span className={styles.metaLabel}>Order Time</span>
-              <span className={styles.metaValue}>{orderTime}</span>
+            <div className="">
+              <span className="">Order Time</span>
+              <span className="">{orderTime}</span>
             </div>
-            <div className={styles.metaItem}>
-              <span className={styles.metaLabel}>Status</span>
+            <div className="">
+              <span className="">Status</span>
               <div
-                className={styles.statusBadge}
+                className=""
                 style={{ backgroundColor: getStatusColor() }}
               >
-                <span className={styles.statusIcon}>{getStatusIcon()}</span>
-                <span className={styles.statusText}>{status}</span>
+                <span className="">{getStatusIcon()}</span>
+                <span className="">{status}</span>
               </div>
             </div>
           </div>
@@ -152,14 +152,14 @@ export default function OrderArea({ orderId }) {
             (appliedCoupon.discount > 0 ||
               appliedCoupon.discountAmount > 0))) && (
           <div
-            className={styles.card}
+            className=""
             style={{
               marginBottom: '20px',
               background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
               border: '2px solid #0ea5e9',
             }}
           >
-            <div className={styles.cardBody}>
+            <div className="">
               {appliedCoupons.length > 0 ? (
                 appliedCoupons.length === 1 ? (
                   <div style={{ textAlign: 'center' }}>
@@ -250,22 +250,22 @@ export default function OrderArea({ orderId }) {
         )}
 
         {/* Main Content Grid */}
-        <div className={styles.grid}>
+        <div className="">
           {/* Order Summary */}
-          <div className={styles.card}>
-            <div className={styles.cardHeader}>
-              <h2 className={styles.cardTitle}>Order Summary</h2>
-              <span className={styles.itemCount}>
+          <div className="">
+            <div className="">
+              <h2 className="">Order Summary</h2>
+              <span className="">
                 {cart.length} item{cart.length !== 1 ? 's' : ''}
               </span>
             </div>
-            <div className={styles.cardBody}>
-              <div className={styles.summaryList}>
-                <div className={styles.summaryRow}>
+            <div className="">
+              <div className="">
+                <div className="">
                   <span>Subtotal</span>
                   <span>${subtotal.toFixed(2)}</span>
                 </div>
-                <div className={styles.summaryRow}>
+                <div className="">
                   <span>Shipping</span>
                   <span>${parseFloat(shippingCost.toFixed(2)).toFixed(2)}</span>
                 </div>
@@ -275,38 +275,38 @@ export default function OrderArea({ orderId }) {
                     discount > 0 &&
                     Math.abs(discount - subtotal * 0.1) < 0.01)) &&
                   firstTimeDiscountAmount > 0 && (
-                    <div className={styles.summaryRow}>
+                    <div className="">
                       <span>
                         🎉 First-time order discount (-
                         {firstTimeDiscount?.percentage || 10}%)
                       </span>
-                      <span className={styles.discount}>
+                      <span className="">
                         -${firstTimeDiscountAmount.toFixed(2)}
                       </span>
                     </div>
                   )}
                 {/* Coupon discounts */}
                 {couponDiscounts > 0 && (
-                  <div className={styles.summaryRow}>
+                  <div className="">
                     <span>{couponDisplayText}</span>
-                    <span className={styles.discount}>
+                    <span className="">
                       -${couponDiscounts.toFixed(2)}
                     </span>
                   </div>
                 )}
                 {/* Other discounts (if any remaining) */}
                 {otherDiscounts > 0 && (
-                  <div className={styles.summaryRow}>
+                  <div className="">
                     <span>Other Discounts</span>
-                    <span className={styles.discount}>
+                    <span className="">
                       -${otherDiscounts.toFixed(2)}
                     </span>
                   </div>
                 )}
               </div>
-              <div className={styles.totalRow}>
-                <span className={styles.totalLabel}>Total</span>
-                <span className={styles.totalAmount}>
+              <div className="">
+                <span className="">Total</span>
+                <span className="">
                   $
                   {(
                     subtotal -
@@ -321,43 +321,43 @@ export default function OrderArea({ orderId }) {
           </div>
 
           {/* Customer Information */}
-          <div className={styles.card}>
-            <div className={styles.cardHeader}>
-              <h2 className={styles.cardTitle}>Customer Information</h2>
+          <div className="">
+            <div className="">
+              <h2 className="">Customer Information</h2>
             </div>
-            <div className={styles.cardBody}>
-              <div className={styles.infoGrid}>
-                <div className={styles.infoGroup}>
-                  <h3 className={styles.groupTitle}>Contact Details</h3>
-                  <div className={styles.infoList}>
-                    <div className={styles.infoRow}>
-                      <span className={styles.infoLabel}>Name</span>
-                      <span className={styles.infoValue}>{name}</span>
+            <div className="">
+              <div className="">
+                <div className="">
+                  <h3 className="">Contact Details</h3>
+                  <div className="">
+                    <div className="">
+                      <span className="">Name</span>
+                      <span className="">{name}</span>
                     </div>
-                    <div className={styles.infoRow}>
-                      <span className={styles.infoLabel}>Email</span>
-                      <span className={styles.infoValue}>
+                    <div className="">
+                      <span className="">Email</span>
+                      <span className="">
                         {email || contact}
                       </span>
                     </div>
-                    <div className={styles.infoRow}>
-                      <span className={styles.infoLabel}>Phone</span>
-                      <span className={styles.infoValue}>{contact}</span>
+                    <div className="">
+                      <span className="">Phone</span>
+                      <span className="">{contact}</span>
                     </div>
                   </div>
                 </div>
-                <div className={styles.infoGroup}>
-                  <h3 className={styles.groupTitle}>Delivery Details</h3>
-                  <div className={styles.infoList}>
-                    <div className={styles.infoRow}>
-                      <span className={styles.infoLabel}>Location</span>
-                      <span className={styles.infoValue}>
+                <div className="">
+                  <h3 className="">Delivery Details</h3>
+                  <div className="">
+                    <div className="">
+                      <span className="">Location</span>
+                      <span className="">
                         {city}, {country}
                       </span>
                     </div>
-                    <div className={styles.infoRow}>
-                      <span className={styles.infoLabel}>Payment</span>
-                      <span className={styles.infoValue}>
+                    <div className="">
+                      <span className="">Payment</span>
+                      <span className="">
                         {paymentMethod === 'COD'
                           ? 'Cash on Delivery'
                           : 'Credit Card'}
@@ -371,34 +371,34 @@ export default function OrderArea({ orderId }) {
         </div>
 
         {/* Order Items */}
-        <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <h2 className={styles.cardTitle}>Order Items</h2>
+        <div className="">
+          <div className="">
+            <h2 className="">Order Items</h2>
           </div>
-          <div className={styles.cardBody}>
-            <div className={styles.itemsList}>
+          <div className="">
+            <div className="">
               {cart.map((item, i) => (
-                <div key={i} className={styles.itemCard}>
-                  <div className={styles.itemContent}>
-                    <div className={styles.itemImage}>
+                <div key={i} className="">
+                  <div className="">
+                    <div className="">
                       <img
                         src={item.img}
                         alt={item.title}
-                        className={styles.productImage}
+                        className=""
                       />
                     </div>
-                    <div className={styles.itemDetails}>
-                      <h3 className={styles.itemName}>{item.title}</h3>
-                      <span className={styles.itemQuantity}>
+                    <div className="">
+                      <h3 className="">{item.title}</h3>
+                      <span className="">
                         Quantity: {item.orderQuantity}
                       </span>
                     </div>
-                    <div className={styles.itemPricing}>
-                      <span className={styles.itemPrice}>
+                    <div className="">
+                      <span className="">
                         ${(item.price * item.orderQuantity).toFixed(2)}
                       </span>
                       {item.orderQuantity > 1 && (
-                        <span className={styles.unitPrice}>
+                        <span className="">
                           ${item.price.toFixed(2)} each
                         </span>
                       )}

@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 // internal
 import useCheckoutSubmit from '@/hooks/use-checkout-submit';
 import ThankYouModal from '../common/thank-you-modal';
-import styles from './checkout-area.module.css';
+
 import CheckoutBillingArea from './checkout-billing-area';
 import CheckoutOrderArea from './checkout-order-area';
 
@@ -47,35 +47,31 @@ export default function CheckoutArea() {
 
   return (
     <>
-      <section className={styles.checkoutArea}>
-        <div className={styles.container}>
+      <section className="">
+        <div className="">
           {cart_products.length === 0 && (
-            <div className={styles.emptyCart}>
-              <h3 className={styles.emptyCartTitle}>
-                No items found in cart to checkout
-              </h3>
-              <Link href="/shop" className={styles.returnToShopBtn}>
+            <div className="">
+              <h3 className="">No items found in cart to checkout</h3>
+              <Link href="/shop" className="">
                 Return to shop
               </Link>
             </div>
           )}
           {cart_products.length > 0 && (
             <form onSubmit={handleSubmit(submitHandler)} noValidate>
-              <div className={styles.checkoutGrid}>
-                <div className={styles.leftColumn}>
+              <div className="">
+                <div className="">
                   {isGuest && (
-                    <div className={styles.guestSection}>
-                      <div className={styles.guestContent}>
-                        <div className={styles.guestInfo}>
-                          <div className={styles.guestIcon}>?</div>
-                          <span className={styles.guestText}>
-                            Checking out as Guest
-                          </span>
+                    <div className="">
+                      <div className="">
+                        <div className="">
+                          <div className="">?</div>
+                          <span className="">Checking out as Guest</span>
                         </div>
                         <button
                           type="button"
                           onClick={loginWithRedirect}
-                          className={styles.signInBtn}
+                          className=""
                         >
                           Sign In Instead
                         </button>
@@ -89,7 +85,7 @@ export default function CheckoutArea() {
                     isGuest={isGuest}
                   />
                 </div>
-                <div className={styles.rightColumn}>
+                <div className="">
                   <CheckoutOrderArea
                     checkoutData={checkoutData}
                     isGuest={isGuest}

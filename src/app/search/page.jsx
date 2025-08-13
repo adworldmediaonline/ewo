@@ -1,9 +1,8 @@
-import Wrapper from '@/layout/wrapper';
-import HeaderV2 from '@/layout/headers/HeaderV2';
 import CommonBreadcrumb from '@/components/breadcrumb/common-breadcrumb';
 import SearchArea from '@/components/search/search-area';
 import Footer from '@/layout/footers/footer';
-import styles from './search.module.css';
+import HeaderV2 from '@/layout/headers/HeaderV2';
+import Wrapper from '@/layout/wrapper';
 
 export const metadata = {
   title: 'EWO - Search',
@@ -14,7 +13,7 @@ export const metadata = {
 
 export default function SearchPage() {
   return (
-    <div className={styles.searchPage}>
+    <div className="">
       <Wrapper>
         <HeaderV2 />
         <CommonBreadcrumb title="Search Products" subtitle="Search Products" />

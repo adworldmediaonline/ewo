@@ -188,19 +188,19 @@ export default function DetailsWrapper({
   return (
     <>
       {category?.name && (
-        <div className={styles.productMeta}>
+        <div className="">
           <span>Category: {category?.name}</span>
         </div>
       )}
 
-      <h1 className={styles.productTitle}>
+      <h1 className="">
         {replaceTextCharacters(title, '*', '')}
         {/* {titleCaseFirstLetterOfEveryWord(title)} */}
       </h1>
 
-      <div className={styles.productMeta}>
-        <div className={styles.rating}>
-          <div className={styles.ratingStars}>
+      <div className="">
+        <div className="">
+          <div className="">
             <Rating
               allowFraction
               size={16}
@@ -208,47 +208,38 @@ export default function DetailsWrapper({
               readonly={true}
             />
           </div>
-          <span className={styles.ratingCount}>
-            ({reviews?.length || 0} Reviews)
-          </span>
+          <span className="">({reviews?.length || 0} Reviews)</span>
         </div>
 
-        <div className={styles.productAvailability}>
+        <div className="">
           Status:
           {status === 'in-stock' ? (
-            <span className={styles.inStock}> In Stock</span>
+            <span className=""> In Stock</span>
           ) : (
-            <span className={styles.outOfStock}> Out of Stock</span>
+            <span className=""> Out of Stock</span>
           )}
         </div>
       </div>
 
-      <div className={styles.productPrice}>
-        <span className={styles.oldPrice}>
-          $
-          <span className={styles.oldPriceValue}>
-            {calculateMarkedUpPrice()}
-          </span>
+      <div className="">
+        <span className="">
+          $<span className="">{calculateMarkedUpPrice()}</span>
         </span>
-        <span className={styles.currentPrice}>${calculateFinalPrice()}</span>
-        {selectedOption && (
-          <div className={styles.optionPriceInfo}>{selectedOption.title}</div>
-        )}
+        <span className="">${calculateFinalPrice()}</span>
+        {selectedOption && <div className="">{selectedOption.title}</div>}
       </div>
 
       {imageURLs?.some(item => item?.color && item?.color?.name) && (
-        <div className={styles.optionsContainer}>
-          <h3 className={styles.optionTitle}>Color</h3>
-          <div className={styles.colorOptions}>
+        <div className="">
+          <h3 className="">Color</h3>
+          <div className="">
             {imageURLs
               .filter(item => item?.color && item?.color?.name)
               .map((item, i) => (
                 <div
                   onClick={() => handleImageActive(item)}
                   key={i}
-                  className={`${styles.colorOption} ${
-                    item === activeImg ? styles.colorOptionSelected : ''
-                  }`}
+                  className={``}
                   style={{ backgroundColor: item?.color?.clrCode }}
                   title={item?.color?.name}
                   role="button"
@@ -265,11 +256,11 @@ export default function DetailsWrapper({
 
       {/* Product Options Section */}
       {options && options.length > 0 && (
-        <div className={styles.optionsContainer}>
-          <h3 className={styles.optionTitle}>Options</h3>
-          <div className={styles.selectOptionContainer}>
+        <div className="">
+          <h3 className="">Options</h3>
+          <div className="">
             <select
-              className={styles.selectOption}
+              className=""
               onChange={handleOptionChange}
               value={
                 selectedOption ? options.indexOf(selectedOption).toString() : ''
@@ -289,16 +280,14 @@ export default function DetailsWrapper({
       )}
       {/* Options section end here */}
 
-      <div className={styles.quantityAndCart}>
-        <div className={styles.quantitySelector}>
+      <div className="">
+        <div className="">
           <ProductQuantity productItem={productItem} />
         </div>
         <button
           onClick={() => handleAddProduct(productItem)}
           disabled={status === 'out-of-stock'}
-          className={`${styles.addToCartButton} ${
-            status === 'out-of-stock' ? styles.addToCartDisabled : ''
-          }`}
+          className={``}
         >
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path
@@ -330,11 +319,8 @@ export default function DetailsWrapper({
         </button>
       </div>
 
-      <div className={styles.actionButtons}>
-        <button
-          onClick={() => handleWishlistProduct(productItem)}
-          className={styles.actionButton}
-        >
+      <div className="">
+        <button onClick={() => handleWishlistProduct(productItem)} className="">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
             <path
               d="M9 16.5C9 16.5 1.125 12 1.125 5.625C1.125 4.47989 1.58627 3.38145 2.40641 2.56131C3.22655 1.74118 4.32489 1.27991 5.47 1.27991C7.08 1.27991 8.49 2.12991 9 3.36991C9.51 2.12991 10.92 1.27991 12.53 1.27991C13.6751 1.27991 14.7734 1.74118 15.5936 2.56131C16.4137 3.38145 16.875 4.47989 16.875 5.625C16.875 12 9 16.5 9 16.5Z"
@@ -346,10 +332,7 @@ export default function DetailsWrapper({
           </svg>
           Add to Wishlist
         </button>
-        <button
-          onClick={() => handleCompareProduct(productItem)}
-          className={styles.actionButton}
-        >
+        <button onClick={() => handleCompareProduct(productItem)} className="">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
             <path
               d="M14.25 2.25H3.75C2.92157 2.25 2.25 2.92157 2.25 3.75V14.25C2.25 15.0784 2.92157 15.75 3.75 15.75H14.25C15.0784 15.75 15.75 15.0784 15.75 14.25V3.75C15.75 2.92157 15.0784 2.25 14.25 2.25Z"
@@ -371,13 +354,13 @@ export default function DetailsWrapper({
       </div>
 
       {sku && (
-        <div className={styles.productMeta}>
+        <div className="">
           <span>SKU: {sku}</span>
         </div>
       )}
 
       {tags && tags.length > 0 && (
-        <div className={styles.productMeta}>
+        <div className="">
           <span>
             Tags:{' '}
             {tags.map((tag, i) => (

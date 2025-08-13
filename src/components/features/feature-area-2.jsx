@@ -28,7 +28,7 @@ export const feature_data = [
 
 const FeatureAreaTwo = () => {
   return (
-    <section className={`tp-feature-area tp-feature-border-2 pb-80`}>
+    <section className="tp-feature-area tp-feature-border-2 pb-80">
       <div className="container">
         <div className="tp-feature-inner-2">
           <div className="row align-items-center">

@@ -144,10 +144,10 @@ export default function GuestCartModal() {
   if (!showModal) return null;
 
   return (
-    <div className={styles.modalOverlay} onClick={handleClose}>
-      <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+    <div className="" onClick={handleClose}>
+      <div className="" onClick={e => e.stopPropagation()}>
         {/* Close button */}
-        <button className={styles.closeButton} onClick={handleClose}>
+        <button className="" onClick={handleClose}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
             <path
               d="M18 6L6 18M6 6L18 18"
@@ -160,53 +160,53 @@ export default function GuestCartModal() {
         </button>
 
         {/* Header */}
-        <div className={styles.modalHeader}>
-          <h2 className={styles.modalTitle}>Choose Your Option</h2>
+        <div className="">
+          <h2 className="">Choose Your Option</h2>
         </div>
 
         {/* Content */}
-        <div className={styles.modalBody}>
+        <div className="">
           {/* Continue as Guest Option */}
-          <div className={styles.optionSection}>
-            <h3 className={styles.optionTitle}>Continue as Guest</h3>
-            <p className={styles.optionDescription}>
+          <div className="">
+            <h3 className="">Continue as Guest</h3>
+            <p className="">
               Enter your email to save your cart and proceed to checkout.
             </p>
 
-            <div className={styles.emailForm}>
-              <div className={styles.inputGroup}>
+            <div className="">
+              <div className="">
                 <input
                   id="guest-email"
                   type="email"
                   value={email}
                   onChange={handleEmailChange}
                   placeholder="Enter your email address"
-                  className={`${styles.emailInput} ${
+                  className={` ${
                     emailError ? styles.inputError : ''
                   }`}
                   disabled={isLoading}
                 />
                 {emailError && (
-                  <span className={styles.errorMessage}>{emailError}</span>
+                  <span className="">{emailError}</span>
                 )}
               </div>
 
               {error && (
-                <div className={styles.errorMessage}>
+                <div className="">
                   {error?.data?.message ||
                     error?.message ||
                     'An error occurred'}
                 </div>
               )}
 
-              <div className={styles.buttonGroup}>
+              <div className="">
                 <button
                   onClick={handleViewCart}
                   disabled={isLoading || !email.trim()}
-                  className={styles.viewCartButton}
+                  className=""
                 >
                   {isLoading ? (
-                    <span className={styles.loadingSpinner}>
+                    <span className="">
                       <svg width="16" height="16" viewBox="0 0 24 24">
                         <circle
                           cx="12"
@@ -218,7 +218,7 @@ export default function GuestCartModal() {
                           strokeLinecap="round"
                           strokeDasharray="31.416"
                           strokeDashoffset="31.416"
-                          className={styles.spinner}
+                          className=""
                         />
                       </svg>
                       Saving...
@@ -231,10 +231,10 @@ export default function GuestCartModal() {
                 <button
                   onClick={handleContinueAsGuest}
                   disabled={isLoading || !email.trim()}
-                  className={styles.continueButton}
+                  className=""
                 >
                   {isLoading ? (
-                    <span className={styles.loadingSpinner}>
+                    <span className="">
                       <svg width="16" height="16" viewBox="0 0 24 24">
                         <circle
                           cx="12"
@@ -246,7 +246,7 @@ export default function GuestCartModal() {
                           strokeLinecap="round"
                           strokeDasharray="31.416"
                           strokeDashoffset="31.416"
-                          className={styles.spinner}
+                          className=""
                         />
                       </svg>
                       Saving...
@@ -260,26 +260,26 @@ export default function GuestCartModal() {
           </div>
 
           {/* Divider */}
-          <div className={styles.divider}>
-            <span className={styles.dividerText}>or</span>
+          <div className="">
+            <span className="">or</span>
           </div>
 
           {/* Sign In Option */}
-          <div className={styles.optionSection}>
-            <h3 className={styles.optionTitle}>Sign In</h3>
-            <p className={styles.optionDescription}>
+          <div className="">
+            <h3 className="">Sign In</h3>
+            <p className="">
               Access your account for faster checkout and order history.
             </p>
 
-            <button onClick={handleSignIn} className={styles.signInButton}>
+            <button onClick={handleSignIn} className="">
               Sign In to Your Account
             </button>
 
-            <p className={styles.registerPrompt}>
+            <p className="">
               Don't have an account?{' '}
               <Link
                 href="/register?redirect=/checkout"
-                className={styles.registerLink}
+                className=""
               >
                 Create one
               </Link>

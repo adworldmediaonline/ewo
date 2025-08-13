@@ -1,15 +1,15 @@
 'use client';
 
-import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import styles from './CategoryContent.module.css';
-import ChildCategoryCard from './ChildCategoryCard';
-import HeaderV2 from '@/layout/headers/HeaderV2';
+import { useEffect } from 'react';
+
 import Footer from '@/layout/footers/footer';
+import HeaderV2 from '@/layout/headers/HeaderV2';
 import parentCategoryModified from '@/lib/parentCategory';
 import { useGetCategoryByIdQuery } from '@/redux/features/categoryApi';
-import CategoryContentSkeleton from '../loaders/CategoryContentSkeleton';
 import EmptyState from '../common/EmptyState';
+import CategoryContentSkeleton from '../loaders/CategoryContentSkeleton';
+import ChildCategoryCard from './ChildCategoryCard';
 
 function CategoryContent({ categoryId }) {
   const router = useRouter();
@@ -65,16 +65,14 @@ function CategoryContent({ categoryId }) {
   return (
     <>
       <HeaderV2 />
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <div className={styles.headerAccent}></div>
-          <h1 className={styles.title}>{category.parent}</h1>
+      <div className="">
+        <div className="">
+          <div className=""></div>
+          <h1 className="">{category.parent}</h1>
 
-          {category.description && (
-            <p className={styles.description}>{category.description}</p>
-          )}
+          {category.description && <p className="">{category.description}</p>}
           {!category.description && (
-            <p className={styles.description}>
+            <p className="">
               Discover our collection of high-quality{' '}
               {category.parent.toLowerCase()} products designed to meet your
               needs. Browse our categories below.
@@ -82,8 +80,8 @@ function CategoryContent({ categoryId }) {
           )}
         </div>
 
-        <div className={styles.gridContainer}>
-          <div className={styles.grid}>
+        <div className="">
+          <div className="">
             {category.children.map((childCategory, index) => (
               <ChildCategoryCard
                 key={index}

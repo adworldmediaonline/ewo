@@ -56,7 +56,7 @@ const ProductArea = () => {
                   <button
                     key={i}
                     onClick={() => handleActiveTab(tab)}
-                    className={`nav-link text-capitalize ${activeTab === tab ? "active" : ""}`}
+                    className="nav-link text-capitalize ${activeTab === tab ? "active" : ""}"
                   >
                     {tab.split("-").join(" ")}
                     <span className="tp-product-tab-tooltip">{product_items.length}</span>

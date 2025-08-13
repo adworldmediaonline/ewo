@@ -1,18 +1,13 @@
-import React from 'react';
-import styles from './CategorySkeleton.module.css';
-
 export default function CategorySkeleton() {
   return (
-    <div className={styles.container}>
-      <div className={styles.grid}>
+    <div className="">
+      <div className="">
         {[...Array(12)].map((_, index) => (
-          <div key={index} className={styles.card}>
-            <div className={`${styles.image} ${styles.skeleton}`}></div>
-            <div className={styles.content}>
-              <div
-                className={`${styles.categoryTitle} ${styles.skeleton}`}
-              ></div>
-              <div className={`${styles.count} ${styles.skeleton}`}></div>
+          <div key={index} className="">
+            <div className=" "></div>
+            <div className="">
+              <div className=" "></div>
+              <div className=" "></div>
             </div>
           </div>
         ))}

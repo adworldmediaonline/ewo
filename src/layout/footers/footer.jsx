@@ -1,31 +1,29 @@
 'use client';
-import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 // import logo from '@assets/img/logo/logo.webp';
 import logo from '@assets/img/logo/logo.png';
-import styles from './footer.module.css';
 
 export default function Footer() {
   return (
-    <footer className={styles.footer}>
-      <div className={styles.container}>
-        <div className={styles.footerContent}>
+    <footer className="">
+      <div className="">
+        <div className="">
           {/* Logo and About */}
-          <div className={styles.footerColumn}>
-            <div className={styles.footerLogo}>
+          <div className="">
+            <div className="">
               <Link href="/">
                 <Image
                   src={logo}
                   alt="EWO Logo"
                   width={180}
                   height={75}
-                  className={styles.footerLogoImage}
+                  className=""
                 />
               </Link>
             </div>
-            <div className={styles.footerAbout}>
-              <p className={styles.footerAboutText}>
+            <div className="">
+              <p className="">
                 Join EWO ARMY today and become part of our exclusive community.
                 Shop the latest trends with special member discounts.
               </p>
@@ -33,26 +31,26 @@ export default function Footer() {
           </div>
 
           {/* My Account */}
-          <div className={styles.footerColumn}>
-            <h3 className={styles.footerTitle}>My Account</h3>
-            <ul className={styles.footerLinks}>
-              <li className={styles.footerLink}>
-                <Link href="/profile" className={styles.footerLinkAnchor}>
+          <div className="">
+            <h3 className="">My Account</h3>
+            <ul className="">
+              <li className="">
+                <Link href="/profile" className="">
                   My Profile
                 </Link>
               </li>
-              <li className={styles.footerLink}>
-                <Link href="/wishlist" className={styles.footerLinkAnchor}>
+              <li className="">
+                <Link href="/wishlist" className="">
                   Wishlist
                 </Link>
               </li>
-              <li className={styles.footerLink}>
-                <Link href="/cart" className={styles.footerLinkAnchor}>
+              <li className="">
+                <Link href="/cart" className="">
                   Shopping Cart
                 </Link>
               </li>
-              <li className={styles.footerLink}>
-                <Link href="/compare" className={styles.footerLinkAnchor}>
+              <li className="">
+                <Link href="/compare" className="">
                   Compare Products
                 </Link>
               </li>
@@ -60,26 +58,26 @@ export default function Footer() {
           </div>
 
           {/* Legal */}
-          <div className={styles.footerColumn}>
-            <h3 className={styles.footerTitle}>Legal</h3>
-            <ul className={styles.footerLinks}>
-              <li className={styles.footerLink}>
-                <Link href="/terms" className={styles.footerLinkAnchor}>
+          <div className="">
+            <h3 className="">Legal</h3>
+            <ul className="">
+              <li className="">
+                <Link href="/terms" className="">
                   Terms & Conditions
                 </Link>
               </li>
-              <li className={styles.footerLink}>
-                <Link href="/returns" className={styles.footerLinkAnchor}>
+              <li className="">
+                <Link href="/returns" className="">
                   Returns Policy
                 </Link>
               </li>
-              <li className={styles.footerLink}>
-                <Link href="/history" className={styles.footerLinkAnchor}>
+              <li className="">
+                <Link href="/history" className="">
                   History
                 </Link>
               </li>
-              <li className={styles.footerLink}>
-                <Link href="/about" className={styles.footerLinkAnchor}>
+              <li className="">
+                <Link href="/about" className="">
                   About
                 </Link>
               </li>
@@ -88,14 +86,14 @@ export default function Footer() {
         </div>
 
         {/* Footer Bottom */}
-        <div className={styles.footerBottom}>
-          <div className={styles.copyright}>
+        <div className="">
+          <div className="">
             © {new Date().getFullYear()} EWO. All Rights Reserved.
           </div>
-          <div className={styles.paymentMethods}>
-            <span className={styles.paymentCard}>Visa</span>
-            <span className={styles.paymentCard}>Mastercard</span>
-            <span className={styles.paymentCard}>Stripe</span>
+          <div className="">
+            <span className="">Visa</span>
+            <span className="">Mastercard</span>
+            <span className="">Stripe</span>
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 'use client';
 import { useEffect } from 'react';
-import styles from '../app/shop/shop.module.css';
+// Removed CSS module import; Tailwind-only styling
 
 export default function Pagination({
   items = [],
@@ -69,7 +69,7 @@ export default function Pagination({
     return visiblePages.map((page, index) => {
       if (page === '...') {
         return (
-          <div key={`ellipsis-${index}`} className={styles.paginationEllipsis}>
+          <div key={`ellipsis-${index}`} className="">
             ...
           </div>
         );
@@ -79,9 +79,7 @@ export default function Pagination({
         <button
           key={page}
           onClick={() => setPage(page)}
-          className={`${styles.paginationButton} ${
-            currPage === page ? styles.paginationButtonActive : ''
-          }`}
+          className={``}
           aria-current={currPage === page ? 'page' : undefined}
         >
           {page}
@@ -93,16 +91,10 @@ export default function Pagination({
   if (totalPage <= 1) return null;
 
   return (
-    <div
-      className={styles.pagination}
-      role="navigation"
-      aria-label="Pagination"
-    >
+    <div className="" role="navigation" aria-label="Pagination">
       <button
         onClick={() => setPage(currPage - 1)}
-        className={`${styles.paginationButton} ${styles.paginationPrevNext} ${
-          currPage === 1 ? styles.paginationDisabled : ''
-        }`}
+        className={``}
         disabled={currPage === 1}
         aria-label="Go to previous page"
       >
@@ -113,9 +105,7 @@ export default function Pagination({
 
       <button
         onClick={() => setPage(currPage + 1)}
-        className={`${styles.paginationButton} ${styles.paginationPrevNext} ${
-          currPage === totalPage ? styles.paginationDisabled : ''
-        }`}
+        className={``}
         disabled={currPage === totalPage}
         aria-label="Go to next page"
       >

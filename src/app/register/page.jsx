@@ -1,9 +1,5 @@
-import Wrapper from '@/layout/wrapper';
-import HeaderV2 from '@/layout/headers/HeaderV2';
-import Footer from '@/layout/footers/footer';
-import CommonBreadcrumb from '@/components/breadcrumb/common-breadcrumb';
 import RegisterArea from '@/components/login-register/register-area';
-import styles from './register.module.css';
+import Wrapper from '@/layout/wrapper';
 
 export const metadata = {
   title: 'EWO - Register',
@@ -14,7 +10,7 @@ export const metadata = {
 
 export default function RegisterPage() {
   return (
-    <div className={styles.registerPage}>
+    <div className="">
       <Wrapper>
         {/* <HeaderV2 /> */}
         {/* <CommonBreadcrumb title="Register" subtitle="Register" center={true} /> */}

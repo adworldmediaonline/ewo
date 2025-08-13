@@ -90,7 +90,7 @@ const Header = () => {
       {/* sticky header start */}
       <div
         id="header-sticky-2"
-        className={`tp-header-sticky-area ${sticky ? 'header-sticky-2' : ''}`}
+        className="tp-header-sticky-area ${sticky ? 'header-sticky-2' : ''}"
       >
         <div className="container">
           <div className="tp-mega-menu-wrapper p-relative">

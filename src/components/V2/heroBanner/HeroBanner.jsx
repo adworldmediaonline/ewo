@@ -1,11 +1,11 @@
 'use client';
 
 import { CldImage } from 'next-cloudinary';
-import styles from './HeroBanner.module.css';
+// Removed CSS module import; Tailwind-only styling
 
 export default function HeroBanner() {
   return (
-    <div className={styles.bannerContainer}>
+    <div className="">
       <CldImage
         src="EWO_Car_Banner_03_page-0001_rbhbhl"
         alt="Banner"
@@ -16,7 +16,7 @@ export default function HeroBanner() {
         gravity="center"
         priority
         quality={90}
-        className={styles.bannerImage}
+        className=""
       />
     </div>
   );

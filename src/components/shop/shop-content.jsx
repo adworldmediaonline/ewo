@@ -6,7 +6,7 @@ import CategoryFilter from './shop-filter/category-filter';
 import StatusFilter from './shop-filter/status-filter';
 import TopRatedProducts from './shop-filter/top-rated-products';
 // import ShopListItem from './shop-list-item';
-import styles from '../../app/shop/shop.module.css';
+
 import ProductItemWrapper from './product-item-wrapper';
 import ResetButton from './shop-filter/reset-button';
 import ShopTopLeft from './shop-top-left';
@@ -43,12 +43,12 @@ const ShopContent = ({
   }, 0);
 
   return (
-    <div className={styles.shopSection}>
-      <div className={styles.shopContentContainer}>
-        <div className={styles.shopLayout}>
+    <div className="">
+      <div className="">
+        <div className="">
           {!shop_right && !hidden_sidebar && (
-            <div className={`d-none d-lg-block ${styles.shopSidebar}`}>
-              <div className={styles.filterSection}>
+            <div className="d-none d-lg-block ">
+              <div className="">
                 {/* filter */}
                 {/* <PriceFilter
                   priceFilterValues={priceFilterValues}
@@ -69,8 +69,8 @@ const ShopContent = ({
             </div>
           )}
 
-          <div className={styles.shopMainContent}>
-            <div className={styles.shopTopBar}>
+          <div className="">
+            <div className="">
               <div>
                 <ShopTopLeft
                   showing={
@@ -87,17 +87,15 @@ const ShopContent = ({
               </div>
             </div>
 
-            {products.length === 0 && (
-              <div className={styles.noProducts}>No products found</div>
-            )}
+            {products.length === 0 && <div className="">No products found</div>}
 
             {products.length > 0 && (
-              <div className={styles.productsWrapper}>
-                <div className={styles.productGrid}>
+              <div className="">
+                <div className="">
                   {filteredRows
                     .slice(pageStart, pageStart + countOfPage)
                     .map((item, i) => (
-                      <div key={i} className={styles.productGridItem}>
+                      <div key={i} className="">
                         <ProductItemWrapper
                           product={item}
                           coupons={productCoupons[item._id] || []}
@@ -109,7 +107,7 @@ const ShopContent = ({
             )}
 
             {products.length > 0 && (
-              <div className={styles.pagination}>
+              <div className="">
                 <Pagination
                   items={products}
                   countOfPage={50}
@@ -122,8 +120,8 @@ const ShopContent = ({
           </div>
 
           {shop_right && (
-            <div className={`d-none d-lg-block ${styles.shopSidebar}`}>
-              <div className={styles.filterSection}>
+            <div className="d-none d-lg-block ">
+              <div className="">
                 {/* filter */}
                 {/* <PriceFilter
                   priceFilterValues={priceFilterValues}

@@ -2,7 +2,6 @@
 import DOMPurify from 'isomorphic-dompurify';
 import { useState } from 'react';
 import { Rating } from 'react-simple-star-rating';
-import styles from '../../app/product/[id]/product-details.module.css';
 import ReviewForm from '../forms/review-form';
 import ReviewItem from './review-item';
 
@@ -15,39 +14,24 @@ const DetailsTabNav = ({ product }) => {
   };
 
   return (
-    <div className={styles.tabsContainer}>
-      <div className={styles.tabsHeader}>
-        <button
-          className={`${styles.tab} ${
-            activeTab === 'desc' ? styles.tabActive : ''
-          }`}
-          onClick={() => handleTabChange('desc')}
-        >
+    <div className="">
+      <div className="">
+        <button className="" onClick={() => handleTabChange('desc')}>
           Description
         </button>
         {additionalInformation && additionalInformation.length > 0 && (
-          <button
-            className={`${styles.tab} ${
-              activeTab === 'additional' ? styles.tabActive : ''
-            }`}
-            onClick={() => handleTabChange('additional')}
-          >
+          <button className="" onClick={() => handleTabChange('additional')}>
             Additional Information
           </button>
         )}
-        <button
-          className={`${styles.tab} ${
-            activeTab === 'review' ? styles.tabActive : ''
-          }`}
-          onClick={() => handleTabChange('review')}
-        >
+        <button className="" onClick={() => handleTabChange('review')}>
           Reviews ({reviews?.length || 0})
         </button>
       </div>
 
-      <div className={styles.tabContent}>
+      <div className="">
         {activeTab === 'desc' && (
-          <div className={styles.fadeIn}>
+          <div className="">
             {description ? (
               <div
                 dangerouslySetInnerHTML={{
@@ -61,9 +45,9 @@ const DetailsTabNav = ({ product }) => {
         )}
 
         {activeTab === 'additional' && (
-          <div className={styles.fadeIn}>
+          <div className="">
             {additionalInformation && additionalInformation.length > 0 ? (
-              <table className={styles.additionalTable}>
+              <table className="">
                 <tbody>
                   {additionalInformation.map((item, i) => (
                     <tr key={i}>
@@ -80,32 +64,30 @@ const DetailsTabNav = ({ product }) => {
         )}
 
         {activeTab === 'review' && (
-          <div className={`${styles.reviewsContainer} ${styles.fadeIn}`}>
+          <div className=" ">
             {/* Reviews Summary Header */}
-            <div className={styles.reviewsSummaryHeader}>
-              <div className={styles.reviewsSummaryLeft}>
-                <h3 className={styles.reviewsTitle}>
+            <div className="">
+              <div className="">
+                <h3 className="">
                   {reviews && reviews.length > 0
                     ? 'Customer Reviews'
                     : 'No Reviews Yet'}
                 </h3>
-                <div className={styles.reviewsCount}>
+                <div className="">
                   {reviews && reviews.length > 0 ? (
-                    <span className={styles.reviewsBadge}>
+                    <span className="">
                       {reviews.length} review{reviews.length !== 1 ? 's' : ''}
                     </span>
                   ) : (
-                    <span className={styles.noReviewsBadge}>
-                      Be the first to review!
-                    </span>
+                    <span className="">Be the first to review!</span>
                   )}
                 </div>
               </div>
-              <div className={styles.reviewsSummaryRight}>
-                <div className={styles.overallRating}>
+              <div className="">
+                <div className="">
                   {reviews && reviews.length > 0 && (
                     <>
-                      <div className={styles.ratingNumber}>
+                      <div className="">
                         {(
                           reviews.reduce(
                             (sum, review) => sum + review.rating,
@@ -113,7 +95,7 @@ const DetailsTabNav = ({ product }) => {
                           ) / reviews.length
                         ).toFixed(1)}
                       </div>
-                      <div className={styles.ratingStars}>
+                      <div className="">
                         <Rating
                           allowFraction
                           size={20}
@@ -133,18 +115,18 @@ const DetailsTabNav = ({ product }) => {
             </div>
 
             {/* Reviews Content Layout - Desktop Aside, Mobile Below */}
-            <div className={styles.reviewsContentLayout}>
+            <div className="">
               {/* Reviews List */}
-              <div className={styles.reviewsListSection}>
+              <div className="">
                 {reviews && reviews.length > 0 ? (
-                  <div className={styles.reviewsGrid}>
+                  <div className="">
                     {reviews.map(item => (
                       <ReviewItem key={item._id} review={item} />
                     ))}
                   </div>
                 ) : (
-                  <div className={styles.noReviewsPlaceholder}>
-                    <div className={styles.noReviewsIcon}>⭐</div>
+                  <div className="">
+                    <div className="">⭐</div>
                     <h4>No reviews yet</h4>
                     <p>
                       Be the first to share your experience with this product!
@@ -154,18 +136,16 @@ const DetailsTabNav = ({ product }) => {
               </div>
 
               {/* Review Form Aside */}
-              <div className={styles.reviewFormAside}>
-                <div className={styles.reviewFormSection}>
-                  <div className={styles.reviewFormHeader}>
-                    <h3 className={styles.reviewFormTitle}>
-                      Share Your Experience
-                    </h3>
-                    <p className={styles.reviewFormSubtitle}>
+              <div className="">
+                <div className="">
+                  <div className="">
+                    <h3 className="">Share Your Experience</h3>
+                    <p className="">
                       Your email address will not be published. Required fields
                       are marked *
                     </p>
                   </div>
-                  <div className={styles.reviewFormWrapper}>
+                  <div className="">
                     <ReviewForm product_id={_id} />
                   </div>
                 </div>

@@ -1,392 +1,116 @@
 /* Tailwind v4 base utilities injected via PostCSS */
 @import 'tailwindcss';
-@import "tw-animate-css";
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
-/* Product Modal Styles */
-.tp-product-modal {
-  width: 100%;
-}
-
-.tp-product-modal-content {
-  position: relative;
-  width: 100%;
-  padding: 20px;
-}
-
-.tp-product-modal-close-btn {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: #f5f5f5;
-  color: #333;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  cursor: pointer;
-  z-index: 10;
-  transition: all 0.2s;
-}
-
-.tp-product-modal-close-btn:hover {
-  background-color: #ff3d3d;
-  color: white;
-}
-
-.tp-product-modal-wrapper {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 30px;
-}
-
-.tp-product-modal-thumb {
-  flex: 1;
-  min-width: 300px;
-}
-
-.tp-product-modal-details {
-  flex: 1;
-  min-width: 300px;
-}
-
-@media (max-width: 991px) {
-  .tp-product-modal-wrapper {
-    flex-direction: column;
-  }
-
-  .tp-product-modal-thumb,
-  .tp-product-modal-details {
-    width: 100%;
-  }
-}
-
-@media (max-width: 576px) {
-  .tp-product-modal-content {
-    padding: 15px;
-  }
-
-  .tp-product-modal-close-btn {
-    top: 10px;
-    right: 10px;
-    width: 35px;
-    height: 35px;
-  }
-}
-
-/* Toast Notifications - Center Positioning with CSS Variables */
 :root {
-  --toastify-toast-width: 400px;
-  --toastify-z-index: 2147483647;
-  --toastify-container-width: fit-content;
-  --radius: 0.625rem;
   --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --foreground: oklch(0.1884 0.0128 248.5103);
+  --card: oklch(0.9784 0.0011 197.1387);
+  --card-foreground: oklch(0.1884 0.0128 248.5103);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --popover-foreground: oklch(0.1884 0.0128 248.5103);
+  --primary: #cb0405;
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.1884 0.0128 248.5103);
+  --secondary-foreground: oklch(1 0 0);
+  --muted: oklch(0.9222 0.0013 286.3737);
+  --muted-foreground: oklch(0.1884 0.0128 248.5103);
+  --accent: oklch(0.9392 0.0166 250.8453);
+  --accent-foreground: oklch(0.6723 0.1606 244.9955);
+  --destructive: oklch(0.6188 0.2376 25.7658);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.9317 0.0118 231.6594);
+  --input: oklch(0.9809 0.0025 228.7836);
+  --ring: oklch(0.6818 0.1584 243.354);
+  --chart-1: #cb0405;
+  --chart-2: oklch(0.6907 0.1554 160.3454);
+  --chart-3: oklch(0.8214 0.16 82.5337);
+  --chart-4: oklch(0.7064 0.1822 151.7125);
+  --chart-5: oklch(0.5919 0.2186 10.5826);
+  --sidebar: oklch(0.9784 0.0011 197.1387);
+  --sidebar-foreground: oklch(0.1884 0.0128 248.5103);
+  --sidebar-primary: #cb0405;
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.9392 0.0166 250.8453);
+  --sidebar-accent-foreground: oklch(0.6723 0.1606 244.9955);
+  --sidebar-border: oklch(0.9271 0.0101 238.5177);
+  --sidebar-ring: oklch(0.6818 0.1584 243.354);
+  --font-sans: Open Sans, sans-serif;
+  --font-serif: Georgia, serif;
+  --font-mono: Menlo, monospace;
+  --radius: 1.3rem;
+  --shadow-2xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0);
+  --shadow-xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0);
+  --shadow-sm: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0),
+    0px 1px 2px -1px hsl(202.8169 89.1213% 53.1373% / 0);
+  --shadow: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0),
+    0px 1px 2px -1px hsl(202.8169 89.1213% 53.1373% / 0);
+  --shadow-md: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0),
+    0px 2px 4px -1px hsl(202.8169 89.1213% 53.1373% / 0);
+  --shadow-lg: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0),
+    0px 4px 6px -1px hsl(202.8169 89.1213% 53.1373% / 0);
+  --shadow-xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0),
+    0px 8px 10px -1px hsl(202.8169 89.1213% 53.1373% / 0);
+  --shadow-2xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0);
+  --tracking-normal: 0em;
+  --spacing: 0.25rem;
 }
 
-/* Force center positioning with multiple selectors */
-.Toastify__toast-container,
-.Toastify__toast-container--top-center,
-.Toastify__toast-container--top-left,
-.Toastify__toast-container--top-right,
-.Toastify__toast-container--bottom-left,
-.Toastify__toast-container--bottom-center,
-.Toastify__toast-container--bottom-right,
-div[class*='Toastify__toast-container'],
-.custom-toast-container {
-  position: fixed !important;
-  top: 50% !important;
-  left: 50% !important;
-  right: auto !important;
-  bottom: auto !important;
-  transform: translate(-50%, -50%) !important;
-  width: auto !important;
-  max-width: 400px !important;
-  min-width: 300px !important;
-  z-index: 2147483647 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-/* Toast styling improvements with zoom animation support */
-.Toastify__toast {
-  border-radius: 12px !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
-  backdrop-filter: blur(8px) !important;
-  margin-bottom: 8px !important;
-  font-family: 'Lato', sans-serif !important;
-  font-size: 14px !important;
-  line-height: 1.4 !important;
-  transform-origin: center center !important;
-  position: relative !important;
-  width: 100% !important;
-  max-width: 400px !important;
-  min-width: 300px !important;
-}
-
-/* Enhanced zoom animation for centered toasts */
-.Toastify__zoom-enter {
-  transform: scale(0.8) !important;
-  opacity: 0 !important;
-}
-
-.Toastify__zoom-enter--active {
-  transform: scale(1) !important;
-  opacity: 1 !important;
-  transition: transform 300ms cubic-bezier(0.175, 0.885, 0.32, 1.275),
-    opacity 300ms ease-out !important;
-}
-
-.Toastify__zoom-exit {
-  transform: scale(1) !important;
-  opacity: 1 !important;
-}
-
-.Toastify__zoom-exit--active {
-  transform: scale(0.8) !important;
-  opacity: 0 !important;
-  transition: transform 200ms ease-in, opacity 200ms ease-in !important;
-}
-
-.Toastify__toast--success {
-  background: rgba(34, 197, 94, 0.95) !important;
-  color: white !important;
-}
-
-.Toastify__toast--error {
-  background: rgba(239, 68, 68, 0.95) !important;
-  color: white !important;
-}
-
-.Toastify__toast--info {
-  background: rgba(59, 130, 246, 0.95) !important;
-  color: white !important;
-}
-
-.Toastify__toast--warning {
-  background: rgba(245, 158, 11, 0.95) !important;
-  color: white !important;
-}
-
-/* Progress bar styling */
-.Toastify__progress-bar {
-  background: rgba(255, 255, 255, 0.3) !important;
-}
-
-/* Close button styling */
-.Toastify__close-button {
-  color: white !important;
-  opacity: 0.8 !important;
-}
-
-.Toastify__close-button:hover {
-  opacity: 1 !important;
-}
-
-/* Animation improvements - Force center positioning */
-.Toastify__toast-container--top-center,
-.Toastify__toast-container[class*='top-center'] {
-  top: 50% !important;
-  left: 50% !important;
-  right: auto !important;
-  bottom: auto !important;
-  transform: translate(-50%, -50%) !important;
-  margin: 0 !important;
-}
-
-/* Coupon Badge Styles */
-.coupon-badge {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 10;
-  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-  color: white;
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
-  animation: pulse 2s infinite;
-}
-
-.coupon-badge-text {
-  white-space: nowrap;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.coupon-badge:hover {
-  animation: none;
-  transform: scale(1.1);
-  transition: transform 0.2s ease;
-}
-
-/* Override any inline styles */
-div[style*='top'][style*='left'] {
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) !important;
-}
-
-/* Custom toast center class targeting */
-.custom-toast-center {
-  position: relative !important;
-}
-
-/* Force center positioning with highest specificity */
-body .Toastify__toast-container,
-html .Toastify__toast-container,
-#__next .Toastify__toast-container {
-  position: fixed !important;
-  top: 50% !important;
-  left: 50% !important;
-  right: auto !important;
-  bottom: auto !important;
-  transform: translate(-50%, -50%) !important;
-  width: auto !important;
-  max-width: 400px !important;
-  min-width: 300px !important;
-  z-index: 2147483647 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-/* Alternative approach - Use CSS animations to force center */
-@keyframes centerToast {
-  0% {
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-  }
-  100% {
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-  }
-}
-
-/* Apply animation to force positioning */
-.Toastify__toast-container {
-  animation: centerToast 0.1s forwards !important;
-}
-
-/* Additional specificity for stubborn positioning */
-body > div[class*='Toastify__toast-container'],
-#__next > div[class*='Toastify__toast-container'],
-#wrapper > div[class*='Toastify__toast-container'] {
-  position: fixed !important;
-  top: 50% !important;
-  left: 50% !important;
-  right: auto !important;
-  bottom: auto !important;
-  transform: translate(-50%, -50%) !important;
-  width: auto !important;
-  max-width: 400px !important;
-  min-width: 300px !important;
-  z-index: 2147483647 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-/* Ensure proper spacing between multiple toasts */
-.Toastify__toast + .Toastify__toast {
-  margin-top: 8px !important;
-}
-
-/* Stack toasts properly in center */
-.Toastify__toast-container .Toastify__toast {
-  position: relative !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
-
-/* Force positioning with attribute selectors */
-div[style*='position'][class*='Toastify__toast-container'] {
-  position: fixed !important;
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) !important;
-}
-
-/* Mobile responsive adjustments */
-@media (max-width: 768px) {
-  .Toastify__toast-container,
-  body .Toastify__toast-container,
-  html .Toastify__toast-container,
-  #__next .Toastify__toast-container {
-    max-width: 90vw !important;
-    min-width: 280px !important;
-    padding: 0 10px !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-  }
-
-  .Toastify__toast {
-    font-size: 13px !important;
-    margin-bottom: 6px !important;
-  }
+.dark {
+  --background: oklch(0 0 0);
+  --foreground: oklch(0.9328 0.0025 228.7857);
+  --card: oklch(0.2097 0.008 274.5332);
+  --card-foreground: oklch(0.8853 0 0);
+  --popover: oklch(0 0 0);
+  --popover-foreground: oklch(0.9328 0.0025 228.7857);
+  --primary: #cb0405;
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.9622 0.0035 219.5331);
+  --secondary-foreground: oklch(0.1884 0.0128 248.5103);
+  --muted: oklch(0.209 0 0);
+  --muted-foreground: oklch(0.5637 0.0078 247.9662);
+  --accent: oklch(0.1928 0.0331 242.5459);
+  --accent-foreground: oklch(0.53 0.2158 28.9765);
+  --destructive: oklch(0.6188 0.2376 25.7658);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.2674 0.0047 248.0045);
+  --input: oklch(0.302 0.0288 244.8244);
+  --ring: oklch(0.6818 0.1584 243.354);
+  --chart-1: #cb0405;
+  --chart-2: oklch(0.6907 0.1554 160.3454);
+  --chart-3: oklch(0.8214 0.16 82.5337);
+  --chart-4: oklch(0.7064 0.1822 151.7125);
+  --chart-5: oklch(0.5919 0.2186 10.5826);
+  --sidebar: oklch(0.2097 0.008 274.5332);
+  --sidebar-foreground: oklch(0.8853 0 0);
+  --sidebar-primary: #cb0405;
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.1928 0.0331 242.5459);
+  --sidebar-accent-foreground: oklch(0.6692 0.1607 245.011);
+  --sidebar-border: oklch(0.3795 0.022 240.5943);
+  --sidebar-ring: oklch(0.6818 0.1584 243.354);
+  --font-sans: Open Sans, sans-serif;
+  --font-serif: Georgia, serif;
+  --font-mono: Menlo, monospace;
+  --radius: 1.3rem;
+  --shadow-2xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0);
+  --shadow-xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0);
+  --shadow-sm: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0),
+    0px 1px 2px -1px hsl(202.8169 89.1213% 53.1373% / 0);
+  --shadow: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0),
+    0px 1px 2px -1px hsl(202.8169 89.1213% 53.1373% / 0);
+  --shadow-md: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0),
+    0px 2px 4px -1px hsl(202.8169 89.1213% 53.1373% / 0);
+  --shadow-lg: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0),
+    0px 4px 6px -1px hsl(202.8169 89.1213% 53.1373% / 0);
+  --shadow-xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0),
+    0px 8px 10px -1px hsl(202.8169 89.1213% 53.1373% / 0);
+  --shadow-2xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0);
 }
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -402,6 +126,7 @@ div[style*='position'][class*='Toastify__toast-container'] {
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -418,40 +143,24 @@ div[style*='position'][class*='Toastify__toast-container'] {
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-}
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-serif: var(--font-serif);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --shadow-2xs: var(--shadow-2xs);
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow: var(--shadow);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+  --shadow-2xl: var(--shadow-2xl);
 }
 
 @layer base {
@@ -460,5 +169,6 @@ div[style*='position'][class*='Toastify__toast-container'] {
   }
   body {
     @apply bg-background text-foreground;
+    letter-spacing: var(--tracking-normal);
   }
 }

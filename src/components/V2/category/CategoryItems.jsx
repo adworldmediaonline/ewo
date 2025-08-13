@@ -2,11 +2,11 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import styles from './CategoryList.module.css';
+
 import { titleCaseFirstLetterOfEveryWord } from '@/lib/titleCaseFirstLetterOfEveryWord';
 import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
-import CategorySkeleton from '../loaders/CategorySkeleton';
 import EmptyState from '../common/EmptyState';
+import CategorySkeleton from '../loaders/CategorySkeleton';
 
 export default function CategoryItems() {
   const { data, isLoading, isError, refetch } = useGetShowCategoryQuery();
@@ -58,39 +58,39 @@ export default function CategoryItems() {
   }
 
   return (
-    <div className={styles.container}>
-      {/* <div className={styles.ewoHeader}>
-        <h2 className={styles.ewoTitle}>
-          <span className={styles.titleHighlight}>Explore</span> Categories
+    <div className="">
+      {/* <div className="">
+        <h2 className="">
+          <span className="">Explore</span> Categories
         </h2>
-        <p className={styles.ewoSubtitle}>
+        <p className="">
           Find high-quality auto parts for your vehicle from our extensive
           catalog
         </p>
       </div> */}
 
-      <div className={styles.ewoList}>
+      <div className="">
         {filteredCategories.map((category, index) => (
           <Link
             href={`/category?id=${category._id}`}
             key={category._id}
-            className={`${styles.ewoItem} ${styles.itemAppear}`}
+            className=" "
             style={{ animationDelay: `${index * 0.1}s` }}
           >
-            <div className={styles.ewoImageWrapper}>
+            <div className="">
               <Image
                 src={category.img}
                 alt={category.parent}
                 width={240}
                 height={240}
-                className={styles.ewoImage}
+                className=""
                 priority={filteredCategories.indexOf(category) < 6}
               />
-              <div className={styles.ewoOverlay}>
-                <span className={styles.ewoViewButton}>
+              <div className="">
+                <span className="">
                   View Parts
                   <svg
-                    className={styles.arrowIcon}
+                    className=""
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
                     fill="currentColor"
@@ -104,20 +104,20 @@ export default function CategoryItems() {
                 </span>
               </div>
             </div>
-            <div className={styles.ewoContent}>
-              <h3 className={styles.ewoCategoryTitle}>
+            <div className="">
+              <h3 className="">
                 {titleCaseFirstLetterOfEveryWord(category?.parent)}
               </h3>
-              {/* <div className={styles.ewoMeta}> */}
-              {/* <span className={styles.ewoCount}>
+              {/* <div className=""> */}
+              {/* <span className="">
                   {category.products.length}{' '}
                   {category.products.length === 1 ? 'part' : 'parts'}
                 </span>
-                <div className={styles.ewoDivider}></div> */}
-              {/* <span className={styles.ewoShopLink}>Shop Now</span> */}
+                <div className=""></div> */}
+              {/* <span className="">Shop Now</span> */}
               {/* </div> */}
             </div>
-            <div className={styles.ewoCardDecoration}></div>
+            <div className=""></div>
           </Link>
         ))}
       </div>

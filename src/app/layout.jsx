@@ -1,11 +1,10 @@
 import Providers from '@/components/provider';
 import TawkToChat from '@/components/tawk-to-chat';
+import Wrapper from '@/layout/wrapper';
 import { GoogleTagManager } from '@next/third-parties/google';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Lato } from 'next/font/google';
-// Import Tailwind (globals.css) before existing SCSS so legacy styles can override where needed
 import './globals.css';
-import './toast-fix.css';
 
 export const metadata = {
   title: 'East West Off Road | Premium Automotive & Off-Road Gear USA',
@@ -32,42 +31,6 @@ const lato = Lato({
   weight: ['100', '300', '400', '700', '900'],
   subsets: ['latin'],
 });
-
-// const body = Lato({
-//   weight: ['300', '400', '700', '900'],
-//   subsets: ['latin'],
-//   variable: '--tp-ff-body',
-// });
-// const heading = Lato({
-//   weight: ['300', '400', '700', '900'],
-//   subsets: ['latin'],
-//   variable: '--tp-ff-heading',
-// });
-// const p = Lato({
-//   weight: ['300', '400', '700', '900'],
-//   subsets: ['latin'],
-//   variable: '--tp-ff-p',
-// });
-// const jost = Lato({
-//   weight: ['300', '400', '700', '900'],
-//   subsets: ['latin'],
-//   variable: '--tp-ff-jost',
-// });
-// const roboto = Roboto({
-//   weight: ['300', '400', '700', '900'],
-//   subsets: ['latin'],
-//   variable: '--tp-ff-roboto',
-// });
-// const oregano = Oregano({
-//   weight: ['400'],
-//   subsets: ['latin'],
-//   variable: '--tp-ff-oregano',
-// });
-// const charm = Charm({
-//   weight: ['400', '700'],
-//   subsets: ['latin'],
-//   variable: '--tp-ff-charm',
-// });
 
 export default function RootLayout({ children }) {
   return (
@@ -102,10 +65,12 @@ export default function RootLayout({ children }) {
       </head>
       <GoogleTagManager gtmId="GTM-MB34NG65" />
       <body
-        className={`${lato.variable} ${lato.className} antialiased`}
+        className="${lato.variable} ${lato.className} antialiased"
         suppressHydrationWarning
       >
-        <Providers>{children}</Providers>
+        <Providers>
+          <Wrapper>{children}</Wrapper>
+        </Providers>
         <SpeedInsights />
         <TawkToChat />
       </body>

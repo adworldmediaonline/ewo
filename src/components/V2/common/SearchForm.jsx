@@ -1,7 +1,7 @@
 'use client';
 import CloudinaryImage from '@/components/common/CloudinaryImage';
 import { replaceTextCharacters } from '@/lib/replaceTextCharacters';
-import styles from '@/styleModules/Search.module.css';
+
 import { debounce } from 'lodash';
 import Form from 'next/form';
 import { useRouter } from 'next/navigation';
@@ -119,12 +119,8 @@ export default function SearchForm({ inputRef }) {
   };
 
   return (
-    <div className={styles.searchContainer} ref={suggestionsRef}>
-      <Form
-        action="/search"
-        className={styles.searchForm}
-        onSubmit={handleSubmit}
-      >
+    <div className="" ref={suggestionsRef}>
+      <Form action="/search" className="" onSubmit={handleSubmit}>
         <input
           ref={inputRef}
           type="search"
@@ -132,24 +128,24 @@ export default function SearchForm({ inputRef }) {
           value={searchText}
           onChange={handleInputChange}
           placeholder="Search for products..."
-          className={styles.searchInput}
+          className=""
           autoComplete="off"
           aria-label="Search products"
         />
-        <SearchButton className={styles.searchButton} isLoading={isLoading} />
+        <SearchButton className="" isLoading={isLoading} />
       </Form>
 
-      {error && <div className={styles.errorMessage}>{error}</div>}
+      {error && <div className="">{error}</div>}
 
       {showSuggestions && (
-        <div className={styles.suggestionsContainer}>
+        <div className="">
           {message && suggestions.length === 0 && (
-            <div className={styles.noResults}>{message}</div>
+            <div className="">{message}</div>
           )}
           {suggestions.map(suggestion => (
             <div
               key={suggestion.slug}
-              className={styles.suggestionItem}
+              className=""
               onClick={() => handleSuggestionClick(suggestion.slug)}
               role="button"
               tabIndex={0}
@@ -159,14 +155,14 @@ export default function SearchForm({ inputRef }) {
                 }
               }}
             >
-              <div className={styles.suggestionContent}>
+              <div className="">
                 {suggestion.img ? (
                   <CloudinaryImage
                     src={suggestion.img}
                     alt={suggestion.title}
                     width={50}
                     height={50}
-                    className={styles.suggestionImage}
+                    className=""
                     loading="lazy"
                     quality="auto"
                     format="auto"
@@ -174,14 +170,14 @@ export default function SearchForm({ inputRef }) {
                     gravity="auto"
                   />
                 ) : (
-                  <div className={styles.noImage}>No Image</div>
+                  <div className="">No Image</div>
                 )}
-                <div className={styles.suggestionInfo}>
-                  <div className={styles.suggestionTitle}>
+                <div className="">
+                  <div className="">
                     {replaceTextCharacters(suggestion.title, '*', '')}
                   </div>
                   {suggestion.finalPriceDiscount && (
-                    <div className={styles.suggestionPrice}>
+                    <div className="">
                       ${suggestion.finalPriceDiscount.toFixed(2)}
                     </div>
                   )}

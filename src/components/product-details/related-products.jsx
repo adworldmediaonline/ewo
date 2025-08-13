@@ -1,9 +1,6 @@
 'use client';
-import React from 'react';
 import { useGetRelatedProductsQuery } from '@/redux/features/productApi';
-import Link from 'next/link';
 import ProductItem from '../products/fashion/product-item';
-import styles from '../../app/product/[id]/product-details.module.css';
 
 const RelatedProducts = ({ id }) => {
   const { data: products, isError, isLoading } = useGetRelatedProductsQuery(id);
@@ -38,11 +35,11 @@ const RelatedProducts = ({ id }) => {
     const relatedProducts = products.data.filter(p => p._id !== id).slice(0, 4);
 
     content = (
-      <div className={styles.relatedProducts}>
-        <h2 className={styles.sectionTitle}>Related Products</h2>
-        <div className={styles.productsGrid}>
+      <div className="">
+        <h2 className="">Related Products</h2>
+        <div className="">
           {relatedProducts.map(product => (
-            <div key={product._id} className={styles.productCard}>
+            <div key={product._id} className="">
               <ProductItem product={product} />
             </div>
           ))}

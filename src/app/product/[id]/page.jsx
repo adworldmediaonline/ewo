@@ -2,7 +2,6 @@ import ProductDetailsArea from '@/components/product-details/product-details-are
 import Footer from '@/layout/footers/footer';
 import HeaderV2 from '@/layout/headers/HeaderV2';
 import Wrapper from '@/layout/wrapper';
-import styles from './product-details.module.css';
 
 // Fetch product data for metadata
 async function getProductData(id) {
@@ -70,7 +69,7 @@ export const generateMetadata = async props => {
 export default async function ProductDetailsPage(props) {
   const params = await props.params;
   return (
-    <div className={styles.productDetailsPage}>
+    <div className="">
       <Wrapper>
         <HeaderV2 />
         <ProductDetailsArea id={params.id} />

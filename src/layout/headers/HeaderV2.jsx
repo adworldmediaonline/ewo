@@ -242,7 +242,7 @@ export default function HeaderV2() {
         <li>
           <button
             ref={isSticky ? stickyDropdownButtonRef : mainDropdownButtonRef}
-            className={`${linkClassName} ${styles.dropdownButton}`}
+            className="${linkClassName} "
             onMouseEnter={() =>
               handleDropdownHover(isSticky ? 'sticky' : 'main')
             }
@@ -252,8 +252,8 @@ export default function HeaderV2() {
             aria-haspopup="true"
           >
             SHOP
-            <span className={styles.dropdownIcon}>▼</span>
-            <span className={styles.srOnly}>
+            <span className="">▼</span>
+            <span className="">
               {isDropdownOpen ? 'Close menu' : 'Open menu'}
             </span>
           </button>
@@ -376,17 +376,17 @@ export default function HeaderV2() {
   const renderUserProfile = () => {
     if (user) {
       return (
-        <Link href="/profile" className={styles.userProfileSimple}>
+        <Link href="/profile" className="">
           {user.imageURL ? (
             <Image
               src={user.imageURL}
               alt={user.name}
               width={32}
               height={32}
-              className={styles.userAvatar}
+              className=""
             />
           ) : (
-            <div className={styles.userInitials}>
+            <div className="">
               {getUserInitials(user.name)}
             </div>
           )}
@@ -395,7 +395,7 @@ export default function HeaderV2() {
     }
 
     return (
-      <Link href="/profile" className={styles.actionButton}>
+      <Link href="/profile" className="">
         <User />
       </Link>
     );
@@ -405,32 +405,32 @@ export default function HeaderV2() {
   const renderPhoneNumber = (className = '') => (
     <a
       href="tel:1-866-396-7623"
-      className={`${styles.phoneNumber} ${className}`}
+      className=" ${className}"
       aria-label="Call us at 1-866-EWO-ROAD"
     >
-      <div className={styles.phoneNumberWrapper}>
-        <span className={styles.phoneNumberText}>1-866-EWO-ROAD</span>
-        <span className={styles.phoneNumberSubtext}>(396-7623)</span>
+      <div className="">
+        <span className="">1-866-EWO-ROAD</span>
+        <span className="">(396-7623)</span>
       </div>
     </a>
   );
 
   // Checkout header variant - single header with all functionality
   const renderCheckoutHeader = () => (
-    <div className={styles.headerContainer}>
-      <header className={styles.header}>
-        <div className={styles.headerInnerContainer}>
-          <div className={styles.container}>
-            <div className={styles.checkoutHeaderLayout}>
+    <div className="">
+      <header className="">
+        <div className="">
+          <div className="">
+            <div className="">
               {/* Logo - 97px height as requested */}
-              <Link href="/" className={styles.checkoutLogoContainer}>
+              <Link href="/" className="">
                 <Image
                   src={logo}
                   alt="logo"
                   width={180}
                   height={60}
                   priority
-                  className={styles.checkoutLogo}
+                  className=""
                   style={{
                     width: 'auto',
                     height: '97px',
@@ -440,17 +440,17 @@ export default function HeaderV2() {
               </Link>
 
               {/* Navigation */}
-              <nav className={styles.checkoutNav}>
-                <ul className={styles.checkoutNavList}>
+              <nav className="">
+                <ul className="">
                   <li>
-                    <Link href="/" className={styles.checkoutNavLink}>
+                    <Link href="/" className="">
                       HOME
                     </Link>
                   </li>
                   <li>
                     <button
                       ref={mainDropdownButtonRef}
-                      className={`${styles.checkoutNavLink} ${styles.dropdownButton}`}
+                      className=" "
                       onMouseEnter={() => handleDropdownHover('main')}
                       onClick={() => handleDropdownToggle('main')}
                       aria-expanded={isDropdownOpen}
@@ -458,16 +458,16 @@ export default function HeaderV2() {
                       aria-haspopup="true"
                     >
                       SHOP
-                      <span className={styles.dropdownIcon}>▼</span>
+                      <span className="">▼</span>
                     </button>
                   </li>
                   <li>
-                    <Link href="/shop" className={styles.checkoutNavLink}>
+                    <Link href="/shop" className="">
                       PRODUCTS
                     </Link>
                   </li>
                   <li>
-                    <Link href="/contact" className={styles.checkoutNavLink}>
+                    <Link href="/contact" className="">
                       CONTACT
                     </Link>
                   </li>
@@ -475,51 +475,51 @@ export default function HeaderV2() {
               </nav>
 
               {/* Search */}
-              <div className={styles.checkoutSearchContainer}>
+              <div className="">
                 <SearchForm />
               </div>
 
               {/* Phone Number */}
-              <div className={styles.checkoutPhoneContainer}>
+              <div className="">
                 {renderPhoneNumber(styles.checkoutPhoneNumber)}
               </div>
 
               {/* Action Buttons */}
-              <div className={styles.actions}>
+              <div className="">
                 <button
-                  className={styles.searchButton}
+                  className=""
                   onClick={handleMobileSearchOpen}
                 >
                   <Search />
                 </button>
 
-                <Link href="/compare" className={styles.actionButton}>
+                <Link href="/compare" className="">
                   <Compare />
                 </Link>
 
-                <Link href="/wishlist" className={styles.actionButton}>
+                <Link href="/wishlist" className="">
                   <Wishlist />
                   {wishlist.length > 0 && (
-                    <span className={styles.actionBadge}>
+                    <span className="">
                       {wishlist.length}
                     </span>
                   )}
                 </Link>
 
                 <button
-                  className={styles.actionButton}
+                  className=""
                   onClick={() => dispatch(openCartMini())}
                 >
                   <CartTwo />
                   {quantity > 0 && (
-                    <span className={styles.actionBadge}>{quantity}</span>
+                    <span className="">{quantity}</span>
                   )}
                 </button>
 
                 {renderUserProfile()}
 
                 <button
-                  className={styles.actionButton}
+                  className=""
                   onClick={handleMobileNavToggle}
                   aria-label="Open menu"
                   aria-expanded={isMobileNavOpen}
@@ -537,9 +537,9 @@ export default function HeaderV2() {
 
   // Modern Professional Banner Component
   const renderScrollingBanner = () => (
-    <div className={styles.scrollingBanner}>
-      <div className={styles.scrollingBannerContent}>
-        <span className={styles.scrollingText}>
+    <div className="">
+      <div className="">
+        <span className="">
           Join EWO Army and stay connected for deals and discounts
         </span>
       </div>
@@ -555,24 +555,24 @@ export default function HeaderV2() {
 
           {/* Mobile Navigation (shared) */}
           <div
-            className={`${styles.mobileNav} ${
+            className={` ${
               isMobileNavOpen ? styles.mobileNavActive : ''
             }`}
             ref={mobileNavRef}
             role="navigation"
             aria-label="Mobile navigation"
           >
-            <div className={styles.mobileNavHeader}>
+            <div className="">
               <Image
                 src={logo}
                 alt="logo"
                 width={90}
                 height={30}
                 priority
-                className={styles.sidebarLogo}
+                className=""
               />
               <button
-                className={styles.actionButton}
+                className=""
                 onClick={() => {
                   setIsMobileNavOpen(false);
                   setIsMobileShopOpen(false);
@@ -583,33 +583,33 @@ export default function HeaderV2() {
                 <Close />
               </button>
             </div>
-            <div className={styles.mobileNavContent}>
+            <div className="">
               {/* Mobile Phone Number */}
-              <div className={styles.mobilePhoneContainer}>
+              <div className="">
                 {renderPhoneNumber(styles.mobilePhoneNumber)}
               </div>
 
-              <ul className={styles.mobileNavigation}>
+              <ul className="">
                 <li>
                   <Link
                     href="/"
-                    className={styles.navLink}
+                    className=""
                     onClick={() => setIsMobileNavOpen(false)}
                   >
                     HOME
                   </Link>
                 </li>
                 <li>
-                  <div className={styles.mobileCategory}>
+                  <div className="">
                     <button
-                      className={styles.mobileCategoryHeader}
+                      className=""
                       onClick={toggleMobileShop}
                       aria-expanded={isMobileShopOpen}
                     >
-                      <span className={styles.mobileCategoryTitle}>SHOP</span>
+                      <span className="">SHOP</span>
                       <svg
                         style={{ color: 'black' }}
-                        className={`${styles.mobileDropdownIcon} ${
+                        className={` ${
                           isMobileShopOpen ? styles.active : ''
                         }`}
                         viewBox="0 0 24 24"
@@ -625,13 +625,13 @@ export default function HeaderV2() {
                       </svg>
                     </button>
                     <div
-                      className={`${styles.mobileSubCategories} ${
+                      className={` ${
                         isMobileShopOpen ? styles.active : ''
                       }`}
                     >
                       {/* All Products Link */}
                       <button
-                        className={styles.subCategoryLink}
+                        className=""
                         onClick={() => {
                           router.push('/shop');
                           setIsMobileNavOpen(false);
@@ -644,12 +644,12 @@ export default function HeaderV2() {
                       {filteredCategories.map(category => (
                         <div
                           key={category._id}
-                          className={styles.mobileSubCategory}
+                          className=""
                         >
                           {category.children && category.children.length > 0 ? (
                             <>
                               <button
-                                className={styles.mobileSubCategoryHeader}
+                                className=""
                                 onClick={() =>
                                   toggleMobileCategory(category._id)
                                 }
@@ -657,11 +657,11 @@ export default function HeaderV2() {
                                   activeMobileCategory === category._id
                                 }
                               >
-                                <span className={styles.mobileSubCategoryTitle}>
+                                <span className="">
                                   {category.parent}
                                 </span>
                                 <svg
-                                  className={`${styles.mobileSubDropdownIcon} ${
+                                  className={` ${
                                     activeMobileCategory === category._id
                                       ? styles.active
                                       : ''
@@ -679,7 +679,7 @@ export default function HeaderV2() {
                                 </svg>
                               </button>
                               <div
-                                className={`${styles.mobileSubSubCategories} ${
+                                className={` ${
                                   activeMobileCategory === category._id
                                     ? styles.active
                                     : ''
@@ -688,7 +688,7 @@ export default function HeaderV2() {
                                 {category.children?.map((child, index) => (
                                   <button
                                     key={index}
-                                    className={styles.subSubCategoryLink}
+                                    className=""
                                     onClick={() =>
                                       handleChildCategoryRoute(
                                         category.parent,
@@ -703,7 +703,7 @@ export default function HeaderV2() {
                             </>
                           ) : (
                             <button
-                              className={styles.subCategoryLink}
+                              className=""
                               onClick={() =>
                                 handleCategoryRoute(category.parent)
                               }
@@ -719,7 +719,7 @@ export default function HeaderV2() {
                 <li>
                   <Link
                     href="/about"
-                    className={styles.navLink}
+                    className=""
                     onClick={() => setIsMobileNavOpen(false)}
                   >
                     ABOUT
@@ -728,7 +728,7 @@ export default function HeaderV2() {
                 <li>
                   <Link
                     href="/shop"
-                    className={styles.navLink}
+                    className=""
                     onClick={() => setIsMobileNavOpen(false)}
                   >
                     PRODUCTS
@@ -737,7 +737,7 @@ export default function HeaderV2() {
                 <li>
                   <Link
                     href="/contact"
-                    className={styles.navLink}
+                    className=""
                     onClick={() => setIsMobileNavOpen(false)}
                   >
                     CONTACT
@@ -749,7 +749,7 @@ export default function HeaderV2() {
 
           {/* Mobile Navigation Backdrop */}
           <div
-            className={`${styles.mobileNavBackdrop} ${
+            className={` ${
               isMobileNavOpen ? styles.mobileNavBackdropActive : ''
             }`}
             onClick={() => {
@@ -763,7 +763,7 @@ export default function HeaderV2() {
           {/* Dropdown Menu (for Shop) */}
           <div
             id="shop-dropdown"
-            className={styles.dropdownContent}
+            className=""
             aria-hidden={!isDropdownOpen}
             role="menu"
             onKeyDown={handleDropdownKeyDown}
@@ -780,15 +780,15 @@ export default function HeaderV2() {
               display: isDropdownOpen ? 'block' : 'none',
             }}
           >
-            <ul className={styles.simpleDropdownList} role="none">
+            <ul className="" role="none">
               {filteredCategories.map(category => (
                 <li
                   key={category._id}
-                  className={styles.simpleDropdownItem}
+                  className=""
                   role="none"
                 >
                   <button
-                    className={styles.simpleDropdownButton}
+                    className=""
                     onClick={() => handleCategoryNavigation(category)}
                     role="menuitem"
                   >
@@ -805,7 +805,7 @@ export default function HeaderV2() {
           {/* Mobile Search Backdrop */}
           {isMobileSearchOpen && (
             <div
-              className={styles.backdrop}
+              className=""
               onClick={closeSearch}
               aria-hidden="true"
             />
@@ -813,18 +813,18 @@ export default function HeaderV2() {
 
           {/* Mobile Search Overlay */}
           <div
-            className={`${styles.mobileSearch} ${
+            className={` ${
               isMobileSearchOpen ? styles.mobileSearchActive : ''
             }`}
             onClick={closeSearch}
           >
-            <div className={styles.mobileSearchWrapper}>
+            <div className="">
               <div
-                className={styles.mobileSearchHeader}
+                className=""
                 onClick={e => e.stopPropagation()}
               >
                 <button
-                  className={styles.mobileSearchClose}
+                  className=""
                   onClick={closeSearch}
                   aria-label="Close search"
                 >
@@ -838,13 +838,13 @@ export default function HeaderV2() {
       ) : (
         <>
           {renderScrollingBanner()}
-          <header className={styles.headerWrapper}>
+          <header className="">
             {/* Main Header (always static) */}
-            <div className={styles.headerContainer}>
-              <header className={styles.header}>
-                <div className={styles.headerInnerContainer}>
-                  <div className={styles.container}>
-                    <div className={styles.headerTop}>
+            <div className="">
+              <header className="">
+                <div className="">
+                  <div className="">
+                    <div className="">
                       {/* Logo */}
                       <Link href="/">
                         <Image
@@ -852,46 +852,46 @@ export default function HeaderV2() {
                           alt="logo"
                           width={140}
                           priority
-                          className={styles.desktopLogo}
+                          className=""
                         />
                         <Image
                           src={logo}
                           alt="logo"
                           width={80}
                           priority
-                          className={styles.mobileLogo}
+                          className=""
                         />
                       </Link>
 
                       {/* Action Buttons */}
-                      <div className={styles.actions}>
+                      <div className="">
                         <button
-                          className={styles.searchButton}
+                          className=""
                           onClick={handleMobileSearchOpen}
                         >
                           <Search />
                         </button>
 
-                        <Link href="/compare" className={styles.actionButton}>
+                        <Link href="/compare" className="">
                           <Compare />
                         </Link>
 
-                        <Link href="/wishlist" className={styles.actionButton}>
+                        <Link href="/wishlist" className="">
                           <Wishlist />
                           {wishlist.length > 0 && (
-                            <span className={styles.actionBadge}>
+                            <span className="">
                               {wishlist.length}
                             </span>
                           )}
                         </Link>
 
                         <button
-                          className={styles.actionButton}
+                          className=""
                           onClick={() => dispatch(openCartMini())}
                         >
                           <CartTwo />
                           {quantity > 0 && (
-                            <span className={styles.actionBadge}>
+                            <span className="">
                               {quantity}
                             </span>
                           )}
@@ -899,12 +899,12 @@ export default function HeaderV2() {
 
                         {renderUserProfile()}
 
-                        <div className={styles.actionPhoneNumberWrapper}>
+                        <div className="">
                           {renderPhoneNumber(styles.actionPhoneNumber)}
                         </div>
 
                         <button
-                          className={styles.actionButton}
+                          className=""
                           onClick={handleMobileNavToggle}
                           aria-label="Open menu"
                           aria-expanded={isMobileNavOpen}
@@ -924,16 +924,16 @@ export default function HeaderV2() {
               </header>
 
               {/* Secondary Navigation */}
-              <div className={styles.headerBottom}>
-                <nav className={styles.bottomNav}>
-                  <div className={styles.headerInnerContainer}>
-                    <div className={styles.bottomNavContainer}>
+              <div className="">
+                <nav className="">
+                  <div className="">
+                    <div className="">
                       {renderNavLinks(
                         styles.bottomNavLink,
                         styles.bottomNavList
                       )}
                       {/* Desktop Search */}
-                      <div className={styles.bottomSearchContainer}>
+                      <div className="">
                         <SearchForm />
                       </div>
                     </div>
@@ -944,11 +944,11 @@ export default function HeaderV2() {
 
             {/* Separate Sticky Header that appears on scroll */}
             <div
-              className={`${styles.stickyHeader} ${
+              className={` ${
                 showStickyHeader ? styles.stickyHeaderVisible : ''
               }`}
             >
-              <div className={styles.stickyHeaderContent}>
+              <div className="">
                 {/* Logo */}
                 <Link href="/">
                   <Image
@@ -956,7 +956,7 @@ export default function HeaderV2() {
                     alt="logo"
                     width={90}
                     height={30}
-                    className={styles.desktopLogo}
+                    className=""
                     priority
                   />
                   <Image
@@ -964,7 +964,7 @@ export default function HeaderV2() {
                     alt="logo"
                     width={60}
                     height={20}
-                    className={styles.mobileLogo}
+                    className=""
                     priority
                   />
                 </Link>
@@ -978,44 +978,44 @@ export default function HeaderV2() {
                 )}
 
                 {/* Sticky Header Search */}
-                <div className={styles.stickySearchContainer}>
+                <div className="">
                   <SearchForm />
                 </div>
 
                 {/* Phone Number */}
-                <div className={styles.stickyPhoneContainer}>
+                <div className="">
                   {renderPhoneNumber(styles.stickyPhoneNumber)}
                 </div>
 
                 {/* Action Buttons */}
-                <div className={styles.actions}>
+                <div className="">
                   <button
-                    className={styles.searchButton}
+                    className=""
                     onClick={handleMobileSearchOpen}
                   >
                     <Search />
                   </button>
 
-                  <Link href="/compare" className={styles.actionButton}>
+                  <Link href="/compare" className="">
                     <Compare />
                   </Link>
 
-                  <Link href="/wishlist" className={styles.actionButton}>
+                  <Link href="/wishlist" className="">
                     <Wishlist />
                     {wishlist.length > 0 && (
-                      <span className={styles.actionBadge}>
+                      <span className="">
                         {wishlist.length}
                       </span>
                     )}
                   </Link>
 
                   <button
-                    className={styles.actionButton}
+                    className=""
                     onClick={() => dispatch(openCartMini())}
                   >
                     <CartTwo />
                     {quantity > 0 && (
-                      <span className={styles.actionBadge}>{quantity}</span>
+                      <span className="">{quantity}</span>
                     )}
                   </button>
 
@@ -1023,7 +1023,7 @@ export default function HeaderV2() {
 
                   {/* Add sidebar toggle for sticky header */}
                   <button
-                    className={styles.actionButton}
+                    className=""
                     onClick={handleMobileNavToggle}
                     aria-label="Open menu"
                     aria-expanded={isMobileNavOpen}
@@ -1036,24 +1036,24 @@ export default function HeaderV2() {
 
             {/* Mobile Navigation */}
             <div
-              className={`${styles.mobileNav} ${
+              className={` ${
                 isMobileNavOpen ? styles.mobileNavActive : ''
               }`}
               ref={mobileNavRef}
               role="navigation"
               aria-label="Mobile navigation"
             >
-              <div className={styles.mobileNavHeader}>
+              <div className="">
                 <Image
                   src={logo}
                   alt="logo"
                   width={90}
                   height={30}
                   priority
-                  className={styles.sidebarLogo}
+                  className=""
                 />
                 <button
-                  className={styles.actionButton}
+                  className=""
                   onClick={() => {
                     setIsMobileNavOpen(false);
                     setIsMobileShopOpen(false);
@@ -1064,34 +1064,34 @@ export default function HeaderV2() {
                   <Close />
                 </button>
               </div>
-              <div className={styles.mobileNavContent}>
+              <div className="">
                 {/* Mobile Phone Number */}
-                <div className={styles.mobilePhoneContainer}>
+                <div className="">
                   {renderPhoneNumber(styles.mobilePhoneNumber)}
                 </div>
 
-                <ul className={styles.mobileNavigation}>
+                <ul className="">
                   <li>
                     <Link
                       href="/"
-                      className={styles.navLink}
+                      className=""
                       onClick={() => setIsMobileNavOpen(false)}
                     >
                       HOME
                     </Link>
                   </li>
                   <li>
-                    <div className={styles.mobileCategory}>
+                    <div className="">
                       <button
-                        className={styles.mobileCategoryHeader}
+                        className=""
                         onClick={toggleMobileShop}
                         aria-expanded={isMobileShopOpen}
                       >
-                        <span className={styles.mobileCategoryTitle}>SHOP</span>
+                        <span className="">SHOP</span>
                         {/*  */}
                         <svg
                           style={{ color: 'black' }}
-                          className={`${styles.mobileDropdownIcon} ${
+                          className={` ${
                             isMobileShopOpen ? styles.active : ''
                           }`}
                           viewBox="0 0 24 24"
@@ -1107,13 +1107,13 @@ export default function HeaderV2() {
                         </svg>
                       </button>
                       <div
-                        className={`${styles.mobileSubCategories} ${
+                        className={` ${
                           isMobileShopOpen ? styles.active : ''
                         }`}
                       >
                         {/* All Products Link */}
                         <button
-                          className={styles.subCategoryLink}
+                          className=""
                           onClick={() => {
                             router.push('/shop');
                             setIsMobileNavOpen(false);
@@ -1126,13 +1126,13 @@ export default function HeaderV2() {
                         {filteredCategories.map(category => (
                           <div
                             key={category._id}
-                            className={styles.mobileSubCategory}
+                            className=""
                           >
                             {category.children &&
                             category.children.length > 0 ? (
                               <>
                                 <button
-                                  className={styles.mobileSubCategoryHeader}
+                                  className=""
                                   onClick={() =>
                                     toggleMobileCategory(category._id)
                                   }
@@ -1141,7 +1141,7 @@ export default function HeaderV2() {
                                   }
                                 >
                                   <span
-                                    className={styles.mobileSubCategoryTitle}
+                                    className=""
                                   >
                                     {category.parent}
                                   </span>
@@ -1177,7 +1177,7 @@ export default function HeaderV2() {
                                   {category.children?.map((child, index) => (
                                     <button
                                       key={index}
-                                      className={styles.subSubCategoryLink}
+                                      className=""
                                       onClick={() =>
                                         handleChildCategoryRoute(
                                           category.parent,
@@ -1192,7 +1192,7 @@ export default function HeaderV2() {
                               </>
                             ) : (
                               <button
-                                className={styles.subCategoryLink}
+                                className=""
                                 onClick={() =>
                                   handleCategoryRoute(category.parent)
                                 }
@@ -1208,7 +1208,7 @@ export default function HeaderV2() {
                   <li>
                     <Link
                       href="/about"
-                      className={styles.navLink}
+                      className=""
                       onClick={() => setIsMobileNavOpen(false)}
                     >
                       ABOUT
@@ -1217,7 +1217,7 @@ export default function HeaderV2() {
                   <li>
                     <Link
                       href="/shop"
-                      className={styles.navLink}
+                      className=""
                       onClick={() => setIsMobileNavOpen(false)}
                     >
                       PRODUCTS
@@ -1226,7 +1226,7 @@ export default function HeaderV2() {
                   <li>
                     <Link
                       href="/contact"
-                      className={styles.navLink}
+                      className=""
                       onClick={() => setIsMobileNavOpen(false)}
                     >
                       CONTACT
@@ -1238,7 +1238,7 @@ export default function HeaderV2() {
 
             {/* Mobile Navigation Backdrop */}
             <div
-              className={`${styles.mobileNavBackdrop} ${
+              className={` ${
                 isMobileNavOpen ? styles.mobileNavBackdropActive : ''
               }`}
               onClick={() => {
@@ -1252,7 +1252,7 @@ export default function HeaderV2() {
             {/* Dropdown Menu (for Shop) */}
             <div
               id="shop-dropdown"
-              className={styles.dropdownContent}
+              className=""
               aria-hidden={!isDropdownOpen}
               role="menu"
               onKeyDown={handleDropdownKeyDown}
@@ -1269,15 +1269,15 @@ export default function HeaderV2() {
                 display: isDropdownOpen ? 'block' : 'none',
               }}
             >
-              <ul className={styles.simpleDropdownList} role="none">
+              <ul className="" role="none">
                 {filteredCategories.map(category => (
                   <li
                     key={category._id}
-                    className={styles.simpleDropdownItem}
+                    className=""
                     role="none"
                   >
                     <button
-                      className={styles.simpleDropdownButton}
+                      className=""
                       onClick={() => handleCategoryNavigation(category)}
                       role="menuitem"
                     >
@@ -1294,7 +1294,7 @@ export default function HeaderV2() {
             {/* Mobile Search Backdrop */}
             {isMobileSearchOpen && (
               <div
-                className={styles.backdrop}
+                className=""
                 onClick={closeSearch}
                 aria-hidden="true"
               />
@@ -1303,18 +1303,18 @@ export default function HeaderV2() {
 
           {/* Mobile Search Overlay - Outside header for highest z-index */}
           <div
-            className={`${styles.mobileSearch} ${
+            className={` ${
               isMobileSearchOpen ? styles.mobileSearchActive : ''
             }`}
             onClick={closeSearch}
           >
-            <div className={styles.mobileSearchWrapper}>
+            <div className="">
               <div
-                className={styles.mobileSearchHeader}
+                className=""
                 onClick={e => e.stopPropagation()}
               >
                 <button
-                  className={styles.mobileSearchClose}
+                  className=""
                   onClick={closeSearch}
                   aria-label="Close search"
                 >

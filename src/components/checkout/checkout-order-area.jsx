@@ -10,7 +10,7 @@ import {
 } from '@/redux/features/cartSlice';
 import { load_applied_coupons } from '@/redux/features/coupon/couponSlice';
 import { Minus, Plus } from '@/svg';
-import styles from './checkout-order-area.module.css';
+// Removed CSS module import; Tailwind-only styling
 
 // Custom styles for quantity controls
 const quantityStyle = {
@@ -204,32 +204,32 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
   };
 
   return (
-    <div className={styles.orderSummary}>
-      <h3 className={styles.summaryTitle}>Your Order</h3>
+    <div className="">
+      <h3 className="">Your Order</h3>
 
-      <div className={styles.productList}>
+      <div className="">
         {cart_products.map(item => (
-          <div key={item._id} className={styles.productItem}>
-            <div className={styles.productImage}>
+          <div key={item._id} className="">
+            <div className="">
               <img
                 src={item.img || '/placeholder-product.png'}
                 alt={item.title}
-                className={styles.productImage}
+                className=""
               />
             </div>
-            <div className={styles.productDetails}>
-              <h4 className={styles.productName}>{item.title}</h4>
+            <div className="">
+              <h4 className="">{item.title}</h4>
               {item.selectedOption && (
-                <p className={styles.productOption}>
+                <p className="">
                   {item.selectedOption.title} (+$
                   {Number(item.selectedOption.price).toFixed(2)})
                 </p>
               )}
-              <div className={styles.quantityControls}>
+              <div className="">
                 <button
                   type="button"
                   onClick={() => handleDecrement(item)}
-                  className={styles.quantityBtn}
+                  className=""
                   disabled={
                     isCheckoutSubmit ||
                     processingPayment ||
@@ -238,39 +238,37 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
                 >
                   <Minus width={12} height={12} />
                 </button>
-                <span className={styles.quantityValue}>
-                  {item.orderQuantity}
-                </span>
+                <span className="">{item.orderQuantity}</span>
                 <button
                   type="button"
                   onClick={() => handleAddProduct(item)}
-                  className={styles.quantityBtn}
+                  className=""
                   disabled={isCheckoutSubmit || processingPayment}
                 >
                   <Plus width={12} height={12} />
                 </button>
               </div>
             </div>
-            <div className={styles.productTotal}>
+            <div className="">
               ${(item.price * item.orderQuantity).toFixed(2)}
             </div>
           </div>
         ))}
       </div>
 
-      <div className={styles.discountSection}>
-        <div className={styles.discountForm}>
+      <div className="">
+        <div className="">
           <input
             ref={couponRef}
             type="text"
             placeholder="Add another coupon code"
-            className={styles.discountInput}
+            className=""
             disabled={coupon_loading || isCheckoutSubmit || processingPayment}
           />
           <button
             type="button"
             onClick={handleCouponSubmit}
-            className={styles.discountButton}
+            className=""
             disabled={coupon_loading || isCheckoutSubmit || processingPayment}
           >
             {coupon_loading ? 'Applying...' : 'Apply'}
@@ -278,28 +276,18 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
         </div>
 
         {/* Enhanced coupon messages */}
-        {couponApplyMsg && (
-          <div
-            className={`${styles.couponMessage} ${
-              coupon_error ? styles.couponError : styles.couponSuccess
-            }`}
-          >
-            {couponApplyMsg}
-          </div>
-        )}
+        {couponApplyMsg && <div className="">{couponApplyMsg}</div>}
 
         {/* Display multiple applied coupons */}
         {applied_coupons.length > 0 && (
-          <div className={styles.appliedCouponsSection}>
-            <div className={styles.appliedCouponsHeader}>
-              <h4 className={styles.appliedCouponsTitle}>
-                Applied Coupons ({applied_coupons.length})
-              </h4>
+          <div className="">
+            <div className="">
+              <h4 className="">Applied Coupons ({applied_coupons.length})</h4>
               {applied_coupons.length > 1 && (
                 <button
                   type="button"
                   onClick={handleClearAllCoupons}
-                  className={styles.clearAllCouponsBtn}
+                  className=""
                   disabled={isCheckoutSubmit || processingPayment}
                 >
                   Remove All
@@ -307,25 +295,18 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
               )}
             </div>
 
-            <div className={styles.appliedCouponsList}>
+            <div className="">
               {applied_coupons.map((coupon, index) => (
-                <div
-                  key={coupon.couponCode || index}
-                  className={styles.appliedCouponItem}
-                >
-                  <div className={styles.appliedCouponDetails}>
-                    <span className={styles.appliedCouponCode}>
-                      {coupon.couponCode}
-                    </span>
-                    <span className={styles.appliedCouponTitle}>
-                      {coupon.title}
-                    </span>
-                    <span className={styles.appliedCouponDiscount}>
+                <div key={coupon.couponCode || index} className="">
+                  <div className="">
+                    <span className="">{coupon.couponCode}</span>
+                    <span className="">{coupon.title}</span>
+                    <span className="">
                       -${Number(coupon.discount || 0).toFixed(2)}
                     </span>
                     {coupon.applicableProductNames &&
                       coupon.applicableProductNames.length > 0 && (
-                        <span className={styles.appliedCouponProducts}>
+                        <span className="">
                           Applied to:{' '}
                           {coupon.applicableProductNames.slice(0, 2).join(', ')}
                           {coupon.applicableProductNames.length > 2 &&
@@ -338,7 +319,7 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
                   <button
                     type="button"
                     onClick={() => handleRemoveCoupon(coupon.couponCode)}
-                    className={styles.removeCouponBtn}
+                    className=""
                     disabled={isCheckoutSubmit || processingPayment}
                   >
                     Remove
@@ -350,10 +331,10 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
         )}
       </div>
 
-      <div className={styles.summaryBreakdown}>
-        <div className={styles.summaryRow}>
-          <span className={styles.summaryLabel}>Subtotal</span>
-          <span className={styles.summaryValue}>
+      <div className="">
+        <div className="">
+          <span className="">Subtotal</span>
+          <span className="">
             $
             {(
               Number(firstTimeDiscount.isApplied ? subtotal : total) || 0
@@ -361,30 +342,26 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
           </span>
         </div>
 
-        <div className={styles.summaryRow}>
-          <span className={styles.summaryLabel}>Shipping</span>
-          <span className={styles.summaryValue}>
+        <div className="">
+          <span className="">Shipping</span>
+          <span className="">
             ${(Number(totalShippingCost) || 0).toFixed(2)}
             {discountPercentage > 0 && (
-              <span className={styles.discountBadge}>
-                {discountPercentage}% off
-              </span>
+              <span className="">{discountPercentage}% off</span>
             )}
           </span>
         </div>
 
         {/* Multiple coupon discounts display */}
         {Number(total_coupon_discount) > 0 && (
-          <div className={styles.summaryRow}>
-            <span className={styles.summaryLabel}>
+          <div className="">
+            <span className="">
               Coupon Discounts
               {applied_coupons.length > 1 && (
-                <span className={styles.couponCountBadge}>
-                  {applied_coupons.length} coupons
-                </span>
+                <span className="">{applied_coupons.length} coupons</span>
               )}
             </span>
-            <span className={`${styles.summaryValue} ${styles.discount}`}>
+            <span className=" ">
               -${Number(total_coupon_discount).toFixed(2)}
             </span>
           </div>
@@ -392,19 +369,17 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
 
         {/* Legacy fallback for single coupon */}
         {Number(total_coupon_discount) === 0 && Number(discountAmount) > 0 && (
-          <div className={styles.summaryRow}>
-            <span className={styles.summaryLabel}>Coupon Discount</span>
-            <span className={`${styles.summaryValue} ${styles.discount}`}>
-              -${Number(discountAmount).toFixed(2)}
-            </span>
+          <div className="">
+            <span className="">Coupon Discount</span>
+            <span className=" ">-${Number(discountAmount).toFixed(2)}</span>
           </div>
         )}
 
         {/* Address discount */}
         {Number(displayAddressDiscount) > 0 && (
-          <div className={styles.summaryRow}>
-            <span className={styles.summaryLabel}>Address Discount</span>
-            <span className={`${styles.summaryValue} ${styles.discount}`}>
+          <div className="">
+            <span className="">Address Discount</span>
+            <span className=" ">
               -${Number(displayAddressDiscount).toFixed(2)}
             </span>
           </div>
@@ -412,29 +387,25 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
 
         {/* First-time discount */}
         {firstTimeDiscount.isApplied && (
-          <div className={styles.summaryRow}>
-            <span
-              className={`${styles.summaryLabel} ${styles.firstTimeDiscountLabel}`}
-            >
+          <div className="">
+            <span className=" ">
               🎉 First-time order discount (-{firstTimeDiscount.percentage}%)
             </span>
-            <span className={`${styles.summaryValue} ${styles.discount}`}>
+            <span className=" ">
               -${(Number(firstTimeDiscountAmount) || 0).toFixed(2)}
             </span>
           </div>
         )}
 
-        <div className={`${styles.summaryRow} ${styles.summaryTotal}`}>
-          <span className={styles.totalLabel}>Total</span>
-          <span className={styles.totalValue}>
-            ${calculateFinalTotal().toFixed(2)}
-          </span>
+        <div className=" ">
+          <span className="">Total</span>
+          <span className="">${calculateFinalTotal().toFixed(2)}</span>
         </div>
       </div>
 
-      <div className={styles.paymentSection}>
-        <h4 className={styles.paymentTitle}>Payment Information</h4>
-        <div className={styles.cardElement}>
+      <div className="">
+        <h4 className="">Payment Information</h4>
+        <div className="">
           <CardElement
             options={{
               style: {
@@ -453,7 +424,7 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
             }}
           />
           {cardError && (
-            <div className={styles.paymentError}>
+            <div className="">
               <small>Payment could not be processed:</small>
               <strong>{cardError}</strong>
               <div>
@@ -467,7 +438,7 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
       <button
         type="submit"
         disabled={!stripe || isCheckoutSubmit || processingPayment}
-        className={styles.checkoutButton}
+        className=""
       >
         {processingPayment ? (
           <span>
@@ -483,12 +454,8 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
         )}
       </button>
 
-      <div className={styles.securityBadge}>
-        <svg
-          className={styles.securityIcon}
-          fill="currentColor"
-          viewBox="0 0 20 20"
-        >
+      <div className="">
+        <svg className="" fill="currentColor" viewBox="0 0 20 20">
           <path
             fillRule="evenodd"
             d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -496,10 +463,8 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
           />
         </svg>
         <div>
-          <div className={styles.securityText}>
-            Secure Checkout - SSL Encrypted
-          </div>
-          <div className={styles.securitySubtext}>
+          <div className="">Secure Checkout - SSL Encrypted</div>
+          <div className="">
             Ensuring your financial and personal details are secure during every
             transaction.
           </div>

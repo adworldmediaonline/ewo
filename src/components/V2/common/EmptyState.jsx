@@ -1,7 +1,5 @@
 'use client';
 
-import React from 'react';
-import styles from './EmptyState.module.css';
 import Link from 'next/link';
 
 export default function EmptyState({
@@ -16,7 +14,7 @@ export default function EmptyState({
   const icons = {
     search: (
       <svg
-        className={styles.icon}
+        className=""
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
@@ -32,7 +30,7 @@ export default function EmptyState({
     ),
     category: (
       <svg
-        className={styles.icon}
+        className=""
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
@@ -48,7 +46,7 @@ export default function EmptyState({
     ),
     error: (
       <svg
-        className={styles.icon}
+        className=""
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
@@ -65,18 +63,18 @@ export default function EmptyState({
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.content}>
+    <div className="">
+      <div className="">
         {icons[icon] || icons.search}
-        <h2 className={styles.title}>{title}</h2>
-        <p className={styles.message}>{message}</p>
+        <h2 className="">{title}</h2>
+        <p className="">{message}</p>
 
         {action ? (
-          <button onClick={action} className={styles.button}>
+          <button onClick={action} className="">
             {actionText}
           </button>
         ) : (
-          <Link href={actionLink} className={styles.button}>
+          <Link href={actionLink} className="">
             {actionText}
           </Link>
         )}

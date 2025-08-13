@@ -1,7 +1,5 @@
 'use client';
-import React from 'react';
 import Link from 'next/link';
-import styles from '../../app/cart/cart.module.css';
 
 const CommonBreadcrumb = ({
   title = '',
@@ -22,7 +20,7 @@ const CommonBreadcrumb = ({
 
   return (
     <section
-      className={styles['breadcrumb-section']}
+      className=""
       style={{ backgroundColor: bg_clr ? '#EFF1F5' : '#f8f9fa' }}
     >
       <div className="container">
@@ -30,22 +28,20 @@ const CommonBreadcrumb = ({
           <div className="col-xxl-12">
             <nav
               aria-label="Breadcrumb"
-              className={`${styles['breadcrumb-nav']} ${
-                center ? 'text-center' : ''
-              }`}
+              className={`${center ? 'text-center' : ''}`}
             >
-              <ol className={styles['breadcrumb-list']}>
-                <li className={styles['breadcrumb-item']}>
-                  <Link href="/" className={styles['breadcrumb-link']}>
-                    <span className={styles['breadcrumb-text']}>Home</span>
+              <ol className="">
+                <li className="">
+                  <Link href="/" className="">
+                    <span className="">Home</span>
                   </Link>
                 </li>
                 <li
-                  className={`${styles['breadcrumb-item']} ${styles['breadcrumb-active']}`}
+                  className="${styles['breadcrumb-item']} ${styles['breadcrumb-active']}"
                   aria-current="page"
                 >
                   <svg
-                    className={styles['chevron-icon']}
+                    className=""
                     width="16"
                     height="16"
                     viewBox="0 0 24 24"
@@ -57,15 +53,11 @@ const CommonBreadcrumb = ({
                   >
                     <polyline points="9 18 15 12 9 6"></polyline>
                   </svg>
-                  <span className={styles['breadcrumb-current']}>
-                    {formattedSubtitle}
-                  </span>
+                  <span className="">{formattedSubtitle}</span>
                 </li>
               </ol>
             </nav>
-            {title && (
-              <h3 className={styles['breadcrumb-title']}>{formattedTitle}</h3>
-            )}
+            {title && <h3 className="">{formattedTitle}</h3>}
           </div>
         </div>
       </div>

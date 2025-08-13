@@ -7,7 +7,6 @@ import { remove_wishlist_product } from '@/redux/features/wishlist-slice';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
-import styles from './wishlist-item.module.css';
 
 export default function WishlistItem({ product }) {
   const { _id, img, title, price } = product || {};
@@ -31,35 +30,29 @@ export default function WishlistItem({ product }) {
   };
 
   return (
-    <div className={styles.wishlistItem}>
-      <div className={styles.itemContent}>
+    <div className="">
+      <div className="">
         {/* Product Image */}
-        <div className={styles.itemImage}>
+        <div className="">
           <Link href={`/product/${_id}`}>
-            <Image
-              src={img}
-              alt={title}
-              width={80}
-              height={80}
-              className={styles.productImage}
-            />
+            <Image src={img} alt={title} width={80} height={80} className="" />
           </Link>
         </div>
 
         {/* Product Info */}
-        <div className={styles.itemInfo}>
-          <Link href={`/product/${_id}`} className={styles.productTitle}>
+        <div className="">
+          <Link href={`/product/${_id}`} className="">
             {title}
           </Link>
-          <div className={styles.productPrice}>${price.toFixed(2)}</div>
+          <div className="">${price.toFixed(2)}</div>
         </div>
 
         {/* Quantity Controls */}
-        <div className={styles.quantitySection}>
-          <div className={styles.quantityControls}>
+        <div className="">
+          <div className="">
             <button
               onClick={() => handleDecrement(product)}
-              className={styles.quantityBtn}
+              className=""
               disabled={!isAddToCart || isAddToCart?.orderQuantity <= 0}
             >
               <svg
@@ -73,13 +66,10 @@ export default function WishlistItem({ product }) {
                 <line x1="5" y1="12" x2="19" y2="12"></line>
               </svg>
             </button>
-            <span className={styles.quantityValue}>
+            <span className="">
               {isAddToCart ? isAddToCart?.orderQuantity : 0}
             </span>
-            <button
-              onClick={() => handleAddProduct(product)}
-              className={styles.quantityBtn}
-            >
+            <button onClick={() => handleAddProduct(product)} className="">
               <svg
                 width="12"
                 height="12"
@@ -96,11 +86,8 @@ export default function WishlistItem({ product }) {
         </div>
 
         {/* Actions */}
-        <div className={styles.itemActions}>
-          <button
-            onClick={() => handleAddProduct(product)}
-            className={styles.addToCartBtn}
-          >
+        <div className="">
+          <button onClick={() => handleAddProduct(product)} className="">
             <svg
               width="16"
               height="16"
@@ -117,7 +104,7 @@ export default function WishlistItem({ product }) {
           </button>
           <button
             onClick={() => handleRemovePrd({ title, id: _id })}
-            className={styles.removeBtn}
+            className=""
           >
             <svg
               width="16"

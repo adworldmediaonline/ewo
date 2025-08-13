@@ -9,7 +9,6 @@ import {
   remove_product,
 } from '@/redux/features/cartSlice';
 import { Close, Minus, Plus } from '@/svg';
-import styles from './cart-item.module.css';
 
 export default function CartItem({ product }) {
   const {
@@ -38,47 +37,42 @@ export default function CartItem({ product }) {
   };
 
   return (
-    <div className={styles.cartItem}>
-      <div className={styles.itemContent}>
-        <div className={styles.productSection}>
-          <div className={styles.productImage}>
+    <div className="">
+      <div className="">
+        <div className="">
+          <div className="">
             <Link href={`/product/${_id}`}>
               <Image src={img} alt={title} width={80} height={80} />
             </Link>
           </div>
-          <div className={styles.productInfo}>
-            <Link href={`/product/${_id}`} className={styles.productTitle}>
+          <div className="">
+            <Link href={`/product/${_id}`} className="">
               {title}
             </Link>
             {selectedOption && (
-              <div className={styles.productOption}>
+              <div className="">
                 Option: {selectedOption.title} (+$
                 {Number(selectedOption.price).toFixed(2)})
               </div>
             )}
-            <div className={styles.unitPrice}>${price.toFixed(2)} each</div>
+            <div className="">${price.toFixed(2)} each</div>
           </div>
         </div>
 
-        <div className={styles.quantitySection}>
-          <label className={styles.quantityLabel}>Quantity</label>
-          <div className={styles.quantityControls}>
+        <div className="">
+          <label className="">Quantity</label>
+          <div className="">
             <button
               onClick={() => handleDecrement(product)}
-              className={styles.quantityBtn}
+              className=""
               aria-label="Decrease quantity"
             >
               <Minus />
             </button>
-            <input
-              className={styles.quantityInput}
-              type="text"
-              value={orderQuantity}
-              readOnly
-            />
+            <input className="" type="text" value={orderQuantity} readOnly />
             <button
               onClick={() => handleAddProduct(product)}
-              className={styles.quantityBtn}
+              className=""
               aria-label="Increase quantity"
             >
               <Plus />
@@ -86,13 +80,11 @@ export default function CartItem({ product }) {
           </div>
         </div>
 
-        <div className={styles.priceSection}>
-          <div className={styles.totalPrice}>
-            ${(price * orderQuantity).toFixed(2)}
-          </div>
+        <div className="">
+          <div className="">${(price * orderQuantity).toFixed(2)}</div>
           <button
             onClick={() => handleRemovePrd({ title, id: _id })}
-            className={styles.removeBtn}
+            className=""
             aria-label="Remove item"
           >
             <Close />

@@ -126,26 +126,26 @@ export default function ContactPage() {
   };
 
   return (
-    <div className={styles.contactPage}>
+    <div className="">
       <Wrapper>
         <HeaderV2 />
-        <div className={styles.contactContainer}>
-          <div className={styles.contactContent}>
-            <div className={styles.contactHeader}>
-              <h1 className={styles.contactTitle}>Contact Us</h1>
-              <p className={styles.contactSubtitle}>
+        <div className="">
+          <div className="">
+            <div className="">
+              <h1 className="">Contact Us</h1>
+              <p className="">
                 Get in touch with our team. We'd love to hear from you!
               </p>
             </div>
 
-            <div className={styles.contactLayout}>
+            <div className="">
               {/* Contact Form */}
-              <div className={styles.formSection}>
-                <form onSubmit={handleSubmit} className={styles.contactForm}>
-                  <div className={styles.formRow}>
-                    <div className={styles.formGroup}>
-                      <label htmlFor="name" className={styles.formLabel}>
-                        Name <span className={styles.required}>*</span>
+              <div className="">
+                <form onSubmit={handleSubmit} className="">
+                  <div className="">
+                    <div className="">
+                      <label htmlFor="name" className="">
+                        Name <span className="">*</span>
                       </label>
                       <input
                         type="text"
@@ -153,22 +153,22 @@ export default function ContactPage() {
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        className={`${styles.formInput} ${
+                        className={` ${
                           errors.name ? styles.inputError : ''
                         }`}
                         placeholder="Your full name"
                         maxLength={100}
                       />
                       {errors.name && (
-                        <span className={styles.errorMessage}>
+                        <span className="">
                           {errors.name}
                         </span>
                       )}
                     </div>
 
-                    <div className={styles.formGroup}>
-                      <label htmlFor="email" className={styles.formLabel}>
-                        Email <span className={styles.required}>*</span>
+                    <div className="">
+                      <label htmlFor="email" className="">
+                        Email <span className="">*</span>
                       </label>
                       <input
                         type="email"
@@ -176,22 +176,22 @@ export default function ContactPage() {
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
-                        className={`${styles.formInput} ${
+                        className={` ${
                           errors.email ? styles.inputError : ''
                         }`}
                         placeholder="your.email@example.com"
                       />
                       {errors.email && (
-                        <span className={styles.errorMessage}>
+                        <span className="">
                           {errors.email}
                         </span>
                       )}
                     </div>
                   </div>
 
-                  <div className={styles.formRow}>
-                    <div className={styles.formGroup}>
-                      <label htmlFor="phone" className={styles.formLabel}>
+                  <div className="">
+                    <div className="">
+                      <label htmlFor="phone" className="">
                         Phone (Optional)
                       </label>
                       <input
@@ -200,21 +200,21 @@ export default function ContactPage() {
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
-                        className={`${styles.formInput} ${
+                        className={` ${
                           errors.phone ? styles.inputError : ''
                         }`}
                         placeholder="(555) 123-4567"
                       />
                       {errors.phone && (
-                        <span className={styles.errorMessage}>
+                        <span className="">
                           {errors.phone}
                         </span>
                       )}
                     </div>
 
-                    <div className={styles.formGroup}>
-                      <label htmlFor="subject" className={styles.formLabel}>
-                        Subject <span className={styles.required}>*</span>
+                    <div className="">
+                      <label htmlFor="subject" className="">
+                        Subject <span className="">*</span>
                       </label>
                       <input
                         type="text"
@@ -222,41 +222,41 @@ export default function ContactPage() {
                         name="subject"
                         value={formData.subject}
                         onChange={handleChange}
-                        className={`${styles.formInput} ${
+                        className={` ${
                           errors.subject ? styles.inputError : ''
                         }`}
                         placeholder="How can we help you?"
                         maxLength={200}
                       />
                       {errors.subject && (
-                        <span className={styles.errorMessage}>
+                        <span className="">
                           {errors.subject}
                         </span>
                       )}
                     </div>
                   </div>
 
-                  <div className={styles.formGroup}>
-                    <label htmlFor="message" className={styles.formLabel}>
-                      Message <span className={styles.required}>*</span>
+                  <div className="">
+                    <label htmlFor="message" className="">
+                      Message <span className="">*</span>
                     </label>
                     <textarea
                       id="message"
                       name="message"
                       value={formData.message}
                       onChange={handleChange}
-                      className={`${styles.formTextarea} ${
+                      className={` ${
                         errors.message ? styles.inputError : ''
                       }`}
                       placeholder="Please describe your inquiry in detail..."
                       rows={6}
                       maxLength={2000}
                     />
-                    <div className={styles.charCount}>
+                    <div className="">
                       {formData.message.length}/2000 characters
                     </div>
                     {errors.message && (
-                      <span className={styles.errorMessage}>
+                      <span className="">
                         {errors.message}
                       </span>
                     )}
@@ -264,7 +264,7 @@ export default function ContactPage() {
 
                   {submitMessage && (
                     <div
-                      className={`${styles.submitMessage} ${
+                      className={` ${
                         submitMessage.includes('Network') ||
                         submitMessage.includes('Failed')
                           ? styles.errorMessage
@@ -278,13 +278,13 @@ export default function ContactPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`${styles.submitButton} ${
+                    className={` ${
                       isSubmitting ? styles.submitting : ''
                     }`}
                   >
                     {isSubmitting ? (
                       <>
-                        <span className={styles.spinner}></span>
+                        <span className=""></span>
                         Sending Message...
                       </>
                     ) : (
@@ -295,17 +295,17 @@ export default function ContactPage() {
               </div>
 
               {/* Contact Information */}
-              <div className={styles.infoSection}>
-                <div className={styles.contactInfoCard}>
-                  <h3 className={styles.infoTitle}>Get in Touch</h3>
+              <div className="">
+                <div className="">
+                  <h3 className="">Get in Touch</h3>
 
-                  <div className={styles.contactInfoItem}>
-                    <div className={styles.infoIcon}>📞</div>
-                    <div className={styles.infoDetails}>
+                  <div className="">
+                    <div className="">📞</div>
+                    <div className="">
                       <h4>Phone</h4>
                       <a
                         href="tel:1-866-396-7623"
-                        className={styles.contactLink}
+                        className=""
                       >
                         1-866-EWO-ROAD
                         <br />
@@ -314,22 +314,22 @@ export default function ContactPage() {
                     </div>
                   </div>
 
-                  <div className={styles.contactInfoItem}>
-                    <div className={styles.infoIcon}>✉️</div>
-                    <div className={styles.infoDetails}>
+                  <div className="">
+                    <div className="">✉️</div>
+                    <div className="">
                       <h4>Email</h4>
                       <a
                         href="mailto:info@eastwestoffroad.com"
-                        className={styles.contactLink}
+                        className=""
                       >
                         info@eastwestoffroad.com
                       </a>
                     </div>
                   </div>
 
-                  <div className={styles.contactInfoItem}>
-                    <div className={styles.infoIcon}>📍</div>
-                    <div className={styles.infoDetails}>
+                  <div className="">
+                    <div className="">📍</div>
+                    <div className="">
                       <h4>Address</h4>
                       <p>
                         PO Box 2644
@@ -339,9 +339,9 @@ export default function ContactPage() {
                     </div>
                   </div>
 
-                  <div className={styles.contactInfoItem}>
-                    <div className={styles.infoIcon}>🕒</div>
-                    <div className={styles.infoDetails}>
+                  <div className="">
+                    <div className="">🕒</div>
+                    <div className="">
                       <h4>Response Time</h4>
                       <p>
                         We typically respond within

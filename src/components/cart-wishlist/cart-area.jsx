@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 // internal
 import useCartInfo from '@/hooks/use-cart-info';
 import { clearCart } from '@/redux/features/cartSlice';
-import styles from './cart-area.module.css';
+
 import CartCheckout from './cart-checkout';
 import CartItem from './cart-item';
 // import RenderCartProgress from '../common/render-cart-progress';
@@ -15,12 +15,12 @@ export default function CartArea() {
   const dispatch = useDispatch();
 
   return (
-    <section className={styles.container}>
-      <div className={styles.content}>
+    <section className="">
+      <div className="">
         {cart_products.length === 0 ? (
-          <div className={styles.emptyCart}>
-            <div className={styles.emptyCartContent}>
-              <div className={styles.emptyCartIcon}>
+          <div className="">
+            <div className="">
+              <div className="">
                 <svg
                   width="80"
                   height="80"
@@ -36,43 +36,41 @@ export default function CartArea() {
                   <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                 </svg>
               </div>
-              <h2 className={styles.emptyCartTitle}>Your Cart is Empty</h2>
-              <p className={styles.emptyCartText}>
+              <h2 className="">Your Cart is Empty</h2>
+              <p className="">
                 Looks like you haven't added anything to your cart yet.
               </p>
-              <Link href="/shop" className={styles.continueShoppingBtn}>
+              <Link href="/shop" className="">
                 Continue Shopping
               </Link>
             </div>
           </div>
         ) : (
-          <div className={styles.cartContent}>
+          <div className="">
             {/* First-time discount banner */}
             {firstTimeDiscount.isApplied && (
-              <div className={styles.discountBanner}>
-                <div className={styles.discountBannerContent}>
-                  <div className={styles.discountIcon}>🎉</div>
-                  <div className={styles.discountInfo}>
-                    <h3 className={styles.discountTitle}>
+              <div className="">
+                <div className="">
+                  <div className="">🎉</div>
+                  <div className="">
+                    <h3 className="">
                       Congratulations! First-time order discount applied
                     </h3>
-                    <p className={styles.discountDescription}>
+                    <p className="">
                       You're saving ${firstTimeDiscountAmount.toFixed(2)} (
                       {firstTimeDiscount.percentage}% off) on your first order!
                     </p>
                   </div>
-                  <div className={styles.discountAmount}>
-                    -{firstTimeDiscount.percentage}%
-                  </div>
+                  <div className="">-{firstTimeDiscount.percentage}%</div>
                 </div>
               </div>
             )}
 
             {/* Simple Header */}
-            <div className={styles.header}>
-              <div className={styles.headerLeft}>
-                <h1 className={styles.title}>Shopping Cart</h1>
-                <p className={styles.itemsCount}>
+            <div className="">
+              <div className="">
+                <h1 className="">Shopping Cart</h1>
+                <p className="">
                   {cart_products.length}{' '}
                   {cart_products.length === 1 ? 'item' : 'items'}
                 </p>
@@ -80,7 +78,7 @@ export default function CartArea() {
               <button
                 onClick={() => dispatch(clearCart())}
                 type="button"
-                className={styles.clearCartBtn}
+                className=""
               >
                 <svg
                   width="16"
@@ -99,10 +97,10 @@ export default function CartArea() {
               </button>
             </div>
 
-            <div className={styles.grid}>
+            <div className="">
               {/* Cart Items */}
-              <div className={styles.cartItemsSection}>
-                <div className={styles.cartItemsList}>
+              <div className="">
+                <div className="">
                   {cart_products.map((item, i) => (
                     <CartItem key={i} product={item} />
                   ))}
@@ -110,7 +108,7 @@ export default function CartArea() {
               </div>
 
               {/* Cart Checkout */}
-              <div className={styles.checkoutSection}>
+              <div className="">
                 <CartCheckout />
               </div>
             </div>

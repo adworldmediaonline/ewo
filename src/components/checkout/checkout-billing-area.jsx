@@ -1,10 +1,9 @@
 'use client';
-import React, { useState, useEffect } from 'react';
-import ErrorMsg from '../common/error-msg';
-import { useSelector, useDispatch } from 'react-redux';
-import { Country, State, City } from 'country-state-city';
 import { reset_address_discount } from '@/redux/features/order/orderSlice';
-import styles from './checkout-billing-area.module.css';
+import { City, Country, State } from 'country-state-city';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import ErrorMsg from '../common/error-msg';
 
 const CheckoutBillingArea = ({
   register,
@@ -175,14 +174,14 @@ const CheckoutBillingArea = ({
   };
 
   return (
-    <div className={styles.billingArea}>
-      <h3 className={styles.sectionTitle}>Billing Details</h3>
+    <div className="">
+      <h3 className="">Billing Details</h3>
 
-      <div className={styles.formGrid}>
-        <div className={styles.formRow}>
-          <div className={styles.formGroup}>
-            <label className={styles.formLabel}>
-              First Name <span className={styles.required}>*</span>
+      <div className="">
+        <div className="">
+          <div className="">
+            <label className="">
+              First Name <span className="">*</span>
             </label>
             <input
               {...register('firstName', {
@@ -193,13 +192,13 @@ const CheckoutBillingArea = ({
               type="text"
               placeholder="First Name"
               defaultValue={user?.firstName}
-              className={styles.formInput}
+              className=""
             />
             <ErrorMsg msg={errors?.firstName?.message} />
           </div>
-          <div className={styles.formGroup}>
-            <label className={styles.formLabel}>
-              Last Name <span className={styles.required}>*</span>
+          <div className="">
+            <label className="">
+              Last Name <span className="">*</span>
             </label>
             <input
               {...register('lastName', {
@@ -209,15 +208,15 @@ const CheckoutBillingArea = ({
               id="lastName"
               type="text"
               placeholder="Last Name"
-              className={styles.formInput}
+              className=""
             />
             <ErrorMsg msg={errors?.lastName?.message} />
           </div>
         </div>
 
-        <div className={styles.formGroup}>
-          <label className={styles.formLabel}>
-            Country <span className={styles.required}>*</span>
+        <div className="">
+          <label className="">
+            Country <span className="">*</span>
           </label>
           <select
             {...register('country', {
@@ -228,7 +227,7 @@ const CheckoutBillingArea = ({
             })}
             name="country"
             id="country"
-            className={styles.formSelect}
+            className=""
             defaultValue={formValues.country}
           >
             <option value="">Select Country</option>
@@ -241,9 +240,9 @@ const CheckoutBillingArea = ({
           <ErrorMsg msg={errors?.country?.message} />
         </div>
 
-        <div className={styles.formGroup}>
-          <label className={styles.formLabel}>
-            Street address <span className={styles.required}>*</span>
+        <div className="">
+          <label className="">
+            Street address <span className="">*</span>
           </label>
           <input
             {...register('address', {
@@ -256,15 +255,15 @@ const CheckoutBillingArea = ({
             id="address"
             type="text"
             placeholder="House number and street name"
-            className={styles.formInput}
+            className=""
           />
           <ErrorMsg msg={errors?.address?.message} />
         </div>
 
-        <div className={styles.formRowThree}>
-          <div className={styles.formGroup}>
-            <label className={styles.formLabel}>
-              City <span className={styles.required}>*</span>
+        <div className="">
+          <div className="">
+            <label className="">
+              City <span className="">*</span>
             </label>
             <input
               {...register('city', {
@@ -277,14 +276,14 @@ const CheckoutBillingArea = ({
               id="city"
               type="text"
               placeholder="Enter city"
-              className={styles.formInput}
+              className=""
             />
             <ErrorMsg msg={errors?.city?.message} />
           </div>
 
-          <div className={styles.formGroup}>
-            <label className={styles.formLabel}>
-              State <span className={styles.required}>*</span>
+          <div className="">
+            <label className="">
+              State <span className="">*</span>
             </label>
             <select
               {...register('state', {
@@ -295,7 +294,7 @@ const CheckoutBillingArea = ({
               })}
               name="state"
               id="state"
-              className={styles.formSelect}
+              className=""
               defaultValue={formValues.state}
               disabled={!selectedCountry}
             >
@@ -309,9 +308,9 @@ const CheckoutBillingArea = ({
             <ErrorMsg msg={errors?.state?.message} />
           </div>
 
-          <div className={styles.formGroup}>
-            <label className={styles.formLabel}>
-              ZIP Code <span className={styles.required}>*</span>
+          <div className="">
+            <label className="">
+              ZIP Code <span className="">*</span>
             </label>
             <input
               {...register('zipCode', {
@@ -324,15 +323,15 @@ const CheckoutBillingArea = ({
               id="zipCode"
               type="text"
               placeholder="Enter ZIP code"
-              className={styles.formInput}
+              className=""
             />
             <ErrorMsg msg={errors?.zipCode?.message} />
           </div>
         </div>
 
-        <div className={styles.formGroup}>
-          <label className={styles.formLabel}>
-            Phone <span className={styles.required}>*</span>
+        <div className="">
+          <label className="">
+            Phone <span className="">*</span>
           </label>
           <input
             {...register('contactNo', {
@@ -342,14 +341,14 @@ const CheckoutBillingArea = ({
             id="contactNo"
             type="text"
             placeholder="Phone"
-            className={styles.formInput}
+            className=""
           />
           <ErrorMsg msg={errors?.contactNo?.message} />
         </div>
 
-        <div className={styles.formGroup}>
-          <label className={styles.formLabel}>
-            Email address <span className={styles.required}>*</span>
+        <div className="">
+          <label className="">
+            Email address <span className="">*</span>
           </label>
           <input
             {...register('email', { required: `Email is required!` })}
@@ -358,20 +357,20 @@ const CheckoutBillingArea = ({
             type="email"
             placeholder="Email"
             defaultValue={user?.email}
-            className={styles.formInput}
+            className=""
           />
           <ErrorMsg msg={errors?.email?.message} />
         </div>
 
         {/* Uncomment for Order Notes feature
-        <div className={styles.formGroup}>
-          <label className={styles.formLabel}>Order notes (optional)</label>
+        <div className="">
+          <label className="">Order notes (optional)</label>
                 <textarea
                   {...register('orderNote', { required: false })}
                   name="orderNote"
                   id="orderNote"
                   placeholder="Notes about your order, e.g. special notes for delivery."
-            className={styles.formTextarea}
+            className=""
                 />
         </div>
         */}

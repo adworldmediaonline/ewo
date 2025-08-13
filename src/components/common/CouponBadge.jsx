@@ -1,5 +1,3 @@
-import styles from './CouponBadge.module.css';
-
 export default function CouponBadge({ coupons = [], className = '' }) {
   if (!coupons || coupons.length === 0) {
     return null;
@@ -37,10 +35,8 @@ export default function CouponBadge({ coupons = [], className = '' }) {
   };
 
   return (
-    <div className={`${styles.couponBadge} ${className}`}>
-      <span className={styles.couponBadgeText}>
-        {getDiscountText(primaryCoupon)}
-      </span>
+    <div className=" ${className}">
+      <span className="">{getDiscountText(primaryCoupon)}</span>
     </div>
   );
 }

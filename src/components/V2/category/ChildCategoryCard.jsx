@@ -1,5 +1,3 @@
-import React from 'react';
-import styles from './CategoryContent.module.css';
 import Link from 'next/link';
 
 export default function ChildCategoryCard({ category, index, parentCategory }) {
@@ -12,20 +10,17 @@ export default function ChildCategoryCard({ category, index, parentCategory }) {
     : `/shop?subCategory=${formattedCategory}`;
 
   return (
-    <div
-      className={`${styles.categoryCard} ${styles.fadeIn}`}
-      style={{ animationDelay: `${index * 0.1}s` }}
-    >
-      <div className={styles.cardTop}></div>
-      <div className={styles.cardDecoration}></div>
-      <div className={styles.cardInner}>
-        <h3 className={styles.categoryTitle}>{category}</h3>
-        <div className={styles.categoryMeta}>
-          <Link href={url} className={styles.shopNow}>
+    <div className=" " style={{ animationDelay: `${index * 0.1}s` }}>
+      <div className=""></div>
+      <div className=""></div>
+      <div className="">
+        <h3 className="">{category}</h3>
+        <div className="">
+          <Link href={url} className="">
             Shop Now
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className={styles.arrowIcon}
+              className=""
               width="16"
               height="16"
               viewBox="0 0 24 24"

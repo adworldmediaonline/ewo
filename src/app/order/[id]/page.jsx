@@ -1,8 +1,7 @@
-import Wrapper from '@/layout/wrapper';
-import HeaderV2 from '@/layout/headers/HeaderV2';
-import Footer from '@/layout/footers/footer';
 import OrderArea from '@/components/order/order-area';
-import styles from './order.module.css';
+import Footer from '@/layout/footers/footer';
+import HeaderV2 from '@/layout/headers/HeaderV2';
+import Wrapper from '@/layout/wrapper';
 
 export const metadata = {
   title: 'EWO - Order',
@@ -14,7 +13,7 @@ export const metadata = {
 export default async function OrderPage({ params }) {
   const id = (await params).id;
   return (
-    <div className={styles.orderPage}>
+    <div className="">
       <Wrapper>
         <HeaderV2 />
         <OrderArea orderId={id} />

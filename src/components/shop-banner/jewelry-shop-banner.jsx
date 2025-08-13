@@ -11,7 +11,7 @@ import banner_bg_4 from '@assets/img/banner/4/banner-4.jpg';
 // BannerItem
 function BannerItem({ cls, bg_clr, bg, content, title,isBtn=false}) {
   return (
-    <div className={`tp-banner-item-4 tp-banner-height-4 fix p-relative z-index-1 ${cls}`} 
+    <div className="tp-banner-item-4 tp-banner-height-4 fix p-relative z-index-1 ${cls}" 
     data-bg-color={`#${bg_clr}`}>
       <div className="tp-banner-thumb-4 include-bg black-bg transition-3" 
       style={{backgroundImage:`url(${bg.src})`}}></div>

@@ -65,32 +65,32 @@ export default function ThankYouPage() {
   // Show loading while checking authorization
   if (!isAuthorized) {
     return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.spinner}></div>
+      <div className="">
+        <div className=""></div>
         <p>Verifying submission...</p>
       </div>
     );
   }
 
   return (
-    <div className={styles.thankYouPage}>
+    <div className="">
       <Wrapper>
         <HeaderV2 />
-        <div className={styles.thankYouContainer}>
-          <div className={styles.thankYouContent}>
+        <div className="">
+          <div className="">
             {/* Success Icon */}
-            <div className={styles.successIcon}>
-              <div className={styles.checkmark}>
-                <svg viewBox="0 0 52 52" className={styles.checkmarkSvg}>
+            <div className="">
+              <div className="">
+                <svg viewBox="0 0 52 52" className="">
                   <circle
-                    className={styles.checkmarkCircle}
+                    className=""
                     cx="26"
                     cy="26"
                     r="25"
                     fill="none"
                   />
                   <path
-                    className={styles.checkmarkCheck}
+                    className=""
                     fill="none"
                     d="m16 27 8 8 16-16"
                   />
@@ -99,26 +99,26 @@ export default function ThankYouPage() {
             </div>
 
             {/* Main Message */}
-            <div className={styles.mainMessage}>
-              <h1 className={styles.thankYouTitle}>
+            <div className="">
+              <h1 className="">
                 Message Sent Successfully!
               </h1>
-              <p className={styles.thankYouSubtitle}>
+              <p className="">
                 Thank you for contacting us. We've received your message and
                 will get back to you soon.
               </p>
             </div>
 
             {/* Contact Info */}
-            <div className={styles.contactInfo}>
-              <p className={styles.contactText}>Need immediate assistance?</p>
-              <div className={styles.contactButtons}>
-                <a href="tel:1-866-396-7623" className={styles.phoneButton}>
+            <div className="">
+              <p className="">Need immediate assistance?</p>
+              <div className="">
+                <a href="tel:1-866-396-7623" className="">
                   Call 1-866-EWO-ROAD (396-7623)
                 </a>
                 <a
                   href="mailto:info@eastwestoffroad.com"
-                  className={styles.emailButton}
+                  className=""
                 >
                   Email Us
                 </a>
@@ -126,16 +126,16 @@ export default function ThankYouPage() {
             </div>
 
             {/* Action Buttons */}
-            <div className={styles.actionButtons}>
+            <div className="">
               <button
                 onClick={() => router.push('/')}
-                className={styles.homeButton}
+                className=""
               >
                 Back to Home
               </button>
               <button
                 onClick={() => router.push('/shop')}
-                className={styles.shopButton}
+                className=""
               >
                 Continue Shopping
               </button>

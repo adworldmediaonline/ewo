@@ -2,7 +2,6 @@ import ProfileArea from '@/components/my-account/profile-area';
 import Footer from '@/layout/footers/footer';
 import HeaderV2 from '@/layout/headers/HeaderV2';
 import Wrapper from '@/layout/wrapper';
-import styles from './profile.module.css';
 
 export const metadata = {
   title: 'EWO - Profile',
@@ -13,7 +12,7 @@ export const metadata = {
 
 export default function ProfilePage() {
   return (
-    <div className={styles.profilePage}>
+    <div className="">
       <Wrapper>
         <HeaderV2 />
         <ProfileArea />

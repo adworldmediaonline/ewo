@@ -1,20 +1,18 @@
 'use client';
-import React from 'react';
 import Link from 'next/link';
 import { useSelector } from 'react-redux';
 import WishlistItem from './wishlist-item';
-import styles from './wishlist-area.module.css';
 
 export default function WishlistArea() {
   const { wishlist } = useSelector(state => state.wishlist);
 
   return (
-    <section className={styles.container}>
-      <div className={styles.content}>
+    <section className="">
+      <div className="">
         {wishlist.length === 0 ? (
-          <div className={styles.emptyWishlist}>
-            <div className={styles.emptyWishlistContent}>
-              <div className={styles.emptyWishlistIcon}>
+          <div className="">
+            <div className="">
+              <div className="">
                 <svg
                   width="80"
                   height="80"
@@ -28,35 +26,33 @@ export default function WishlistArea() {
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                 </svg>
               </div>
-              <h2 className={styles.emptyWishlistTitle}>
-                Your Wishlist is Empty
-              </h2>
-              <p className={styles.emptyWishlistText}>
+              <h2 className="">Your Wishlist is Empty</h2>
+              <p className="">
                 Save your favorite items to your wishlist and come back to them
                 later.
               </p>
-              <Link href="/shop" className={styles.continueShoppingBtn}>
+              <Link href="/shop" className="">
                 Start Shopping
               </Link>
             </div>
           </div>
         ) : (
-          <div className={styles.wishlistContent}>
+          <div className="">
             {/* Header */}
-            <div className={styles.header}>
-              <div className={styles.headerLeft}>
-                <h1 className={styles.title}>My Wishlist</h1>
-                <p className={styles.itemsCount}>
+            <div className="">
+              <div className="">
+                <h1 className="">My Wishlist</h1>
+                <p className="">
                   {wishlist.length} {wishlist.length === 1 ? 'item' : 'items'}{' '}
                   saved
                 </p>
               </div>
             </div>
 
-            <div className={styles.grid}>
+            <div className="">
               {/* Wishlist Items */}
-              <div className={styles.wishlistItemsSection}>
-                <div className={styles.wishlistItemsList}>
+              <div className="">
+                <div className="">
                   {wishlist.map((item, i) => (
                     <WishlistItem key={i} product={item} />
                   ))}
@@ -64,13 +60,13 @@ export default function WishlistArea() {
               </div>
 
               {/* Wishlist Actions */}
-              <div className={styles.actionsSection}>
-                <div className={styles.actionsCard}>
-                  <div className={styles.actionsHeader}>
-                    <h3 className={styles.actionsTitle}>Quick Actions</h3>
+              <div className="">
+                <div className="">
+                  <div className="">
+                    <h3 className="">Quick Actions</h3>
                   </div>
-                  <div className={styles.actionsBody}>
-                    <Link href="/cart" className={styles.goToCartBtn}>
+                  <div className="">
+                    <Link href="/cart" className="">
                       <svg
                         width="16"
                         height="16"
@@ -87,7 +83,7 @@ export default function WishlistArea() {
                       </svg>
                       View Cart
                     </Link>
-                    <Link href="/shop" className={styles.continueShoppingBtn}>
+                    <Link href="/shop" className="">
                       Continue Shopping
                     </Link>
                   </div>

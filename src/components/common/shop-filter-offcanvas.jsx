@@ -62,7 +62,7 @@ const ShopFilterOffCanvas = ({
       {/* overlay start */}
       <div
         onClick={() => dispatch(handleFilterSidebarClose())}
-        className={`body-overlay ${filterSidebar ? 'opened' : ''}`}
+        className="body-overlay ${filterSidebar ? 'opened' : ''}"
       ></div>
       {/* overlay end */}
     </>

@@ -87,7 +87,7 @@ const JewelryBanner = () => {
 
               <div className="tp-slider-video-wrapper">
                 {/* <!-- video --> */}
-                <div className={`tp-slider-video transition-3 ${play?'full-width':''}`}>
+                <div className="tp-slider-video transition-3 ${play?'full-width':''}">
 
                   <video loop>
                     <source type="video/mp4" src="https://html.hixstudio.net/videos/shofy/jewellery-1.mp4" />
@@ -96,7 +96,7 @@ const JewelryBanner = () => {
                 {/* <!-- video button --> */}
                 <div className="tp-slider-play">
 
-                  <button onClick={handleToggle} type="button" className={`tp-slider-play-btn tp-slider-video-move-btn tp-video-toggle-btn ${play?'hide':''}`}>
+                  <button onClick={handleToggle} type="button" className="tp-slider-play-btn tp-slider-video-move-btn tp-video-toggle-btn ${play?'hide':''}">
                     <Image className="text-shape" src={text_shape} alt="text shape" priority />
                     <span className="play-icon">
                       <Play/>

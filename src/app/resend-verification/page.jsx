@@ -11,7 +11,7 @@ export const metadata = {
 
 export default function ResendVerificationPage() {
   return (
-    <div className={styles.resendVerificationPage}>
+    <div className="">
       <Wrapper>
         <ResendVerificationArea />
       </Wrapper>

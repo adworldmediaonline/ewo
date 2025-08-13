@@ -1,10 +1,10 @@
 'use client';
-import React, { useState, useRef, useEffect } from 'react';
-import CloudinaryImage from '../common/CloudinaryImage';
+import { useEffect, useRef, useState } from 'react';
 import Lightbox from 'yet-another-react-lightbox';
 import Zoom from 'yet-another-react-lightbox/plugins/zoom';
 import 'yet-another-react-lightbox/styles.css';
-import styles from '../../app/product/[id]/product-details.module.css';
+import CloudinaryImage from '../common/CloudinaryImage';
+const styles = new Proxy({}, { get: () => '' });
 
 export default function DetailsThumbWrapper({
   activeImg,
@@ -51,9 +51,7 @@ export default function DetailsThumbWrapper({
   useEffect(() => {
     // For horizontal thumbnails
     if (thumbnailsRef.current) {
-      const activeThumb = thumbnailsRef.current.querySelector(
-        `.${styles.thumbnailActive}`
-      );
+      const activeThumb = thumbnailsRef.current.querySelector('');
       if (activeThumb) {
         const container = thumbnailsRef.current;
         const scrollLeft =
@@ -70,9 +68,7 @@ export default function DetailsThumbWrapper({
 
     // For vertical thumbnails
     if (verticalThumbnailsRef.current) {
-      const activeThumb = verticalThumbnailsRef.current.querySelector(
-        `.${styles.thumbnailActive}`
-      );
+      const activeThumb = verticalThumbnailsRef.current.querySelector('');
       if (activeThumb) {
         const container = verticalThumbnailsRef.current;
         const scrollTop =
@@ -86,28 +82,23 @@ export default function DetailsThumbWrapper({
         });
       }
     }
-  }, [activeImg, styles.thumbnailActive]);
+  }, [activeImg]);
 
   return (
-    <div className={styles.galleryContainer}>
-      <div className={styles.galleryLayout}>
+    <div className="">
+      <div className="">
         {/* Vertical thumbnails for desktop */}
         {imageURLs && imageURLs.length > 0 && (
-          <div
-            className={styles.verticalThumbnails}
-            ref={verticalThumbnailsRef}
-          >
+          <div className="" ref={verticalThumbnailsRef}>
             {imageURLs.map((url, i) => (
               <button
                 key={i}
-                className={`${styles.thumbnailVertical} ${
-                  url === activeImg ? styles.thumbnailActive : ''
-                }`}
+                className={``}
                 onClick={() => handleImageActive(url)}
                 aria-label={`View product image ${i + 1}`}
                 type="button"
               >
-                <div className={styles.thumbnailImageWrapper}>
+                <div className="">
                   <CloudinaryImage
                     src={url ?? null}
                     alt={`Product thumbnail ${i + 1}`}
@@ -129,12 +120,9 @@ export default function DetailsThumbWrapper({
         )}
 
         {/* Main image container */}
-        <div className={styles.mainImageWrapper}>
-          <div
-            className={styles.mainImage}
-            onClick={() => setIsLightboxOpen(true)}
-          >
-            <div className={styles.mainImageContainer}>
+        <div className="">
+          <div className="" onClick={() => setIsLightboxOpen(true)}>
+            <div className="">
               <CloudinaryImage
                 src={activeImg}
                 alt="Product main image"
@@ -155,7 +143,7 @@ export default function DetailsThumbWrapper({
             </div>
           </div>
 
-          <div className={styles.zoomHint}>
+          <div className="">
             <svg
               width="18"
               height="18"
@@ -175,7 +163,7 @@ export default function DetailsThumbWrapper({
           </div>
 
           {status === 'out-of-stock' && (
-            <div className={styles.productBadge}>
+            <div className="">
               <span>Out of Stock</span>
             </div>
           )}
@@ -184,10 +172,10 @@ export default function DetailsThumbWrapper({
 
       {/* Horizontal thumbnails (mobile & secondary) */}
       {imageURLs && imageURLs.length > 0 && (
-        <div className={styles.horizontalThumbnailsWrapper}>
+        <div className="">
           {imageURLs.length > 3 && (
             <button
-              className={`${styles.thumbnailArrow} ${styles.thumbnailArrowLeft}`}
+              className=" "
               onClick={() => scrollThumbnails('left')}
               aria-label="Scroll thumbnails left"
               type="button"
@@ -207,18 +195,16 @@ export default function DetailsThumbWrapper({
             </button>
           )}
 
-          <div className={styles.horizontalThumbnails} ref={thumbnailsRef}>
+          <div className="" ref={thumbnailsRef}>
             {imageURLs.map((url, i) => (
               <button
                 key={i}
-                className={`${styles.thumbnail} ${
-                  url === activeImg ? styles.thumbnailActive : ''
-                }`}
+                className={``}
                 onClick={() => handleImageActive(url)}
                 aria-label={`View product image ${i + 1}`}
                 type="button"
               >
-                <div className={styles.thumbnailImageWrapper}>
+                <div className="">
                   <CloudinaryImage
                     src={url ?? null}
                     alt={`Product thumbnail ${i + 1}`}
@@ -240,7 +226,7 @@ export default function DetailsThumbWrapper({
 
           {imageURLs.length > 3 && (
             <button
-              className={`${styles.thumbnailArrow} ${styles.thumbnailArrowRight}`}
+              className=" "
               onClick={() => scrollThumbnails('right')}
               aria-label="Scroll thumbnails right"
               type="button"
@@ -270,7 +256,7 @@ export default function DetailsThumbWrapper({
         plugins={[Zoom]}
         index={currentSlideIndex > -1 ? currentSlideIndex : 0}
         animation={{ zoom: 500 }}
-        className={styles.customLightbox}
+        className=""
         zoom={{
           maxZoomPixelRatio: 3,
           zoomInMultiplier: 2,

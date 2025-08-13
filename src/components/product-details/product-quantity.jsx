@@ -1,9 +1,7 @@
 'use client';
-import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import styles from '../../app/product/[id]/product-details.module.css';
+
 // internal
-import { Minus, Plus } from '@/svg';
 import { decrement, increment } from '@/redux/features/cartSlice';
 import { notifyError } from '@/utils/toast';
 
@@ -44,21 +42,21 @@ const ProductQuantity = ({ productItem }) => {
   return (
     <>
       <button
-        className={styles.quantityButton}
+        className=""
         onClick={handleDecrease}
         aria-label="Decrease quantity"
       >
         -
       </button>
       <input
-        className={styles.quantityInput}
+        className=""
         type="text"
         readOnly
         value={orderQuantity}
         aria-label="Product quantity"
       />
       <button
-        className={styles.quantityButton}
+        className=""
         onClick={handleIncrease}
         aria-label="Increase quantity"
       >

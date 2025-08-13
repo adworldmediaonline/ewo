@@ -1,21 +1,19 @@
 'use client';
-import React from 'react';
 import Link from 'next/link';
-import styles from '../../app/product/[id]/product-details.module.css';
 
 export default function Breadcrumb({ title, current, productId }) {
   return (
-    <div className={styles.breadcrumb}>
-      <div className={styles.breadcrumbContent}>
-        <Link href="/" className={styles.breadcrumbLink}>
+    <div className="">
+      <div className="">
+        <Link href="/" className="">
           Home
         </Link>
-        <span className={styles.breadcrumbSeparator}>/</span>
-        <Link href="/shop" className={styles.breadcrumbLink}>
+        <span className="">/</span>
+        <Link href="/shop" className="">
           Shop
         </Link>
-        <span className={styles.breadcrumbSeparator}>/</span>
-        <span className={styles.breadcrumbCurrent}>{current}</span>
+        <span className="">/</span>
+        <span className="">{current}</span>
       </div>
     </div>
   );

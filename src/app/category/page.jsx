@@ -1,10 +1,9 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import CategoryContent from '../../components/V2/category/CategoryContent';
 import { Suspense } from 'react';
+import CategoryContent from '../../components/V2/category/CategoryContent';
 import CategoryContentSkeleton from '../../components/V2/loaders/CategoryContentSkeleton';
-import styles from './category.module.css';
 
 function CategoryPageContent() {
   const router = useRouter();
@@ -20,8 +19,8 @@ function CategoryPageContent() {
 
 export default function CategoryPage() {
   return (
-    <div className={styles.categoryPage}>
-      <main className={styles.categoryPageWrapper}>
+    <div className="">
+      <main className="">
         <Suspense fallback={<CategoryContentSkeleton />}>
           <CategoryPageContent />
         </Suspense>

@@ -1,7 +1,7 @@
 'use client';
 import parentCategoryModified from '@/lib/parentCategory';
 import { useGetProductQuery } from '@/redux/features/productApi';
-import styles from '../../app/product/[id]/product-details.module.css';
+
 import ErrorMsg from '../common/error-msg';
 import PrdDetailsLoader from '../loader/prd-details-loader';
 import ProductDetailsContent from './product-details-content';
@@ -37,17 +37,17 @@ const ProductDetailsArea = ({ id }) => {
     const formattedProductTitle = formatProductTitle(product.title);
 
     content = (
-      <div className={styles.productContainer}>
-        <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
-          <ol className={styles.breadcrumbList}>
-            <li className={styles.breadcrumbItem}>
-              <a href="/" className={styles.breadcrumbLink}>
-                <span className={styles.breadcrumbText}>Home</span>
+      <div className="">
+        <nav aria-label="Breadcrumb" className="">
+          <ol className="">
+            <li className="">
+              <a href="/" className="">
+                <span className="">Home</span>
               </a>
             </li>
-            <li className={styles.breadcrumbItem}>
+            <li className="">
               <svg
-                className={styles.chevronIcon}
+                className=""
                 width="16"
                 height="16"
                 viewBox="0 0 24 24"
@@ -59,21 +59,13 @@ const ProductDetailsArea = ({ id }) => {
               >
                 <polyline points="9 18 15 12 9 6"></polyline>
               </svg>
-              <a
-                href={`/shop?category=${categoryName}`}
-                className={styles.breadcrumbLink}
-              >
-                <span className={styles.breadcrumbText}>
-                  {formattedCategoryName}
-                </span>
+              <a href={`/shop?category=${categoryName}`} className="">
+                <span className="">{formattedCategoryName}</span>
               </a>
             </li>
-            <li
-              className={`${styles.breadcrumbItem} ${styles.breadcrumbActive}`}
-              aria-current="page"
-            >
+            <li className=" " aria-current="page">
               <svg
-                className={styles.chevronIcon}
+                className=""
                 width="16"
                 height="16"
                 viewBox="0 0 24 24"
@@ -85,9 +77,7 @@ const ProductDetailsArea = ({ id }) => {
               >
                 <polyline points="9 18 15 12 9 6"></polyline>
               </svg>
-              <span className={styles.breadcrumbCurrent}>
-                {formattedProductTitle}
-              </span>
+              <span className="">{formattedProductTitle}</span>
             </li>
           </ol>
         </nav>

@@ -1,10 +1,9 @@
 'use client';
-import React, { useState, useEffect } from 'react';
-import DetailsWrapper from './details-wrapper';
+import { useEffect, useState } from 'react';
 import DetailsBottomInfo from './details-bottom-info';
-import RelatedProducts from './related-products';
 import DetailsThumbWrapper from './details-thumb-wrapper';
-import styles from '../../app/product/[id]/product-details.module.css';
+import DetailsWrapper from './details-wrapper';
+import RelatedProducts from './related-products';
 
 export default function ProductDetailsContent({ productItem }) {
   const { _id, img, imageURLs, videoId, status } = productItem || {};
@@ -21,8 +20,8 @@ export default function ProductDetailsContent({ productItem }) {
 
   return (
     <>
-      <div className={styles.productDetails}>
-        <div className={styles.productGallery}>
+      <div className="">
+        <div className="">
           <DetailsThumbWrapper
             activeImg={activeImg}
             handleImageActive={handleImageActive}
@@ -33,7 +32,7 @@ export default function ProductDetailsContent({ productItem }) {
             status={status}
           />
         </div>
-        <div className={styles.productInfo}>
+        <div className="">
           <DetailsWrapper
             productItem={productItem}
             handleImageActive={handleImageActive}
@@ -42,7 +41,7 @@ export default function ProductDetailsContent({ productItem }) {
         </div>
       </div>
 
-      <div className={styles.productAdditionalInfo}>
+      <div className="">
         <DetailsBottomInfo productItem={productItem} />
         <RelatedProducts id={_id} />
       </div>

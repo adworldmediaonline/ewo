@@ -11,7 +11,6 @@ import {
   remove_applied_coupon,
 } from '@/redux/features/coupon/couponSlice';
 import { notifyError, notifySuccess } from '@/utils/toast';
-import styles from '../../app/cart/cart.module.css';
 
 export default function CartCheckout() {
   const {
@@ -225,18 +224,18 @@ export default function CartCheckout() {
   const totals = calculateTotals();
 
   return (
-    <div className={styles['checkout-card']}>
-      <div className={styles['checkout-card-header']}>
-        <h3 className={styles['checkout-card-title']}>Order Summary</h3>
+    <div className="">
+      <div className="">
+        <h3 className="">Order Summary</h3>
       </div>
 
-      <div className={styles['checkout-card-body']}>
+      <div className="">
         {/* Coupon Application Section */}
-        <div className={styles['coupon-section']}>
-          <div className={styles['coupon-toggle-container']}>
+        <div className="">
+          <div className="">
             <button
               onClick={() => setCouponFormVisible(!couponFormVisible)}
-              className={styles['coupon-toggle-btn']}
+              className=""
               type="button"
             >
               {couponFormVisible ? '📝 Hide Coupon Form' : '🎟️ Apply Coupon'}
@@ -244,23 +243,20 @@ export default function CartCheckout() {
           </div>
 
           {couponFormVisible && (
-            <div className={styles['coupon-form-container']}>
-              <form
-                onSubmit={handleCouponSubmit}
-                className={styles['coupon-form']}
-              >
-                <div className={styles['coupon-input-group']}>
+            <div className="">
+              <form onSubmit={handleCouponSubmit} className="">
+                <div className="">
                   <input
                     ref={couponInputRef}
                     type="text"
                     placeholder="Enter coupon code"
-                    className={styles['coupon-input']}
+                    className=""
                     disabled={isApplyingCoupon}
                   />
                   <button
                     type="submit"
                     disabled={isApplyingCoupon}
-                    className={styles['coupon-apply-btn']}
+                    className=""
                   >
                     {isApplyingCoupon ? 'Applying...' : 'Apply'}
                   </button>
@@ -272,36 +268,32 @@ export default function CartCheckout() {
 
         {/* Applied Coupons Section */}
         {Array.isArray(applied_coupons) && applied_coupons.length > 0 && (
-          <div className={styles['applied-coupons-section']}>
-            <div className={styles['applied-coupons-header']}>
-              <h4 className={styles['applied-coupons-title']}>
-                Applied Coupons ({applied_coupons.length})
-              </h4>
+          <div className="">
+            <div className="">
+              <h4 className="">Applied Coupons ({applied_coupons.length})</h4>
               <button
                 onClick={handleClearAllCoupons}
-                className={styles['clear-all-coupons-btn']}
+                className=""
                 type="button"
               >
                 Clear All
               </button>
             </div>
-            <div className={styles['applied-coupons-list']}>
+            <div className="">
               {applied_coupons.map((coupon, index) => (
                 <div
                   key={coupon._id || coupon.couponCode || index}
-                  className={styles['applied-coupon-item']}
+                  className=""
                 >
-                  <div className={styles['applied-coupon-details']}>
-                    <span className={styles['applied-coupon-code']}>
-                      {coupon.couponCode}
-                    </span>
-                    <span className={styles['applied-coupon-discount']}>
+                  <div className="">
+                    <span className="">{coupon.couponCode}</span>
+                    <span className="">
                       -${coupon.discount ? coupon.discount.toFixed(2) : '0.00'}
                     </span>
                   </div>
                   <button
                     onClick={() => handleRemoveCoupon(coupon._id)}
-                    className={styles['remove-coupon-btn']}
+                    className=""
                     type="button"
                   >
                     ×
@@ -313,26 +305,20 @@ export default function CartCheckout() {
         )}
 
         {/* Order Summary Details */}
-        <div className={styles['checkout-summary-item']}>
-          <span className={styles['checkout-summary-label']}>Subtotal</span>
-          <span className={styles['checkout-summary-value']}>
-            ${totals.subtotal.toFixed(2)}
-          </span>
+        <div className="">
+          <span className="">Subtotal</span>
+          <span className="">${totals.subtotal.toFixed(2)}</span>
         </div>
 
-        <div className={styles['checkout-shipping']}>
-          <h4 className={styles['checkout-shipping-title']}>Shipping</h4>
-          <div className={styles['checkout-shipping-options']}>
-            <div className={styles['checkout-shipping-option']}>
-              <span className={styles['checkout-shipping-label']}>
+        <div className="">
+          <h4 className="">Shipping</h4>
+          <div className="">
+            <div className="">
+              <span className="">
                 Calculated shipping:{' '}
-                <span className={styles['checkout-shipping-price']}>
-                  ${totals.shipping.toFixed(2)}
-                </span>
+                <span className="">${totals.shipping.toFixed(2)}</span>
                 {discountPercentage > 0 && (
-                  <span
-                    className={`${styles['checkout-shipping-discount']} ms-2 badge bg-success`}
-                  >
+                  <span className="${styles['checkout-shipping-discount']} ms-2 badge bg-success">
                     {discountPercentage}% off
                   </span>
                 )}
@@ -343,56 +329,44 @@ export default function CartCheckout() {
 
         {/* Address Discount */}
         {totals.addressDiscount > 0 && (
-          <div className={styles['checkout-discount-section']}>
-            <div className={styles['checkout-discount-item']}>
-              <span className={styles['checkout-discount-label']}>
-                📍 Address discount
-              </span>
-              <span className={styles['checkout-discount-value']}>
-                -${totals.addressDiscount.toFixed(2)}
-              </span>
+          <div className="">
+            <div className="">
+              <span className="">📍 Address discount</span>
+              <span className="">-${totals.addressDiscount.toFixed(2)}</span>
             </div>
           </div>
         )}
 
         {/* First-time discount section */}
         {totals.firstTimeDiscount > 0 && (
-          <div className={styles['checkout-discount-section']}>
-            <div className={styles['checkout-discount-item']}>
-              <span className={styles['checkout-discount-label']}>
+          <div className="">
+            <div className="">
+              <span className="">
                 🎉 First-time order discount (-{firstTimeDiscount.percentage}%)
               </span>
-              <span className={styles['checkout-discount-value']}>
-                -${totals.firstTimeDiscount.toFixed(2)}
-              </span>
+              <span className="">-${totals.firstTimeDiscount.toFixed(2)}</span>
             </div>
           </div>
         )}
 
         {/* Coupon Discounts */}
         {totals.couponDiscount > 0 && (
-          <div className={styles['checkout-discount-section']}>
-            <div className={styles['checkout-discount-item']}>
-              <span className={styles['checkout-discount-label']}>
-                🎟️ Coupon discounts
-              </span>
-              <span className={styles['checkout-discount-value']}>
-                -${totals.couponDiscount.toFixed(2)}
-              </span>
+          <div className="">
+            <div className="">
+              <span className="">🎟️ Coupon discounts</span>
+              <span className="">-${totals.couponDiscount.toFixed(2)}</span>
             </div>
           </div>
         )}
 
-        <div className={styles['checkout-total']}>
-          <span className={styles['checkout-total-label']}>Total</span>
-          <span className={styles['checkout-total-value']}>
-            ${Math.max(0, totals.finalTotal).toFixed(2)}
-          </span>
+        <div className="">
+          <span className="">Total</span>
+          <span className="">${Math.max(0, totals.finalTotal).toFixed(2)}</span>
         </div>
       </div>
 
-      <div className={styles['checkout-card-footer']}>
-        <Link href="/checkout" className={styles['checkout-btn']}>
+      <div className="">
+        <Link href="/checkout" className="">
           Proceed to Checkout
         </Link>
       </div>

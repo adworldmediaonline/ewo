@@ -2,18 +2,17 @@
 
 import { CldImage } from 'next-cloudinary';
 import Link from 'next/link';
-import styles from './BannerWithDiscount.module.css';
 
 export default function BannerWithDiscount() {
   return (
-    <div className={styles.bannerContainer}>
+    <div className="">
       <Link href="/profile">
         <CldImage
           src="deb418fe-8324-40a2-b4b8-9e0548c0aba1"
           width={1680}
           height={401}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1680px"
-          className={styles.bannerImage}
+          className=""
           alt="EWO Special Offer"
           crop="scale"
           quality={90}

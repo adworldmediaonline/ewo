@@ -21,14 +21,14 @@ const MobileMenus = () => {
         {mobile_menu.map((menu, i) => (
           <ul key={i}>
             {menu.homes ? (
-              <li className={`has-dropdown has-mega-menu ${isActiveMenu === menu.title ? 'dropdown-opened':''}`}>
-                <a className={`${isActiveMenu === menu.title ? 'expanded':''}`}>
+              <li className="has-dropdown has-mega-menu ${isActiveMenu === menu.title ? 'dropdown-opened':''}">
+                <a className="${isActiveMenu === menu.title ? 'expanded':''}">
                   Home
-                  <button onClick={()=> handleOpenSubMenu(menu.title)} className={`dropdown-toggle-btn ${isActiveMenu === menu.title ? 'dropdown-opened':''}`}>
+                  <button onClick={()=> handleOpenSubMenu(menu.title)} className="dropdown-toggle-btn ${isActiveMenu === menu.title ? 'dropdown-opened':''}">
                     <i className="fa-regular fa-angle-right"></i>
                   </button>
                 </a>
-                <div className={`home-menu tp-submenu tp-mega-menu ${isActiveMenu === menu.title ? 'active':''}`}>
+                <div className="home-menu tp-submenu tp-mega-menu ${isActiveMenu === menu.title ? 'active':''}">
                   <div className="row row-cols-1 row-cols-lg-4 row-cols-xl-5">
                     {menu.home_pages.map((home, i) => (
                       <div key={i} className="col">
@@ -48,14 +48,14 @@ const MobileMenus = () => {
                 </div>
               </li>
             ) : menu.sub_menu ? (
-              <li key={menu.id} className={`has-dropdown ${isActiveMenu === menu.title ? 'dropdown-opened':''}`}>
-                <a className={`${isActiveMenu === menu.title ? 'expanded':''}`}>
+              <li key={menu.id} className="has-dropdown ${isActiveMenu === menu.title ? 'dropdown-opened':''}">
+                <a className="${isActiveMenu === menu.title ? 'expanded':''}">
                   {menu.title}
-                  <button onClick={()=> handleOpenSubMenu(menu.title)} className={`dropdown-toggle-btn ${isActiveMenu === menu.title ? 'dropdown-opened':''}`}>
+                  <button onClick={()=> handleOpenSubMenu(menu.title)} className="dropdown-toggle-btn ${isActiveMenu === menu.title ? 'dropdown-opened':''}">
                     <i className="fa-regular fa-angle-right"></i>
                   </button>
                 </a>
-                <ul className={`tp-submenu ${isActiveMenu === menu.title ? 'active':''}`}>
+                <ul className="tp-submenu ${isActiveMenu === menu.title ? 'active':''}">
                   {menu.sub_menus.map((b, i) => (
                     <li key={i}>
                       <Link href={b.link}>{b.title}</Link>

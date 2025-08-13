@@ -22,18 +22,18 @@ export default function ResendVerificationArea() {
 
   return (
     <>
-      <section className={`tp-login-area ${styles.resendSection}`}>
+      <section className="tp-login-area ">
         <div className="container">
           <div className="row justify-content-center">
             <div className="col-xl-5 col-lg-6 col-md-8">
-              <div className={`tp-login-wrapper ${styles.resendWrapper}`}>
+              <div className="tp-login-wrapper ">
                 {/* Header */}
                 <div
-                  className={`tp-login-top text-center ${styles.resendHeader}`}
+                  className="tp-login-top text-center "
                 >
                   {/* Back Button */}
-                  <div className={styles.backButton}>
-                    <Link href="/login" className={styles.backLink}>
+                  <div className="">
+                    <Link href="/login" className="">
                       <svg
                         width="20"
                         height="20"
@@ -52,31 +52,31 @@ export default function ResendVerificationArea() {
                     </Link>
                   </div>
 
-                  <div className={styles.brandSection}>
-                    <h1 className={`tp-login-title ${styles.resendTitle}`}>
+                  <div className="">
+                    <h1 className="tp-login-title ">
                       Activate Your Account
                     </h1>
-                    <p className={styles.resendSubtitle}>
+                    <p className="">
                       Get a new verification link sent to your email
                     </p>
                   </div>
 
                   {/* Help Message */}
                   {helpMessage && (
-                    <div className={styles.helpMessage}>
+                    <div className="">
                       <p>{helpMessage}</p>
                     </div>
                   )}
                 </div>
 
                 {/* Resend Verification Form */}
-                <div className={`tp-login-option ${styles.resendForm}`}>
+                <div className="tp-login-option ">
                   <ResendVerificationForm />
                 </div>
 
                 {/* Info Section */}
-                <div className={styles.infoSection}>
-                  <div className={styles.infoCard}>
+                <div className="">
+                  <div className="">
                     <h4>📧 Verification Email Info</h4>
                     <ul>
                       <li>Check your spam/junk folder</li>
@@ -88,10 +88,10 @@ export default function ResendVerificationArea() {
                 </div>
 
                 {/* Sign In Link */}
-                <div className={styles.signinSection}>
+                <div className="">
                   <p>
                     Already activated your account?{' '}
-                    <Link href="/login" className={styles.signinLink}>
+                    <Link href="/login" className="">
                       Sign in here
                     </Link>
                   </p>

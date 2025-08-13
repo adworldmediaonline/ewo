@@ -1,9 +1,8 @@
-import Wrapper from '@/layout/wrapper';
-import HeaderV2 from '@/layout/headers/HeaderV2';
-import Footer from '@/layout/footers/footer';
 import CommonBreadcrumb from '@/components/breadcrumb/common-breadcrumb';
 import WishlistArea from '@/components/cart-wishlist/wishlist-area';
-import styles from './wishlist.module.css';
+import Footer from '@/layout/footers/footer';
+import HeaderV2 from '@/layout/headers/HeaderV2';
+import Wrapper from '@/layout/wrapper';
 
 export const metadata = {
   title: 'EWO - Wishlist',
@@ -14,7 +13,7 @@ export const metadata = {
 
 export default function WishlistPage() {
   return (
-    <div className={styles.wishlistPage}>
+    <div className="">
       <Wrapper>
         <HeaderV2 />
         <CommonBreadcrumb subtitle="Wishlist" />

@@ -37,10 +37,10 @@ const BlogGridArea = ({ list_area = false }) => {
                   <div className="tp-blog-grid-tab tp-tab">
                     <nav>
                       <div className="nav nav-tabs" id="nav-tab" role="tablist">
-                        <button className={`nav-link ${list_area ? '' : 'active'}`} id="nav-grid-tab" data-bs-toggle="tab" data-bs-target="#nav-grid" type="button" role="tab" aria-controls="nav-grid" aria-selected="true">
+                        <button className="nav-link ${list_area ? '' : 'active'}" id="nav-grid-tab" data-bs-toggle="tab" data-bs-target="#nav-grid" type="button" role="tab" aria-controls="nav-grid" aria-selected="true">
                           <ListTab />
                         </button>
-                        <button className={`nav-link ${list_area ? 'active' : ''}`} id="nav-list-tab" data-bs-toggle="tab" data-bs-target="#nav-list" type="button" role="tab" aria-controls="nav-list" aria-selected="false">
+                        <button className="nav-link ${list_area ? 'active' : ''}" id="nav-list-tab" data-bs-toggle="tab" data-bs-target="#nav-list" type="button" role="tab" aria-controls="nav-list" aria-selected="false">
                           <GridTab />
                         </button>
                       </div>
@@ -49,7 +49,7 @@ const BlogGridArea = ({ list_area = false }) => {
                 </div>
 
                 <div className="tab-content" id="nav-tabContent">
-                  <div className={`tab-pane fade ${list_area ? '' : 'show active'}`} id="nav-grid" role="tabpanel" aria-labelledby="nav-grid-tab" tabIndex="0">
+                  <div className="tab-pane fade ${list_area ? '' : 'show active'}" id="nav-grid" role="tabpanel" aria-labelledby="nav-grid-tab" tabIndex="0">
                     {/*  blog grid item wrapper */}
                     <div className="tp-blog-grid-item-wrapper">
                       <div className="row tp-gx-30">
@@ -61,7 +61,7 @@ const BlogGridArea = ({ list_area = false }) => {
                       </div>
                     </div>
                   </div>
-                  <div className={`tab-pane fade ${list_area ? 'show active' : ''}`} id="nav-list" role="tabpanel" aria-labelledby="nav-list-tab" tabIndex="0">
+                  <div className="tab-pane fade ${list_area ? 'show active' : ''}" id="nav-list" role="tabpanel" aria-labelledby="nav-list-tab" tabIndex="0">
                     {/* blog list wrapper */}
                     <div className="tp-blog-list-item-wrapper">
                       {filteredRows.slice(pageStart, pageStart + countOfPage).map((blog, i) => (

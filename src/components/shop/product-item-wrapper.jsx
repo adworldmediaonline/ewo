@@ -100,14 +100,14 @@ export default function ProductItemWrapper({ product, coupons = [] }) {
   };
 
   return (
-    <div className={styles.productCard}>
-      <div className={styles.productCardInner}>
+    <div className="">
+      <div className="">
         <ProductItem product={formattedProduct} coupons={coupons} />
 
-        <div className={styles.productCardActions}>
+        <div className="">
           <button
             type="button"
-            className={`${styles.addToCartBtn} ${
+            className={` ${
               isAddedToCart ? styles.active : ''
             }`}
             disabled={product.status === 'out-of-stock'}
@@ -125,7 +125,7 @@ export default function ProductItemWrapper({ product, coupons = [] }) {
                 fill="currentColor"
               />
             </svg>
-            <span className={styles.cartBtnText}>
+            <span className="">
               {isAddedToCart ? 'View Cart' : 'Add to Cart'}
             </span>
           </button>
