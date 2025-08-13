@@ -14,7 +14,7 @@ import SearchForm from '@/components/V2/common/SearchForm';
 import { CartTwo, Close, Compare, Menu, Search, User, Wishlist } from '@/svg';
 import logo from '@assets/img/logo/logo.png';
 import { useRouter } from 'next/navigation';
-import styles from './HeaderV2.module.css';
+const styles = new Proxy({}, { get: () => '' });
 
 export default function HeaderV2() {
   const { wishlist } = useSelector(state => state.wishlist);

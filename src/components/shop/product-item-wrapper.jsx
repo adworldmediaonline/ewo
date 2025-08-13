@@ -6,8 +6,8 @@ import { add_cart_product } from '@/redux/features/cartSlice';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import styles from '../../app/shop/shop.module.css';
 import ProductItem from '../products/fashion/product-item';
+const styles = new Proxy({}, { get: () => '' });
 
 // Function to convert text to title case (first letter of each word capitalized)
 // const toTitleCase = str => {

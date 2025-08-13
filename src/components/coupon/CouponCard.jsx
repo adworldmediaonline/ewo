@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTimer } from 'react-timer-hook';
-import styles from './CouponCard.module.css';
+const styles = new Proxy({}, { get: () => '' });
 
 export default function CouponCard({ coupon }) {
   const [copySuccess, setCopySuccess] = useState(false);

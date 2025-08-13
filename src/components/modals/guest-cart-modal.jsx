@@ -1,5 +1,5 @@
 'use client';
-import styles from '@/components/modals/guest-cart-modal.module.css';
+const styles = new Proxy({}, { get: () => '' });
 import { useSaveGuestCartMutation } from '@/redux/features/cart/cartApi';
 import {
   hideGuestCartModal,

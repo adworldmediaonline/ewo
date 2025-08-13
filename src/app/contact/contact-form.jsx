@@ -5,7 +5,7 @@ import Wrapper from '@/layout/wrapper';
 import { useSubmitContactMutation } from '@/redux/features/contactApi';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import styles from './page.module.css';
+const styles = new Proxy({}, { get: () => '' });
 
 export default function ContactPage() {
   const router = useRouter();

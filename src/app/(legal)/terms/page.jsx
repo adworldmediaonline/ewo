@@ -1,4 +1,4 @@
-import styles from './page.module.css';
+const styles = new Proxy({}, { get: () => '' });
 
 export const metadata = {
   title: 'Terms of Use - East West Offroad',
@@ -182,9 +182,9 @@ export default function TermsPage() {
                 </p>
                 <p className={styles.contactDetail}>
                   Phone:{' '}
-                              <a href="tel:1-866-396-7623" className={styles.contactLink}>
-              1-866-EWO-ROAD (396-7623)
-            </a>
+                  <a href="tel:1-866-396-7623" className={styles.contactLink}>
+                    1-866-EWO-ROAD (396-7623)
+                  </a>
                 </p>
                 <p className={styles.contactDetail}>
                   Address: PO Box 2644 Everett WA 98213

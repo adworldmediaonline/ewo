@@ -3,7 +3,8 @@ import TawkToChat from '@/components/tawk-to-chat';
 import { GoogleTagManager } from '@next/third-parties/google';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Lato } from 'next/font/google';
-import './globals.scss';
+// Import Tailwind (globals.css) before existing SCSS so legacy styles can override where needed
+import './globals.css';
 import './toast-fix.css';
 
 export const metadata = {

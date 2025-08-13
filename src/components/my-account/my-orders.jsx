@@ -2,7 +2,7 @@
 import dayjs from 'dayjs';
 import Link from 'next/link';
 import { useState } from 'react';
-import styles from './my-orders.module.css';
+const styles = new Proxy({}, { get: () => '' });
 
 // SVG Icons for Order Status
 const OrderStatusIcon = ({ status }) => {

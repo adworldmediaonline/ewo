@@ -1,6 +1,6 @@
-import Wrapper from '@/layout/wrapper';
 import ResendVerificationArea from '@/components/login-register/resend-verification-area';
-import styles from './resend-verification.module.css';
+import Wrapper from '@/layout/wrapper';
+const styles = new Proxy({}, { get: () => '' });
 
 export const metadata = {
   title: 'EWO - Resend Verification',

@@ -1,10 +1,10 @@
 'use client';
-import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 // internal
 import ResendVerificationForm from '../forms/resend-verification-form';
-import styles from './resend-verification-area.module.css';
+const styles = new Proxy({}, { get: () => '' });
 
 export default function ResendVerificationArea() {
   const searchParams = useSearchParams();
@@ -28,7 +28,9 @@ export default function ResendVerificationArea() {
             <div className="col-xl-5 col-lg-6 col-md-8">
               <div className={`tp-login-wrapper ${styles.resendWrapper}`}>
                 {/* Header */}
-                <div className={`tp-login-top text-center ${styles.resendHeader}`}>
+                <div
+                  className={`tp-login-top text-center ${styles.resendHeader}`}
+                >
                   {/* Back Button */}
                   <div className={styles.backButton}>
                     <Link href="/login" className={styles.backLink}>

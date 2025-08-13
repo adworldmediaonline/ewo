@@ -14,9 +14,9 @@ import {
 import { add_to_compare } from '@/redux/features/compareSlice';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { notifyError, notifySuccess } from '@/utils/toast';
-import styles from '../../app/product/[id]/product-details.module.css';
 import ProductDetailsCountdown from './product-details-countdown';
 import ProductQuantity from './product-quantity';
+const styles = new Proxy({}, { get: () => '' });
 // import { titleCaseFirstLetterOfEveryWord } from '@/lib/titleCaseFirstLetterOfEveryWord';
 
 export default function DetailsWrapper({

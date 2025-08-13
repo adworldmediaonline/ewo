@@ -3,7 +3,7 @@ import ErrorMsg from '@/components/common/error-msg';
 import PrdDetailsLoader from '@/components/loader/prd-details-loader';
 import { useGetUserOrderByIdQuery } from '@/redux/features/order/orderApi';
 import dayjs from 'dayjs';
-import styles from './order-area.module.css';
+const styles = new Proxy({}, { get: () => '' });
 
 export default function OrderArea({ orderId }) {
   const { data: order, isError, isLoading } = useGetUserOrderByIdQuery(orderId);

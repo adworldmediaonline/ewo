@@ -9,12 +9,12 @@ import Wrapper from '@/layout/wrapper';
 // import TawkMessengerReact from '@tawk.to/tawk-messenger-react';
 
 // import TawkToChat from '@/components/tawk-to-chat';
-import styles from './page.module.css';
+const styles = new Proxy({}, { get: () => '' });
 
 export default async function HomePage() {
   return (
     <>
-      <div className={styles.homePage}>
+      <div className={`${styles.homePage}`}>
         <Wrapper>
           <HeaderV2 />
           {/* <IndependenceDayBanner /> */}
