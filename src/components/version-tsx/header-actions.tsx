@@ -6,6 +6,7 @@ import { Heart, ShoppingCart, User as UserIcon } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import AuthDialog from './auth-dialog';
 import CartDropdown from './cart-dropdown';
 
 export interface HeaderActionsProps {
@@ -20,6 +21,7 @@ export function HeaderActions({
   const wishlist: unknown[] = useSelector(
     (s: any) => s?.wishlist?.wishlist ?? []
   );
+  const user = useSelector((s: any) => s?.auth?.user ?? null);
 
   function handleOpenCart() {
     dispatch(openCartMini());
@@ -55,19 +57,35 @@ export function HeaderActions({
         </button>
       </CartDropdown>
 
-      <Link
-        href="/profile"
-        aria-label="Account"
-        className="inline-flex items-center gap-3"
-      >
-        <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-muted text-foreground">
-          <UserIcon className="h-5 w-5" />
-        </span>
-        <div className="hidden sm:flex flex-col leading-tight text-header-foreground">
-          <span className="text-xs/4 opacity-80">Hi, Welcome</span>
-          <span className="text-sm font-semibold">Albert Edison</span>
-        </div>
-      </Link>
+      {user ? (
+        <Link
+          href="/profile"
+          aria-label="Account"
+          className="inline-flex items-center gap-3"
+        >
+          <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-muted text-foreground">
+            <UserIcon className="h-5 w-5" />
+          </span>
+          <div className="hidden sm:flex flex-col leading-tight text-header-foreground">
+            <span className="text-xs/4 opacity-80">Hi, Welcome</span>
+            <span className="text-sm font-semibold">
+              {user?.name || 'User'}
+            </span>
+          </div>
+        </Link>
+      ) : (
+        <AuthDialog>
+          <button
+            type="button"
+            aria-label="Open login"
+            className="inline-flex items-center gap-3"
+          >
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-muted text-foreground">
+              <UserIcon className="h-5 w-5" />
+            </span>
+          </button>
+        </AuthDialog>
+      )}
     </div>
   );
 }
