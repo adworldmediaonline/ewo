@@ -27,8 +27,8 @@ export function HeaderBrand({
         placeholder="blur"
         width={(logo as unknown as { width: number }).width}
         height={(logo as unknown as { height: number }).height}
-        sizes="(max-width: 768px) 220px, 260px"
-        className="h-[72px] md:h-[96px] w-auto object-contain"
+        sizes="(max-width: 480px) 160px, (max-width: 768px) 200px, 260px"
+        className="h-[52px] sm:h-[64px] md:h-[96px] w-auto object-contain"
       />
     </Link>
   );

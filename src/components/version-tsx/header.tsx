@@ -70,9 +70,10 @@ export default function HeaderV2(): React.ReactElement {
   return (
     <>
       <header className="sticky top-0 z-50 w-full bg-header text-header-foreground border-b border-border">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
-          <div className="flex h-28 items-center gap-4">
-            <div className="flex items-center gap-3 shrink-0">
+        <div className="mx-auto max-w-7xl px-3 md:px-6">
+          {/* Top row */}
+          <div className="flex h-16 md:h-28 items-center justify-between gap-2 md:gap-4">
+            <div className="flex items-center gap-2 md:gap-3 min-w-0">
               <div className="md:hidden">
                 <HeaderMenuButton links={PRIMARY_LINKS} />
               </div>
@@ -89,7 +90,7 @@ export default function HeaderV2(): React.ReactElement {
               />
             </div>
 
-            {/* Centered search grows to fill remaining space */}
+            {/* Centered search grows to fill remaining space on desktop */}
             <div className="hidden md:block flex-1 px-2">
               <HeaderSearch
                 inputRef={desktopSearchRef}
@@ -100,6 +101,10 @@ export default function HeaderV2(): React.ReactElement {
             <div className="shrink-0">
               <HeaderActions />
             </div>
+          </div>
+          {/* Mobile search below the row */}
+          <div className="md:hidden pb-3">
+            <HeaderSearch inputRef={mobileSearchRef} className="w-full" />
           </div>
         </div>
       </header>

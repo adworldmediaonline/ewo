@@ -28,13 +28,13 @@ export function HeaderActions({
   }
 
   return (
-    <div className="flex items-center gap-3 md:gap-4">
+    <div className="flex items-center gap-2 md:gap-4">
       <Link
         href="/wishlist"
         aria-label="Wishlist"
-        className="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-background text-foreground hover:bg-accent"
+        className="relative inline-flex h-10 w-10 md:h-11 md:w-11 items-center justify-center rounded-full border border-border bg-background text-foreground hover:bg-accent"
       >
-        <Heart className="h-5 w-5" />
+        <Heart className="h-5 w-5 md:h-5 md:w-5" />
         {showBadges && wishlist.length > 0 && (
           <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
             {wishlist.length}
@@ -45,10 +45,10 @@ export function HeaderActions({
       <CartDropdown>
         <button
           aria-label="Cart"
-          className="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-background text-foreground hover:bg-accent"
+          className="relative inline-flex h-10 w-10 md:h-11 md:w-11 items-center justify-center rounded-full border border-border bg-background text-foreground hover:bg-accent"
           type="button"
         >
-          <ShoppingCart className="h-5 w-5" />
+          <ShoppingCart className="h-5 w-5 md:h-5 md:w-5" />
           {showBadges && quantity > 0 && (
             <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
               {quantity}
@@ -61,12 +61,12 @@ export function HeaderActions({
         <Link
           href="/profile"
           aria-label="Account"
-          className="inline-flex items-center gap-3"
+          className="inline-flex items-center gap-2 md:gap-3"
         >
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-muted text-foreground">
-            <UserIcon className="h-5 w-5" />
+          <span className="inline-flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-full bg-muted text-foreground">
+            <UserIcon className="h-5 w-5 md:h-5 md:w-5" />
           </span>
-          <div className="hidden sm:flex flex-col leading-tight text-header-foreground">
+          <div className="hidden md:flex flex-col leading-tight text-header-foreground">
             <span className="text-xs/4 opacity-80">Hi, Welcome</span>
             <span className="text-sm font-semibold">
               {user?.name || 'User'}
@@ -78,10 +78,10 @@ export function HeaderActions({
           <button
             type="button"
             aria-label="Open login"
-            className="inline-flex items-center gap-3"
+            className="inline-flex items-center gap-2 md:gap-3"
           >
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-muted text-foreground">
-              <UserIcon className="h-5 w-5" />
+            <span className="inline-flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-full bg-muted text-foreground">
+              <UserIcon className="h-5 w-5 md:h-5 md:w-5" />
             </span>
           </button>
         </AuthDialog>

@@ -25,7 +25,7 @@ export function HeaderSearch({
       <SearchForm
         inputRef={inputRef}
         placeholder={placeholder}
-        className="h-12 w-full rounded-full border border-border bg-background pl-12 pr-14 text-sm text-foreground placeholder:text-muted-foreground caret-primary outline-none ring-0 focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-header selection:bg-primary/20 selection:text-foreground"
+        className="h-10 sm:h-11 md:h-12 w-full rounded-full border border-border bg-background pl-12 pr-14 text-sm text-foreground placeholder:text-muted-foreground caret-primary outline-none ring-0 focus:border-primary/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-header selection:bg-primary/20 selection:text-foreground"
         hideButton={true}
       />
     </div>
