@@ -310,10 +310,6 @@ export default function ShopContentWrapper() {
                         >
                           Load More Products
                         </Button>
-                        <div className="text-xs text-muted-foreground">
-                          Current: {pagination.currentPage} | Total:{' '}
-                          {pagination.totalPages} | Products: {products.length}
-                        </div>
                       </div>
                     )}
                   </div>
