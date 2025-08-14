@@ -6,14 +6,13 @@ import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 // Forms are rendered via reusable components below
 // We now use a single-view layout that can toggle between modes without tabs
 import {
@@ -103,18 +102,16 @@ export default function AuthDialog({
 
   const title = mode === 'login' ? 'Welcome back' : 'Create account';
   const subtitle =
-    mode === 'login'
-      ? 'Login with your Apple or Google account'
-      : 'Sign up with your Apple or Google account';
+    mode === 'login' ? 'Log in to continue' : 'Create your account';
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-md p-0 overflow-hidden">
+        <DialogTitle className="sr-only">{title}</DialogTitle>
         <Card className="border-0 rounded-none">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold">{title}</CardTitle>
-            <CardDescription>{subtitle}</CardDescription>
           </CardHeader>
           <CardContent>
             {mode === 'login' ? (
