@@ -70,7 +70,7 @@ export default function HeaderV2(): React.ReactElement {
   return (
     <>
       <header className="sticky top-0 z-50 w-full bg-header text-header-foreground border-b border-border">
-        <div className="mx-auto max-w-7xl px-3 md:px-6">
+        <div className="container mx-auto px-3 md:px-6">
           {/* Top row */}
           <div className="flex h-16 md:h-28 items-center justify-between gap-2 md:gap-4">
             <div className="flex items-center gap-2 md:gap-3 min-w-0">

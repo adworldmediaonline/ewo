@@ -12,7 +12,7 @@ export default function Footer() {
       <h2 id="footer-heading" className="sr-only">
         Footer
       </h2>
-      <div className="mx-auto max-w-7xl px-4 md:px-6">
+      <div className="container mx-auto px-3 md:px-6">
         {/* Top section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 py-10">
           {/* Logo and About */}

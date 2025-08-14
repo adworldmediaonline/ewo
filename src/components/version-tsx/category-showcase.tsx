@@ -135,7 +135,7 @@ export default function CategoryShowcase() {
       aria-labelledby="category-heading"
       className="w-full py-8 md:py-10"
     >
-      <div className="mx-auto max-w-7xl px-3 md:px-6">
+      <div className="container mx-auto px-3 md:px-6">
         <div className="mb-4 md:mb-6 flex items-end justify-between gap-3">
           <h2
             id="category-heading"

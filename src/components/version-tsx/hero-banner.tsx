@@ -60,7 +60,7 @@ export default function HeroBanner({
 
       {/* Overlay content - shared */}
       <div className="absolute inset-0 flex items-center">
-        <div className="mx-auto max-w-7xl w-full px-3 md:px-6">
+        <div className="container mx-auto w-full px-3 md:px-6">
           <div className="max-w-[75%] sm:max-w-lg md:max-w-xl lg:max-w-xl xl:max-w-2xl">
             {/* Desktop heading */}
             <h2 className="hidden md:block text-white/95 text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight leading-[1.15] lg:leading-[1.12] drop-shadow">
