@@ -18,6 +18,7 @@ import {
   quantityDecrement,
   remove_product,
 } from '@/redux/features/cartSlice';
+import { X as XIcon } from 'lucide-react';
 
 interface CartItem {
   _id: string;
@@ -72,21 +73,47 @@ export default function CartDropdown({
       ? String(Math.round(Number(shippingDiscount) * 100))
       : '0';
 
+  const finalTotal = React.useMemo(() => {
+    const baseTotal = Number(total || 0);
+    const shipping = Number(totalShippingCost || 0);
+    const coupon = Number(total_coupon_discount || 0);
+    return Math.max(0, baseTotal + shipping - coupon);
+  }, [total, totalShippingCost, total_coupon_discount]);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[24rem] p-0">
+      <DropdownMenuContent
+        align="end"
+        className="w-[min(92vw,26rem)] rounded-xl border border-border bg-popover p-0 shadow-xl z-[2147483647]"
+      >
         {items.length === 0 ? (
           <div className="grid place-items-center py-16 text-sm text-muted-foreground">
             Your cart is empty
           </div>
         ) : (
-          <div className="p-3">
-            <div className="grid max-h-80 gap-3 overflow-auto pr-1">
+          <div>
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3">
+              <div className="text-sm font-semibold">
+                My Cart ({items.length})
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-xs"
+                onClick={navigateToCart}
+              >
+                View all
+              </Button>
+            </div>
+
+            {/* Items */}
+            <div className="max-h-80 overflow-auto p-3 pr-1 grid gap-3">
               {items.map((item, idx) => (
                 <div
                   key={`${item._id}-${idx}`}
-                  className="grid grid-cols-[56px_1fr_auto] items-start gap-3"
+                  className="grid grid-cols-[56px_1fr_auto] items-start gap-3 rounded-lg border border-border/60 bg-background p-2"
                 >
                   <Link
                     href={`/product/${item.slug || item._id}`}
@@ -108,6 +135,13 @@ export default function CartDropdown({
                     >
                       {item.title}
                     </Link>
+                    <div className="mt-1 flex flex-wrap items-center gap-2">
+                      {Number(item.discount || 0) > 0 && (
+                        <span className="inline-flex items-center rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-700">
+                          Disc {Number(item.discount)}%
+                        </span>
+                      )}
+                    </div>
                     <div className="mt-1 inline-flex items-center gap-2 text-xs text-muted-foreground">
                       <button
                         type="button"
@@ -134,10 +168,10 @@ export default function CartDropdown({
                   <div className="flex flex-col items-end">
                     <button
                       type="button"
-                      className="text-xs text-muted-foreground hover:text-destructive"
+                      className="inline-flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground hover:text-destructive"
                       onClick={() => handleRemove(item)}
                     >
-                      Remove
+                      <XIcon className="h-4 w-4" aria-hidden />
                     </button>
                     <div className="text-sm font-semibold">
                       ${renderLinePrice(item)}
@@ -146,7 +180,8 @@ export default function CartDropdown({
                 </div>
               ))}
             </div>
-            <div className="mt-3 space-y-2 text-sm">
+            {/* Summary (no separators) */}
+            <div className="px-3 py-3 space-y-2 text-sm">
               <div className="flex items-center justify-between">
                 <span>Subtotal</span>
                 <span>
@@ -191,6 +226,10 @@ export default function CartDropdown({
                   <span>- ${Number(total_coupon_discount).toFixed(2)}</span>
                 </div>
               )}
+              <div className="flex items-center justify-between text-base font-bold">
+                <span>Total</span>
+                <span>${finalTotal.toFixed(2)}</span>
+              </div>
               <div className="grid grid-cols-2 gap-2 pt-2">
                 <Button
                   variant="outline"
