@@ -3,11 +3,11 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 // internal
-import BackToTopCom from '@/components/common/back-to-top';
 import ProductModal from '@/components/common/product-modal';
 import Loader from '@/components/loader/loader';
 import CartConfirmationModal from '@/components/modals/cart-confirmation-modal';
 import GuestCartModal from '@/components/modals/guest-cart-modal';
+// import BackToTopCom from '@/components/version-tsx/back-to-top';
 import useAuthCheck from '@/hooks/use-auth-check';
 import {
   get_cart_products,
@@ -50,7 +50,7 @@ const Wrapper = ({ children }: WrapperProps) => {
   ) : (
     <div id="wrapper">
       {children}
-      <BackToTopCom cls="" />
+      {/* <BackToTopCom /> */}
       <ToastContainer
         position="top-center"
         autoClose={400}

@@ -2,8 +2,8 @@ import Wrapper from '@/components/wrapper';
 // import HeaderTwo from '@/layout/headers/header-2';
 import ShopBreadcrumb from '@/components/breadcrumb/shop-breadcrumb';
 import ShopArea from '@/components/shop/shop-area';
+import Footer from '@/components/version-tsx/footer';
 import HeaderV2 from '@/components/version-tsx/header';
-import Footer from '@/layout/footers/footer';
 
 export const metadata = {
   title: 'EWO - Shop',

@@ -1,8 +1,8 @@
 import CommonBreadcrumb from '@/components/breadcrumb/common-breadcrumb';
 import CartArea from '@/components/cart-wishlist/cart-area';
+import Footer from '@/components/version-tsx/footer';
 import HeaderV2 from '@/components/version-tsx/header';
 import Wrapper from '@/components/wrapper';
-import Footer from '@/layout/footers/footer';
 
 export const metadata = {
   title: 'EWO - Shopping Cart',

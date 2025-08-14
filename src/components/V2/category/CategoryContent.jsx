@@ -3,8 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
+import Footer from '@/components/version-tsx/footer';
 import HeaderV2 from '@/components/version-tsx/header';
-import Footer from '@/layout/footers/footer';
 import parentCategoryModified from '@/lib/parentCategory';
 import { useGetCategoryByIdQuery } from '@/redux/features/categoryApi';
 import EmptyState from '../common/EmptyState';
