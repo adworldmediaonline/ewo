@@ -10,7 +10,13 @@ import SearchButton from './SearchButton';
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:7000';
 
-export default function SearchForm({ inputRef }) {
+export default function SearchForm({
+  inputRef,
+  className = '',
+  placeholder = 'Search for products...',
+  hideButton = false,
+  buttonClassName = '',
+}) {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [searchText, setSearchText] = useState('');
@@ -127,12 +133,14 @@ export default function SearchForm({ inputRef }) {
           name="q"
           value={searchText}
           onChange={handleInputChange}
-          placeholder="Search for products..."
-          className=""
+          placeholder={placeholder}
+          className={className}
           autoComplete="off"
           aria-label="Search products"
         />
-        <SearchButton className="" isLoading={isLoading} />
+        {!hideButton && (
+          <SearchButton className={buttonClassName} isLoading={isLoading} />
+        )}
       </Form>
 
       {error && <div className="">{error}</div>}

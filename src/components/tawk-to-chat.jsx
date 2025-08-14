@@ -21,7 +21,17 @@ export default function TawkToChat() {
     // eslint-disable-next-line no-undef
     window.Tawk_LoadStart = new Date();
 
-    const handleLoad = () => setIsLoading(false);
+    const handleLoad = () => {
+      setIsLoading(false);
+      try {
+        // eslint-disable-next-line no-undef
+        if (window.Tawk_API) {
+          // Raise z-index of sheet via CSS already, but also hide widget when cart opens
+          // eslint-disable-next-line no-undef
+          window.Tawk_API.onChatMinimized = function () {};
+        }
+      } catch {}
+    };
     // Attach basic callbacks if needed
     // eslint-disable-next-line no-undef
     window.Tawk_API.onLoad = handleLoad;

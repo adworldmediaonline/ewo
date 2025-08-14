@@ -32,6 +32,12 @@ const lato = Lato({
   subsets: ['latin'],
 });
 
+// const quattrocento = Quattrocento({
+//   variable: '--font-quattrocento',
+//   weight: ['400', '700'],
+//   subsets: ['latin'],
+// });
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
@@ -65,9 +71,10 @@ export default function RootLayout({ children }) {
       </head>
       <GoogleTagManager gtmId="GTM-MB34NG65" />
       <body
-        className="${lato.variable} ${lato.className} antialiased"
+        className={`${lato.variable} ${lato.className} $antialiased`}
         suppressHydrationWarning
       >
+        {/* {quattrocento.variable} ${quattrocento.className} */}
         <Providers>
           <Wrapper>{children}</Wrapper>
         </Providers>

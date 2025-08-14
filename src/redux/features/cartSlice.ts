@@ -1,40 +1,83 @@
 import { getLocalStorage, setLocalStorage } from '@/utils/localstorage';
 import { notifyError } from '@/utils/toast';
-import { createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-const initialState = {
+interface SelectedOption {
+  title: string;
+}
+
+interface CartProduct {
+  _id: string;
+  title: string;
+  img: string;
+  price: number | string;
+  orderQuantity: number;
+  quantity?: number;
+  discount?: number | string;
+  slug?: string;
+  shipping?: { price?: number };
+  selectedOption?: SelectedOption;
+  finalPrice?: number | string;
+}
+
+interface FirstTimeDiscountState {
+  isEligible: boolean;
+  isApplied: boolean;
+  percentage: number;
+  showCelebration?: boolean;
+}
+
+interface LastAddedProduct {
+  title: string;
+  img: string;
+  selectedOption?: SelectedOption;
+  orderQuantity: number;
+}
+
+interface CartState {
+  cart_products: CartProduct[];
+  orderQuantity: number;
+  cartMiniOpen: boolean;
+  totalShippingCost: number;
+  shippingDiscount: number;
+  firstTimeDiscount: FirstTimeDiscountState;
+  showCartConfirmation: boolean;
+  lastAddedProduct: LastAddedProduct | null;
+}
+
+const initialState: CartState = {
   cart_products: [],
   orderQuantity: 1,
   cartMiniOpen: false,
   totalShippingCost: 0,
   shippingDiscount: 0,
-  // First-time discount state
   firstTimeDiscount: {
     isEligible: true,
     isApplied: false,
     percentage: 15,
+    showCelebration: false,
   },
-  // Cart confirmation modal state
   showCartConfirmation: false,
   lastAddedProduct: null,
 };
 
 // Helper function to check if user is first-time customer
-const checkFirstTimeCustomer = () => {
+const checkFirstTimeCustomer = (): boolean => {
   // Use direct localStorage access to avoid the getLocalStorage function's default behavior
   const hasReceivedDiscount = localStorage.getItem('first_time_discount_used');
   return !hasReceivedDiscount; // Returns true if null/undefined (first time)
 };
 
 // Helper function to mark discount as used (should only be called on order completion)
-const markDiscountAsUsed = () => {
+const markDiscountAsUsed = (): void => {
   localStorage.setItem('first_time_discount_used', 'true');
 };
 
 // Helper function to calculate shipping discount
-const calculateShippingDiscount = items => {
+const calculateShippingDiscount = (items: CartProduct[]): number => {
   const itemCount = items.reduce(
-    (total, item) => total + item.orderQuantity,
+    (total: number, item: CartProduct) =>
+      total + (Number(item.orderQuantity) || 0),
     0
   );
 
@@ -45,10 +88,13 @@ const calculateShippingDiscount = items => {
 };
 
 // Helper function to calculate total shipping cost
-const calculateTotalShipping = (items, discount) => {
-  const totalShipping = items.reduce((total, item) => {
-    const itemShipping = item.shipping?.price || 0;
-    return total + itemShipping * item.orderQuantity;
+const calculateTotalShipping = (
+  items: CartProduct[],
+  discount: number
+): number => {
+  const totalShipping = items.reduce((total: number, item: CartProduct) => {
+    const itemShipping = Number(item.shipping?.price || 0);
+    return total + itemShipping * Number(item.orderQuantity || 0);
   }, 0);
 
   // Apply discount and fix to 2 decimal places to avoid floating point errors
@@ -57,7 +103,7 @@ const calculateTotalShipping = (items, discount) => {
 };
 
 // Helper to update shipping costs
-const updateShippingCosts = state => {
+const updateShippingCosts = (state: CartState): void => {
   const discount = calculateShippingDiscount(state.cart_products);
   state.shippingDiscount = discount;
   state.totalShippingCost = calculateTotalShipping(
@@ -67,7 +113,7 @@ const updateShippingCosts = state => {
 };
 
 // Helper to update first-time discount eligibility
-const updateFirstTimeDiscount = state => {
+const updateFirstTimeDiscount = (state: CartState): void => {
   const isFirstTime = checkFirstTimeCustomer();
   const hasProducts = state.cart_products.length > 0;
 
@@ -79,7 +125,7 @@ export const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
-    add_cart_product: (state, { payload }) => {
+    add_cart_product: (state, { payload }: PayloadAction<CartProduct>) => {
       // Check if this is the first product being added to cart
       const isFirstProduct = state.cart_products.length === 0;
       const isFirstTimeCustomer = checkFirstTimeCustomer();
@@ -90,7 +136,7 @@ export const cartSlice = createSlice({
         : payload._id;
 
       // Check if this exact product with the same option already exists in cart
-      const isExist = state.cart_products.some(item => {
+      const isExist = state.cart_products.some((item: CartProduct) => {
         const itemId = item.selectedOption
           ? `${item._id}-option-${item.selectedOption.title}`
           : item._id;
@@ -98,11 +144,13 @@ export const cartSlice = createSlice({
       });
 
       if (!isExist) {
-        const newItem = {
+        const newItem: CartProduct = {
           ...payload,
           orderQuantity: state.orderQuantity,
           // If a final price is provided (when option is selected), use it
-          ...(payload.finalPrice && { price: parseFloat(payload.finalPrice) }),
+          ...(payload.finalPrice && {
+            price: parseFloat(String(payload.finalPrice)),
+          }),
         };
         state.cart_products.push(newItem);
 
@@ -122,17 +170,20 @@ export const cartSlice = createSlice({
           state.cartMiniOpen = true;
         }
       } else {
-        state.cart_products = state.cart_products.map(item => {
+        state.cart_products = state.cart_products.map((item: CartProduct) => {
           const itemId = item.selectedOption
             ? `${item._id}-option-${item.selectedOption.title}`
             : item._id;
 
           if (itemId === productId) {
-            if (item.quantity >= item.orderQuantity + state.orderQuantity) {
+            if (
+              (Number(item.quantity) || 0) >=
+              (Number(item.orderQuantity) || 0) + state.orderQuantity
+            ) {
               item.orderQuantity =
                 state.orderQuantity !== 1
-                  ? state.orderQuantity + item.orderQuantity
-                  : item.orderQuantity + 1;
+                  ? state.orderQuantity + Number(item.orderQuantity || 0)
+                  : Number(item.orderQuantity || 0) + 1;
 
               // Show cart confirmation modal
               state.showCartConfirmation = true;
@@ -149,7 +200,7 @@ export const cartSlice = createSlice({
               state.orderQuantity = 1;
             }
           }
-          return { ...item };
+          return { ...item } as CartProduct;
         });
       }
 
@@ -160,23 +211,23 @@ export const cartSlice = createSlice({
       setLocalStorage('cart_products', state.cart_products);
       setLocalStorage('shipping_cost', state.totalShippingCost);
     },
-    increment: (state, { payload }) => {
+    increment: state => {
       state.orderQuantity = state.orderQuantity + 1;
     },
-    decrement: (state, { payload }) => {
+    decrement: state => {
       state.orderQuantity =
         state.orderQuantity > 1
           ? state.orderQuantity - 1
           : (state.orderQuantity = 1);
     },
-    quantityDecrement: (state, { payload }) => {
-      state.cart_products.map(item => {
+    quantityDecrement: (state, { payload }: PayloadAction<CartProduct>) => {
+      state.cart_products.map((item: CartProduct) => {
         if (item._id === payload._id) {
-          if (item.orderQuantity > 1) {
-            item.orderQuantity = item.orderQuantity - 1;
+          if (Number(item.orderQuantity || 0) > 1) {
+            item.orderQuantity = Number(item.orderQuantity || 0) - 1;
           }
         }
-        return { ...item };
+        return { ...item } as CartProduct;
       });
 
       // Update shipping costs and first-time discount
@@ -186,9 +237,12 @@ export const cartSlice = createSlice({
       setLocalStorage('cart_products', state.cart_products);
       setLocalStorage('shipping_cost', state.totalShippingCost);
     },
-    remove_product: (state, { payload }) => {
+    remove_product: (
+      state,
+      { payload }: PayloadAction<{ id: string; title: string }>
+    ) => {
       state.cart_products = state.cart_products.filter(
-        item => item._id !== payload.id
+        (item: CartProduct) => item._id !== payload.id
       );
 
       // Update shipping costs and first-time discount
@@ -199,9 +253,12 @@ export const cartSlice = createSlice({
       setLocalStorage('shipping_cost', state.totalShippingCost);
       notifyError(`${payload.title} Remove from cart`);
     },
-    update_product_option: (state, { payload }) => {
+    update_product_option: (
+      state,
+      { payload }: PayloadAction<{ id: string }>
+    ) => {
       state.cart_products = state.cart_products.filter(
-        item => item._id !== payload.id
+        (item: CartProduct) => item._id !== payload.id
       );
 
       // Update shipping costs and first-time discount
@@ -212,8 +269,9 @@ export const cartSlice = createSlice({
       setLocalStorage('shipping_cost', state.totalShippingCost);
       // No toast notification for option updates - will be handled when new item is added
     },
-    get_cart_products: (state, action) => {
-      state.cart_products = getLocalStorage('cart_products');
+    get_cart_products: state => {
+      state.cart_products = (getLocalStorage('cart_products') ||
+        []) as CartProduct[];
       // Always keep cartMiniOpen as false on page load for better UX
       state.cartMiniOpen = false;
       // Clear any lingering celebration state on page load
@@ -226,7 +284,7 @@ export const cartSlice = createSlice({
       updateShippingCosts(state);
       updateFirstTimeDiscount(state);
     },
-    initialOrderQuantity: (state, { payload }) => {
+    initialOrderQuantity: state => {
       state.orderQuantity = 1;
     },
     clearCart: state => {
@@ -245,11 +303,11 @@ export const cartSlice = createSlice({
       setLocalStorage('cart_products', state.cart_products);
       setLocalStorage('shipping_cost', state.totalShippingCost);
     },
-    openCartMini: (state, { payload }) => {
+    openCartMini: state => {
       state.cartMiniOpen = true;
       setLocalStorage('cartMiniOpen', true);
     },
-    closeCartMini: (state, { payload }) => {
+    closeCartMini: state => {
       state.cartMiniOpen = false;
       setLocalStorage('cartMiniOpen', false);
     },

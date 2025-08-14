@@ -1,6 +1,6 @@
 import OrderArea from '@/components/order/order-area';
+import HeaderV2 from '@/components/version-tsx/header';
 import Footer from '@/layout/footers/footer';
-import HeaderV2 from '@/layout/headers/HeaderV2';
 import Wrapper from '@/layout/wrapper';
 
 export const metadata = {

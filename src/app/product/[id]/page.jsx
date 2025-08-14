@@ -1,6 +1,6 @@
 import ProductDetailsArea from '@/components/product-details/product-details-area';
+import HeaderV2 from '@/components/version-tsx/header';
 import Footer from '@/layout/footers/footer';
-import HeaderV2 from '@/layout/headers/HeaderV2';
 import Wrapper from '@/layout/wrapper';
 
 // Fetch product data for metadata

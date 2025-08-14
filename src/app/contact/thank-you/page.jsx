@@ -1,6 +1,6 @@
 'use client';
+import HeaderV2 from '@/components/version-tsx/header';
 import Footer from '@/layout/footers/footer';
-import HeaderV2 from '@/layout/headers/HeaderV2';
 import Wrapper from '@/layout/wrapper';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -82,27 +82,15 @@ export default function ThankYouPage() {
             <div className="">
               <div className="">
                 <svg viewBox="0 0 52 52" className="">
-                  <circle
-                    className=""
-                    cx="26"
-                    cy="26"
-                    r="25"
-                    fill="none"
-                  />
-                  <path
-                    className=""
-                    fill="none"
-                    d="m16 27 8 8 16-16"
-                  />
+                  <circle className="" cx="26" cy="26" r="25" fill="none" />
+                  <path className="" fill="none" d="m16 27 8 8 16-16" />
                 </svg>
               </div>
             </div>
 
             {/* Main Message */}
             <div className="">
-              <h1 className="">
-                Message Sent Successfully!
-              </h1>
+              <h1 className="">Message Sent Successfully!</h1>
               <p className="">
                 Thank you for contacting us. We've received your message and
                 will get back to you soon.
@@ -116,10 +104,7 @@ export default function ThankYouPage() {
                 <a href="tel:1-866-396-7623" className="">
                   Call 1-866-EWO-ROAD (396-7623)
                 </a>
-                <a
-                  href="mailto:info@eastwestoffroad.com"
-                  className=""
-                >
+                <a href="mailto:info@eastwestoffroad.com" className="">
                   Email Us
                 </a>
               </div>
@@ -127,16 +112,10 @@ export default function ThankYouPage() {
 
             {/* Action Buttons */}
             <div className="">
-              <button
-                onClick={() => router.push('/')}
-                className=""
-              >
+              <button onClick={() => router.push('/')} className="">
                 Back to Home
               </button>
-              <button
-                onClick={() => router.push('/shop')}
-                className=""
-              >
+              <button onClick={() => router.push('/shop')} className="">
                 Continue Shopping
               </button>
             </div>

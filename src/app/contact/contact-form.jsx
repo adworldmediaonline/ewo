@@ -1,6 +1,6 @@
 'use client';
+import HeaderV2 from '@/components/version-tsx/header';
 import Footer from '@/layout/footers/footer';
-import HeaderV2 from '@/layout/headers/HeaderV2';
 import Wrapper from '@/layout/wrapper';
 import { useSubmitContactMutation } from '@/redux/features/contactApi';
 import { useRouter } from 'next/navigation';
@@ -153,17 +153,11 @@ export default function ContactPage() {
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        className={` ${
-                          errors.name ? styles.inputError : ''
-                        }`}
+                        className={` ${errors.name ? styles.inputError : ''}`}
                         placeholder="Your full name"
                         maxLength={100}
                       />
-                      {errors.name && (
-                        <span className="">
-                          {errors.name}
-                        </span>
-                      )}
+                      {errors.name && <span className="">{errors.name}</span>}
                     </div>
 
                     <div className="">
@@ -176,16 +170,10 @@ export default function ContactPage() {
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
-                        className={` ${
-                          errors.email ? styles.inputError : ''
-                        }`}
+                        className={` ${errors.email ? styles.inputError : ''}`}
                         placeholder="your.email@example.com"
                       />
-                      {errors.email && (
-                        <span className="">
-                          {errors.email}
-                        </span>
-                      )}
+                      {errors.email && <span className="">{errors.email}</span>}
                     </div>
                   </div>
 
@@ -200,16 +188,10 @@ export default function ContactPage() {
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
-                        className={` ${
-                          errors.phone ? styles.inputError : ''
-                        }`}
+                        className={` ${errors.phone ? styles.inputError : ''}`}
                         placeholder="(555) 123-4567"
                       />
-                      {errors.phone && (
-                        <span className="">
-                          {errors.phone}
-                        </span>
-                      )}
+                      {errors.phone && <span className="">{errors.phone}</span>}
                     </div>
 
                     <div className="">
@@ -229,9 +211,7 @@ export default function ContactPage() {
                         maxLength={200}
                       />
                       {errors.subject && (
-                        <span className="">
-                          {errors.subject}
-                        </span>
+                        <span className="">{errors.subject}</span>
                       )}
                     </div>
                   </div>
@@ -245,9 +225,7 @@ export default function ContactPage() {
                       name="message"
                       value={formData.message}
                       onChange={handleChange}
-                      className={` ${
-                        errors.message ? styles.inputError : ''
-                      }`}
+                      className={` ${errors.message ? styles.inputError : ''}`}
                       placeholder="Please describe your inquiry in detail..."
                       rows={6}
                       maxLength={2000}
@@ -256,9 +234,7 @@ export default function ContactPage() {
                       {formData.message.length}/2000 characters
                     </div>
                     {errors.message && (
-                      <span className="">
-                        {errors.message}
-                      </span>
+                      <span className="">{errors.message}</span>
                     )}
                   </div>
 
@@ -278,9 +254,7 @@ export default function ContactPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={` ${
-                      isSubmitting ? styles.submitting : ''
-                    }`}
+                    className={` ${isSubmitting ? styles.submitting : ''}`}
                   >
                     {isSubmitting ? (
                       <>
@@ -303,10 +277,7 @@ export default function ContactPage() {
                     <div className="">📞</div>
                     <div className="">
                       <h4>Phone</h4>
-                      <a
-                        href="tel:1-866-396-7623"
-                        className=""
-                      >
+                      <a href="tel:1-866-396-7623" className="">
                         1-866-EWO-ROAD
                         <br />
                         (396-7623)
@@ -318,10 +289,7 @@ export default function ContactPage() {
                     <div className="">✉️</div>
                     <div className="">
                       <h4>Email</h4>
-                      <a
-                        href="mailto:info@eastwestoffroad.com"
-                        className=""
-                      >
+                      <a href="mailto:info@eastwestoffroad.com" className="">
                         info@eastwestoffroad.com
                       </a>
                     </div>
