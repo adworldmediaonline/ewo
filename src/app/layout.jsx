@@ -5,6 +5,8 @@ import Wrapper from '@/components/wrapper';
 import { GoogleTagManager } from '@next/third-parties/google';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Lato } from 'next/font/google';
+import Footer from '../components/version-tsx/footer';
+import HeaderV2 from '../components/version-tsx/header';
 import './globals.css';
 
 export const metadata = {
@@ -77,7 +79,11 @@ export default function RootLayout({ children }) {
       >
         {/* {quattrocento.variable} ${quattrocento.className} */}
         <Providers>
-          <Wrapper>{children}</Wrapper>
+          <Wrapper>
+            <HeaderV2 />
+            {children}
+            <Footer />
+          </Wrapper>
         </Providers>
         <SpeedInsights />
         <TawkToChat />
