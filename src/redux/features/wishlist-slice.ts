@@ -1,8 +1,18 @@
-import { createSlice } from '@reduxjs/toolkit';
 import { getLocalStorage, setLocalStorage } from '@/utils/localstorage';
 import { notifyError, notifySuccess } from '@/utils/toast';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-const initialState = {
+interface WishlistItem {
+  _id: string;
+  title: string;
+  [key: string]: unknown;
+}
+
+interface WishlistState {
+  wishlist: WishlistItem[];
+}
+
+const initialState: WishlistState = {
   wishlist: [],
 };
 
@@ -10,7 +20,7 @@ export const wishlistSlice = createSlice({
   name: 'wishlist',
   initialState,
   reducers: {
-    add_to_wishlist: (state, { payload }) => {
+    add_to_wishlist: (state, { payload }: PayloadAction<WishlistItem>) => {
       const isExist = state.wishlist.some(item => item._id === payload._id);
       if (!isExist) {
         state.wishlist.push(payload);
@@ -23,14 +33,18 @@ export const wishlistSlice = createSlice({
       }
       setLocalStorage('wishlist_items', state.wishlist);
     },
-    remove_wishlist_product: (state, { payload }) => {
+    remove_wishlist_product: (
+      state,
+      { payload }: PayloadAction<{ id: string; title: string }>
+    ) => {
       state.wishlist = state.wishlist.filter(item => item._id !== payload.id);
       notifyError(`${payload.title} removed from wishlist`);
       setLocalStorage('wishlist_items', state.wishlist);
       notifyError(`${payload.title} removed from wishlist`);
     },
-    get_wishlist_products: (state, { payload }) => {
-      state.wishlist = getLocalStorage('wishlist_items');
+    get_wishlist_products: state => {
+      state.wishlist = (getLocalStorage('wishlist_items') ||
+        []) as WishlistItem[];
     },
   },
 });

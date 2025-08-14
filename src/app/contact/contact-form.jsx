@@ -1,7 +1,7 @@
 'use client';
 import HeaderV2 from '@/components/version-tsx/header';
+import Wrapper from '@/components/wrapper';
 import Footer from '@/layout/footers/footer';
-import Wrapper from '@/layout/wrapper';
 import { useSubmitContactMutation } from '@/redux/features/contactApi';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';

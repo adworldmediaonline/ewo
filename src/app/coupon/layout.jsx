@@ -2,7 +2,7 @@ import ShopBreadcrumb from '../../components/breadcrumb/shop-breadcrumb';
 import Footer from '../../layout/footers/footer';
 
 import HeaderV2 from '../../components/version-tsx/header';
-import Wrapper from '../../layout/wrapper';
+import Wrapper from '../../components/wrapper';
 
 export default function CouponLayout({ children }) {
   return (

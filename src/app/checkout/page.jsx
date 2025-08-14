@@ -1,7 +1,7 @@
 import CheckoutArea from '@/components/checkout/checkout-area';
 import HeaderV2 from '@/components/version-tsx/header';
+import Wrapper from '@/components/wrapper';
 import Footer from '@/layout/footers/footer';
-import Wrapper from '@/layout/wrapper';
 
 export const metadata = {
   title: 'EWO - Checkout',

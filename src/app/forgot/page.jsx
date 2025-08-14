@@ -1,5 +1,5 @@
 import ForgotArea from '@/components/login-register/forgot-area';
-import Wrapper from '@/layout/wrapper';
+import Wrapper from '@/components/wrapper';
 
 export const metadata = {
   title: 'EWO - Forgot Password',

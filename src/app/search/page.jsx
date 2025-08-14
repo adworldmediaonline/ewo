@@ -1,8 +1,8 @@
 import CommonBreadcrumb from '@/components/breadcrumb/common-breadcrumb';
 import SearchArea from '@/components/search/search-area';
 import HeaderV2 from '@/components/version-tsx/header';
+import Wrapper from '@/components/wrapper';
 import Footer from '@/layout/footers/footer';
-import Wrapper from '@/layout/wrapper';
 
 export const metadata = {
   title: 'EWO - Search',

@@ -1,9 +1,7 @@
 'use client';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-if (typeof window !== 'undefined') {
-  require('bootstrap/dist/js/bootstrap');
-}
+
 // internal
 import BackToTopCom from '@/components/common/back-to-top';
 import ProductModal from '@/components/common/product-modal';
@@ -21,8 +19,12 @@ import { forceToastCenter } from '@/utils/toast-center';
 import { ToastContainer, Zoom } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const Wrapper = ({ children }) => {
-  const { productItem } = useSelector(state => state.productModal);
+interface WrapperProps {
+  children: React.ReactNode;
+}
+
+const Wrapper = ({ children }: WrapperProps) => {
+  const { productItem } = useSelector((state: any) => state.productModal);
   const dispatch = useDispatch();
   const authChecked = useAuthCheck();
 
@@ -48,7 +50,7 @@ const Wrapper = ({ children }) => {
   ) : (
     <div id="wrapper">
       {children}
-      <BackToTopCom />
+      <BackToTopCom cls="" />
       <ToastContainer
         position="top-center"
         autoClose={400}

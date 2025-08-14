@@ -1,7 +1,7 @@
 'use client';
 import HeaderV2 from '@/components/version-tsx/header';
+import Wrapper from '@/components/wrapper';
 import Footer from '@/layout/footers/footer';
-import Wrapper from '@/layout/wrapper';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 const styles = new Proxy({}, { get: () => '' });

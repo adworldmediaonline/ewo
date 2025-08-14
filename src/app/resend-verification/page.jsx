@@ -1,5 +1,5 @@
 import ResendVerificationArea from '@/components/login-register/resend-verification-area';
-import Wrapper from '@/layout/wrapper';
+import Wrapper from '@/components/wrapper';
 const styles = new Proxy({}, { get: () => '' });
 
 export const metadata = {

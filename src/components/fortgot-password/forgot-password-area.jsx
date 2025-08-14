@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 // internal
-import Wrapper from '@/layout/wrapper';
+import Wrapper from '@/components/wrapper';
 // import LoginShapes from "@/components/login-register/login-shapes";
 import ErrorMsg from '@/components/common/error-msg';
 import { useConfirmForgotPasswordMutation } from '@/redux/features/auth/authApi';

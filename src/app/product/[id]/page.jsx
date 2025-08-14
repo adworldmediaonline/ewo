@@ -1,7 +1,7 @@
 import ProductDetailsArea from '@/components/product-details/product-details-area';
 import HeaderV2 from '@/components/version-tsx/header';
+import Wrapper from '@/components/wrapper';
 import Footer from '@/layout/footers/footer';
-import Wrapper from '@/layout/wrapper';
 
 // Fetch product data for metadata
 async function getProductData(id) {

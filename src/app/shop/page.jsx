@@ -1,4 +1,4 @@
-import Wrapper from '@/layout/wrapper';
+import Wrapper from '@/components/wrapper';
 // import HeaderTwo from '@/layout/headers/header-2';
 import ShopBreadcrumb from '@/components/breadcrumb/shop-breadcrumb';
 import ShopArea from '@/components/shop/shop-area';

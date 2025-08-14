@@ -1,5 +1,5 @@
 import LoginArea from '@/components/login-register/login-area';
-import Wrapper from '@/layout/wrapper';
+import Wrapper from '@/components/wrapper';
 
 export const metadata = {
   title: 'EWO - Login',
