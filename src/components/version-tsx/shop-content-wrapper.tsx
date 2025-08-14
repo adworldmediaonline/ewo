@@ -49,7 +49,6 @@ export default function ShopContentWrapper() {
       page: currentPage,
       limit: 15,
     };
-    console.log('Creating apiFilters:', apiFiltersObj);
     return apiFiltersObj;
   }, [filters, currentPage]);
 
@@ -65,34 +64,13 @@ export default function ShopContentWrapper() {
   const pagination = data?.pagination;
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  // Debug logging
-  useEffect(() => {
-    console.log('Current page:', currentPage);
-    console.log('API filters:', apiFilters);
-    console.log('Products count:', products.length);
-    console.log('Pagination:', pagination);
-    console.log('Raw data:', data);
-  }, [currentPage, apiFilters, products.length, pagination, data]);
-
-  // Log when page changes
-  useEffect(() => {
-    console.log('Page changed to:', currentPage);
-  }, [currentPage]);
-
-  // Log when API filters change
-  useEffect(() => {
-    console.log('API filters changed:', apiFilters);
-  }, [apiFilters]);
-
   // Load more products when scroll reaches bottom
   useEffect(() => {
     if (inView && pagination?.hasNextPage && !isLoadingMore) {
-      console.log('Auto-loading next page');
       const nextPage = currentPageRef.current + 1;
-      console.log('Auto-setting page to:', nextPage);
       setCurrentPage(nextPage);
     }
-  }, [inView, pagination?.hasNextPage, isLoadingMore]); // Removed currentPage dependency
+  }, [inView, pagination?.hasNextPage, isLoadingMore]);
 
   // Reset page when filters change
   useEffect(() => {
@@ -123,12 +101,10 @@ export default function ShopContentWrapper() {
 
   const handleLoadMore = useCallback(async () => {
     if (pagination?.hasNextPage && !isLoadingMore) {
-      console.log('Manual load more triggered');
       setIsLoadingMore(true);
 
       // Increment page and trigger new API call
       const nextPage = currentPageRef.current + 1;
-      console.log('Setting page to:', nextPage);
       setCurrentPage(nextPage);
 
       // Small delay to show loading state
@@ -338,42 +314,6 @@ export default function ShopContentWrapper() {
                           Current: {pagination.currentPage} | Total:{' '}
                           {pagination.totalPages} | Products: {products.length}
                         </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={async () => {
-                            console.log('Testing API call...');
-                            try {
-                              const response = await fetch(
-                                `/api/product/paginated?page=2&limit=15`
-                              );
-                              const data = await response.json();
-                              console.log('Test API response:', data);
-                            } catch (error) {
-                              console.error('Test API error:', error);
-                            }
-                          }}
-                        >
-                          Test API
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={async () => {
-                            console.log('Testing current page API call...');
-                            try {
-                              const response = await fetch(
-                                `/api/product/paginated?page=${currentPage}&limit=15`
-                              );
-                              const data = await response.json();
-                              console.log('Current page API response:', data);
-                            } catch (error) {
-                              console.error('Current page API error:', error);
-                            }
-                          }}
-                        >
-                          Test Current Page
-                        </Button>
                       </div>
                     )}
                   </div>

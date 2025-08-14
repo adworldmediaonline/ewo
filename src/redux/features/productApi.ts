@@ -30,56 +30,33 @@ export const productApi = apiSlice.injectEndpoints({
       ProductFilters
     >({
       query: filters => {
-        console.log('RTK Query query called with filters:', filters);
         const params = new URLSearchParams();
         Object.entries(filters).forEach(([key, value]) => {
           if (value !== undefined && value !== '') {
             params.append(key, value.toString());
           }
         });
-        const url = `/api/product/paginated?${params.toString()}`;
-        console.log('RTK Query URL:', url);
-        return url;
+        return `/api/product/paginated?${params.toString()}`;
       },
       serializeQueryArgs: ({ queryArgs }) => {
         // Create a stable cache key that excludes the page number
         const { page, ...rest } = queryArgs;
-        const cacheKey = JSON.stringify(rest);
-        console.log('RTK Query cache key:', cacheKey, 'for page:', page);
-        return cacheKey;
+        return JSON.stringify(rest);
       },
       merge: (currentCache, newItems, { arg }) => {
-        console.log('RTK Query merge called:', {
-          currentCacheLength: currentCache?.data?.length || 0,
-          newItemsLength: newItems?.data?.length || 0,
-          page: arg.page,
-          currentCache: currentCache,
-          newItems: newItems,
-        });
-
         // If this is the first page, return new items
         if (arg.page === 1) {
-          console.log('First page, returning new items');
           return newItems;
         }
 
         // For subsequent pages, merge with existing data
         if (currentCache && currentCache.data) {
-          console.log(
-            'Merging pages:',
-            currentCache.data.length,
-            '+',
-            newItems.data.length
-          );
-          const mergedData = {
+          return {
             data: [...currentCache.data, ...newItems.data],
             pagination: newItems.pagination,
           };
-          console.log('Merged result:', mergedData);
-          return mergedData;
         }
 
-        console.log('No current cache, returning new items');
         return newItems;
       },
       forceRefetch: ({ currentArg, previousArg }) => {
@@ -87,9 +64,9 @@ export const productApi = apiSlice.injectEndpoints({
         if (!previousArg || !currentArg) return true;
         const { page: currentPage, ...currentFilters } = currentArg;
         const { page: previousPage, ...previousFilters } = previousArg;
-        const shouldRefetch = JSON.stringify(currentFilters) !== JSON.stringify(previousFilters);
-        console.log('RTK Query forceRefetch:', shouldRefetch, 'current:', currentArg, 'previous:', previousArg);
-        return shouldRefetch;
+        return (
+          JSON.stringify(currentFilters) !== JSON.stringify(previousFilters)
+        );
       },
       // Add a key to ensure re-fetching when page changes
       keepUnusedDataFor: 0,
