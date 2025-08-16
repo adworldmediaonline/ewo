@@ -136,7 +136,7 @@ export default function ShopContentWrapper() {
       <div className="container mx-auto px-4 py-6">
         <div className="flex gap-6">
           {/* Desktop Filters Sidebar */}
-          <div className="hidden w-80 flex-shrink-0 lg:block">
+          <div className="hidden w-64 flex-shrink-0 lg:block">
             <div className="sticky top-6">
               <ShopFilters
                 filters={filters}
