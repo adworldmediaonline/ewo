@@ -31,6 +31,7 @@ interface ShopFiltersProps {
 }
 
 const sortOptions = [
+  { value: 'skuArrangementOrderNo-asc', label: 'Default Order' },
   { value: 'createdAt-desc', label: 'Newest First' },
   { value: 'createdAt-asc', label: 'Oldest First' },
   { value: 'price-asc', label: 'Price: Low to High' },

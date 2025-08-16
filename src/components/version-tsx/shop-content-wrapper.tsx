@@ -21,8 +21,8 @@ export default function ShopContentWrapper() {
   const [filters, setFilters] = useState<ShopFiltersType>({
     search: '',
     category: '',
-    sortBy: 'createdAt',
-    sortOrder: 'desc',
+    sortBy: 'skuArrangementOrderNo',
+    sortOrder: 'asc',
   });
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -79,8 +79,8 @@ export default function ShopContentWrapper() {
     setFilters({
       search: '',
       category: '',
-      sortBy: 'createdAt',
-      sortOrder: 'desc',
+      sortBy: 'skuArrangementOrderNo',
+      sortOrder: 'asc',
     });
   }, []);
 

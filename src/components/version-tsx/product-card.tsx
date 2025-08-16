@@ -16,6 +16,7 @@ export interface Product {
   img?: string;
   imageURLs?: string[];
   price: number;
+  updatedPrice?: number;
   finalPriceDiscount?: number;
   category: {
     name: string;
@@ -54,14 +55,6 @@ export default function ProductCard({
   );
 
   const imageUrl = product.imageURLs?.[0] || product.img;
-  const hasDiscount =
-    product.finalPriceDiscount && product.finalPriceDiscount < product.price;
-  const discountPercentage = hasDiscount
-    ? Math.round(
-        ((product.price - product.finalPriceDiscount!) / product.price) * 100
-      )
-    : 0;
-
   const averageRating =
     product.reviews && product.reviews.length > 0
       ? product.reviews.reduce((sum, review) => sum + review.rating, 0) /
@@ -90,14 +83,21 @@ export default function ProductCard({
         <CardContent className="p-0">
           <div className="relative aspect-square overflow-hidden">
             {/* Discount Badge */}
-            {hasDiscount && (
-              <Badge
-                variant="destructive"
-                className="absolute left-2 top-2 z-10"
-              >
-                -{discountPercentage}%
-              </Badge>
-            )}
+            {product.finalPriceDiscount &&
+              product.finalPriceDiscount < product.price && (
+                <Badge
+                  variant="destructive"
+                  className="absolute left-2 top-2 z-10"
+                >
+                  -
+                  {Math.round(
+                    ((product.price - product.finalPriceDiscount!) /
+                      product.price) *
+                      100
+                  )}
+                  %
+                </Badge>
+              )}
 
             {/* Status Badge */}
             {product.status === 'out-of-stock' && (
@@ -205,18 +205,12 @@ export default function ProductCard({
         <div className="mt-auto pt-3">
           {/* Price */}
           <div className="flex items-center gap-2 mb-2.5">
-            {hasDiscount ? (
-              <>
-                <span className="text-lg font-bold text-destructive">
-                  ${product.finalPriceDiscount}
-                </span>
-                <span className="text-sm text-muted-foreground line-through">
-                  ${product.price}
-                </span>
-              </>
-            ) : (
-              <span className="text-lg font-bold">${product.price}</span>
-            )}
+            <span className="text-sm text-primary line-through">
+              ${Number(product.updatedPrice).toFixed(2)}
+            </span>
+            <span className="text-lg font-bold">
+              ${Number(product.finalPriceDiscount).toFixed(2)}
+            </span>
           </div>
 
           {/* Add to Cart Button */}
