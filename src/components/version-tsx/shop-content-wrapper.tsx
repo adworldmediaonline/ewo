@@ -6,6 +6,7 @@ import { add_cart_product } from '@/redux/features/cartSlice';
 import { useGetPaginatedProductsQuery } from '@/redux/features/productApi';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { Filter, Search } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,12 +16,19 @@ import ShopFilters, { ShopFilters as ShopFiltersType } from './shop-filters';
 
 export default function ShopContentWrapper() {
   const dispatch = useDispatch();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { cart_products } = useSelector((state: any) => state.cart);
   const { wishlist } = useSelector((state: any) => state.wishlist);
 
+  // Initialize filters from URL parameters
+  const initialCategory = searchParams.get('category') || '';
+  const initialSubcategory = searchParams.get('subcategory') || '';
+
   const [filters, setFilters] = useState<ShopFiltersType>({
     search: '',
-    category: '',
+    category: initialCategory,
+    subcategory: initialSubcategory,
     sortBy: 'skuArrangementOrderNo',
     sortOrder: 'asc',
   });
@@ -28,6 +36,7 @@ export default function ShopContentWrapper() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const currentPageRef = useRef(currentPage);
+  const isUpdatingFromUrl = useRef(false);
 
   const { ref: loadMoreRef, inView } = useInView();
 
@@ -41,7 +50,7 @@ export default function ShopContentWrapper() {
     const apiFiltersObj = {
       ...filters,
       page: currentPage,
-      limit: 15,
+      limit: 8,
     };
     return apiFiltersObj;
   }, [filters, currentPage]);
@@ -69,20 +78,82 @@ export default function ShopContentWrapper() {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [filters.search, filters.category, filters.sortBy, filters.sortOrder]);
+  }, [
+    filters.search,
+    filters.category,
+    filters.subcategory,
+    filters.sortBy,
+    filters.sortOrder,
+  ]);
 
-  const handleFiltersChange = useCallback((newFilters: ShopFiltersType) => {
-    setFilters(newFilters);
-  }, []);
+  // Synchronize URL with filters when they change
+  useEffect(() => {
+    if (isUpdatingFromUrl.current) {
+      isUpdatingFromUrl.current = false;
+      return;
+    }
+
+    const params = new URLSearchParams(searchParams);
+    const currentSearch = params.get('search') || '';
+    const currentCategory = params.get('category') || '';
+    const currentSubcategory = params.get('subcategory') || '';
+    const currentSortBy = params.get('sortBy') || 'skuArrangementOrderNo';
+    const currentSortOrder = params.get('sortOrder') || 'asc';
+
+    // Only update if there's a mismatch
+    if (
+      currentSearch !== filters.search ||
+      currentCategory !== filters.category ||
+      currentSubcategory !== filters.subcategory ||
+      currentSortBy !== filters.sortBy ||
+      currentSortOrder !== filters.sortOrder
+    ) {
+      setFilters({
+        search: currentSearch,
+        category: currentCategory,
+        subcategory: currentSubcategory,
+        sortBy: currentSortBy,
+        sortOrder: currentSortOrder as 'asc' | 'desc',
+      });
+    }
+  }, [searchParams]);
+
+  const handleFiltersChange = useCallback(
+    (newFilters: ShopFiltersType) => {
+      setFilters(newFilters);
+
+      // Set flag to prevent infinite loop in URL sync
+      isUpdatingFromUrl.current = true;
+
+      // Update URL parameters when filters change
+      const params = new URLSearchParams();
+      if (newFilters.search) params.set('search', newFilters.search);
+      if (newFilters.category) params.set('category', newFilters.category);
+      if (newFilters.subcategory)
+        params.set('subcategory', newFilters.subcategory);
+      if (newFilters.sortBy !== 'skuArrangementOrderNo')
+        params.set('sortBy', newFilters.sortBy);
+      if (newFilters.sortOrder !== 'asc')
+        params.set('sortOrder', newFilters.sortOrder);
+
+      const queryString = params.toString();
+      const newUrl = queryString ? `/shop?${queryString}` : '/shop';
+      router.push(newUrl);
+    },
+    [router]
+  );
 
   const handleClearFilters = useCallback(() => {
     setFilters({
       search: '',
       category: '',
+      subcategory: '',
       sortBy: 'skuArrangementOrderNo',
       sortOrder: 'asc',
     });
-  }, []);
+    // Clear URL parameters when filters are cleared
+    router.push('/shop');
+  }, [router]);
 
   const handleLoadMore = useCallback(async () => {
     if (pagination?.hasNextPage && !isLoadingMore) {
@@ -133,6 +204,28 @@ export default function ShopContentWrapper() {
     },
     [dispatch]
   );
+
+  const breadcrumbItems = [{ label: 'Shop', href: '/shop', isCurrent: true }];
+
+  if (filters.category) {
+    breadcrumbItems.splice(1, 0, {
+      label: filters.category,
+      href: `/shop?category=${filters.category}`,
+      isCurrent: false,
+    });
+  }
+
+  if (filters.subcategory) {
+    breadcrumbItems.splice(2, 0, {
+      label: filters.subcategory,
+      href: `/shop?category=${filters.category}&subcategory=${filters.subcategory}`,
+      isCurrent: true,
+    });
+    // Update the category breadcrumb to not be current
+    if (breadcrumbItems.length > 1) {
+      breadcrumbItems[1].isCurrent = false;
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background">

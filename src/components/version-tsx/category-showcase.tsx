@@ -24,7 +24,7 @@ function toSlug(label: string): string {
   if (!label) return '';
   return label
     .toLowerCase()
-    .replace(/&/g, '')
+    .replace(/&/g, 'and') // Replace & with 'and' for better URL readability
     .replace(/[^a-z0-9\s-]/g, '')
     .trim()
     .replace(/\s+/g, '-');
@@ -127,7 +127,7 @@ export default function CategoryShowcase() {
   const handleChild = (parent: string, child: string) => {
     const parentSlug = toSlug(parent);
     const childSlug = toSlug(child);
-    router.push(`/shop?category=${parentSlug}&subCategory=${childSlug}`);
+    router.push(`/shop?category=${parentSlug}&subcategory=${childSlug}`);
   };
 
   return (

@@ -16,6 +16,17 @@ import HeaderMenuButton from './header-menu-button';
 import HeaderSearch from './header-search';
 import { CategoryItem as MenuCategoryItem } from './shop-menu-content';
 
+// Consistent slug generation function
+function toSlug(label: string): string {
+  if (!label) return '';
+  return label
+    .toLowerCase()
+    .replace(/&/g, 'and') // Replace & with 'and' for better URL readability
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+}
+
 interface CategoryItem {
   _id: string;
   parent: string;
@@ -53,18 +64,14 @@ export default function HeaderV2(): React.ReactElement {
   }
 
   function handleCategoryRoute(title: string): void {
-    const slug = title.toLowerCase().replace('&', '').split(' ').join('-');
+    const slug = toSlug(title);
     router.push(`/shop?category=${slug}`);
   }
 
   function handleChildCategoryRoute(parent: string, child: string): void {
-    const parentSlug = parent
-      .toLowerCase()
-      .replace('&', '')
-      .split(' ')
-      .join('-');
-    const childSlug = child.toLowerCase().replace('&', '').split(' ').join('-');
-    router.push(`/shop?category=${parentSlug}&subCategory=${childSlug}`);
+    const parentSlug = toSlug(parent);
+    const childSlug = toSlug(child);
+    router.push(`/shop?category=${parentSlug}&subcategory=${childSlug}`);
   }
 
   return (

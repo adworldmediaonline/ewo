@@ -20,6 +20,7 @@ import * as React from 'react';
 export interface ShopFilters {
   search: string;
   category: string;
+  subcategory: string;
   sortBy: string;
   sortOrder: 'asc' | 'desc';
 }
@@ -55,7 +56,17 @@ export default function ShopFilters({
 
   const handleCategoryChange = (category: string) => {
     const newCategory = filters.category === category ? '' : category;
-    onFiltersChange({ ...filters, category: newCategory });
+    onFiltersChange({
+      ...filters,
+      category: newCategory,
+      subcategory: '', // Reset subcategory when category changes
+    });
+  };
+
+  const handleSubcategoryChange = (subcategory: string) => {
+    const newSubcategory =
+      filters.subcategory === subcategory ? '' : subcategory;
+    onFiltersChange({ ...filters, subcategory: newSubcategory });
   };
 
   const handleSortChange = (sortBy: string) => {
@@ -68,7 +79,11 @@ export default function ShopFilters({
   };
 
   const hasActiveFilters =
-    filters.search || filters.category || filters.sortBy || filters.sortOrder;
+    filters.search ||
+    filters.category ||
+    filters.subcategory ||
+    filters.sortBy ||
+    filters.sortOrder;
 
   return (
     <div className="w-full space-y-6">
@@ -139,6 +154,35 @@ export default function ShopFilters({
           </div>
         </ScrollArea>
       </div>
+
+      {/* Subcategories - Only show when a category is selected */}
+      {filters.category && (
+        <>
+          <Separator />
+          <div className="space-y-3">
+            <Label className="text-sm font-medium">Subcategories</Label>
+            <ScrollArea className="h-[200px]">
+              <div className="space-y-2">
+                {categories?.result
+                  ?.find((cat: any) => cat.parent === filters.category)
+                  ?.children?.map((subcat: string) => (
+                    <Button
+                      key={subcat}
+                      variant={
+                        filters.subcategory === subcat ? 'default' : 'ghost'
+                      }
+                      size="sm"
+                      className="w-full justify-start"
+                      onClick={() => handleSubcategoryChange(subcat)}
+                    >
+                      {subcat}
+                    </Button>
+                  ))}
+              </div>
+            </ScrollArea>
+          </div>
+        </>
+      )}
 
       {/* Clear Filters */}
       {hasActiveFilters && (
