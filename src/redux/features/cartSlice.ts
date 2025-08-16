@@ -11,13 +11,13 @@ interface CartProduct {
   title: string;
   img: string;
   price: number | string;
+  finalPriceDiscount: number | string;
   orderQuantity: number;
   quantity?: number;
   discount?: number | string;
   slug?: string;
   shipping?: { price?: number };
   selectedOption?: SelectedOption;
-  finalPrice?: number | string;
 }
 
 interface FirstTimeDiscountState {
@@ -148,8 +148,8 @@ export const cartSlice = createSlice({
           ...payload,
           orderQuantity: state.orderQuantity,
           // If a final price is provided (when option is selected), use it
-          ...(payload.finalPrice && {
-            price: parseFloat(String(payload.finalPrice)),
+          ...(payload.finalPriceDiscount && {
+            price: parseFloat(String(payload.finalPriceDiscount)),
           }),
         };
         state.cart_products.push(newItem);

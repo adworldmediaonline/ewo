@@ -9,6 +9,63 @@ import Link from 'next/link';
 import * as React from 'react';
 import { useSelector } from 'react-redux';
 
+// Star rating component
+const StarRating = ({
+  rating,
+  size = 'sm',
+}: {
+  rating: number;
+  size?: 'sm' | 'md';
+}) => {
+  const stars = [];
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 !== 0;
+
+  // Add filled stars
+  for (let i = 0; i < fullStars; i++) {
+    stars.push(
+      <Star
+        key={`full-${i}`}
+        className={`${
+          size === 'sm' ? 'h-3 w-3' : 'h-4 w-4'
+        } fill-yellow-400 text-yellow-400`}
+      />
+    );
+  }
+
+  // Add half star if needed
+  if (hasHalfStar) {
+    stars.push(
+      <div key="half" className="relative">
+        <Star
+          className={`${size === 'sm' ? 'h-3 w-3' : 'h-4 w-4'} text-yellow-400`}
+        />
+        <div className="absolute inset-0 overflow-hidden">
+          <Star
+            className={`${
+              size === 'sm' ? 'h-3 w-3' : 'h-4 w-4'
+            } fill-yellow-400 text-yellow-400`}
+            style={{ clipPath: 'inset(0 50% 0 0)' }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Add empty stars to complete 5 stars
+  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+  for (let i = 0; i < emptyStars; i++) {
+    stars.push(
+      <Star
+        key={`empty-${i}`}
+        className={`${size === 'sm' ? 'h-3 w-3' : 'h-4 w-4'} text-yellow-400`}
+      />
+    );
+  }
+
+  return <div className="flex items-center gap-0.5">{stars}</div>;
+};
+
 export interface Product {
   _id: string;
   title: string;
@@ -191,14 +248,16 @@ export default function ProductCard({
           </h3>
 
           {/* Rating */}
-          {averageRating > 0 && (
-            <div className="mb-1.5 flex items-center gap-1">
-              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-              <span className="text-xs text-muted-foreground">
-                {averageRating.toFixed(1)} ({product.reviews?.length || 0})
-              </span>
-            </div>
-          )}
+          <div className="mb-1.5 flex items-center gap-1">
+            <StarRating rating={averageRating || 0} />
+            <span className="text-xs text-muted-foreground">
+              {averageRating > 0
+                ? `${averageRating.toFixed(1)} (${
+                    product.reviews?.length || 0
+                  })`
+                : 'No reviews yet'}
+            </span>
+          </div>
         </div>
 
         {/* Price and Button - Fixed at Bottom */}

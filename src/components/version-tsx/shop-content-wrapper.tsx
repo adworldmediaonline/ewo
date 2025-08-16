@@ -103,11 +103,12 @@ export default function ShopContentWrapper() {
         _id: product._id,
         title: product.title,
         img: product.imageURLs?.[0] || product.img || '',
-        price: product.price,
+        price: product.finalPriceDiscount || product.price || 0,
         orderQuantity: 1,
         quantity: product.quantity,
         slug: product.slug,
         shipping: { price: 0 }, // Default shipping price
+        finalPriceDiscount: product.finalPriceDiscount || product.price || 0,
       };
 
       dispatch(add_cart_product(cartProduct));
@@ -124,6 +125,8 @@ export default function ShopContentWrapper() {
         price: product.price,
         category: product.category,
         slug: product.slug,
+        finalPriceDiscount: product.finalPriceDiscount,
+        updatedPrice: product.updatedPrice,
       };
 
       dispatch(add_to_wishlist(wishlistProduct));
