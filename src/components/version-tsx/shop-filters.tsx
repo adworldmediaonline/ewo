@@ -4,8 +4,15 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Slider } from '@/components/ui/slider';
 import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
 import { Search, X } from 'lucide-react';
 import * as React from 'react';
@@ -13,8 +20,6 @@ import * as React from 'react';
 export interface ShopFilters {
   search: string;
   category: string;
-  minPrice: number;
-  maxPrice: number;
   sortBy: string;
   sortOrder: 'asc' | 'desc';
 }
@@ -26,9 +31,12 @@ interface ShopFiltersProps {
 }
 
 const sortOptions = [
-  { value: 'createdAt', label: 'Newest First' },
-  { value: 'price', label: 'Price' },
-  { value: 'title', label: 'Name' },
+  { value: 'createdAt-desc', label: 'Newest First' },
+  { value: 'createdAt-asc', label: 'Oldest First' },
+  { value: 'price-asc', label: 'Price: Low to High' },
+  { value: 'price-desc', label: 'Price: High to Low' },
+  { value: 'title-asc', label: 'Name: A to Z' },
+  { value: 'title-desc', label: 'Name: Z to A' },
 ];
 
 export default function ShopFilters({
@@ -36,7 +44,7 @@ export default function ShopFilters({
   onFiltersChange,
   onClearFilters,
 }: ShopFiltersProps): React.ReactElement {
-  const { data: categories } = useGetShowCategoryQuery();
+  const { data: categories } = useGetShowCategoryQuery('');
   const [localSearch, setLocalSearch] = React.useState(filters.search);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -49,14 +57,6 @@ export default function ShopFilters({
     onFiltersChange({ ...filters, category: newCategory });
   };
 
-  const handlePriceChange = (values: number[]) => {
-    onFiltersChange({
-      ...filters,
-      minPrice: values[0],
-      maxPrice: values[1],
-    });
-  };
-
   const handleSortChange = (sortBy: string) => {
     const [field, order] = sortBy.split('-');
     onFiltersChange({
@@ -67,10 +67,7 @@ export default function ShopFilters({
   };
 
   const hasActiveFilters =
-    filters.search ||
-    filters.category ||
-    filters.minPrice > 0 ||
-    filters.maxPrice < 1000;
+    filters.search || filters.category || filters.sortBy || filters.sortOrder;
 
   return (
     <div className="w-full space-y-6">
@@ -95,68 +92,51 @@ export default function ShopFilters({
 
       <Separator />
 
-      {/* Categories */}
-      <div className="space-y-3">
-        <Label className="text-sm font-medium">Categories</Label>
-        <div className="space-y-2">
-          {categories?.result?.map((cat: any) => (
-            <Button
-              key={cat._id}
-              variant={filters.category === cat.parent ? 'default' : 'ghost'}
-              size="sm"
-              className="w-full justify-start"
-              onClick={() => handleCategoryChange(cat.parent)}
-            >
-              {cat.parent}
-              {cat.products?.length > 0 && (
-                <Badge variant="secondary" className="ml-auto">
-                  {cat.products.length}
-                </Badge>
-              )}
-            </Button>
-          ))}
-        </div>
-      </div>
-
-      <Separator />
-
-      {/* Price Range */}
-      <div className="space-y-3">
-        <Label className="text-sm font-medium">Price Range</Label>
-        <div className="px-2">
-          <Slider
-            value={[filters.minPrice, filters.maxPrice]}
-            onValueChange={handlePriceChange}
-            max={1000}
-            min={0}
-            step={10}
-            className="w-full"
-          />
-          <div className="flex justify-between text-xs text-muted-foreground mt-2">
-            <span>${filters.minPrice}</span>
-            <span>${filters.maxPrice}</span>
-          </div>
-        </div>
-      </div>
-
-      <Separator />
-
       {/* Sort Options */}
       <div className="space-y-3">
         <Label className="text-sm font-medium">Sort By</Label>
-        <div className="space-y-2">
-          {sortOptions.map(option => (
-            <Button
-              key={option.value}
-              variant={filters.sortBy === option.value ? 'default' : 'ghost'}
-              size="sm"
-              className="w-full justify-start"
-              onClick={() => handleSortChange(option.value)}
-            >
-              {option.label}
-            </Button>
-          ))}
-        </div>
+        <Select
+          onValueChange={handleSortChange}
+          value={`${filters.sortBy}-${filters.sortOrder}`}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select a sort option" />
+          </SelectTrigger>
+          <SelectContent>
+            {sortOptions.map(option => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <Separator />
+
+      {/* Categories */}
+      <div className="space-y-3">
+        <Label className="text-sm font-medium">Categories</Label>
+        <ScrollArea className="h-[300px]">
+          <div className="space-y-2">
+            {categories?.result?.map((cat: any) => (
+              <Button
+                key={cat._id}
+                variant={filters.category === cat.parent ? 'default' : 'ghost'}
+                size="sm"
+                className="w-full justify-start"
+                onClick={() => handleCategoryChange(cat.parent)}
+              >
+                {cat.parent}
+                {cat.products?.length > 0 && (
+                  <Badge variant="secondary" className="ml-auto">
+                    {cat.products.length}
+                  </Badge>
+                )}
+              </Button>
+            ))}
+          </div>
+        </ScrollArea>
       </div>
 
       {/* Clear Filters */}

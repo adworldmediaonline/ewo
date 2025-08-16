@@ -2,7 +2,7 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Heart, ShoppingCart, Star } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -82,7 +82,7 @@ export default function ProductCard({
 
   return (
     <Card
-      className="group relative overflow-hidden transition-all duration-300 hover:shadow-lg"
+      className="group relative overflow-hidden transition-all duration-300 hover:shadow-lg p-0"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -143,8 +143,9 @@ export default function ProductCard({
                 <div className="absolute right-2 top-2 flex flex-col gap-2">
                   <Button
                     size="icon"
-                    variant="secondary"
-                    className={`h-8 w-8 rounded-full ${
+                    variant="outline"
+                    rounded="full"
+                    className={`h-8 w-8 ${
                       isAddedToWishlist
                         ? 'bg-primary text-primary-foreground'
                         : 'bg-white/90 hover:bg-white'
@@ -159,8 +160,9 @@ export default function ProductCard({
                   </Button>
                   <Button
                     size="icon"
-                    variant="secondary"
-                    className={`h-8 w-8 rounded-full ${
+                    variant="outline"
+                    rounded="full"
+                    className={`h-8 w-8 ${
                       isAddedToCart
                         ? 'bg-primary text-primary-foreground'
                         : 'bg-white/90 hover:bg-white'
@@ -178,66 +180,66 @@ export default function ProductCard({
               </div>
             </div>
           </div>
-
-          {/* Product Info */}
-          <div className="p-4">
-            <div className="mb-2">
-              <Badge variant="outline" className="text-xs">
-                {product.category.name}
-              </Badge>
-            </div>
-
-            <h3 className="mb-2 line-clamp-2 text-sm font-medium leading-tight">
-              {product.title}
-            </h3>
-
-            {/* Rating */}
-            {averageRating > 0 && (
-              <div className="mb-2 flex items-center gap-1">
-                <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                <span className="text-xs text-muted-foreground">
-                  {averageRating.toFixed(1)} ({product.reviews?.length || 0})
-                </span>
-              </div>
-            )}
-
-            {/* Price */}
-            <div className="flex items-center gap-2">
-              {hasDiscount ? (
-                <>
-                  <span className="text-lg font-bold text-destructive">
-                    ${product.finalPriceDiscount}
-                  </span>
-                  <span className="text-sm text-muted-foreground line-through">
-                    ${product.price}
-                  </span>
-                </>
-              ) : (
-                <span className="text-lg font-bold">${product.price}</span>
-              )}
-            </div>
-          </div>
         </CardContent>
       </Link>
 
-      {/* Add to Cart Button */}
-      <CardFooter className="p-4 pt-0">
-        {isAddedToCart ? (
-          <Link href="/cart" className="w-full">
-            <Button className="w-full" variant="outline">
-              View Cart
+      {/* Product Info - Fixed Layout */}
+      <div className="flex flex-col h-full px-4 pb-4 pt-2">
+        <div className="flex-1">
+          <h3 className="mb-1.5 text-sm font-medium leading-tight">
+            {product.title}
+          </h3>
+
+          {/* Rating */}
+          {averageRating > 0 && (
+            <div className="mb-1.5 flex items-center gap-1">
+              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+              <span className="text-xs text-muted-foreground">
+                {averageRating.toFixed(1)} ({product.reviews?.length || 0})
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Price and Button - Fixed at Bottom */}
+        <div className="mt-auto pt-3">
+          {/* Price */}
+          <div className="flex items-center gap-2 mb-2.5">
+            {hasDiscount ? (
+              <>
+                <span className="text-lg font-bold text-destructive">
+                  ${product.finalPriceDiscount}
+                </span>
+                <span className="text-sm text-muted-foreground line-through">
+                  ${product.price}
+                </span>
+              </>
+            ) : (
+              <span className="text-lg font-bold">${product.price}</span>
+            )}
+          </div>
+
+          {/* Add to Cart Button */}
+          {isAddedToCart ? (
+            <Link href="/cart" className="w-full block">
+              <Button className="w-full" variant="outline" rounded="full">
+                View Cart
+              </Button>
+            </Link>
+          ) : (
+            <Button
+              className="w-full"
+              rounded="full"
+              onClick={handleAddToCart}
+              disabled={product.status === 'out-of-stock'}
+            >
+              {product.status === 'out-of-stock'
+                ? 'Out of Stock'
+                : 'Add to Cart'}
             </Button>
-          </Link>
-        ) : (
-          <Button
-            className="w-full"
-            onClick={handleAddToCart}
-            disabled={product.status === 'out-of-stock'}
-          >
-            {product.status === 'out-of-stock' ? 'Out of Stock' : 'Add to Cart'}
-          </Button>
-        )}
-      </CardFooter>
+          )}
+        </div>
+      </div>
     </Card>
   );
 }
