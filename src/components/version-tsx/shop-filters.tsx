@@ -1,13 +1,13 @@
 'use client';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Slider } from '@/components/ui/slider';
-import { Badge } from '@/components/ui/badge';
-import { Search, Filter, X } from 'lucide-react';
 import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
+import { Search, X } from 'lucide-react';
 import * as React from 'react';
 
 export interface ShopFilters {
@@ -31,10 +31,10 @@ const sortOptions = [
   { value: 'title', label: 'Name' },
 ];
 
-export default function ShopFilters({ 
-  filters, 
-  onFiltersChange, 
-  onClearFilters 
+export default function ShopFilters({
+  filters,
+  onFiltersChange,
+  onClearFilters,
 }: ShopFiltersProps): React.ReactElement {
   const { data: categories } = useGetShowCategoryQuery();
   const [localSearch, setLocalSearch] = React.useState(filters.search);
@@ -53,7 +53,7 @@ export default function ShopFilters({
     onFiltersChange({
       ...filters,
       minPrice: values[0],
-      maxPrice: values[1]
+      maxPrice: values[1],
     });
   };
 
@@ -62,11 +62,15 @@ export default function ShopFilters({
     onFiltersChange({
       ...filters,
       sortBy: field,
-      sortOrder: order as 'asc' | 'desc'
+      sortOrder: order as 'asc' | 'desc',
     });
   };
 
-  const hasActiveFilters = filters.search || filters.category || filters.minPrice > 0 || filters.maxPrice < 1000;
+  const hasActiveFilters =
+    filters.search ||
+    filters.category ||
+    filters.minPrice > 0 ||
+    filters.maxPrice < 1000;
 
   return (
     <div className="w-full space-y-6">
@@ -80,7 +84,7 @@ export default function ShopFilters({
             id="search"
             placeholder="Search products..."
             value={localSearch}
-            onChange={(e) => setLocalSearch(e.target.value)}
+            onChange={e => setLocalSearch(e.target.value)}
             className="flex-1"
           />
           <Button type="submit" size="icon" variant="outline">
@@ -98,7 +102,7 @@ export default function ShopFilters({
           {categories?.result?.map((cat: any) => (
             <Button
               key={cat._id}
-              variant={filters.category === cat.parent ? "default" : "ghost"}
+              variant={filters.category === cat.parent ? 'default' : 'ghost'}
               size="sm"
               className="w-full justify-start"
               onClick={() => handleCategoryChange(cat.parent)}
@@ -141,10 +145,10 @@ export default function ShopFilters({
       <div className="space-y-3">
         <Label className="text-sm font-medium">Sort By</Label>
         <div className="space-y-2">
-          {sortOptions.map((option) => (
+          {sortOptions.map(option => (
             <Button
               key={option.value}
-              variant={filters.sortBy === option.value ? "default" : "ghost"}
+              variant={filters.sortBy === option.value ? 'default' : 'ghost'}
               size="sm"
               className="w-full justify-start"
               onClick={() => handleSortChange(option.value)}
