@@ -17,6 +17,17 @@ import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
 import { Search, X } from 'lucide-react';
 import * as React from 'react';
 
+// Consistent slug generation function - same as homepage
+function toSlug(label: string): string {
+  if (!label) return '';
+  return label
+    .toLowerCase()
+    .replace(/&/g, 'and') // Replace & with 'and' for better URL readability
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+}
+
 export interface ShopFilters {
   search: string;
   category: string;
@@ -138,7 +149,9 @@ export default function ShopFilters({
             {categories?.result?.map((cat: any) => (
               <Button
                 key={cat._id}
-                variant={filters.category === cat.parent ? 'default' : 'ghost'}
+                variant={
+                  filters.category === toSlug(cat.parent) ? 'default' : 'ghost'
+                }
                 size="sm"
                 className="w-full justify-start"
                 onClick={() => handleCategoryChange(cat.parent)}
@@ -169,7 +182,9 @@ export default function ShopFilters({
                     <Button
                       key={subcat}
                       variant={
-                        filters.subcategory === subcat ? 'default' : 'ghost'
+                        filters.subcategory === toSlug(subcat)
+                          ? 'default'
+                          : 'ghost'
                       }
                       size="sm"
                       className="w-full justify-start"

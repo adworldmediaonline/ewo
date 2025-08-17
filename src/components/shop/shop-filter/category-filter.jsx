@@ -7,6 +7,17 @@ import ShopCategoryLoader from '@/components/loader/shop/shop-category-loader';
 import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
 import { handleFilterSidebarClose } from '@/redux/features/shop-filter-slice';
 
+// Consistent slug generation function - same as homepage
+function toSlug(label) {
+  if (!label) return '';
+  return label
+    .toLowerCase()
+    .replace(/&/g, 'and') // Replace & with 'and' for better URL readability
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+}
+
 const CategoryFilter = ({ setCurrPage, shop_right = false }) => {
   const { data: categories, isLoading, isError } = useGetShowCategoryQuery();
   const router = useRouter();
@@ -22,12 +33,8 @@ const CategoryFilter = ({ setCurrPage, shop_right = false }) => {
     // Create new URLSearchParams to preserve existing query parameters
     const newSearchParams = new URLSearchParams(searchParams);
 
-    // Update category parameter
-    const categorySlug = title
-      .toLowerCase()
-      .replace(/&/g, 'and') // Replace & with 'and' for better URL readability
-      .split(' ')
-      .join('-');
+    // Update category parameter using the same toSlug function as homepage
+    const categorySlug = toSlug(title);
 
     newSearchParams.set('category', categorySlug);
 
@@ -59,11 +66,7 @@ const CategoryFilter = ({ setCurrPage, shop_right = false }) => {
   if (!isLoading && !isError && categories?.result?.length > 0) {
     const category_items = categories.result;
     content = category_items.map(item => {
-      const itemSlug = item.parent
-        .toLowerCase()
-        .replace(/&/g, 'and')
-        .split(' ')
-        .join('-');
+      const itemSlug = toSlug(item.parent);
 
       const isActive = currentCategory === itemSlug;
 

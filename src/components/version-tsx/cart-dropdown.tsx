@@ -28,6 +28,10 @@ interface CartItem {
   price: number | string;
   discount?: number | string;
   orderQuantity: number;
+  shipping?: {
+    price: number;
+  };
+  finalPriceDiscount?: number | string;
 }
 
 export default function CartDropdown({
@@ -52,10 +56,20 @@ export default function CartDropdown({
   const items: CartItem[] = Array.isArray(cart_products) ? cart_products : [];
 
   function handleIncrement(item: CartItem): void {
-    dispatch(add_cart_product(item));
+    dispatch(
+      add_cart_product({
+        ...item,
+        finalPriceDiscount: item.finalPriceDiscount || item.price,
+      })
+    );
   }
   function handleDecrement(item: CartItem): void {
-    dispatch(quantityDecrement(item));
+    dispatch(
+      quantityDecrement({
+        ...item,
+        finalPriceDiscount: item.finalPriceDiscount || item.price,
+      })
+    );
   }
   function handleRemove(item: CartItem): void {
     dispatch(remove_product({ title: item.title, id: item._id }));
@@ -79,6 +93,17 @@ export default function CartDropdown({
     const coupon = Number(total_coupon_discount || 0);
     return Math.max(0, baseTotal + shipping - coupon);
   }, [total, totalShippingCost, total_coupon_discount]);
+
+  console.log(
+    'cart_products',
+    cart_products,
+    'totalShippingCost',
+    totalShippingCost,
+    'shippingDiscount',
+    shippingDiscount,
+    'firstTimeDiscount',
+    firstTimeDiscount
+  );
 
   return (
     <DropdownMenu>
@@ -204,7 +229,7 @@ export default function CartDropdown({
               <div className="flex items-center justify-between">
                 <span>Shipping</span>
                 <span>
-                  ${Number(totalShippingCost || 0).toFixed(2)}
+                  ${totalShippingCost.toFixed(2)}
                   {Number(discountPercentage) > 0 && (
                     <span className="ml-2 text-xs text-muted-foreground">
                       {discountPercentage}% off

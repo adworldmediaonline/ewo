@@ -1,7 +1,13 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import { add_cart_product } from '@/redux/features/cartSlice';
 import { useGetPaginatedProductsQuery } from '@/redux/features/productApi';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
@@ -13,6 +19,26 @@ import { useDispatch, useSelector } from 'react-redux';
 import ProductCard, { Product } from './product-card';
 import ProductSkeleton from './product-skeleton';
 import ShopFilters, { ShopFilters as ShopFiltersType } from './shop-filters';
+
+// Consistent slug generation function - same as homepage
+function toSlug(label: string): string {
+  if (!label) return '';
+  return label
+    .toLowerCase()
+    .replace(/&/g, 'and') // Replace & with 'and' for better URL readability
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+}
+
+// Convert slug back to readable category name
+function fromSlug(slug: string): string {
+  if (!slug) return '';
+  return slug
+    .replace(/-/g, ' ')
+    .replace(/\band\b/g, '&')
+    .replace(/\b\w/g, l => l.toUpperCase());
+}
 
 export default function ShopContentWrapper() {
   const dispatch = useDispatch();
@@ -120,6 +146,8 @@ export default function ShopContentWrapper() {
 
   const handleFiltersChange = useCallback(
     (newFilters: ShopFiltersType) => {
+      console.log('handleFiltersChange called with:', newFilters);
+
       setFilters(newFilters);
 
       // Set flag to prevent infinite loop in URL sync
@@ -128,9 +156,22 @@ export default function ShopContentWrapper() {
       // Update URL parameters when filters change
       const params = new URLSearchParams();
       if (newFilters.search) params.set('search', newFilters.search);
-      if (newFilters.category) params.set('category', newFilters.category);
-      if (newFilters.subcategory)
-        params.set('subcategory', newFilters.subcategory);
+      if (newFilters.category) {
+        const slugifiedCategory = toSlug(newFilters.category);
+        console.log('Category conversion:', {
+          original: newFilters.category,
+          slugified: slugifiedCategory,
+        });
+        params.set('category', slugifiedCategory);
+      }
+      if (newFilters.subcategory) {
+        const slugifiedSubcategory = toSlug(newFilters.subcategory);
+        console.log('Subcategory conversion:', {
+          original: newFilters.subcategory,
+          slugified: slugifiedSubcategory,
+        });
+        params.set('subcategory', slugifiedSubcategory);
+      }
       if (newFilters.sortBy !== 'skuArrangementOrderNo')
         params.set('sortBy', newFilters.sortBy);
       if (newFilters.sortOrder !== 'asc')
@@ -138,6 +179,7 @@ export default function ShopContentWrapper() {
 
       const queryString = params.toString();
       const newUrl = queryString ? `/shop?${queryString}` : '/shop';
+      console.log('Generated URL:', newUrl);
       router.push(newUrl);
     },
     [router]
@@ -170,6 +212,8 @@ export default function ShopContentWrapper() {
 
   const handleAddToCart = useCallback(
     (product: Product) => {
+      console.log('Product data received:', product);
+
       const cartProduct = {
         _id: product._id,
         title: product.title,
@@ -178,10 +222,11 @@ export default function ShopContentWrapper() {
         orderQuantity: 1,
         quantity: product.quantity,
         slug: product.slug,
-        shipping: { price: 0 }, // Default shipping price
+        shipping: product.shipping || { price: 0 }, // Use product's actual shipping
         finalPriceDiscount: product.finalPriceDiscount || product.price || 0,
       };
 
+      console.log('Cart product being created:', cartProduct);
       dispatch(add_cart_product(cartProduct));
     },
     [dispatch]
@@ -257,6 +302,9 @@ export default function ShopContentWrapper() {
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="left" className="w-80">
+                  <SheetHeader>
+                    <SheetTitle className="text-left">Filters</SheetTitle>
+                  </SheetHeader>
                   <ShopFilters
                     filters={filters}
                     onFiltersChange={handleFiltersChange}

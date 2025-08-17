@@ -106,6 +106,7 @@ const calculateTotalShipping = (
 const updateShippingCosts = (state: CartState): void => {
   const discount = calculateShippingDiscount(state.cart_products);
   state.shippingDiscount = discount;
+
   state.totalShippingCost = calculateTotalShipping(
     state.cart_products,
     discount
@@ -208,6 +209,12 @@ export const cartSlice = createSlice({
       updateShippingCosts(state);
       updateFirstTimeDiscount(state);
 
+      console.log('Storing cart in localStorage:', {
+        cartProducts: state.cart_products,
+        totalShippingCost: state.totalShippingCost,
+        shippingCost: getLocalStorage('shipping_cost'),
+      });
+
       setLocalStorage('cart_products', state.cart_products);
       setLocalStorage('shipping_cost', state.totalShippingCost);
     },
@@ -280,6 +287,16 @@ export const cartSlice = createSlice({
       state.showCartConfirmation = false;
       state.lastAddedProduct = null;
 
+      // Restore shipping cost from localStorage first
+      const storedShippingCost = getLocalStorage('shipping_cost');
+      if (storedShippingCost !== null && storedShippingCost !== undefined) {
+        state.totalShippingCost = Number(storedShippingCost);
+        console.log(
+          'Restored shipping cost from localStorage:',
+          state.totalShippingCost
+        );
+      }
+
       // Update shipping costs and first-time discount when getting cart products
       updateShippingCosts(state);
       updateFirstTimeDiscount(state);
@@ -329,6 +346,16 @@ export const cartSlice = createSlice({
       state.firstTimeDiscount.isEligible = false;
       state.firstTimeDiscount.isApplied = false;
     },
+    // Debug action to check cart state
+    debugCartState: state => {
+      console.log('Cart State Debug:', {
+        cartProducts: state.cart_products,
+        totalShippingCost: state.totalShippingCost,
+        shippingDiscount: state.shippingDiscount,
+        localStorageCart: getLocalStorage('cart_products'),
+        localStorageShipping: getLocalStorage('shipping_cost'),
+      });
+    },
   },
 });
 
@@ -347,5 +374,6 @@ export const {
   resetFirstTimeDiscount,
   completeFirstTimeDiscount,
   update_product_option,
+  debugCartState,
 } = cartSlice.actions;
 export default cartSlice.reducer;

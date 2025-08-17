@@ -81,6 +81,10 @@ export interface Product {
   };
   status: string;
   quantity: number;
+  shipping?: {
+    price: number;
+    description?: string;
+  };
   reviews?: Array<{
     rating: number;
   }>;
@@ -247,17 +251,17 @@ export default function ProductCard({
             {product.title}
           </h3>
 
-          {/* Rating */}
-          <div className="mb-1.5 flex items-center gap-1">
-            <StarRating rating={averageRating || 0} />
-            <span className="text-xs text-muted-foreground">
-              {averageRating > 0
-                ? `${averageRating.toFixed(1)} (${
-                    product.reviews?.length || 0
-                  })`
-                : 'No reviews yet'}
-            </span>
-          </div>
+          {/* Rating - Only show when there are reviews */}
+          {product.reviews &&
+            product.reviews.length > 0 &&
+            averageRating > 0 && (
+              <div className="mb-1.5 flex items-center gap-1">
+                <StarRating rating={averageRating || 0} />
+                <span className="text-xs text-muted-foreground">
+                  {averageRating.toFixed(1)} ({product.reviews.length})
+                </span>
+              </div>
+            )}
         </div>
 
         {/* Price and Button - Fixed at Bottom */}

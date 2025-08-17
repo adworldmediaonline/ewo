@@ -32,6 +32,10 @@ interface CartItem {
   price: number | string;
   discount?: number | string;
   orderQuantity: number;
+  finalPriceDiscount?: number | string;
+  shipping?: {
+    price: number;
+  };
 }
 
 export default function CartMiniSheet(): React.ReactElement {
@@ -86,11 +90,21 @@ export default function CartMiniSheet(): React.ReactElement {
   }
 
   function handleDecrement(item: CartItem): void {
-    dispatch(quantityDecrement(item));
+    dispatch(
+      quantityDecrement({
+        ...item,
+        finalPriceDiscount: item.finalPriceDiscount || item.price,
+      })
+    );
   }
 
   function handleIncrement(item: CartItem): void {
-    dispatch(add_cart_product(item));
+    dispatch(
+      add_cart_product({
+        ...item,
+        finalPriceDiscount: item.finalPriceDiscount || item.price,
+      })
+    );
   }
 
   function renderLinePrice(item: CartItem): string {
@@ -226,7 +240,7 @@ export default function CartMiniSheet(): React.ReactElement {
             <div className="flex items-center justify-between">
               <span>Shipping</span>
               <span>
-                ${Number(totalShippingCost || 0).toFixed(2)}
+                ${totalShippingCost.toFixed(2)}
                 {Number(discountPercentage) > 0 && (
                   <span className="ml-2 text-xs text-muted-foreground">
                     {discountPercentage}% off
