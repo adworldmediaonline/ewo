@@ -166,10 +166,10 @@ export const cartSlice = createSlice({
 
         // Cart confirmation modal will handle user feedback - no toast needed
 
-        if (isFirstProduct) {
-          // Open cart mini for first product
-          state.cartMiniOpen = true;
-        }
+        // if (isFirstProduct) {
+        //   // Open cart mini for first product
+        //   state.cartMiniOpen = true;
+        // }
       } else {
         state.cart_products = state.cart_products.map((item: CartProduct) => {
           const itemId = item.selectedOption
@@ -208,12 +208,6 @@ export const cartSlice = createSlice({
       // Update shipping costs and first-time discount
       updateShippingCosts(state);
       updateFirstTimeDiscount(state);
-
-      console.log('Storing cart in localStorage:', {
-        cartProducts: state.cart_products,
-        totalShippingCost: state.totalShippingCost,
-        shippingCost: getLocalStorage('shipping_cost'),
-      });
 
       setLocalStorage('cart_products', state.cart_products);
       setLocalStorage('shipping_cost', state.totalShippingCost);

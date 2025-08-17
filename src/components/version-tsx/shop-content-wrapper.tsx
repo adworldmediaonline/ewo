@@ -212,8 +212,6 @@ export default function ShopContentWrapper() {
 
   const handleAddToCart = useCallback(
     (product: Product) => {
-      console.log('Product data received:', product);
-
       const cartProduct = {
         _id: product._id,
         title: product.title,
@@ -226,7 +224,6 @@ export default function ShopContentWrapper() {
         finalPriceDiscount: product.finalPriceDiscount || product.price || 0,
       };
 
-      console.log('Cart product being created:', cartProduct);
       dispatch(add_cart_product(cartProduct));
     },
     [dispatch]

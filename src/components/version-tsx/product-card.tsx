@@ -247,9 +247,11 @@ export default function ProductCard({
       {/* Product Info - Fixed Layout */}
       <div className="flex flex-col h-full px-4 pb-4 pt-2">
         <div className="flex-1">
-          <h3 className="mb-1.5 text-sm font-medium leading-tight">
-            {product.title}
-          </h3>
+          <Link href={`/product/${product.slug}`} className="block">
+            <h3 className="mb-1.5 text-sm font-medium leading-tight hover:text-primary transition-colors cursor-pointer">
+              {product.title}
+            </h3>
+          </Link>
 
           {/* Rating - Only show when there are reviews */}
           {product.reviews &&

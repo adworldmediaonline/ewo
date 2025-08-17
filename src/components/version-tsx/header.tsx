@@ -8,7 +8,7 @@ import { PRIMARY_LINKS } from '@/appdata/navigation';
 import useCartInfo from '@/hooks/use-cart-info';
 import { openCartMini } from '@/redux/features/cartSlice';
 import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
-import CartMiniSheet from './cart-mini-sheet';
+// import CartMiniSheet from './cart-mini-sheet';
 import DesktopNav from './desktop-nav';
 import HeaderActions from './header-actions';
 import HeaderBrand from './header-brand';
@@ -115,7 +115,7 @@ export default function HeaderV2(): React.ReactElement {
           </div>
         </div>
       </header>
-      <CartMiniSheet />
+      {/* <CartMiniSheet /> */}
     </>
   );
 }
