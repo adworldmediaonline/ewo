@@ -328,18 +328,6 @@ export default function ContactPage() {
                   </div>
 
                   <div className={styles.contactInfoItem}>
-                    <div className={styles.infoIcon}>📍</div>
-                    <div className={styles.infoDetails}>
-                      <h4>Address</h4>
-                      <p>
-                        PO Box 2644
-                        <br />
-                        Everett, WA 98213
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className={styles.contactInfoItem}>
                     <div className={styles.infoIcon}>🕒</div>
                     <div className={styles.infoDetails}>
                       <h4>Response Time</h4>

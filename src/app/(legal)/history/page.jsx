@@ -91,15 +91,6 @@ export default function HistoryPage() {
             <p className={styles.ctaText}>
               The trail is calling — let's get you ready.
             </p>
-            {/*
-            <div className={styles.contactInfo}>
-              <p className={styles.companyName}>East West Offroad Products LLC</p>
-              <p className={styles.contactDetail}>Email: TBA</p>
-              <p className={styles.contactDetail}>Phone: +1 (866) 396 7623</p>
-              <p className={styles.contactDetail}>
-                Address: PO Box 2644 Everett WA 98213
-              </p>
-            </div> */}
           </div>
         </div>
       </div>
