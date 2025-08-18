@@ -61,28 +61,19 @@ export default function ReturnsPage() {
 
           <section className="">
             <h2 className="">4. Non-Returnable Items</h2>
-            <p className="">
-              Certain items are non-returnable, including:
-            </p>
+            <p className="">Certain items are non-returnable, including:</p>
             <ul className="">
-              <li className="">
-                Any item sold as "Non Returnable"
-              </li>
+              <li className="">Any item sold as "Non Returnable"</li>
             </ul>
           </section>
 
           <section className="">
             <h2 className="">5. How to Start a Return</h2>
-            <p className="">
-              To initiate a return, please contact us at:
-            </p>
+            <p className="">To initiate a return, please contact us at:</p>
             <div className="">
               <p className="">
                 Email:{' '}
-                <a
-                  href="mailto:info@eastwestoffroad.com"
-                  className=""
-                >
+                <a href="mailto:info@eastwestoffroad.com" className="">
                   info@eastwestoffroad.com
                 </a>
               </p>
@@ -113,9 +104,7 @@ export default function ReturnsPage() {
                 Refunds are typically processed within 7–10 business days after
                 we receive the returned item.
               </li>
-              <li className="">
-                Shipping charges are non-refundable.
-              </li>
+              <li className="">Shipping charges are non-refundable.</li>
             </ul>
           </section>
 
@@ -136,23 +125,14 @@ export default function ReturnsPage() {
           </section>
 
           <div className="">
-            <h3 className="">
-              Need help or have questions about your return?
-            </h3>
-            <p className="">
-              Contact us anytime — we're happy to assist you!
-            </p>
+            <h3 className="">Need help or have questions about your return?</h3>
+            <p className="">Contact us anytime — we're happy to assist you!</p>
 
             <div className="">
-              <p className="">
-                East West Offroad Products LLC
-              </p>
+              <p className="">East West Offroad Products LLC</p>
               <p className="">
                 Email:{' '}
-                <a
-                  href="mailto:info@eastwestoffroad.com"
-                  className=""
-                >
+                <a href="mailto:info@eastwestoffroad.com" className="">
                   info@eastwestoffroad.com
                 </a>
               </p>
@@ -162,9 +142,7 @@ export default function ReturnsPage() {
                   1-866-EWO-ROAD (396-7623)
                 </a>
               </p>
-              <p className="">
-                Address: PO Box 2644 Everett WA 98213
-              </p>
+              <p className="">Address: PO Box 2644 Everett WA 98213</p>
             </div>
           </div>
         </div>

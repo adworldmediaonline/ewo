@@ -65,9 +65,7 @@ export default function TermsPage() {
             </section>
 
             <section className="">
-              <h2 className="">
-                3. Product Information and Pricing
-              </h2>
+              <h2 className="">3. Product Information and Pricing</h2>
               <p className="">
                 We make every effort to ensure the accuracy of product
                 descriptions, images, pricing, and availability. However, we do
@@ -103,9 +101,7 @@ export default function TermsPage() {
             </section>
 
             <section className="">
-              <h2 className="">
-                6. Disclaimer of Warranties
-              </h2>
+              <h2 className="">6. Disclaimer of Warranties</h2>
               <p className="">
                 Our Website and products are provided on an "as-is" and
                 "as-available" basis.
@@ -118,9 +114,7 @@ export default function TermsPage() {
             </section>
 
             <section className="">
-              <h2 className="">
-                7. Limitation of Liability
-              </h2>
+              <h2 className="">7. Limitation of Liability</h2>
               <p className="">
                 In no event shall East West Offroad Products LLC, its directors,
                 employees, or agents be liable for any indirect, incidental,
@@ -168,15 +162,10 @@ export default function TermsPage() {
               </p>
 
               <div className="">
-                <p className="">
-                  East West Offroad Products LLC
-                </p>
+                <p className="">East West Offroad Products LLC</p>
                 <p className="">
                   Email:{' '}
-                  <a
-                    href="mailto:info@eastwestoffroad.com"
-                    className=""
-                  >
+                  <a href="mailto:info@eastwestoffroad.com" className="">
                     info@eastwestoffroad.com
                   </a>
                 </p>
@@ -186,9 +175,7 @@ export default function TermsPage() {
                     1-866-EWO-ROAD (396-7623)
                   </a>
                 </p>
-                <p className="">
-                  Address: PO Box 2644 Everett WA 98213
-                </p>
+                <p className="">Address: PO Box 2644 Everett WA 98213</p>
               </div>
             </div>
           </div>
