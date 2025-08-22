@@ -1,0 +1,169 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+// import { Checkbox } from '@/components/ui/checkbox';
+import { Loader2, AlertCircle } from 'lucide-react';
+import { authClient } from '@/lib/authClient';
+import GoogleSignIn from './google-signin';
+// import { Checkbox } from '@/components/ui/checkbox';
+
+export function SignInForm() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(true);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
+  const handleEmailPasswordSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const { data, error: signInError } = await authClient.signIn.email({
+        email,
+        password,
+        // rememberMe,
+        callbackURL: '/dashboard',
+      });
+
+      if (signInError) {
+        setError(signInError.message || 'Sign in failed');
+        setIsLoading(false);
+        return;
+      }
+
+      // If successful, redirect to dashboard
+      console.log('✅ Sign-in successful, redirecting to dashboard...');
+      router.push('/dashboard');
+      router.refresh(); // Force a refresh to update session state
+    } catch (err: any) {
+      console.error('Sign-in error:', err);
+      setError(err.message || 'An unexpected error occurred');
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader>
+        <CardTitle>Sign In</CardTitle>
+        <CardDescription>Sign in to your account</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {/* Google Sign In */}
+        <GoogleSignIn />
+
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-background px-2 text-muted-foreground">
+              Or continue with email
+            </span>
+          </div>
+        </div>
+
+        {/* Email/Password Sign In */}
+        <form onSubmit={handleEmailPasswordSignIn} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+              disabled={isLoading}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+              disabled={isLoading}
+            />
+          </div>
+
+          {/* remember me */}
+          {/* <div className="flex items-center space-x-2">
+            <Checkbox
+              id="rememberMe"
+              checked={rememberMe}
+              defaultChecked={rememberMe}
+              onCheckedChange={checked => setRememberMe(checked)}
+            />
+
+            <label
+              htmlFor="rememberMe"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Remember me
+            </label>
+          </div> */}
+          {/* remember me code end here */}
+
+          <div className="flex items-center justify-between">
+            <a
+              href="/forgot-password"
+              className="text-sm text-primary hover:underline"
+            >
+              Forgot password?
+            </a>
+            <a
+              href="/sign-in-otp"
+              className="text-sm text-primary hover:underline"
+            >
+              Sign in with OTP
+            </a>
+          </div>
+
+          <Button type="submit" disabled={isLoading} className="w-full">
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Signing in...
+              </>
+            ) : (
+              'Sign In'
+            )}
+          </Button>
+        </form>
+
+        <div className="text-center text-sm">
+          Don't have an account?{' '}
+          <a href="/sign-up" className="text-primary hover:underline">
+            Sign up
+          </a>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

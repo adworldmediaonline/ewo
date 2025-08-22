@@ -1,7 +1,4 @@
-import CommonBreadcrumb from '@/components/breadcrumb/common-breadcrumb';
 import CartArea from '@/components/cart-wishlist/cart-area';
-import Footer from '@/components/version-tsx/footer';
-import HeaderV2 from '@/components/version-tsx/header';
 import Wrapper from '@/components/wrapper';
 
 export const metadata = {
@@ -13,13 +10,8 @@ export const metadata = {
 
 export default function CartPage() {
   return (
-    <div className="">
-      <Wrapper>
-        <HeaderV2 />
-        <CommonBreadcrumb title="" subtitle="Shopping Cart" />
-        <CartArea />
-        <Footer primary_style={true} />
-      </Wrapper>
-    </div>
+    <Wrapper>
+      <CartArea />
+    </Wrapper>
   );
 }

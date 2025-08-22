@@ -7,7 +7,6 @@ import { clearCart } from '@/redux/features/cartSlice';
 
 import CartCheckout from './cart-checkout';
 import CartItem from './cart-item';
-// import RenderCartProgress from '../common/render-cart-progress';
 
 export default function CartArea() {
   const { cart_products, firstTimeDiscount } = useSelector(state => state.cart);
