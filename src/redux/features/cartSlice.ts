@@ -299,17 +299,12 @@ export const cartSlice = createSlice({
       state.orderQuantity = 1;
     },
     clearCart: state => {
-      const isClearCart = window.confirm(
-        'Are you sure you want to remove all items ?'
-      );
-      if (isClearCart) {
-        state.cart_products = [];
-        state.totalShippingCost = 0;
-        state.shippingDiscount = 0;
+      state.cart_products = [];
+      state.totalShippingCost = 0;
+      state.shippingDiscount = 0;
 
-        // Reset first-time discount state
-        updateFirstTimeDiscount(state);
-      }
+      // Reset first-time discount state
+      updateFirstTimeDiscount(state);
 
       setLocalStorage('cart_products', state.cart_products);
       setLocalStorage('shipping_cost', state.totalShippingCost);
