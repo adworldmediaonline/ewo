@@ -1,5 +1,4 @@
 'use client';
-import { CardElement } from '@stripe/react-stripe-js';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // internal
@@ -10,38 +9,8 @@ import {
 } from '@/redux/features/cartSlice';
 import { load_applied_coupons } from '@/redux/features/coupon/couponSlice';
 import { Minus, Plus } from '@/svg';
+import { ScrollArea } from '@/components/ui/scroll-area';
 // Removed CSS module import; Tailwind-only styling
-
-// Custom styles for quantity controls
-const quantityStyle = {
-  container: {
-    display: 'flex',
-    alignItems: 'center',
-    marginTop: '8px',
-    padding: '4px 0',
-  },
-  button: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '26px',
-    height: '26px',
-    borderRadius: '50%',
-    border: '1px solid #e5e5e5',
-    background: 'white',
-    cursor: 'pointer',
-    transition: 'all 0.2s ease',
-  },
-  buttonHover: {
-    background: '#f5f5f5',
-  },
-  quantity: {
-    margin: '0 10px',
-    fontWeight: '500',
-    minWidth: '24px',
-    textAlign: 'center',
-  },
-};
 
 export default function CheckoutOrderArea({ checkoutData, isGuest }) {
   const dispatch = useDispatch();
@@ -54,17 +23,10 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
   const {
     handleShippingCost,
     cartTotal = 0,
-    stripe,
     isCheckoutSubmit,
-    clientSecret,
-    register,
-    errors,
-    showCard,
-    setShowCard,
     shippingCost,
     discountAmount,
     processingPayment,
-    cardError,
     address_discount_eligible,
     address_discount_message,
     addressDiscountAmount,
@@ -204,294 +166,71 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
   };
 
   return (
-    <div className="">
-      <h3 className="">Your Order</h3>
+    <div className="bg-card rounded-lg shadow-sm p-4 md:p-6 border border-border">
+      <h3 className="text-xl font-semibold text-foreground mb-4 md:mb-6">
+        Your Order
+      </h3>
 
-      <div className="">
-        {cart_products.map(item => (
-          <div key={item._id} className="">
-            <div className="">
-              <img
-                src={item.img || '/placeholder-product.png'}
-                alt={item.title}
-                className=""
-              />
-            </div>
-            <div className="">
-              <h4 className="">{item.title}</h4>
-              {item.selectedOption && (
-                <p className="">
-                  {item.selectedOption.title} (+$
-                  {Number(item.selectedOption.price).toFixed(2)})
-                </p>
-              )}
-              <div className="">
-                <button
-                  type="button"
-                  onClick={() => handleDecrement(item)}
-                  className=""
-                  disabled={
-                    isCheckoutSubmit ||
-                    processingPayment ||
-                    item.orderQuantity <= 1
-                  }
-                >
-                  <Minus width={12} height={12} />
-                </button>
-                <span className="">{item.orderQuantity}</span>
-                <button
-                  type="button"
-                  onClick={() => handleAddProduct(item)}
-                  className=""
-                  disabled={isCheckoutSubmit || processingPayment}
-                >
-                  <Plus width={12} height={12} />
-                </button>
-              </div>
-            </div>
-            <div className="">
-              ${(item.price * item.orderQuantity).toFixed(2)}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="">
-        <div className="">
-          <input
-            ref={couponRef}
-            type="text"
-            placeholder="Add another coupon code"
-            className=""
-            disabled={coupon_loading || isCheckoutSubmit || processingPayment}
-          />
-          <button
-            type="button"
-            onClick={handleCouponSubmit}
-            className=""
-            disabled={coupon_loading || isCheckoutSubmit || processingPayment}
-          >
-            {coupon_loading ? 'Applying...' : 'Apply'}
-          </button>
-        </div>
-
-        {/* Enhanced coupon messages */}
-        {couponApplyMsg && <div className="">{couponApplyMsg}</div>}
-
-        {/* Display multiple applied coupons */}
-        {applied_coupons.length > 0 && (
-          <div className="">
-            <div className="">
-              <h4 className="">Applied Coupons ({applied_coupons.length})</h4>
-              {applied_coupons.length > 1 && (
-                <button
-                  type="button"
-                  onClick={handleClearAllCoupons}
-                  className=""
-                  disabled={isCheckoutSubmit || processingPayment}
-                >
-                  Remove All
-                </button>
-              )}
-            </div>
-
-            <div className="">
-              {applied_coupons.map((coupon, index) => (
-                <div key={coupon.couponCode || index} className="">
-                  <div className="">
-                    <span className="">{coupon.couponCode}</span>
-                    <span className="">{coupon.title}</span>
-                    <span className="">
-                      -${Number(coupon.discount || 0).toFixed(2)}
-                    </span>
-                    {coupon.applicableProductNames &&
-                      coupon.applicableProductNames.length > 0 && (
-                        <span className="">
-                          Applied to:{' '}
-                          {coupon.applicableProductNames.slice(0, 2).join(', ')}
-                          {coupon.applicableProductNames.length > 2 &&
-                            ` +${
-                              coupon.applicableProductNames.length - 2
-                            } more`}
-                        </span>
-                      )}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveCoupon(coupon.couponCode)}
-                    className=""
-                    disabled={isCheckoutSubmit || processingPayment}
-                  >
-                    Remove
-                  </button>
+      {/* Scrollable area for order items */}
+      <ScrollArea className="h-[300px] md:h-[400px] pr-2">
+        <div className="space-y-4 mb-4">
+          {cart_products.map(item => (
+            <div
+              key={item._id}
+              className="flex items-center justify-between py-3 md:py-4 border-b border-border last:border-0"
+            >
+              <div className="flex items-center space-x-3 md:space-x-4">
+                <div className="w-12 h-12 md:w-16 md:h-16 rounded-md overflow-hidden">
+                  <img
+                    src={item.img || '/placeholder-product.png'}
+                    alt={item.title}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="">
-        <div className="">
-          <span className="">Subtotal</span>
-          <span className="">
-            $
-            {(
-              Number(firstTimeDiscount.isApplied ? subtotal : total) || 0
-            ).toFixed(2)}
-          </span>
-        </div>
-
-        <div className="">
-          <span className="">Shipping</span>
-          <span className="">
-            ${(Number(totalShippingCost) || 0).toFixed(2)}
-            {discountPercentage > 0 && (
-              <span className="">{discountPercentage}% off</span>
-            )}
-          </span>
-        </div>
-
-        {/* Multiple coupon discounts display */}
-        {Number(total_coupon_discount) > 0 && (
-          <div className="">
-            <span className="">
-              Coupon Discounts
-              {applied_coupons.length > 1 && (
-                <span className="">{applied_coupons.length} coupons</span>
-              )}
-            </span>
-            <span className=" ">
-              -${Number(total_coupon_discount).toFixed(2)}
-            </span>
-          </div>
-        )}
-
-        {/* Legacy fallback for single coupon */}
-        {Number(total_coupon_discount) === 0 && Number(discountAmount) > 0 && (
-          <div className="">
-            <span className="">Coupon Discount</span>
-            <span className=" ">-${Number(discountAmount).toFixed(2)}</span>
-          </div>
-        )}
-
-        {/* Address discount */}
-        {Number(displayAddressDiscount) > 0 && (
-          <div className="">
-            <span className="">Address Discount</span>
-            <span className=" ">
-              -${Number(displayAddressDiscount).toFixed(2)}
-            </span>
-          </div>
-        )}
-
-        {/* First-time discount */}
-        {firstTimeDiscount.isApplied && (
-          <div className="">
-            <span className=" ">
-              🎉 First-time order discount (-{firstTimeDiscount.percentage}%)
-            </span>
-            <span className=" ">
-              -${(Number(firstTimeDiscountAmount) || 0).toFixed(2)}
-            </span>
-          </div>
-        )}
-
-        <div className=" ">
-          <span className="">Total</span>
-          <span className="">${calculateFinalTotal().toFixed(2)}</span>
-        </div>
-      </div>
-
-      <div className="">
-        <h4 className="">Payment Information</h4>
-        <div className="">
-          <CardElement
-            options={{
-              style: {
-                base: {
-                  fontSize: '16px',
-                  color: '#424770',
-                  '::placeholder': {
-                    color: '#aab7c4',
-                  },
-                  fontFamily: 'var(--font-lato), "Lato", sans-serif',
-                },
-                invalid: {
-                  color: '#9e2146',
-                },
-              },
-            }}
-          />
-          {cardError && (
-            <div className="">
-              <small>Payment could not be processed:</small>
-              <strong>{cardError}</strong>
-              <div>
-                <small>Please check your card details and try again.</small>
+                <div>
+                  <h4 className="font-medium text-foreground text-sm md:text-base">
+                    {item.title}
+                  </h4>
+                  {item.selectedOption && (
+                    <p className="text-xs md:text-sm text-muted-foreground">
+                      {item.selectedOption.title} (+$
+                      {Number(item.selectedOption.price).toFixed(2)})
+                    </p>
+                  )}
+                  <div className="flex items-center mt-1 md:mt-2">
+                    <button
+                      type="button"
+                      onClick={() => handleDecrement(item)}
+                      className="w-6 h-6 md:w-8 md:h-8 flex items-center justify-center rounded-l-md border border-border bg-background text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+                      disabled={
+                        isCheckoutSubmit ||
+                        processingPayment ||
+                        item.orderQuantity <= 1
+                      }
+                    >
+                      <Minus width={10} height={10} />
+                    </button>
+                    <span className="w-8 h-6 md:w-10 md:h-8 flex items-center justify-center border-y border-border bg-background text-foreground text-xs md:text-sm">
+                      {item.orderQuantity}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleAddProduct(item)}
+                      className="w-6 h-6 md:w-8 md:h-8 flex items-center justify-center rounded-r-md border border-border bg-background text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+                      disabled={isCheckoutSubmit || processingPayment}
+                    >
+                      <Plus width={10} height={10} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="text-foreground font-medium text-sm md:text-base">
+                ${(item.price * item.orderQuantity).toFixed(2)}
               </div>
             </div>
-          )}
+          ))}
         </div>
-      </div>
-
-      <button
-        type="submit"
-        disabled={!stripe || isCheckoutSubmit || processingPayment}
-        className=""
-      >
-        {processingPayment ? (
-          <span>
-            <span
-              className="spinner-border spinner-border-sm me-2"
-              role="status"
-              aria-hidden="true"
-            ></span>
-            Processing Your Order...
-          </span>
-        ) : (
-          `Complete Purchase - $${calculateFinalTotal().toFixed(2)}`
-        )}
-      </button>
-
-      <div className="">
-        <svg className="" fill="currentColor" viewBox="0 0 20 20">
-          <path
-            fillRule="evenodd"
-            d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-            clipRule="evenodd"
-          />
-        </svg>
-        <div>
-          <div className="">Secure Checkout - SSL Encrypted</div>
-          <div className="">
-            Ensuring your financial and personal details are secure during every
-            transaction.
-          </div>
-        </div>
-      </div>
-
-      {/* Hidden payment and shipping inputs for form validation */}
-      <div style={{ display: 'none' }}>
-        <input
-          {...register(`shippingOption`, {
-            required: `Shipping Option is required!`,
-          })}
-          type="radio"
-          name="shippingOption"
-          value="calculated"
-          defaultChecked
-        />
-        <input
-          {...register(`payment`, {
-            required: `Payment Option is required!`,
-          })}
-          type="radio"
-          name="payment"
-          value="Card"
-          defaultChecked
-        />
-      </div>
+      </ScrollArea>
     </div>
   );
 }

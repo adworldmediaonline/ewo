@@ -74,15 +74,17 @@ export default function RootLayout({ children }) {
       </head>
       <GoogleTagManager gtmId="GTM-MB34NG65" />
       <body
-        className={`${lato.variable} ${lato.className} $antialiased`}
+        className={`${lato.variable} ${lato.className} $antialiased flex min-h-screen flex-col`}
         suppressHydrationWarning
       >
         {/* {quattrocento.variable} ${quattrocento.className} */}
         <Providers>
           <Wrapper>
-            <HeaderV2 />
-            {children}
-            <Footer />
+            <div className="flex flex-col min-h-screen">
+              <HeaderV2 />
+              <main className="flex-grow">{children}</main>
+              <Footer />
+            </div>
           </Wrapper>
         </Providers>
         <SpeedInsights />

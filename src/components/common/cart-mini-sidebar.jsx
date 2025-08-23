@@ -645,7 +645,7 @@ export default function CartMiniSidebar() {
                     First-time discount (-{firstTimeDiscount.percentage}%):
                   </span>
                   <span>
-                    -${(Number(firstTimeDiscountAmount) || 0).toFixed(2)}
+                    -${Number(firstTimeDiscountAmount || 0).toFixed(2)}
                   </span>
                 </div>
               )}

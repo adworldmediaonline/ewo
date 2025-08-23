@@ -13,13 +13,19 @@ const ThankYouModal = ({ isOpen, onClose, orderData = {}, onContinue }) => {
   return (
     <>
       {/* Backdrop */}
-      <div className="" onClick={handleContinue}>
-        <div className="" onClick={e => e.stopPropagation()}>
+      <div
+        className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+        onClick={handleContinue}
+      >
+        <div
+          className="bg-background rounded-lg shadow-xl max-w-md w-full p-6"
+          onClick={e => e.stopPropagation()}
+        >
           {/* Main Content */}
-          <div className="">
+          <div className="text-center">
             {/* Success Icon */}
-            <div className="">
-              <div className="">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100">
+              <div className="h-12 w-12 text-green-600">
                 <svg
                   width="48"
                   height="48"
@@ -36,23 +42,30 @@ const ThankYouModal = ({ isOpen, onClose, orderData = {}, onContinue }) => {
             </div>
 
             {/* Thank You Message */}
-            <h2 className="">Thank you for your purchase</h2>
+            <h2 className="mt-4 text-2xl font-bold text-foreground">
+              Thank you for your purchase
+            </h2>
 
             {/* Subtitle */}
-            <p className="">
+            <p className="mt-2 text-muted-foreground">
               Your order has been successfully placed. You'll be receiving an
               email shortly with purchase details.
             </p>
 
             {/* Order Info */}
             {orderData.orderId && (
-              <div className="">
-                <p className="">Order #{orderData.orderId}</p>
+              <div className="mt-4 p-3 bg-muted rounded-md">
+                <p className="text-lg font-medium text-foreground">
+                  Order #{orderData.orderId}
+                </p>
               </div>
             )}
 
             {/* Continue Button */}
-            <button className="" onClick={handleContinue}>
+            <button
+              className="mt-6 w-full py-3 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium"
+              onClick={handleContinue}
+            >
               Check Order Details →
             </button>
           </div>
