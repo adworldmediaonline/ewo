@@ -21,8 +21,8 @@ export default function ProductDetailsContent({ productItem }) {
     <>
       {/* Main product section - Desktop: Side by side, Mobile: Stacked */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-16">
-        {/* Image gallery - Desktop: Sticky left column, Mobile: Top */}
-        <div className="order-2 lg:order-1">
+        {/* Image gallery - Desktop: Sticky left column, Mobile: First */}
+        <div className="order-1 lg:order-1">
           <div className="lg:sticky lg:top-4">
             <DetailsThumbWrapper
               activeImg={activeImg}
@@ -36,8 +36,8 @@ export default function ProductDetailsContent({ productItem }) {
           </div>
         </div>
 
-        {/* Product details - Desktop: Right column, Mobile: Middle */}
-        <div className="order-1 lg:order-2">
+        {/* Product details - Desktop: Right column, Mobile: Second */}
+        <div className="order-2 lg:order-2">
           <DetailsWrapper
             productItem={productItem}
             handleImageActive={handleImageActive}
