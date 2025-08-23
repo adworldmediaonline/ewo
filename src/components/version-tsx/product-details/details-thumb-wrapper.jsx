@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import 'photoswipe/style.css';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import CloudinaryImage from '../../common/CloudinaryImage';
 
 // Dynamic import for PhotoSwipe
@@ -22,129 +22,87 @@ export default function DetailsThumbWrapper({
   imgHeight = 580,
   status,
 }) {
-  const [gallery, setGallery] = useState(null);
   const thumbnailsRef = useRef(null);
   const verticalThumbnailsRef = useRef(null);
   const mainImageRef = useRef(null);
 
-  // Prepare items for PhotoSwipe
-  const items = [
-    {
-      src: activeImg,
-      width: imgWidth,
-      height: imgHeight,
-    },
-    ...(imageURLs?.length > 0
-      ? imageURLs
-          .filter(url => url !== activeImg)
-          .map(url => ({
-            src: url,
-            width: imgWidth,
-            height: imgHeight,
-          }))
-      : []),
-  ];
+  // Memoize items to prevent infinite re-renders
+  const items = useMemo(
+    () => [
+      {
+        src: activeImg,
+        width: imgWidth,
+        height: imgHeight,
+      },
+      ...(imageURLs?.length > 0
+        ? imageURLs
+            .filter(url => url !== activeImg)
+            .map(url => ({
+              src: url,
+              width: imgWidth,
+              height: imgHeight,
+            }))
+        : []),
+    ],
+    [activeImg, imageURLs, imgWidth, imgHeight]
+  );
 
   // Find current item index
-  const currentItemIndex = items.findIndex(item => item.src === activeImg);
+  const currentItemIndex = useMemo(
+    () => items.findIndex(item => item.src === activeImg),
+    [items, activeImg]
+  );
 
-  // Initialize PhotoSwipe gallery
-  useEffect(() => {
+  // Helper function to open lightbox
+  const openLightbox = () => {
     if (typeof window !== 'undefined' && PhotoSwipe) {
-      import('photoswipe').then(({ default: PhotoSwipeClass }) => {
-        const newGallery = new PhotoSwipeClass({
-          dataSource: items,
-          index: currentItemIndex > -1 ? currentItemIndex : 0,
-          showHideAnimationType: 'fade',
-          showAnimationDuration: 300,
-          hideAnimationDuration: 300,
-          allowPanToNext: true,
-          allowMouseDrag: true,
-          allowTouchDrag: true,
-          allowKeyboard: true,
-          allowWheel: true,
-          allowPinch: true,
-          allowDoubleTap: true,
-          maxZoomLevel: 4,
-          minZoomLevel: 0.5,
-          zoomAnimationDuration: 300,
-          easing: 'cubic-bezier(0.4, 0, 0.22, 1)',
-          closeOnVerticalDrag: true,
-          closeOnPullDown: true,
-          closeOnBackdropClick: true,
-          closeOnEscape: true,
-          paddingFn: viewportSize => ({
-            top: 30,
-            bottom: 30,
-            left: 70,
-            right: 70,
-          }),
-          // Enhanced zoom controls
-          showHideOpacity: true,
-          allowPanToNext: true,
-          allowMouseDrag: true,
-          allowTouchDrag: true,
-          allowKeyboard: true,
-          allowWheel: true,
-          allowPinch: true,
-          allowDoubleTap: true,
-          // Zoom configuration
-          maxZoomLevel: 4,
-          minZoomLevel: 0.5,
-          zoomAnimationDuration: 300,
-          // Add zoom controls
-          showHideAnimationType: 'fade',
-          showAnimationDuration: 300,
-          hideAnimationDuration: 300,
+      import('photoswipe')
+        .then(({ default: PhotoSwipeClass }) => {
+          try {
+            // Create a new gallery instance each time
+            const newGallery = new PhotoSwipeClass({
+              dataSource: items,
+              index: currentItemIndex > -1 ? currentItemIndex : 0,
+              showHideAnimationType: 'fade',
+              showAnimationDuration: 300,
+              hideAnimationDuration: 300,
+              allowPanToNext: true,
+              allowMouseDrag: true,
+              allowTouchDrag: true,
+              allowKeyboard: true,
+              allowWheel: true,
+              allowPinch: true,
+              allowDoubleTap: true,
+              maxZoomLevel: 4,
+              minZoomLevel: 0.5,
+              zoomAnimationDuration: 300,
+              easing: 'cubic-bezier(0.4, 0, 0.22, 1)',
+              closeOnVerticalDrag: true,
+              closeOnPullDown: true,
+              closeOnBackdropClick: true,
+              closeOnEscape: true,
+              paddingFn: viewportSize => ({
+                top: 30,
+                bottom: 30,
+                left: 70,
+                right: 70,
+              }),
+            });
+
+            // Initialize and show the gallery
+            newGallery.init();
+
+            // Clean up the gallery after it's closed
+            newGallery.on('close', () => {
+              newGallery.destroy();
+            });
+          } catch (error) {
+            console.error('Error creating PhotoSwipe gallery:', error);
+          }
+        })
+        .catch(error => {
+          console.error('Error loading PhotoSwipe:', error);
         });
-
-        setGallery(newGallery);
-      });
-    }
-
-    return () => {
-      if (gallery) {
-        gallery.destroy();
-      }
-    };
-  }, [items, currentItemIndex]);
-
-  // Handle lightbox open
-  const handleLightboxOpen = () => {
-    if (gallery) {
-      console.log('Opening PhotoSwipe with items:', items);
-      console.log('Current item index:', currentItemIndex);
-      console.log('Gallery instance:', gallery);
-
-      // Initialize the gallery
-      gallery.init();
-
-      // Add event listeners for zoom functionality
-      gallery.on('uiRegister', function () {
-        // Add zoom controls to the UI
-        gallery.ui.registerElement({
-          name: 'zoom-controls',
-          className: 'pswp__zoom-controls',
-          appendTo: 'wrapper',
-          onInit: el => {
-            console.log('Zoom controls initialized');
-          },
-        });
-      });
-
-      gallery.on('zoom', e => {
-        console.log('Zoom level:', e.zoomLevel);
-      });
-
-      gallery.on('beforeOpen', () => {
-        console.log('PhotoSwipe opening...');
-      });
-
-      gallery.on('opened', () => {
-        console.log('PhotoSwipe opened successfully');
-      });
-    } else {
-      console.error('Gallery not initialized yet');
     }
   };
 
@@ -251,13 +209,15 @@ export default function DetailsThumbWrapper({
                 <div
                   ref={mainImageRef}
                   className="cursor-zoom-in transition-all duration-200 group-hover:scale-[1.02] group-hover:shadow-lg relative"
-                  onClick={handleLightboxOpen}
+                  onClick={() => {
+                    openLightbox();
+                  }}
                   role="button"
                   tabIndex={0}
                   onKeyDown={e => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      handleLightboxOpen();
+                      openLightbox();
                     }
                   }}
                   aria-label="Click to open image lightbox"

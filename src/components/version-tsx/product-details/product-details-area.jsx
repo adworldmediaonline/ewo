@@ -2,10 +2,10 @@
 import parentCategoryModified from '@/lib/parentCategory';
 import { useGetProductQuery } from '@/redux/features/productApi';
 
-import ProductDetailsContent from './product-details-content';
 import ProductBreadcrumb from './product-breadcrumb';
-import ProductSkeleton from './product-skeleton';
+import ProductDetailsContent from './product-details-content';
 import ProductError from './product-error';
+import ProductSkeleton from './product-skeleton';
 
 const ProductDetailsArea = ({ id }) => {
   const { data: product, isLoading, isError, refetch } = useGetProductQuery(id);
