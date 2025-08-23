@@ -1,7 +1,7 @@
 'use client';
 import ErrorMsg from '@/components/common/error-msg';
 import SearchPrdLoader from '@/components/loader/search-prd-loader';
-import ProductItem from '@/components/products/fashion/product-item';
+import ProductItem from '@/components/version-tsx/product-details/product-item';
 import { useGetAllProductsQuery } from '@/redux/features/productApi';
 import NiceSelect from '@/ui/nice-select';
 import { useSearchParams } from 'next/navigation';

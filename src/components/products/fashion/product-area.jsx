@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import ErrorMsg from '@/components/common/error-msg';
 import { useGetProductTypeQuery } from '@/redux/features/productApi';
 import { TextShapeLine } from '@/svg';
-import ProductItem from './product-item';
+import ProductItem from '../../version-tsx/product-details/product-item';
 import { HomeTwoPrdLoader } from '@/components/loader';
 
 // tabs

@@ -1,6 +1,5 @@
 'use client';
 import { useEffect, useState } from 'react';
-import DetailsBottomInfo from './details-bottom-info';
 import DetailsThumbWrapper from './details-thumb-wrapper';
 import DetailsWrapper from './details-wrapper';
 import RelatedProducts from './related-products';
@@ -20,19 +19,25 @@ export default function ProductDetailsContent({ productItem }) {
 
   return (
     <>
-      <div className="">
-        <div className="">
-          <DetailsThumbWrapper
-            activeImg={activeImg}
-            handleImageActive={handleImageActive}
-            imageURLs={imageURLs}
-            imgWidth={580}
-            imgHeight={580}
-            videoId={videoId}
-            status={status}
-          />
+      {/* Main product section - Desktop: Side by side, Mobile: Stacked */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-16">
+        {/* Image gallery - Desktop: Left column, Mobile: First */}
+        <div className="order-1 lg:order-1">
+          <div className="lg:sticky lg:top-8">
+            <DetailsThumbWrapper
+              activeImg={activeImg}
+              handleImageActive={handleImageActive}
+              imageURLs={imageURLs}
+              imgWidth={580}
+              imgHeight={580}
+              videoId={videoId}
+              status={status}
+            />
+          </div>
         </div>
-        <div className="">
+
+        {/* Product details - Desktop: Right column, Mobile: Second */}
+        <div className="order-2 lg:order-2">
           <DetailsWrapper
             productItem={productItem}
             handleImageActive={handleImageActive}
@@ -41,8 +46,8 @@ export default function ProductDetailsContent({ productItem }) {
         </div>
       </div>
 
-      <div className="">
-        <DetailsBottomInfo productItem={productItem} />
+      {/* Related Products */}
+      <div className="mt-16">
         <RelatedProducts id={_id} />
       </div>
     </>

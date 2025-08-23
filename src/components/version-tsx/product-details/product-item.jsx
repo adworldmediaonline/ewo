@@ -15,11 +15,7 @@ import { handleProductModal } from '@/redux/features/productModalSlice';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { CompareThree, QuickView, Wishlist } from '@/svg';
 
-export default function ProductItem({
-  product,
-  style_2 = false,
-  coupons = [],
-}) {
+export default function ProductItem({ product, coupons = [] }) {
   const {
     _id,
     img,

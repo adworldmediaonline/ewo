@@ -4,9 +4,10 @@ import { reset_address_discount } from '@/redux/features/order/orderSlice';
 import { City, Country, State } from 'country-state-city';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import ErrorMsg from '../common/error-msg';
+import ErrorMsg from '../../common/error-msg';
 import useCartInfo from '@/hooks/use-cart-info';
 import { load_applied_coupons } from '@/redux/features/coupon/couponSlice';
+import { authClient } from '@/lib/authClient';
 
 const CheckoutBillingArea = ({
   register,
@@ -15,6 +16,7 @@ const CheckoutBillingArea = ({
   setValue,
   checkoutData,
 }) => {
+  const { data: session, isPending } = authClient.useSession();
   const { user } = useSelector(state => state.auth);
   const { isCheckoutSubmitting } = useSelector(state => state.order);
   const dispatch = useDispatch();

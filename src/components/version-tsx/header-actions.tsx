@@ -6,7 +6,6 @@ import { Heart, ShoppingCart, User as UserIcon } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import AuthDialog from './auth-dialog';
 import CartDropdown from './cart-dropdown';
 import { authClient } from '@/lib/authClient';
 import { useRouter } from 'next/navigation';

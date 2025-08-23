@@ -1,4 +1,6 @@
 'use client';
+import { Button } from '@/components/ui/button';
+import { Minus, Plus } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 
 // internal
@@ -40,29 +42,34 @@ const ProductQuantity = ({ productItem }) => {
   };
 
   return (
-    <>
-      <button
-        className=""
+    <div className="flex items-center border border-input rounded-lg overflow-hidden">
+      <Button
+        variant="ghost"
+        size="sm"
         onClick={handleDecrease}
+        disabled={orderQuantity <= 1}
+        className="h-12 w-12 rounded-none border-0 hover:bg-muted focus:z-10 focus:ring-2 focus:ring-ring focus:ring-offset-0"
         aria-label="Decrease quantity"
       >
-        -
-      </button>
-      <input
-        className=""
-        type="text"
-        readOnly
-        value={orderQuantity}
-        aria-label="Product quantity"
-      />
-      <button
-        className=""
+        <Minus className="w-4 h-4" />
+      </Button>
+
+      <div className="flex items-center justify-center min-w-[60px] h-12 bg-background border-x border-input">
+        <span className="text-lg font-medium text-foreground">
+          {orderQuantity}
+        </span>
+      </div>
+
+      <Button
+        variant="ghost"
+        size="sm"
         onClick={handleIncrease}
+        className="h-12 w-12 rounded-none border-0 hover:bg-muted focus:z-10 focus:ring-2 focus:ring-ring focus:ring-offset-0"
         aria-label="Increase quantity"
       >
-        +
-      </button>
-    </>
+        <Plus className="w-4 h-4" />
+      </Button>
+    </div>
   );
 };
 

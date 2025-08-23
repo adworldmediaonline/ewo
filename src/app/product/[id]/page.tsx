@@ -1,4 +1,4 @@
-import ProductDetailsArea from '@/components/product-details/product-details-area';
+import ProductDetailsArea from '@/components/version-tsx/product-details/product-details-area';
 import Wrapper from '@/components/wrapper';
 import { Metadata } from 'next';
 
@@ -6,7 +6,7 @@ import { Metadata } from 'next';
 async function getProductData(id: string) {
   try {
     const baseUrl =
-      process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+      process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8090';
     const response = await fetch(
       `${baseUrl}/api/product/single-product/${id}`,
       {

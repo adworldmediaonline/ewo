@@ -6,7 +6,7 @@ import { add_cart_product } from '@/redux/features/cartSlice';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import ProductItem from '../products/fashion/product-item';
+import ProductItem from '../version-tsx/product-details/product-item';
 const styles = new Proxy({}, { get: () => '' });
 
 // Function to convert text to title case (first letter of each word capitalized)
@@ -107,9 +107,7 @@ export default function ProductItemWrapper({ product, coupons = [] }) {
         <div className="">
           <button
             type="button"
-            className={` ${
-              isAddedToCart ? styles.active : ''
-            }`}
+            className={` ${isAddedToCart ? styles.active : ''}`}
             disabled={product.status === 'out-of-stock'}
             onClick={isAddedToCart ? handleViewCart : handleAddToCart}
           >

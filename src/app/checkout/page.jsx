@@ -1,4 +1,4 @@
-import CheckoutArea from '@/components/checkout/checkout-area';
+import CheckoutArea from '@/components/version-tsx/checkout/checkout-area';
 import Wrapper from '@/components/wrapper';
 import {
   Breadcrumb,
@@ -32,11 +32,11 @@ export default function CheckoutPage() {
           </BreadcrumbList>
         </Breadcrumb>
 
-        <div className="mb-6 md:mb-8">
+        {/* <div className="mb-6 md:mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">
             Checkout
           </h1>
-        </div>
+        </div> */}
         <CheckoutArea />
       </div>
     </Wrapper>

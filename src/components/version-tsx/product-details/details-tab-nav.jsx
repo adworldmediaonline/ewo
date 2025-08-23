@@ -2,7 +2,7 @@
 import DOMPurify from 'isomorphic-dompurify';
 import { useState } from 'react';
 import { Rating } from 'react-simple-star-rating';
-import ReviewForm from '../forms/review-form';
+import ReviewForm from './review-form';
 import ReviewItem from './review-item';
 
 const DetailsTabNav = ({ product }) => {
