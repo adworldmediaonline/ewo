@@ -1,10 +1,16 @@
 'use client';
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { User, CheckCircle, Clock } from 'lucide-react';
+import { CheckCircle, Clock, User } from 'lucide-react';
+import React from 'react';
 
 interface ProfileDetailsProps {
   user: any;
@@ -36,27 +42,23 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ user }) => {
             <label className="text-sm font-medium text-foreground">
               Email Address
             </label>
-            <div className="p-3 bg-muted rounded-md">
-              {user.email}
-            </div>
+            <div className="p-3 bg-muted rounded-md">{user.email}</div>
           </div>
         </div>
 
         <Separator />
 
         <div className="space-y-4">
-          <h4 className="font-medium text-foreground">
-            Account Information
-          </h4>
+          <h4 className="font-medium text-foreground">Account Information</h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
                 User ID
               </label>
               <div className="p-3 bg-muted rounded-md font-mono text-sm">
                 {user.id}
               </div>
-            </div>
+            </div> */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
                 Email Verification

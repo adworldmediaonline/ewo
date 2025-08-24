@@ -1,17 +1,15 @@
 'use client';
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { 
-  Settings, 
-  Shield, 
-  Mail, 
-  Activity, 
-  FileText, 
-  AlertTriangle 
-} from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Settings, Shield } from 'lucide-react';
+import React from 'react';
 
 const ProfileSettings: React.FC = () => {
   return (
@@ -33,16 +31,16 @@ const ProfileSettings: React.FC = () => {
               <Shield className="w-4 h-4 mr-2" />
               Change Password
             </Button>
-            <Button variant="outline" className="w-full justify-start">
+            {/* <Button variant="outline" className="w-full justify-start">
               <Shield className="w-4 h-4 mr-2" />
               Enable Two-Factor Authentication
-            </Button>
+            </Button> */}
           </div>
         </div>
 
-        <Separator />
+        {/* <Separator /> */}
 
-        <div className="space-y-4">
+        {/* <div className="space-y-4">
           <h4 className="font-medium text-foreground">Preferences</h4>
           <div className="space-y-3">
             <Button variant="outline" className="w-full justify-start">
@@ -54,14 +52,12 @@ const ProfileSettings: React.FC = () => {
               Activity Log
             </Button>
           </div>
-        </div>
+        </div> */}
 
-        <Separator />
+        {/* <Separator /> */}
 
-        <div className="space-y-4">
-          <h4 className="font-medium text-foreground">
-            Data & Privacy
-          </h4>
+        {/* <div className="space-y-4">
+          <h4 className="font-medium text-foreground">Data & Privacy</h4>
           <div className="space-y-3">
             <Button variant="outline" className="w-full justify-start">
               <FileText className="w-4 h-4 mr-2" />
@@ -72,7 +68,7 @@ const ProfileSettings: React.FC = () => {
               Delete Account
             </Button>
           </div>
-        </div>
+        </div> */}
       </CardContent>
     </Card>
   );
