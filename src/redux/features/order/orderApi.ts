@@ -72,7 +72,7 @@ export const authApi = apiSlice.injectEndpoints({
     }),
     // getUserOrders
     getUserOrders: builder.query({
-      query: () => `/api/user-order`,
+      query: userId => `/api/user-order?userId=${userId}`,
       providesTags: ['UserOrders'],
       keepUnusedDataFor: 600,
     }),

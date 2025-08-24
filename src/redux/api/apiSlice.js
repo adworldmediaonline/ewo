@@ -1,22 +1,22 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import Cookies from 'js-cookie';
+// import { authClient } from '../../lib/authClient';
 
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
-    prepareHeaders: async (headers, { getState, endpoint }) => {
-      try {
-        const userInfo = Cookies.get('userInfo');
-        if (userInfo) {
-          const user = JSON.parse(userInfo);
-          if (user?.accessToken) {
-            headers.set('Authorization', `Bearer ${user.accessToken}`);
-          }
-        }
-      } catch (error) {}
-      return headers;
-    },
+    // prepareHeaders: async (headers, { getState, endpoint }) => {
+    //   try {
+    //     // Use Better Auth session instead of cookies
+    //     const { data: session } = await authClient.getSession();
+    //     if (session?.accessToken) {
+    //       headers.set('Authorization', `Bearer ${session.accessToken}`);
+    //     }
+    //   } catch (error) {
+    //     // Handle error silently
+    //   }
+    //   return headers;
+    // },
   }),
   endpoints: builder => ({}),
   tagTypes: [
