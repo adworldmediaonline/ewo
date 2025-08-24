@@ -3,7 +3,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { useGetUserOrdersQuery } from '@/redux/features/order/orderApi';
-import { CheckCircle, Clock, Package, TrendingUp, Truck } from 'lucide-react';
+import {
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  Package,
+  TrendingUp,
+  Truck,
+} from 'lucide-react';
 import React from 'react';
 
 interface ProfileOrderStatsProps {
@@ -41,8 +48,8 @@ const ProfileOrderStats: React.FC<ProfileOrderStatsProps> = ({ userId }) => {
     return (
       <>
         {/* Order Statistics Cards - Loading */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {[1, 2, 3, 4].map(i => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
+          {[1, 2, 3, 4, 5].map(i => (
             <Card key={i}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <div className="h-4 w-24 bg-muted rounded animate-pulse"></div>
@@ -62,12 +69,13 @@ const ProfileOrderStats: React.FC<ProfileOrderStatsProps> = ({ userId }) => {
   // Error state or no data
   if (ordersError || !ordersData) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
         {[
           { title: 'Total Orders', icon: Package, value: '0' },
           { title: 'Pending', icon: Clock, value: '0' },
-          { title: 'Processing', icon: Truck, value: '0' },
+          { title: 'Shipped', icon: Truck, value: '0' },
           { title: 'Delivered', icon: CheckCircle, value: '0' },
+          { title: 'Cancelled', icon: AlertTriangle, value: '0' },
         ].map((stat, i) => (
           <Card key={i}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -89,7 +97,7 @@ const ProfileOrderStats: React.FC<ProfileOrderStatsProps> = ({ userId }) => {
   return (
     <>
       {/* Order Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
@@ -114,27 +122,36 @@ const ProfileOrderStats: React.FC<ProfileOrderStatsProps> = ({ userId }) => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Processing</CardTitle>
+            <CardTitle className="text-sm font-medium">Shipped</CardTitle>
             <Truck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{orderStats.processing}</div>
-            <p className="text-xs text-muted-foreground">
-              Currently processing
-            </p>
+            <div className="text-2xl font-bold">{orderStats.shipped}</div>
+            <p className="text-xs text-muted-foreground">On the way</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Delivered</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+            <CheckCircle className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{orderStats.delivered}</div>
             <p className="text-xs text-muted-foreground">
               Successfully delivered
             </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Cancelled</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-destructive" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{orderStats.cancelled}</div>
+            <p className="text-xs text-muted-foreground">Cancelled orders</p>
           </CardContent>
         </Card>
       </div>

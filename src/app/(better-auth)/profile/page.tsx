@@ -24,7 +24,6 @@ import {
   ProfileOrdersSection,
   ProfileOrderStats,
   ProfileOverview,
-  ProfileSessionInfo,
   ProfileSettings,
 } from '@/components/version-tsx/profile';
 
@@ -144,7 +143,7 @@ export default function DashboardPage() {
         </Tabs>
 
         {/* Session Information */}
-        <ProfileSessionInfo session={session} />
+        {/* <ProfileSessionInfo session={session} /> */}
       </div>
     </div>
   );
