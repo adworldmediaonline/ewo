@@ -5,6 +5,7 @@ export { default as ProfileDetails } from './profile-details';
 export { default as ProfileEmptyState } from './profile-empty-state';
 export { default as ProfileErrorState } from './profile-error-state';
 export { default as ProfileHeader } from './profile-header';
+export { default as ProfileLayout } from './profile-layout';
 export { default as ProfileLoadingState } from './profile-loading-state';
 export { default as ProfileOrderStats } from './profile-order-stats';
 export { default as ProfileOrders } from './profile-orders';

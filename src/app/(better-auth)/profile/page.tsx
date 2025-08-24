@@ -1,15 +1,6 @@
 'use client';
 
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { authClient } from '@/lib/authClient';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
@@ -20,10 +11,10 @@ import { useEffect } from 'react';
 // Import reusable components
 import {
   ProfileDetails,
+  ProfileLayout,
   ProfileLoadingState,
   ProfileOrdersSection,
   ProfileOrderStats,
-  ProfileOverview,
   ProfileSettings,
 } from '@/components/version-tsx/profile';
 
@@ -55,96 +46,101 @@ export default function DashboardPage() {
     return null;
   }
 
-  return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-        {/* Breadcrumb Navigation */}
-        <div className="mb-8">
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink
-                  href="/"
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  Home
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage className="text-foreground font-medium">
-                  Profile
-                </BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'overview':
+        return (
+          <div className="space-y-6">
+            {/* Header Section */}
+            <div className="mb-8">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">
+                    Welcome back, {session.user.name || session.user.email}!
+                  </h1>
+                  <p className="text-lg text-muted-foreground">
+                    Manage your profile, track orders, and view your account
+                    information.
+                  </p>
+                </div>
+                <Button asChild size="lg" className="flex items-center gap-2">
+                  <Link href="/shop">
+                    Continue Shopping
+                    <ArrowRight className="w-5 h-5" />
+                  </Link>
+                </Button>
+              </div>
+            </div>
 
-        {/* Header Section */}
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            {/* Order Statistics */}
+            <ProfileOrderStats userId={session.user.id} />
+
+            {/* Profile Overview */}
+            {/* <ProfileOverview user={session.user} /> */}
+          </div>
+        );
+
+      case 'orders':
+        return (
+          <div className="space-y-6">
             <div>
-              <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">
-                Welcome back, {session.user.name || session.user.email}!
+              <h1 className="text-3xl font-bold text-foreground mb-2">
+                My Orders
               </h1>
               <p className="text-lg text-muted-foreground">
-                Manage your profile, track orders, and view your account
-                information.
+                Track your order status and view order history
               </p>
             </div>
-            <Button asChild size="lg" className="flex items-center gap-2">
-              <Link href="/shop">
-                Continue Shopping
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-            </Button>
-          </div>
-        </div>
-
-        {/* Order Statistics */}
-        <ProfileOrderStats userId={session.user.id} />
-
-        {/* Main Content Tabs */}
-        <Tabs
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="space-y-6"
-        >
-          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="orders">Orders</TabsTrigger>
-            <TabsTrigger value="profile">Profile</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
-          </TabsList>
-
-          {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-6">
-            <ProfileOverview user={session.user} />
-          </TabsContent>
-
-          {/* Orders Tab */}
-          <TabsContent value="orders" className="space-y-6">
             <ProfileOrdersSection
               userId={session.user.id}
-              maxOrders={5}
-              showViewAllButton={true}
+              maxOrders={10}
+              showViewAllButton={false}
             />
-          </TabsContent>
+          </div>
+        );
 
-          {/* Profile Tab */}
-          <TabsContent value="profile" className="space-y-6">
+      case 'profile':
+        return (
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground mb-2">
+                Profile Information
+              </h1>
+              <p className="text-lg text-muted-foreground">
+                Manage your personal information and account details
+              </p>
+            </div>
             <ProfileDetails user={session.user} />
-          </TabsContent>
+          </div>
+        );
 
-          {/* Settings Tab */}
-          <TabsContent value="settings" className="space-y-6">
+      case 'settings':
+        return (
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground mb-2">
+                Account Settings
+              </h1>
+              <p className="text-lg text-muted-foreground">
+                Manage your security settings and preferences
+              </p>
+            </div>
             <ProfileSettings />
-          </TabsContent>
-        </Tabs>
+          </div>
+        );
 
-        {/* Session Information */}
-        {/* <ProfileSessionInfo session={session} /> */}
-      </div>
-    </div>
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <ProfileLayout
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+      user={session.user}
+    >
+      {renderTabContent()}
+    </ProfileLayout>
   );
 }
