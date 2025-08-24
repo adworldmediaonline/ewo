@@ -1,9 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Card,
   CardContent,
@@ -11,8 +8,11 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-import { Loader2, Mail, CheckCircle, AlertCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle, Loader2, Mail } from 'lucide-react';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { authClient } from '@/lib/authClient';
@@ -83,7 +83,7 @@ export default function VerifyEmailPage() {
       setSuccess(true);
       // Wait a moment for the session to be created, then redirect
       setTimeout(() => {
-        router.push('/dashboard');
+        router.push('/profile');
         router.refresh(); // Refresh to update session state
       }, 2000);
     } catch (err) {
@@ -134,7 +134,7 @@ export default function VerifyEmailPage() {
               </h2>
               <p className="text-gray-600 mb-4">
                 Your email has been successfully verified. Redirecting to
-                dashboard...
+                profile...
               </p>
               <div className="flex justify-center">
                 <Loader2 className="h-6 w-6 animate-spin" />

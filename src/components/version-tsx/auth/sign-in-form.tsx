@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -12,10 +11,11 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 // import { Checkbox } from '@/components/ui/checkbox';
-import { Loader2, AlertCircle } from 'lucide-react';
 import { authClient } from '@/lib/authClient';
+import { AlertCircle, Loader2 } from 'lucide-react';
 import GoogleSignIn from './google-signin';
 // import { Checkbox } from '@/components/ui/checkbox';
 
@@ -37,7 +37,7 @@ export function SignInForm() {
         email,
         password,
         // rememberMe,
-        callbackURL: '/dashboard',
+        callbackURL: '/profile',
       });
 
       if (signInError) {
@@ -47,8 +47,8 @@ export function SignInForm() {
       }
 
       // If successful, redirect to dashboard
-      console.log('✅ Sign-in successful, redirecting to dashboard...');
-      router.push('/dashboard');
+      console.log('✅ Sign-in successful, redirecting to profile...');
+      router.push('/profile');
       router.refresh(); // Force a refresh to update session state
     } catch (err: any) {
       console.error('Sign-in error:', err);

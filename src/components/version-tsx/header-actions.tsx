@@ -1,14 +1,7 @@
 'use client';
 
-import useCartInfo from '@/hooks/use-cart-info';
-import { openCartMini } from '@/redux/features/cartSlice';
-import { Heart, ShoppingCart, User as UserIcon } from 'lucide-react';
-import Link from 'next/link';
-import * as React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import CartDropdown from './cart-dropdown';
-import { authClient } from '@/lib/authClient';
-import { useRouter } from 'next/navigation';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,9 +10,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, LogOut, LayoutDashboard, Settings } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import useCartInfo from '@/hooks/use-cart-info';
+import { authClient } from '@/lib/authClient';
+import { openCartMini } from '@/redux/features/cartSlice';
+import {
+  Heart,
+  LogOut,
+  ShoppingCart,
+  User,
+  User as UserIcon,
+} from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import * as React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import CartDropdown from './cart-dropdown';
 export interface HeaderActionsProps {
   showBadges?: boolean;
 }
@@ -101,22 +106,6 @@ export function HeaderActions({
       ) : null}
 
       {session ? (
-        // <Link
-        //   href="/profile"
-        //   aria-label="Account"
-        //   className="inline-flex items-center gap-2 md:gap-3"
-        // >
-        //   <span className="inline-flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-full bg-muted text-foreground">
-        //     <UserIcon className="h-5 w-5 md:h-5 md:w-5" />
-        //   </span>
-        //   <div className="hidden md:flex flex-col leading-tight text-header-foreground">
-        //     <span className="text-xs/4 opacity-80">Hi, Welcome</span>
-        //     <span className="text-sm font-semibold">
-        //       {user?.name || 'User'}
-        //     </span>
-        //   </div>
-        // </Link>
-
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
@@ -145,25 +134,20 @@ export function HeaderActions({
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link href="/dashboard" className="flex items-center">
-                <LayoutDashboard className="mr-2 h-4 w-4" />
-                <span>Dashboard</span>
-              </Link>
-            </DropdownMenuItem>
+
             <DropdownMenuItem asChild>
               <Link href="/profile" className="flex items-center">
                 <User className="mr-2 h-4 w-4" />
                 <span>Profile</span>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
+            {/* <DropdownMenuItem asChild>
               <Link href="/settings" className="flex items-center">
                 <Settings className="mr-2 h-4 w-4" />
                 <span>Settings</span>
               </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
+            </DropdownMenuItem> */}
+            {/* <DropdownMenuItem asChild>
               <Link href="/change-password" className="flex items-center">
                 <svg
                   className="mr-2 h-4 w-4"
@@ -180,7 +164,7 @@ export function HeaderActions({
                 </svg>
                 <span>Change Password</span>
               </Link>
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="text-red-600 focus:text-red-600"

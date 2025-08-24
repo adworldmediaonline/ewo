@@ -8,9 +8,9 @@ import { useSelector } from 'react-redux';
 import useCheckoutSubmit from '@/hooks/use-checkout-submit';
 import ThankYouModal from '../../common/thank-you-modal';
 
+import { authClient } from '@/lib/authClient';
 import CheckoutBillingArea from './checkout-billing-area';
 import CheckoutOrderArea from './checkout-order-area';
-import { authClient } from '@/lib/authClient';
 
 export default function CheckoutArea() {
   const { data: session, isPending } = authClient.useSession();

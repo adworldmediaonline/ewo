@@ -1,13 +1,13 @@
 'use client';
-import { CardElement } from '@stripe/react-stripe-js';
+import useCartInfo from '@/hooks/use-cart-info';
+import { authClient } from '@/lib/authClient';
+import { load_applied_coupons } from '@/redux/features/coupon/couponSlice';
 import { reset_address_discount } from '@/redux/features/order/orderSlice';
+import { CardElement } from '@stripe/react-stripe-js';
 import { City, Country, State } from 'country-state-city';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ErrorMsg from '../../common/error-msg';
-import useCartInfo from '@/hooks/use-cart-info';
-import { load_applied_coupons } from '@/redux/features/coupon/couponSlice';
-import { authClient } from '@/lib/authClient';
 
 const CheckoutBillingArea = ({
   register,

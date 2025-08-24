@@ -1,9 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Card,
   CardContent,
@@ -11,11 +8,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Loader2, Mail, ArrowLeft } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { ArrowLeft, Loader2, Mail } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import Link from 'next/link';
 import { authClient } from '@/lib/authClient';
+import Link from 'next/link';
 
 export default function SignInOTPPage() {
   const [email, setEmail] = useState('');
@@ -90,7 +90,7 @@ export default function SignInOTPPage() {
       }
 
       console.log('✅ OTP Sign-in successful:', data);
-      router.push('/dashboard');
+      router.push('/profile');
       router.refresh();
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');

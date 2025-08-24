@@ -28,9 +28,12 @@ import {
   set_shipping,
 } from '@/redux/features/order/orderSlice';
 import { notifyError, notifySuccess } from '@/utils/toast';
+import { authClient } from '../lib/authClient';
 import useCartInfo from './use-cart-info';
 
 const useCheckoutSubmit = () => {
+  const { data: session, isPending } = authClient.useSession();
+
   // Enhanced coupon validation
   const [validateCoupon, { isLoading: couponValidationLoading }] =
     useValidateCouponMutation();
@@ -41,8 +44,12 @@ const useCheckoutSubmit = () => {
   const [createPaymentIntent, {}] = useCreatePaymentIntentMutation();
   // cart_products
   const { cart_products, firstTimeDiscount } = useSelector(state => state.cart);
-  // user
-  const { user } = useSelector(state => state.auth);
+
+  // authenticated user
+  // const { user } = useSelector(state => state.auth);
+
+  // console.log('🔑 session', session?.user?.id);
+
   // shipping_info
   const { shipping_info } = useSelector(state => state.order);
   // total amount
@@ -508,7 +515,7 @@ const useCheckoutSubmit = () => {
         orderData: {
           ...orderData,
           totalAmount: Math.max(0, cartTotal), // Ensure never negative
-          isGuestOrder: !user,
+          isGuestOrder: !session?.user?.id,
         },
       });
 
@@ -601,7 +608,7 @@ const useCheckoutSubmit = () => {
       country: newShippingInfo.country,
       zipCode: newShippingInfo.zipCode,
       state: newShippingInfo.state,
-      user: user ? user._id : undefined,
+      user: session?.user?.id,
       paymentMethod: 'Card',
       // Add first-time discount information
       firstTimeDiscount: {

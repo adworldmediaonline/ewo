@@ -9,7 +9,7 @@ export default function GoogleSignIn() {
   const [isLoading, setIsLoading] = useState(false);
   const handleGoogleSignUp = async () => {
     setIsLoading(true);
-    const cb = `${window.location.origin}/`;
+    const cb = `${window.location.origin}/profile`;
     await authClient.signIn.social(
       {
         provider: 'google',
