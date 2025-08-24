@@ -5,6 +5,7 @@ import Wrapper from '@/components/wrapper';
 import { GoogleTagManager } from '@next/third-parties/google';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Lato } from 'next/font/google';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import Footer from '../components/version-tsx/footer';
 import HeaderV2 from '../components/version-tsx/header';
 import './globals.css';
@@ -76,7 +77,9 @@ export default function RootLayout({ children }) {
           <Wrapper>
             <div className="flex flex-col min-h-screen">
               <HeaderV2 />
-              <main className="flex-grow">{children}</main>
+              <main className="flex-grow">
+                <NuqsAdapter>{children}</NuqsAdapter>
+              </main>
               <Footer />
             </div>
           </Wrapper>

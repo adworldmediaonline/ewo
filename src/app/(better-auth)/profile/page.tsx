@@ -14,7 +14,8 @@ import { authClient } from '@/lib/authClient';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useQueryState } from 'nuqs';
+import { useEffect } from 'react';
 
 // Import reusable components
 import {
@@ -30,7 +31,16 @@ import {
 export default function DashboardPage() {
   const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState('overview');
+
+  // Use nuqs to persist active tab in URL
+  const [activeTab, setActiveTab] = useQueryState('tab', {
+    defaultValue: 'overview',
+    parse: value => {
+      // Validate tab value to prevent invalid states
+      const validTabs = ['overview', 'orders', 'profile', 'settings'];
+      return validTabs.includes(value) ? value : 'overview';
+    },
+  });
 
   useEffect(() => {
     if (!isPending && !session) {
