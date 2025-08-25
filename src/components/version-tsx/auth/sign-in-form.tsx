@@ -147,12 +147,12 @@ export function SignInForm({
           >
             Forgot password?
           </a>
-          <a
+          {/* <a
             href="/sign-in-otp"
             className="text-sm text-primary hover:underline"
           >
             Sign in with OTP
-          </a>
+          </a> */}
         </div>
 
         <Button type="submit" disabled={isLoading} className="w-full">

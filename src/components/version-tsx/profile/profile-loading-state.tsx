@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import React from 'react';
 
 const ProfileLoadingState: React.FC = () => (
   <div className="min-h-screen bg-background py-8 lg:py-12">

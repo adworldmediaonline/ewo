@@ -70,15 +70,15 @@ export default function ShopMenuMegaContent({
                   </a>
                 </NavigationMenuLink>
 
-                {/* Subcategories - positioned outside the main anchor tag */}
+                {/* Subcategories - positioned below the main card, outside the anchor tag */}
                 {childLabels.length > 0 && (
-                  <div className="absolute left-0 bottom-0 p-4 sm:p-5 z-10">
-                    <div className="mt-2 flex flex-wrap gap-2">
+                  <div className="p-4 sm:p-5 pt-2">
+                    <div className="flex flex-wrap gap-2">
                       {childLabels.map((child, index) => (
                         <NavigationMenuLink
                           key={index}
                           asChild
-                          className="inline-flex cursor-pointer items-center rounded-full bg-white/90 px-2.5 py-1 text-xs font-medium text-foreground hover:bg-white transition-colors duration-200"
+                          className="inline-flex cursor-pointer items-center rounded-full bg-muted/80 px-2.5 py-1 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors duration-200"
                         >
                           <a
                             href={`/shop?category=${cat.parent}&subcategory=${child}`}
@@ -94,7 +94,7 @@ export default function ShopMenuMegaContent({
                       {cat.children && cat.children.length > 3 && (
                         <NavigationMenuLink
                           asChild
-                          className="inline-flex cursor-pointer items-center rounded-full bg-white/80 px-2.5 py-1 text-xs font-medium text-foreground/80 hover:bg-white hover:text-foreground transition-colors duration-200"
+                          className="inline-flex cursor-pointer items-center rounded-full bg-muted/60 px-2.5 py-1 text-xs font-medium text-muted-foreground/80 hover:bg-muted hover:text-foreground transition-colors duration-200"
                         >
                           <a
                             href={`/shop?category=${cat.parent}`}

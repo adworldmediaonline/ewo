@@ -1,9 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Card,
   CardContent,
@@ -11,11 +8,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Loader2, KeyRound, CheckCircle, AlertCircle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { AlertCircle, CheckCircle, KeyRound, Loader2 } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import Link from 'next/link';
 import { authClient } from '@/lib/authClient';
+import Link from 'next/link';
 
 export default function ResetPasswordLinkPage() {
   const [newPassword, setNewPassword] = useState('');
@@ -74,33 +74,46 @@ export default function ResetPasswordLinkPage() {
       return;
     }
 
-    setIsLoading(true);
-    setError('');
-
-    try {
-      const { error: resetError } = await authClient.resetPassword({
+    // Use better-auth's official callback pattern
+    const { error: resetError } = await authClient.resetPassword(
+      {
         newPassword,
         token,
-      });
-
-      if (resetError) {
-        if (resetError.message?.includes('INVALID_TOKEN')) {
-          setError(
-            'This reset link has expired or is invalid. Please request a new one.'
-          );
-        } else {
-          setError(
-            resetError.message || 'Failed to reset password. Please try again.'
-          );
-        }
-        return;
+      },
+      {
+        onRequest: () => {
+          setIsLoading(true);
+          setError('');
+        },
+        onSuccess: () => {
+          setSuccess(true);
+        },
+        onError: ctx => {
+          if (ctx.error.message?.includes('INVALID_TOKEN')) {
+            setError(
+              'This reset link has expired or is invalid. Please request a new one.'
+            );
+          } else {
+            setError(
+              ctx.error.message || 'Failed to reset password. Please try again.'
+            );
+          }
+          setIsLoading(false);
+        },
       }
+    );
 
-      setSuccess(true);
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
-      console.error('Password reset error:', err);
-    } finally {
+    // Fallback error handling if callbacks don't work
+    if (resetError && !error) {
+      if (resetError.message?.includes('INVALID_TOKEN')) {
+        setError(
+          'This reset link has expired or is invalid. Please request a new one.'
+        );
+      } else {
+        setError(
+          resetError.message || 'Failed to reset password. Please try again.'
+        );
+      }
       setIsLoading(false);
     }
   };

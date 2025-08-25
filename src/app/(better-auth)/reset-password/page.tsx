@@ -1,9 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Card,
   CardContent,
@@ -11,11 +8,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Loader2, KeyRound, ArrowLeft, CheckCircle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { ArrowLeft, CheckCircle, KeyRound, Loader2 } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import Link from 'next/link';
 import { authClient } from '@/lib/authClient';
+import Link from 'next/link';
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState('');
@@ -28,8 +28,31 @@ export default function ResetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [otpSent, setOtpSent] = useState(false);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Check if email is provided in URL (from forgot-password page)
+  useEffect(() => {
+    const emailParam = searchParams.get('email');
+    const otpParam = searchParams.get('otp');
+
+    if (emailParam) {
+      setEmail(emailParam);
+
+      if (otpParam) {
+        setOtp(otpParam);
+        setStep('password'); // Start at password step if both email and OTP are provided
+      } else {
+        setStep('otp'); // Start at OTP step if only email is provided
+      }
+
+      setIsLoading(false); // Ensure loading state is reset
+      setError(''); // Clear any errors
+      setOtpSent(true); // Mark OTP as sent since we came from forgot-password
+    }
+  }, [searchParams]);
 
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,27 +61,34 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    setIsLoading(true);
-    setError('');
-
-    try {
-      const { error: sendError } = await authClient.forgetPassword.emailOtp({
+    // Use better-auth's official callback pattern
+    const { error: sendError } = await authClient.forgetPassword.emailOtp(
+      {
         email: email.trim(),
-      });
-
-      if (sendError) {
-        setError(
-          sendError.message || 'Failed to send reset code. Please try again.'
-        );
-        return;
+      },
+      {
+        onRequest: () => {
+          setIsLoading(true);
+          setError('');
+        },
+        onSuccess: () => {
+          setStep('otp');
+          setResendCooldown(60);
+        },
+        onError: ctx => {
+          setError(
+            ctx.error.message || 'Failed to send reset code. Please try again.'
+          );
+          setIsLoading(false);
+        },
       }
+    );
 
-      setStep('otp');
-      setResendCooldown(60);
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
-      console.error('Send reset OTP error:', err);
-    } finally {
+    // Fallback error handling if callbacks don't work
+    if (sendError && !error) {
+      setError(
+        sendError.message || 'Failed to send reset code. Please try again.'
+      );
       setIsLoading(false);
     }
   };
@@ -70,36 +100,52 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    setIsLoading(true);
-    setError('');
-
-    try {
-      const { error: verifyError } =
-        await authClient.emailOtp.checkVerificationOtp({
+    // Use better-auth's official callback pattern
+    const { error: verifyError } =
+      await authClient.emailOtp.checkVerificationOtp(
+        {
           email,
           type: 'forget-password',
           otp: otp.trim(),
-        });
-
-      if (verifyError) {
-        const errorMessage = verifyError.message || '';
-        if (errorMessage.includes('MAX_ATTEMPTS_EXCEEDED')) {
-          setError('Maximum attempts exceeded. Please request a new code.');
-        } else if (errorMessage.includes('INVALID_OTP')) {
-          setError('Invalid code. Please check and try again.');
-        } else if (errorMessage.includes('EXPIRED')) {
-          setError('Code has expired. Please request a new one.');
-        } else {
-          setError(errorMessage || 'Verification failed. Please try again.');
+        },
+        {
+          onRequest: () => {
+            setIsLoading(true);
+            setError('');
+          },
+          onSuccess: () => {
+            setStep('password');
+          },
+          onError: ctx => {
+            const errorMessage = ctx.error.message || '';
+            if (errorMessage.includes('MAX_ATTEMPTS_EXCEEDED')) {
+              setError('Maximum attempts exceeded. Please request a new code.');
+            } else if (errorMessage.includes('INVALID_OTP')) {
+              setError('Invalid code. Please check and try again.');
+            } else if (errorMessage.includes('EXPIRED')) {
+              setError('Code has expired. Please request a new one.');
+            } else {
+              setError(
+                errorMessage || 'Verification failed. Please try again.'
+              );
+            }
+            setIsLoading(false);
+          },
         }
-        return;
-      }
+      );
 
-      setStep('password');
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
-      console.error('OTP verification error:', err);
-    } finally {
+    // Fallback error handling if callbacks don't work
+    if (verifyError && !error) {
+      const errorMessage = verifyError.message || '';
+      if (errorMessage.includes('MAX_ATTEMPTS_EXCEEDED')) {
+        setError('Maximum attempts exceeded. Please request a new code.');
+      } else if (errorMessage.includes('INVALID_OTP')) {
+        setError('Invalid code. Please check and try again.');
+      } else if (errorMessage.includes('EXPIRED')) {
+        setError('Code has expired. Please request a new one.');
+      } else {
+        setError(errorMessage || 'Verification failed. Please try again.');
+      }
       setIsLoading(false);
     }
   };
@@ -122,54 +168,68 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    setIsLoading(true);
-    setError('');
-
-    try {
-      const { error: resetError } = await authClient.emailOtp.resetPassword({
+    // Use better-auth's official callback pattern
+    const { error: resetError } = await authClient.emailOtp.resetPassword(
+      {
         email,
         otp,
         password: newPassword,
-      });
-
-      if (resetError) {
-        setError(
-          resetError.message || 'Failed to reset password. Please try again.'
-        );
-        return;
+      },
+      {
+        onRequest: () => {
+          setIsLoading(true);
+          setError('');
+        },
+        onSuccess: () => {
+          setStep('success');
+        },
+        onError: ctx => {
+          setError(
+            ctx.error.message || 'Failed to reset password. Please try again.'
+          );
+          setIsLoading(false);
+        },
       }
+    );
 
-      setStep('success');
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
-      console.error('Password reset error:', err);
-    } finally {
+    // Fallback error handling if callbacks don't work
+    if (resetError && !error) {
+      setError(
+        resetError.message || 'Failed to reset password. Please try again.'
+      );
       setIsLoading(false);
     }
   };
 
   const handleResendOTP = async () => {
-    setIsLoading(true);
-    setError('');
-
-    try {
-      const { error: resendError } = await authClient.forgetPassword.emailOtp({
+    // Use better-auth's official callback pattern
+    const { error: resendError } = await authClient.forgetPassword.emailOtp(
+      {
         email,
-      });
-
-      if (resendError) {
-        setError(
-          resendError.message || 'Failed to resend code. Please try again.'
-        );
-        return;
+      },
+      {
+        onRequest: () => {
+          setIsLoading(true);
+          setError('');
+        },
+        onSuccess: () => {
+          setResendCooldown(60);
+          setOtp('');
+        },
+        onError: ctx => {
+          setError(
+            ctx.error.message || 'Failed to resend code. Please try again.'
+          );
+          setIsLoading(false);
+        },
       }
+    );
 
-      setResendCooldown(60);
-      setOtp('');
-    } catch (err) {
-      setError('Failed to resend code. Please try again.');
-      console.error('Resend OTP error:', err);
-    } finally {
+    // Fallback error handling if callbacks don't work
+    if (resendError && !error) {
+      setError(
+        resendError.message || 'Failed to resend code. Please try again.'
+      );
       setIsLoading(false);
     }
   };
