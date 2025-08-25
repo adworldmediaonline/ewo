@@ -5,8 +5,8 @@ import {
 import { nextCookies } from 'better-auth/next-js';
 import { createAuthClient } from 'better-auth/react';
 
-const BACKEND_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8090';
+// const BACKEND_URL =
+//   process.env.NEXT_PUBLIC_BACKEND_URL || 'https://www.eastwestoffroad.com/';
 
 export const authClient = createAuthClient({
   plugins: [
@@ -24,7 +24,7 @@ export const authClient = createAuthClient({
     }),
     nextCookies(),
   ],
-  baseURL: BACKEND_URL,
+  baseURL: 'https://www.eastwestoffroad.com/',
 });
 
 export type ClientSession = typeof authClient.$Infer.Session;
