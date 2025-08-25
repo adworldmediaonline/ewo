@@ -68,14 +68,12 @@ import {
 } from '@/redux/features/cartSlice';
 import { get_compare_products } from '@/redux/features/compareSlice';
 import { get_wishlist_products } from '@/redux/features/wishlist-slice';
-// import { authClient } from '../lib/authClient';
 
 interface WrapperProps {
   children: React.ReactNode;
 }
 
 const Wrapper = ({ children }: WrapperProps) => {
-  // const { data: session, isPending } = authClient.useSession();
   const { productItem } = useSelector((state: any) => state.productModal);
   const dispatch = useDispatch();
 

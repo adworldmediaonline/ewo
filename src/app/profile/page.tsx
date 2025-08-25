@@ -1,7 +1,3 @@
-'use client';
-
-import { authClient } from '../../lib/authClient';
-
 // import { Button } from '@/components/ui/button';
 // import { authClient } from '@/lib/authClient';
 // import { ArrowRight } from 'lucide-react';
@@ -9,6 +5,9 @@ import { authClient } from '../../lib/authClient';
 // import { useRouter } from 'next/navigation';
 // import { useQueryState } from 'nuqs';
 // import { useEffect, useState } from 'react';
+
+import { redirect } from 'next/navigation';
+import { getServerSession } from '../../lib/server-session';
 
 // // Import reusable components
 // import {
@@ -157,11 +156,11 @@ import { authClient } from '../../lib/authClient';
 //   );
 // }
 
-export default function ProfilePage() {
-  const { data: session, isPending } = authClient.useSession();
+export default async function ProfilePage() {
+  const session = await getServerSession();
 
-  if (isPending) {
-    return <div>Loading...</div>;
+  if (!session) {
+    redirect('/sign-in');
   }
 
   return <div>{session?.user?.email}</div>;
