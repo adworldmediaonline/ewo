@@ -15,9 +15,6 @@ import {
 } from '@/redux/features/cartSlice';
 import { get_compare_products } from '@/redux/features/compareSlice';
 import { get_wishlist_products } from '@/redux/features/wishlist-slice';
-import { forceToastCenter } from '@/utils/toast-center';
-import { ToastContainer, Zoom } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 interface WrapperProps {
   children: React.ReactNode;
@@ -33,11 +30,6 @@ const Wrapper = ({ children }: WrapperProps) => {
     dispatch(get_wishlist_products());
     dispatch(get_compare_products());
     dispatch(initialOrderQuantity());
-
-    // Initialize toast centering
-    const cleanup = forceToastCenter();
-
-    return cleanup;
   }, [dispatch]);
 
   return !authChecked ? (
@@ -51,35 +43,6 @@ const Wrapper = ({ children }: WrapperProps) => {
     <div id="wrapper">
       {children}
       {/* <BackToTopCom /> */}
-      <ToastContainer
-        position="top-center"
-        autoClose={400}
-        hideProgressBar={false}
-        newestOnTop={true}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        transition={Zoom}
-        limit={5}
-        className="custom-toast-container"
-        toastClassName="custom-toast"
-        style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: 'auto',
-          maxWidth: '400px',
-          minWidth: '300px',
-          zIndex: 9999,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      />
       <GuestCartModal />
       <CartConfirmationModal />
       {/* product modal start */}

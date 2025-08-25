@@ -5,11 +5,11 @@ import {
   hideGuestCartModal,
   setGuestEmail,
 } from '@/redux/features/guestCart/guestCartSlice';
+import { notifyError, notifySuccess } from '@/utils/toast';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
 
 export default function GuestCartModal() {
   const dispatch = useDispatch();
@@ -62,7 +62,7 @@ export default function GuestCartModal() {
     }
 
     if (cart_products.length === 0) {
-      toast.error('Your cart is empty');
+      notifyError('Your cart is empty');
       return;
     }
 
@@ -78,7 +78,7 @@ export default function GuestCartModal() {
       localStorage.setItem('guestEmail', email);
 
       dispatch(hideGuestCartModal());
-      toast.success('Cart saved! Redirecting to checkout...');
+      notifySuccess('Cart saved! Redirecting to checkout...');
 
       // Redirect to checkout
       router.push('/checkout');
@@ -86,7 +86,7 @@ export default function GuestCartModal() {
       const errorMessage =
         error?.data?.message || error?.message || 'Failed to save cart';
       setEmailError(errorMessage);
-      toast.error(`${errorMessage}. Please try again.`);
+      notifyError(`${errorMessage}. Please try again.`);
     }
   };
 
@@ -102,7 +102,7 @@ export default function GuestCartModal() {
     }
 
     if (cart_products.length === 0) {
-      toast.error('Your cart is empty');
+      notifyError('Your cart is empty');
       return;
     }
 
@@ -118,7 +118,7 @@ export default function GuestCartModal() {
       localStorage.setItem('guestEmail', email);
 
       dispatch(hideGuestCartModal());
-      toast.success('Cart saved! Redirecting to cart...');
+      notifySuccess('Cart saved! Redirecting to cart...');
 
       // Redirect to cart page
       router.push('/cart');
@@ -126,7 +126,7 @@ export default function GuestCartModal() {
       const errorMessage =
         error?.data?.message || error?.message || 'Failed to save cart';
       setEmailError(errorMessage);
-      toast.error(`${errorMessage}. Please try again.`);
+      notifyError(`${errorMessage}. Please try again.`);
     }
   };
 
@@ -181,14 +181,10 @@ export default function GuestCartModal() {
                   value={email}
                   onChange={handleEmailChange}
                   placeholder="Enter your email address"
-                  className={` ${
-                    emailError ? styles.inputError : ''
-                  }`}
+                  className={` ${emailError ? styles.inputError : ''}`}
                   disabled={isLoading}
                 />
-                {emailError && (
-                  <span className="">{emailError}</span>
-                )}
+                {emailError && <span className="">{emailError}</span>}
               </div>
 
               {error && (
@@ -277,10 +273,7 @@ export default function GuestCartModal() {
 
             <p className="">
               Don't have an account?{' '}
-              <Link
-                href="/register?redirect=/checkout"
-                className=""
-              >
+              <Link href="/register?redirect=/checkout" className="">
                 Create one
               </Link>
             </p>
