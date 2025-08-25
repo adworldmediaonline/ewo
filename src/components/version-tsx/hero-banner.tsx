@@ -16,8 +16,8 @@ interface HeroBannerProps {
 export default function HeroBanner({
   desktopPublicId = 'hero-banner-desktop_dja8ci',
   mobilePublicId = 'hero-banner-mobile_uprqgb',
-  desktopTitle = 'Explore premium off‑road accessories, parts and gear for every adventure',
-  mobileTitle = 'Premium off‑road accessories',
+  desktopTitle = 'EAST WEST OFF ROAD',
+  mobileTitle = 'EAST WEST OFF ROAD',
   href = '/shop',
   priority = true,
 }: HeroBannerProps) {
@@ -63,13 +63,31 @@ export default function HeroBanner({
         <div className="container mx-auto w-full px-3 md:px-6">
           <div className="max-w-[75%] sm:max-w-lg md:max-w-xl lg:max-w-xl xl:max-w-2xl">
             {/* Desktop heading */}
-            <h2 className="hidden md:block text-white/95 text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight leading-[1.15] lg:leading-[1.12] drop-shadow">
-              {desktopTitle}
-            </h2>
+            <div className="hidden md:block">
+              <h1 className="text-white/95 text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight leading-[1.15] lg:leading-[1.12] drop-shadow mb-3">
+                {desktopTitle}
+              </h1>
+              <h2 className="text-white/90 text-xl lg:text-2xl xl:text-3xl font-semibold tracking-wide leading-tight drop-shadow mb-2">
+                HEAVY-DUTY OFF-ROAD STEERING & SUSPENSION PARTS
+              </h2>
+              <p className="text-white/85 text-lg lg:text-xl font-medium tracking-wide leading-relaxed drop-shadow">
+                BUILT TO CONQUER ANY TERRAIN.
+              </p>
+            </div>
+
             {/* Mobile heading */}
-            <h2 className="md:hidden text-white text-xl sm:text-2xl font-semibold leading-tight drop-shadow">
-              {mobileTitle}
-            </h2>
+            <div className="md:hidden">
+              <h1 className="text-white text-xl sm:text-2xl font-bold leading-tight drop-shadow mb-2">
+                {mobileTitle}
+              </h1>
+              <h2 className="text-white/90 text-sm sm:text-base font-semibold leading-tight drop-shadow mb-1">
+                HEAVY-DUTY OFF-ROAD STEERING & SUSPENSION PARTS
+              </h2>
+              <p className="text-white/85 text-xs sm:text-sm font-medium leading-tight drop-shadow">
+                BUILT TO CONQUER ANY TERRAIN.
+              </p>
+            </div>
+
             <div className="mt-5 md:mt-6 lg:mt-8">
               <Button
                 asChild
