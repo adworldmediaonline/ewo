@@ -1,17 +1,16 @@
 'use client';
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import * as Yup from 'yup';
 // internal
-import Wrapper from '@/layout/wrapper';
+import Wrapper from '@/components/wrapper';
 // import LoginShapes from "@/components/login-register/login-shapes";
 import ErrorMsg from '@/components/common/error-msg';
 import { useConfirmForgotPasswordMutation } from '@/redux/features/auth/authApi';
 import { CloseEye, OpenEye } from '@/svg';
 import { notifyError, notifySuccess } from '@/utils/toast';
-import styles from './forgot-password-area.module.css';
 
 // schema
 const schema = Yup.object().shape({
@@ -59,25 +58,21 @@ export default function ForgotPasswordArea({ token }) {
 
   return (
     <Wrapper>
-      <section className={styles.forgotPasswordSection}>
+      <section className="">
         <div className="container">
           <div className="row justify-content-center">
             <div className="col-xl-5 col-lg-6 col-md-8">
-              <div className={styles.forgotPasswordWrapper}>
+              <div className="">
                 {/* Clean Header */}
-                <div className={styles.forgotPasswordHeader}>
-                  <div className={styles.brandSection}>
-                    <h1 className={styles.forgotPasswordTitle}>
-                      Set New Password
-                    </h1>
-                    <p className={styles.forgotPasswordSubtitle}>
-                      Enter your new password below
-                    </p>
+                <div className="">
+                  <div className="">
+                    <h1 className="">Set New Password</h1>
+                    <p className="">Enter your new password below</p>
                   </div>
                 </div>
 
                 {/* Password Reset Form */}
-                <div className={styles.forgotPasswordForm}>
+                <div className="">
                   <form onSubmit={handleSubmit(onSubmit)}>
                     <div className="tp-login-input-wrapper">
                       {/* Password Field */}

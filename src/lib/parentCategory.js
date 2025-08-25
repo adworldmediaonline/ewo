@@ -4,7 +4,7 @@ export default function parentCategoryModified(category) {
   }
   const categoryName = category
     .toLowerCase()
-    .replace('&', '')
+    .replace(/&/g, 'and') // Replace & with 'and' for better URL readability
     .split(' ')
     .join('-');
 

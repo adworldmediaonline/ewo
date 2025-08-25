@@ -1,72 +1,13 @@
-import { toast, Zoom } from 'react-toastify';
+import { toast } from 'sonner';
 
 const notifySuccess = message =>
   toast.success(message, {
-    position: 'top-center',
-
-    autoClose: 3000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-    transition: Zoom,
-    className: 'custom-toast-center',
-    onOpen: () => {
-      // Force center positioning when toast opens
-      setTimeout(() => {
-        const containers = document.querySelectorAll(
-          '[class*="Toastify__toast-container"]'
-        );
-        containers.forEach(container => {
-          if (container) {
-            container.style.setProperty('position', 'fixed', 'important');
-            container.style.setProperty('top', '50%', 'important');
-            container.style.setProperty('left', '50%', 'important');
-            container.style.setProperty(
-              'transform',
-              'translate(-50%, -50%)',
-              'important'
-            );
-            container.style.setProperty('z-index', '2147483647', 'important');
-          }
-        });
-      }, 0);
-    },
+    duration: 3000,
   });
 
 const notifyError = message =>
   toast.error(message, {
-    position: 'top-center',
-    autoClose: 3000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-    transition: Zoom,
-    className: 'custom-toast-center',
-    onOpen: () => {
-      // Force center positioning when toast opens
-      setTimeout(() => {
-        const containers = document.querySelectorAll(
-          '[class*="Toastify__toast-container"]'
-        );
-        containers.forEach(container => {
-          if (container) {
-            container.style.setProperty('position', 'fixed', 'important');
-            container.style.setProperty('top', '50%', 'important');
-            container.style.setProperty('left', '50%', 'important');
-            container.style.setProperty(
-              'transform',
-              'translate(-50%, -50%)',
-              'important'
-            );
-            container.style.setProperty('z-index', '2147483647', 'important');
-          }
-        });
-      }, 0);
-    },
+    duration: 3000,
   });
 
-export { notifySuccess, notifyError };
+export { notifyError, notifySuccess };

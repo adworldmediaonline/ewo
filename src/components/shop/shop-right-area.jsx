@@ -1,23 +1,18 @@
-import React, { useState } from "react";
-import Pagination from "@/ui/Pagination";
-import ProductItem from "../products/fashion/product-item";
-import CategoryFilter from "./shop-filter/category-filter";
-import ColorFilter from "./shop-filter/color-filter";
-import PriceFilter from "./shop-filter/price-filter";
-import ProductBrand from "./shop-filter/product-brand";
-import StatusFilter from "./shop-filter/status-filter";
-import TopRatedProducts from "./shop-filter/top-rated-products";
-import ShopListItem from "./shop-list-item";
-import ShopTopLeft from "./shop-top-left";
-import ShopTopRight from "./shop-top-right";
-import ResetButton from "./shop-filter/reset-button";
+import React, { useState } from 'react';
+import Pagination from '@/ui/Pagination';
+import ProductItem from '../version-tsx/product-details/product-item';
+import CategoryFilter from './shop-filter/category-filter';
+import ColorFilter from './shop-filter/color-filter';
+import PriceFilter from './shop-filter/price-filter';
+import ProductBrand from './shop-filter/product-brand';
+import StatusFilter from './shop-filter/status-filter';
+import TopRatedProducts from './shop-filter/top-rated-products';
+import ShopListItem from './shop-list-item';
+import ShopTopLeft from './shop-top-left';
+import ShopTopRight from './shop-top-right';
+import ResetButton from './shop-filter/reset-button';
 
-const ShopRightArea = ({
-  all_products,
-  products,
-  otherProps,
-  right_side
-}) => {
+const ShopRightArea = ({ all_products, products, otherProps, right_side }) => {
   const { priceFilterValues, selectHandleFilter, currPage, setCurrPage } =
     otherProps;
   const [filteredRows, setFilteredRows] = useState(products);
@@ -43,16 +38,20 @@ const ShopRightArea = ({
               <div className="tp-shop-main-wrapper">
                 <div className="tp-shop-top mb-45">
                   <div className="row">
-                      <div className="col-xl-6">
-                        <ShopTopLeft
-                          showing={
-                            products.length === 0? 0: filteredRows.slice(pageStart,pageStart + countOfPage)
-                            .length
-                          }
-                          total={all_products.length}
-                        />
-                      </div>
-                     <div className="col-xl-6">
+                    <div className="col-xl-6">
+                      <ShopTopLeft
+                        showing={
+                          products.length === 0
+                            ? 0
+                            : filteredRows.slice(
+                                pageStart,
+                                pageStart + countOfPage
+                              ).length
+                        }
+                        total={all_products.length}
+                      />
+                    </div>
+                    <div className="col-xl-6">
                       <ShopTopRight selectHandleFilter={selectHandleFilter} />
                     </div>
                   </div>
@@ -71,7 +70,7 @@ const ShopRightArea = ({
                         <div className="row">
                           {filteredRows
                             .slice(pageStart, pageStart + countOfPage)
-                            .map((item) => (
+                            .map(item => (
                               <div
                                 key={item._id}
                                 className="col-xl-4 col-md-6 col-sm-6"
@@ -93,7 +92,7 @@ const ShopRightArea = ({
                             <div className="col-xl-12">
                               {filteredRows
                                 .slice(pageStart, pageStart + countOfPage)
-                                .map((item) => (
+                                .map(item => (
                                   <ShopListItem key={item._id} product={item} />
                                 ))}
                             </div>
@@ -119,28 +118,39 @@ const ShopRightArea = ({
               </div>
             </div>
 
-              <div className="col-xl-3 col-lg-4">
-                <div className="tp-shop-sidebar mr-10">
-                  {/* filter */}
-                  <PriceFilter
-                    priceFilterValues={priceFilterValues}
-                    maxPrice={maxPrice}
-                  />
-                  {/* status */}
-                  <StatusFilter setCurrPage={setCurrPage} shop_right={right_side} />
-                  {/* categories */}
-                  <CategoryFilter setCurrPage={setCurrPage} shop_right={right_side} />
-                  {/* color */}
-                  <ColorFilter setCurrPage={setCurrPage} shop_right={right_side} />
-                  {/* product rating */}
-                  <TopRatedProducts />
-                  {/* brand */}
-                  <ProductBrand setCurrPage={setCurrPage} shop_right={right_side} />
-                  {/* reset filter */}
-                  <ResetButton shop_right={right_side} />
-                </div>
+            <div className="col-xl-3 col-lg-4">
+              <div className="tp-shop-sidebar mr-10">
+                {/* filter */}
+                <PriceFilter
+                  priceFilterValues={priceFilterValues}
+                  maxPrice={maxPrice}
+                />
+                {/* status */}
+                <StatusFilter
+                  setCurrPage={setCurrPage}
+                  shop_right={right_side}
+                />
+                {/* categories */}
+                <CategoryFilter
+                  setCurrPage={setCurrPage}
+                  shop_right={right_side}
+                />
+                {/* color */}
+                <ColorFilter
+                  setCurrPage={setCurrPage}
+                  shop_right={right_side}
+                />
+                {/* product rating */}
+                <TopRatedProducts />
+                {/* brand */}
+                <ProductBrand
+                  setCurrPage={setCurrPage}
+                  shop_right={right_side}
+                />
+                {/* reset filter */}
+                <ResetButton shop_right={right_side} />
               </div>
-
+            </div>
           </div>
         </div>
       </section>

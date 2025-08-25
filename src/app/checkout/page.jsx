@@ -1,8 +1,13 @@
-import Wrapper from '@/layout/wrapper';
-import HeaderV2 from '@/layout/headers/HeaderV2';
-import Footer from '@/layout/footers/footer';
-import CheckoutArea from '@/components/checkout/checkout-area';
-import styles from './checkout.module.css';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
+import CheckoutArea from '@/components/version-tsx/checkout/checkout-area';
+import Wrapper from '@/components/wrapper';
 
 export const metadata = {
   title: 'EWO - Checkout',
@@ -14,16 +19,30 @@ export const metadata = {
 export default function CheckoutPage() {
   return (
     <Wrapper>
-      <HeaderV2 />
-      <div className={styles.checkoutPage}>
-        <div className={styles.checkoutContainer}>
-          <div className={styles.checkoutHeader}>
-            <h1 className={styles.checkoutTitle}>Checkout</h1>
-          </div>
-          <CheckoutArea />
-        </div>
+      <div className="container mx-auto px-4 py-6 md:py-8">
+        <Breadcrumb className="mb-4 md:mb-6">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">Home</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/cart">Cart</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Checkout</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
+        {/* <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+            Checkout
+          </h1>
+        </div> */}
+        <CheckoutArea />
       </div>
-      <Footer style_2={true} />
     </Wrapper>
   );
 }

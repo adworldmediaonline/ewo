@@ -1,10 +1,14 @@
 import Providers from '@/components/provider';
 import TawkToChat from '@/components/tawk-to-chat';
+import { Toaster } from '@/components/ui/sonner';
+import Wrapper from '@/components/wrapper';
 import { GoogleTagManager } from '@next/third-parties/google';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Lato } from 'next/font/google';
-import './globals.scss';
-import './toast-fix.css';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
+import Footer from '../components/version-tsx/footer';
+import HeaderV2 from '../components/version-tsx/header';
+import './globals.css';
 
 export const metadata = {
   title: 'East West Off Road | Premium Automotive & Off-Road Gear USA',
@@ -31,42 +35,6 @@ const lato = Lato({
   weight: ['100', '300', '400', '700', '900'],
   subsets: ['latin'],
 });
-
-// const body = Lato({
-//   weight: ['300', '400', '700', '900'],
-//   subsets: ['latin'],
-//   variable: '--tp-ff-body',
-// });
-// const heading = Lato({
-//   weight: ['300', '400', '700', '900'],
-//   subsets: ['latin'],
-//   variable: '--tp-ff-heading',
-// });
-// const p = Lato({
-//   weight: ['300', '400', '700', '900'],
-//   subsets: ['latin'],
-//   variable: '--tp-ff-p',
-// });
-// const jost = Lato({
-//   weight: ['300', '400', '700', '900'],
-//   subsets: ['latin'],
-//   variable: '--tp-ff-jost',
-// });
-// const roboto = Roboto({
-//   weight: ['300', '400', '700', '900'],
-//   subsets: ['latin'],
-//   variable: '--tp-ff-roboto',
-// });
-// const oregano = Oregano({
-//   weight: ['400'],
-//   subsets: ['latin'],
-//   variable: '--tp-ff-oregano',
-// });
-// const charm = Charm({
-//   weight: ['400', '700'],
-//   subsets: ['latin'],
-//   variable: '--tp-ff-charm',
-// });
 
 export default function RootLayout({ children }) {
   return (
@@ -101,12 +69,33 @@ export default function RootLayout({ children }) {
       </head>
       <GoogleTagManager gtmId="GTM-MB34NG65" />
       <body
-        className={`${lato.variable} ${lato.className} antialiased`}
+        className={`${lato.variable} ${lato.className} $antialiased flex min-h-screen flex-col`}
         suppressHydrationWarning
       >
-        <Providers>{children}</Providers>
+        {/* {quattrocento.variable} ${quattrocento.className} */}
+        <Providers>
+          <Wrapper>
+            <div className="flex flex-col min-h-screen">
+              <HeaderV2 />
+              <main className="flex-grow">
+                <NuqsAdapter>{children}</NuqsAdapter>
+              </main>
+              <Footer />
+            </div>
+          </Wrapper>
+        </Providers>
         <SpeedInsights />
         <TawkToChat />
+        <Toaster
+          // position="top-center"
+          toastOptions={{
+            error: 'bg-red-500 text-white',
+            success: 'bg-green-500 text-white',
+            warning: 'bg-yellow-500 text-white',
+            info: 'bg-blue-500 text-white',
+            default: 'bg-gray-500 text-white',
+          }}
+        />
       </body>
     </html>
   );

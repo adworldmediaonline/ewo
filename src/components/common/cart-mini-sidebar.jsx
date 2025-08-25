@@ -23,7 +23,7 @@ import {
 } from '@/redux/features/coupon/couponSlice';
 import { notifyError, notifySuccess } from '@/utils/toast';
 import empty_cart_img from '@assets/img/product/cartmini/empty-cart.png';
-import styles from './cart-mini-sidebar.module.css';
+// Removed CSS module import; Tailwind-only styling
 
 export default function CartMiniSidebar() {
   const {
@@ -344,30 +344,26 @@ export default function CartMiniSidebar() {
   return (
     <>
       <div
-        className={`${styles.cartMiniArea} ${
-          cartMiniOpen ? styles.cartMiniOpened : ''
-        }`}
+        className=""
         role="dialog"
         aria-modal="true"
         aria-labelledby="cart-title"
       >
-        <div className={styles.cartMiniWrapper}>
-          <div className={styles.cartMiniTopWrapper}>
-            <div className={styles.cartMiniTop}>
-              <div className={styles.cartMiniTopTitle}>
+        <div className="">
+          <div className="">
+            <div className="">
+              <div className="">
                 <h4 id="cart-title">
                   Shopping Cart
                   {cart_products.length > 0 && (
-                    <span className={styles.itemCount}>
-                      {cart_products.length}
-                    </span>
+                    <span className="">{cart_products.length}</span>
                   )}
                 </h4>
               </div>
               <button
                 onClick={handleCloseCartMini}
                 type="button"
-                className={styles.cartMiniCloseBtn}
+                className=""
                 aria-label="Close shopping cart"
               >
                 ✕
@@ -375,24 +371,20 @@ export default function CartMiniSidebar() {
             </div>
             {/* First-time discount banner */}
             {firstTimeDiscount.isApplied && (
-              <div className={styles.discountBanner}>
-                <div className={styles.discountBannerContent}>
-                  <span className={styles.discountIcon}>🎉</span>
-                  <span className={styles.discountText}>
-                    First-time order discount applied!
-                  </span>
-                  <span className={styles.discountAmount}>
-                    -{firstTimeDiscount.percentage}%
-                  </span>
+              <div className="">
+                <div className="">
+                  <span className="">🎉</span>
+                  <span className="">First-time order discount applied!</span>
+                  <span className="">-{firstTimeDiscount.percentage}%</span>
                 </div>
               </div>
             )}
 
             {cart_products.length > 0 && (
-              <div className={styles.cartMiniWidget}>
+              <div className="">
                 {cart_products.map((item, i) => (
-                  <div key={i} className={styles.cartMiniWidgetItem}>
-                    <div className={styles.cartMiniThumb}>
+                  <div key={i} className="">
+                    <div className="">
                       <Link href={`/product/${item.slug || item._id}`}>
                         <Image
                           src={item.img}
@@ -403,16 +395,16 @@ export default function CartMiniSidebar() {
                         />
                       </Link>
                     </div>
-                    <div className={styles.cartMiniContent}>
-                      <h5 className={styles.cartMiniTitle}>
+                    <div className="">
+                      <h5 className="">
                         <Link href={`/product/${item.slug || item._id}`}>
                           {item.title}
                         </Link>
                       </h5>
-                      <div className={styles.cartMiniPriceWrapper}>
+                      <div className="">
                         {/* Unit Price and Calculation Display */}
-                        <div className={styles.priceCalculation}>
-                          <span className={styles.unitPrice}>
+                        <div className="">
+                          <span className="">
                             $
                             {item.discount > 0
                               ? (
@@ -422,12 +414,10 @@ export default function CartMiniSidebar() {
                                 ).toFixed(2)
                               : Number(item.price).toFixed(2)}
                           </span>
-                          <span className={styles.multiply}>×</span>
-                          <span className={styles.quantity}>
-                            {item.orderQuantity}
-                          </span>
-                          <span className={styles.equals}>=</span>
-                          <span className={styles.totalPrice}>
+                          <span className="">×</span>
+                          <span className="">{item.orderQuantity}</span>
+                          <span className="">=</span>
+                          <span className="">
                             $
                             {item.discount > 0
                               ? (
@@ -444,10 +434,10 @@ export default function CartMiniSidebar() {
                         </div>
 
                         {/* Quantity Controls */}
-                        <div className={styles.quantityControls}>
+                        <div className="">
                           <button
                             onClick={() => handleDecrement(item)}
-                            className={styles.quantityBtn}
+                            className=""
                             disabled={item.orderQuantity <= 1}
                             aria-label="Decrease quantity"
                           >
@@ -462,12 +452,10 @@ export default function CartMiniSidebar() {
                               <line x1="5" y1="12" x2="19" y2="12"></line>
                             </svg>
                           </button>
-                          <span className={styles.quantityValue}>
-                            {item.orderQuantity}
-                          </span>
+                          <span className="">{item.orderQuantity}</span>
                           <button
                             onClick={() => handleIncrement(item)}
-                            className={styles.quantityBtn}
+                            className=""
                             aria-label="Increase quantity"
                           >
                             <svg
@@ -489,7 +477,7 @@ export default function CartMiniSidebar() {
                       onClick={() =>
                         handleRemovePrd({ title: item.title, id: item._id })
                       }
-                      className={styles.cartMiniDel}
+                      className=""
                       aria-label={`Remove ${item.title} from cart`}
                       type="button"
                     >
@@ -501,7 +489,7 @@ export default function CartMiniSidebar() {
             )}
             {/* if no item in cart */}
             {cart_products.length === 0 && (
-              <div className={styles.cartMiniEmpty}>
+              <div className="">
                 <Image
                   src={empty_cart_img}
                   alt="Empty shopping cart illustration"
@@ -509,7 +497,7 @@ export default function CartMiniSidebar() {
                   height={120}
                 />
                 <p>Your cart is empty</p>
-                <Link href="/shop" className={styles.tpBtn}>
+                <Link href="/shop" className="">
                   Start Shopping
                 </Link>
               </div>
@@ -517,53 +505,40 @@ export default function CartMiniSidebar() {
           </div>
 
           {/* Essential Checkout Section - Always Visible */}
-          <div className={styles.cartMiniCheckout}>
+          <div className="">
             {/* Apply Coupon Toggle */}
             {cart_products.length > 0 && (
               <>
                 <button
                   type="button"
                   onClick={toggleCouponForm}
-                  className={styles.detailsToggle}
+                  className=""
                   aria-expanded={couponFormVisible}
                   aria-controls="coupon-form"
                 >
                   <span>
                     {couponFormVisible ? 'Hide Coupon Form' : 'Apply Coupon'}
                   </span>
-                  <span
-                    className={`${styles.toggleIcon} ${
-                      couponFormVisible ? styles.toggleIconRotated : ''
-                    }`}
-                  >
-                    ▼
-                  </span>
+                  <span className="">▼</span>
                 </button>
 
                 {/* Collapsible Coupon Form */}
-                <div
-                  id="coupon-form"
-                  className={`${styles.detailsSection} ${
-                    couponFormVisible
-                      ? styles.detailsSectionVisible
-                      : styles.detailsSectionHidden
-                  }`}
-                >
-                  <div className={styles.detailsContent}>
+                <div id="coupon-form" className="">
+                  <div className="">
                     {/* Apply Coupon Section */}
-                    <div className={styles.couponSection}>
-                      <div className={styles.couponForm}>
+                    <div className="">
+                      <div className="">
                         <input
                           ref={couponRef}
                           type="text"
                           placeholder="Enter coupon code"
-                          className={styles.couponInput}
+                          className=""
                           disabled={coupon_loading}
                         />
                         <button
                           type="button"
                           onClick={handleCouponSubmit}
-                          className={styles.couponButton}
+                          className=""
                           disabled={coupon_loading}
                         >
                           {coupon_loading ? 'Applying...' : 'Apply'}
@@ -572,15 +547,7 @@ export default function CartMiniSidebar() {
 
                       {/* Coupon messages */}
                       {couponApplyMsg && (
-                        <div
-                          className={`${styles.couponMessage} ${
-                            coupon_error
-                              ? styles.couponError
-                              : styles.couponSuccess
-                          }`}
-                        >
-                          {couponApplyMsg}
-                        </div>
+                        <div className="">{couponApplyMsg}</div>
                       )}
                     </div>
                   </div>
@@ -590,40 +557,35 @@ export default function CartMiniSidebar() {
 
             {/* Applied Coupons Section - Always visible when coupons exist */}
             {applied_coupons.length > 0 && (
-              <div className={styles.appliedCouponsSection}>
-                <div className={styles.appliedCouponsHeader}>
-                  <h4 className={styles.appliedCouponsTitle}>
+              <div className="">
+                <div className="">
+                  <h4 className="">
                     Applied Coupons ({applied_coupons.length})
                   </h4>
                   {applied_coupons.length > 1 && (
                     <button
                       type="button"
                       onClick={handleClearAllCoupons}
-                      className={styles.clearAllCouponsBtn}
+                      className=""
                     >
                       Remove All
                     </button>
                   )}
                 </div>
 
-                <div className={styles.appliedCouponsList}>
+                <div className="">
                   {applied_coupons.map((coupon, index) => (
-                    <div
-                      key={coupon.couponCode || index}
-                      className={styles.appliedCouponItem}
-                    >
-                      <div className={styles.appliedCouponDetails}>
-                        <span className={styles.appliedCouponCode}>
-                          {coupon.couponCode}
-                        </span>
-                        <span className={styles.appliedCouponDiscount}>
+                    <div key={coupon.couponCode || index} className="">
+                      <div className="">
+                        <span className="">{coupon.couponCode}</span>
+                        <span className="">
                           -${Number(coupon.discount || 0).toFixed(2)}
                         </span>
                       </div>
                       <button
                         type="button"
                         onClick={() => handleRemoveCoupon(coupon.couponCode)}
-                        className={styles.removeCouponBtn}
+                        className=""
                       >
                         ✕
                       </button>
@@ -634,8 +596,8 @@ export default function CartMiniSidebar() {
             )}
 
             {/* Order Details Summary - Always visible */}
-            <div className={styles.cartMiniCheckoutSummary}>
-              <div className={styles.cartMiniCheckoutLine}>
+            <div className="">
+              <div className="">
                 <span>Subtotal:</span>
                 <span>
                   $
@@ -645,29 +607,23 @@ export default function CartMiniSidebar() {
                 </span>
               </div>
 
-              <div className={styles.cartMiniCheckoutLine}>
+              <div className="">
                 <span>Shipping:</span>
                 <span>
                   ${(Number(totalShippingCost) || 0).toFixed(2)}
                   {discountPercentage > 0 && (
-                    <span className={styles.discountBadge}>
-                      {discountPercentage}% off
-                    </span>
+                    <span className="">{discountPercentage}% off</span>
                   )}
                 </span>
               </div>
 
               {/* Multiple coupon discounts display */}
               {Number(total_coupon_discount) > 0 && (
-                <div
-                  className={`${styles.cartMiniCheckoutLine} ${styles.discountLine}`}
-                >
+                <div className=" ">
                   <span>
                     Coupon Discounts:
                     {applied_coupons.length > 1 && (
-                      <span className={styles.couponCountBadge}>
-                        {applied_coupons.length} coupons
-                      </span>
+                      <span className="">{applied_coupons.length} coupons</span>
                     )}
                   </span>
                   <span>-${Number(total_coupon_discount).toFixed(2)}</span>
@@ -676,9 +632,7 @@ export default function CartMiniSidebar() {
 
               {/* Address discount */}
               {Number(addressDiscountAmount) > 0 && (
-                <div
-                  className={`${styles.cartMiniCheckoutLine} ${styles.discountLine}`}
-                >
+                <div className=" ">
                   <span>Address Discount:</span>
                   <span>-${Number(addressDiscountAmount).toFixed(2)}</span>
                 </div>
@@ -686,33 +640,31 @@ export default function CartMiniSidebar() {
 
               {/* First-time discount */}
               {firstTimeDiscount.isApplied && (
-                <div
-                  className={`${styles.cartMiniCheckoutLine} ${styles.discountLine}`}
-                >
+                <div className=" ">
                   <span>
                     First-time discount (-{firstTimeDiscount.percentage}%):
                   </span>
                   <span>
-                    -${(Number(firstTimeDiscountAmount) || 0).toFixed(2)}
+                    -${Number(firstTimeDiscountAmount || 0).toFixed(2)}
                   </span>
                 </div>
               )}
             </div>
 
             {/* Essential Total - Always visible */}
-            <div className={styles.cartMiniCheckoutTitle}>
+            <div className="">
               <h4>Total:</h4>
               <span>${calculateFinalTotal().toFixed(2)}</span>
             </div>
 
             {/* Action Buttons - Single row with 50% width each */}
-            <div className={styles.cartMiniCheckoutBtn}>
+            <div className="">
               <button
                 onClick={() => {
                   handleCloseCartMini();
                   navigateToCart();
                 }}
-                className={`${styles.tpBtn} ${styles.tpBtnBorder}`}
+                className=" "
               >
                 View Cart
               </button>
@@ -721,7 +673,7 @@ export default function CartMiniSidebar() {
                   handleCloseCartMini();
                   navigateToCheckout();
                 }}
-                className={styles.tpBtn}
+                className=""
               >
                 Checkout
               </button>
@@ -730,13 +682,7 @@ export default function CartMiniSidebar() {
         </div>
       </div>
       {/* overlay start */}
-      <div
-        onClick={handleCloseCartMini}
-        className={`${styles.bodyOverlay} ${
-          cartMiniOpen ? styles.bodyOverlayOpened : ''
-        }`}
-        aria-hidden="true"
-      ></div>
+      <div onClick={handleCloseCartMini} className="" aria-hidden="true"></div>
       {/* overlay end */}
     </>
   );

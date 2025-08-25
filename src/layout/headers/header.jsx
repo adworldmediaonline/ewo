@@ -1,20 +1,20 @@
 'use client';
-import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // internal
-import Menus from './header-com/menus';
-import useSticky from '@/hooks/use-sticky';
-import logo from '@assets/img/logo/logo.webp';
-import useCartInfo from '@/hooks/use-cart-info';
 import OffCanvas from '@/components/common/off-canvas';
+import HeaderSearchForm from '@/components/forms/header-search-form';
+import CartMiniSidebar from '@/components/version-tsx/cart-mini-sidebar';
+import useCartInfo from '@/hooks/use-cart-info';
+import useSticky from '@/hooks/use-sticky';
 import { openCartMini } from '@/redux/features/cartSlice';
+import { CartTwo, CategoryMenu, Compare, Menu, Wishlist } from '@/svg';
+import logo from '@assets/img/logo/logo.webp';
 import HeaderCategory from './header-com/header-category';
 import HeaderMainRight from './header-com/header-main-right';
-import CartMiniSidebar from '@/components/common/cart-mini-sidebar';
-import HeaderSearchForm from '@/components/forms/header-search-form';
-import { CartTwo, CategoryMenu, Compare, Menu, Wishlist } from '@/svg';
+import Menus from './header-com/menus';
 
 const Header = () => {
   const { wishlist } = useSelector(state => state.wishlist);
@@ -90,7 +90,7 @@ const Header = () => {
       {/* sticky header start */}
       <div
         id="header-sticky-2"
-        className={`tp-header-sticky-area ${sticky ? 'header-sticky-2' : ''}`}
+        className="tp-header-sticky-area ${sticky ? 'header-sticky-2' : ''}"
       >
         <div className="container">
           <div className="tp-mega-menu-wrapper p-relative">

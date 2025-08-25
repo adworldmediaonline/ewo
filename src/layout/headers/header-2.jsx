@@ -1,27 +1,19 @@
 'use client';
-import React, { useState } from 'react';
 import Image from 'next/image';
-import { useDispatch, useSelector } from 'react-redux';
 import Link from 'next/link';
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 // internal
-import Menus from './header-com/menus';
-import logo from '@assets/img/logo/logo.webp';
-import useSticky from '@/hooks/use-sticky';
-import useCartInfo from '@/hooks/use-cart-info';
-import { openCartMini } from '@/redux/features/cartSlice';
-import HeaderTopRight from './header-com/header-top-right';
-import CartMiniSidebar from '@/components/common/cart-mini-sidebar';
-import {
-  CartTwo,
-  Compare,
-  Facebook,
-  Menu,
-  PhoneTwo,
-  Wishlist,
-  Search,
-} from '@/svg';
-import useSearchFormSubmit from '@/hooks/use-search-form-submit';
 import OffCanvas from '@/components/common/off-canvas';
+import CartMiniSidebar from '@/components/version-tsx/cart-mini-sidebar';
+import useCartInfo from '@/hooks/use-cart-info';
+import useSearchFormSubmit from '@/hooks/use-search-form-submit';
+import useSticky from '@/hooks/use-sticky';
+import { openCartMini } from '@/redux/features/cartSlice';
+import { CartTwo, Compare, Menu, Search, Wishlist } from '@/svg';
+import logo from '@assets/img/logo/logo.webp';
+import HeaderTopRight from './header-com/header-top-right';
+import Menus from './header-com/menus';
 
 const HeaderTwo = ({ style_2 = false }) => {
   const { wishlist } = useSelector(state => state.wishlist);

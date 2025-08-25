@@ -1,7 +1,7 @@
 'use client';
 import CloudinaryImage from '@/components/common/CloudinaryImage';
 import { replaceTextCharacters } from '@/lib/replaceTextCharacters';
-import styles from '@/styleModules/Search.module.css';
+
 import { debounce } from 'lodash';
 import Form from 'next/form';
 import { useRouter } from 'next/navigation';
@@ -10,7 +10,13 @@ import SearchButton from './SearchButton';
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:7000';
 
-export default function SearchForm({ inputRef }) {
+export default function SearchForm({
+  inputRef,
+  className = '',
+  placeholder = 'Search for products...',
+  hideButton = false,
+  buttonClassName = '',
+}) {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [searchText, setSearchText] = useState('');
@@ -119,37 +125,35 @@ export default function SearchForm({ inputRef }) {
   };
 
   return (
-    <div className={styles.searchContainer} ref={suggestionsRef}>
-      <Form
-        action="/search"
-        className={styles.searchForm}
-        onSubmit={handleSubmit}
-      >
+    <div className="" ref={suggestionsRef}>
+      <Form action="/search" className="" onSubmit={handleSubmit}>
         <input
           ref={inputRef}
           type="search"
           name="q"
           value={searchText}
           onChange={handleInputChange}
-          placeholder="Search for products..."
-          className={styles.searchInput}
+          placeholder={placeholder}
+          className={className}
           autoComplete="off"
           aria-label="Search products"
         />
-        <SearchButton className={styles.searchButton} isLoading={isLoading} />
+        {!hideButton && (
+          <SearchButton className={buttonClassName} isLoading={isLoading} />
+        )}
       </Form>
 
-      {error && <div className={styles.errorMessage}>{error}</div>}
+      {error && <div className="">{error}</div>}
 
       {showSuggestions && (
-        <div className={styles.suggestionsContainer}>
+        <div className="">
           {message && suggestions.length === 0 && (
-            <div className={styles.noResults}>{message}</div>
+            <div className="">{message}</div>
           )}
           {suggestions.map(suggestion => (
             <div
               key={suggestion.slug}
-              className={styles.suggestionItem}
+              className=""
               onClick={() => handleSuggestionClick(suggestion.slug)}
               role="button"
               tabIndex={0}
@@ -159,14 +163,14 @@ export default function SearchForm({ inputRef }) {
                 }
               }}
             >
-              <div className={styles.suggestionContent}>
+              <div className="">
                 {suggestion.img ? (
                   <CloudinaryImage
                     src={suggestion.img}
                     alt={suggestion.title}
                     width={50}
                     height={50}
-                    className={styles.suggestionImage}
+                    className=""
                     loading="lazy"
                     quality="auto"
                     format="auto"
@@ -174,14 +178,14 @@ export default function SearchForm({ inputRef }) {
                     gravity="auto"
                   />
                 ) : (
-                  <div className={styles.noImage}>No Image</div>
+                  <div className="">No Image</div>
                 )}
-                <div className={styles.suggestionInfo}>
-                  <div className={styles.suggestionTitle}>
+                <div className="">
+                  <div className="">
                     {replaceTextCharacters(suggestion.title, '*', '')}
                   </div>
                   {suggestion.finalPriceDiscount && (
-                    <div className={styles.suggestionPrice}>
+                    <div className="">
                       ${suggestion.finalPriceDiscount.toFixed(2)}
                     </div>
                   )}

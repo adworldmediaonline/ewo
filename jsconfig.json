@@ -1,8 +1,5 @@
 {
-  "compilerOptions": {
-    "paths": {
-      "@/*": ["./src/*"],
-      "@assets/*": ["./public/assets/*"]
-    }
-  }
+  "extends": "./tsconfig.json",
+  "compilerOptions": {},
+  "include": ["**/*.js", "**/*.jsx"]
 }

@@ -1,22 +1,21 @@
 'use client';
-import React from "react";
-import useSearchFormSubmit from "@/hooks/use-search-form-submit";
+import useSearchFormSubmit from '@/hooks/use-search-form-submit';
 
 const SearchBar = ({ isSearchOpen, setIsSearchOpen }) => {
   const { setSearchText, setCategory, handleSubmit, searchText } =
     useSearchFormSubmit();
 
   // selectHandle
-  const handleCategory = (value) => {
+  const handleCategory = value => {
     setCategory(value);
   };
 
-  const categories = ["electronics", "fashion", "beauty", "jewelry"];
+  const categories = ['electronics', 'fashion', 'beauty', 'jewelry'];
   return (
     <>
       <section
         className={`tp-search-area tp-search-style-brown ${
-          isSearchOpen ? "opened" : ""
+          isSearchOpen ? 'opened' : ''
         }`}
       >
         <div className="container">
@@ -32,7 +31,7 @@ const SearchBar = ({ isSearchOpen, setIsSearchOpen }) => {
                 <form onSubmit={handleSubmit}>
                   <div className="tp-search-input mb-10">
                     <input
-                      onChange={(e) => setSearchText(e.target.value)}
+                      onChange={e => setSearchText(e.target.value)}
                       value={searchText}
                       type="text"
                       placeholder="Search for product..."
@@ -50,7 +49,7 @@ const SearchBar = ({ isSearchOpen, setIsSearchOpen }) => {
                         className="cursor-pointer"
                       >
                         {c}
-                        {i < categories.length - 1 && ", "}
+                        {i < categories.length - 1 && ', '}
                       </a>
                     ))}
                   </div>
@@ -63,7 +62,7 @@ const SearchBar = ({ isSearchOpen, setIsSearchOpen }) => {
       {/* body overlay */}
       <div
         onClick={() => setIsSearchOpen(false)}
-        className={`body-overlay ${isSearchOpen ? "opened" : ""}`}
+        className={`body-overlay ${isSearchOpen ? 'opened' : ''}`}
       ></div>
     </>
   );

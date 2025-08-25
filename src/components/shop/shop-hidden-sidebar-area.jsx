@@ -1,16 +1,12 @@
-import React, { useState } from "react";
-import Pagination from "@/ui/Pagination";
-import ProductItem from "../products/fashion/product-item";
-import ShopListItem from "./shop-list-item";
-import ShopTopLeft from "./shop-top-left";
-import ShopTopRight from "./shop-top-right";
+import React, { useState } from 'react';
+import Pagination from '@/ui/Pagination';
+import ProductItem from '../version-tsx/product-details/product-item';
+import ShopListItem from './shop-list-item';
+import ShopTopLeft from './shop-top-left';
+import ShopTopRight from './shop-top-right';
 
-const ShopHiddenSidebarArea = ({
-  all_products,
-  products,
-  otherProps,
-}) => {
-  const { currPage, setCurrPage,selectHandleFilter } = otherProps;
+const ShopHiddenSidebarArea = ({ all_products, products, otherProps }) => {
+  const { currPage, setCurrPage, selectHandleFilter } = otherProps;
   const [filteredRows, setFilteredRows] = useState(products);
   const [pageStart, setPageStart] = useState(0);
   const [countOfPage, setCountOfPage] = useState(12);
@@ -27,7 +23,7 @@ const ShopHiddenSidebarArea = ({
         <div className="container">
           <div className="row">
             <div className="col-xl-12 col-lg-12">
-            <div className="tp-shop-main-wrapper">
+              <div className="tp-shop-main-wrapper">
                 <div className="tp-shop-top mb-45">
                   <div className="row">
                     <div className="col-xl-6">
@@ -62,7 +58,7 @@ const ShopHiddenSidebarArea = ({
                         <div className="row">
                           {filteredRows
                             .slice(pageStart, pageStart + countOfPage)
-                            .map((item) => (
+                            .map(item => (
                               <div
                                 key={item._id}
                                 className="col-xl-3 col-lg-4 col-md-6 col-sm-6"
@@ -84,7 +80,7 @@ const ShopHiddenSidebarArea = ({
                             <div className="col-xl-12">
                               {filteredRows
                                 .slice(pageStart, pageStart + countOfPage)
-                                .map((item) => (
+                                .map(item => (
                                   <ShopListItem key={item._id} product={item} />
                                 ))}
                             </div>

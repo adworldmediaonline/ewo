@@ -1,5 +1,4 @@
 'use client';
-import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,7 +6,6 @@ import { Rating } from 'react-simple-star-rating';
 // internal
 import { add_cart_product } from '@/redux/features/cartSlice';
 import { remove_compare_product } from '@/redux/features/compareSlice';
-import styles from './compare-area.module.css';
 
 export default function CompareArea() {
   const { compareItems } = useSelector(state => state.compare);
@@ -24,12 +22,12 @@ export default function CompareArea() {
   };
 
   return (
-    <section className={styles.container}>
-      <div className={styles.content}>
+    <section className="">
+      <div className="">
         {compareItems.length === 0 ? (
-          <div className={styles.emptyCompare}>
-            <div className={styles.emptyCompareContent}>
-              <div className={styles.emptyCompareIcon}>
+          <div className="">
+            <div className="">
+              <div className="">
                 <svg
                   width="80"
                   height="80"
@@ -47,25 +45,23 @@ export default function CompareArea() {
                   <path d="M18.5 10.5L16.5 13.5L15 12"></path>
                 </svg>
               </div>
-              <h2 className={styles.emptyCompareTitle}>
-                No Products to Compare
-              </h2>
-              <p className={styles.emptyCompareText}>
+              <h2 className="">No Products to Compare</h2>
+              <p className="">
                 Add products to compare their features, prices, and
                 specifications side by side.
               </p>
-              <Link href="/shop" className={styles.continueShoppingBtn}>
+              <Link href="/shop" className="">
                 Browse Products
               </Link>
             </div>
           </div>
         ) : (
-          <div className={styles.compareContent}>
+          <div className="">
             {/* Header */}
-            <div className={styles.header}>
-              <div className={styles.headerLeft}>
-                <h1 className={styles.title}>Product Comparison</h1>
-                <p className={styles.itemsCount}>
+            <div className="">
+              <div className="">
+                <h1 className="">Product Comparison</h1>
+                <p className="">
                   Comparing {compareItems.length}{' '}
                   {compareItems.length === 1 ? 'product' : 'products'}
                 </p>
@@ -73,9 +69,9 @@ export default function CompareArea() {
             </div>
 
             {/* Compare Grid */}
-            <div className={styles.compareGrid}>
+            <div className="">
               {compareItems.map((item, index) => (
-                <div key={item._id} className={styles.compareCard}>
+                <div key={item._id} className="">
                   {/* Remove Button */}
                   <button
                     onClick={() =>
@@ -84,7 +80,7 @@ export default function CompareArea() {
                         id: item._id,
                       })
                     }
-                    className={styles.removeBtn}
+                    className=""
                   >
                     <svg
                       width="16"
@@ -100,30 +96,28 @@ export default function CompareArea() {
                   </button>
 
                   {/* Product Image */}
-                  <div className={styles.productImage}>
+                  <div className="">
                     <Link href={`/product/${item.slug}`}>
                       <Image
                         src={item.img}
                         alt={item.title}
                         width={200}
                         height={200}
-                        className={styles.image}
+                        className=""
                       />
                     </Link>
                   </div>
 
                   {/* Product Info */}
-                  <div className={styles.productInfo}>
-                    <h3 className={styles.productTitle}>
+                  <div className="">
+                    <h3 className="">
                       <Link href={`/product/${item.slug}`}>{item.title}</Link>
                     </h3>
 
-                    <div className={styles.productPrice}>
-                      ${item.price.toFixed(2)}
-                    </div>
+                    <div className="">${item.price.toFixed(2)}</div>
 
                     {/* Rating */}
-                    <div className={styles.ratingSection}>
+                    <div className="">
                       <Rating
                         allowFraction
                         size={16}
@@ -137,13 +131,11 @@ export default function CompareArea() {
                         }
                         readonly={true}
                       />
-                      <span className={styles.ratingText}>
-                        ({item.reviews.length} reviews)
-                      </span>
+                      <span className="">({item.reviews.length} reviews)</span>
                     </div>
 
                     {/* Description */}
-                    <div className={styles.productDescription}>
+                    <div className="">
                       <h4>Description</h4>
                       <div
                         dangerouslySetInnerHTML={{
@@ -155,10 +147,10 @@ export default function CompareArea() {
                     </div>
 
                     {/* Actions */}
-                    <div className={styles.productActions}>
+                    <div className="">
                       <button
                         onClick={() => handleAddProduct(item)}
-                        className={styles.addToCartBtn}
+                        className=""
                       >
                         <svg
                           width="16"
@@ -174,10 +166,7 @@ export default function CompareArea() {
                         </svg>
                         Add to Cart
                       </button>
-                      <Link
-                        href={`/product/${item.slug}`}
-                        className={styles.viewDetailsBtn}
-                      >
+                      <Link href={`/product/${item.slug}`} className="">
                         View Details
                       </Link>
                     </div>
@@ -187,8 +176,8 @@ export default function CompareArea() {
             </div>
 
             {/* Bottom Actions */}
-            <div className={styles.bottomActions}>
-              <Link href="/shop" className={styles.continueShoppingBtn}>
+            <div className="">
+              <Link href="/shop" className="">
                 Add More Products
               </Link>
             </div>

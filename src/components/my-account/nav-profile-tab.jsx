@@ -6,7 +6,7 @@ import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import styles from './nav-profile-tab.module.css';
+// Removed CSS module import; Tailwind-only styling
 
 export default function NavProfileTab({ orderData }) {
   const { user } = useSelector(state => state.auth);
@@ -306,23 +306,17 @@ export default function NavProfileTab({ orderData }) {
   return (
     <div className="profile__tab-content">
       {/* Enhanced Profile Header */}
-      <div className={styles.profileMainHeader}>
-        <div className={styles.profileAvatarSection}>
-          <div className={styles.profileAvatar}>
-            <div className={styles.profileAvatarCircle}>
-              {getUserInitials()}
-            </div>
-            <div
-              className={`${styles.profileStatusIndicator} ${styles.online}`}
-            ></div>
+      <div className="">
+        <div className="">
+          <div className="">
+            <div className="">{getUserInitials()}</div>
+            <div className=" "></div>
           </div>
 
-          <div className={styles.profileUserInfo}>
+          <div className="">
             <h3>{user?.name || user?.firstName || 'Guest User'}</h3>
-            <p className={styles.profileUserEmail}>
-              {user?.email || 'No email'}
-            </p>
-            <div className={styles.profileMemberBadge}>
+            <p className="">{user?.email || 'No email'}</p>
+            <div className="">
               <CalendarIcon />
               <span>
                 Member since {dayjs(userStats.memberSince).format('MMM YYYY')}
@@ -330,8 +324,8 @@ export default function NavProfileTab({ orderData }) {
             </div>
           </div>
 
-          <div className={styles.profileQuickActions}>
-            <button onClick={handleLogout} className={styles.profileLogoutBtn}>
+          <div className="">
+            <button onClick={handleLogout} className="">
               <LogoutIcon />
               Logout
             </button>
@@ -340,97 +334,83 @@ export default function NavProfileTab({ orderData }) {
       </div>
 
       {/* Enhanced Stats Grid */}
-      <div className={styles.profileStatsGrid}>
-        <div className={`${styles.profileStatCard} ${styles.primary}`}>
-          <div className={styles.statCardIcon}>
+      <div className="">
+        <div className=" ">
+          <div className="">
             <ShoppingBagIcon />
-            <span className={styles.statBadge}>
-              {userStats.orderCounts.totalDoc}
-            </span>
+            <span className="">{userStats.orderCounts.totalDoc}</span>
           </div>
-          <div className={styles.statCardContent}>
+          <div className="">
             <h4>Total Orders</h4>
-            <p className={styles.statCardSubtitle}>All time purchases</p>
+            <p className="">All time purchases</p>
           </div>
         </div>
 
-        <div className={`${styles.profileStatCard} ${styles.warning}`}>
-          <div className={styles.statCardIcon}>
+        <div className=" ">
+          <div className="">
             <ClockIcon />
-            <span className={styles.statBadge}>
-              {userStats.orderCounts.pending}
-            </span>
+            <span className="">{userStats.orderCounts.pending}</span>
           </div>
-          <div className={styles.statCardContent}>
+          <div className="">
             <h4>Pending Orders</h4>
-            <p className={styles.statCardSubtitle}>Awaiting processing</p>
+            <p className="">Awaiting processing</p>
           </div>
         </div>
 
-        <div className={`${styles.profileStatCard} ${styles.info}`}>
-          <div className={styles.statCardIcon}>
+        <div className=" ">
+          <div className="">
             <TruckIcon />
-            <span className={styles.statBadge}>
-              {userStats.orderCounts.processing}
-            </span>
+            <span className="">{userStats.orderCounts.processing}</span>
           </div>
-          <div className={styles.statCardContent}>
+          <div className="">
             <h4>Processing</h4>
-            <p className={styles.statCardSubtitle}>Being prepared</p>
+            <p className="">Being prepared</p>
           </div>
         </div>
 
-        <div className={`${styles.profileStatCard} ${styles.success}`}>
-          <div className={styles.statCardIcon}>
+        <div className=" ">
+          <div className="">
             <CheckCircleIcon />
-            <span className={styles.statBadge}>
-              {userStats.orderCounts.delivered}
-            </span>
+            <span className="">{userStats.orderCounts.delivered}</span>
           </div>
-          <div className={styles.statCardContent}>
+          <div className="">
             <h4>Delivered</h4>
-            <p className={styles.statCardSubtitle}>Successfully completed</p>
+            <p className="">Successfully completed</p>
           </div>
         </div>
 
-        <div className={`${styles.profileStatCard} ${styles.info}`}>
-          <div className={styles.statCardIcon}>
+        <div className=" ">
+          <div className="">
             <ShippedTruckIcon />
-            <span className={styles.statBadge}>
-              {userStats.orderCounts.shipped}
-            </span>
+            <span className="">{userStats.orderCounts.shipped}</span>
           </div>
-          <div className={styles.statCardContent}>
+          <div className="">
             <h4>Shipped</h4>
-            <p className={styles.statCardSubtitle}>On the way</p>
+            <p className="">On the way</p>
           </div>
         </div>
 
-        <div className={`${styles.profileStatCard} ${styles.danger}`}>
-          <div className={styles.statCardIcon}>
+        <div className=" ">
+          <div className="">
             <XCircleIcon />
-            <span className={styles.statBadge}>
-              {userStats.orderCounts.cancelled}
-            </span>
+            <span className="">{userStats.orderCounts.cancelled}</span>
           </div>
-          <div className={styles.statCardContent}>
+          <div className="">
             <h4>Cancelled</h4>
-            <p className={styles.statCardSubtitle}>Order cancelled</p>
+            <p className="">Order cancelled</p>
           </div>
         </div>
       </div>
 
       {/* Summary Cards */}
-      <div className={styles.profileSummarySection}>
-        <div className={styles.summaryCard}>
-          <div className={styles.summaryCardHeader}>
+      <div className="">
+        <div className="">
+          <div className="">
             <h4>Total Spending</h4>
-            <span className={styles.summaryBadge}>Lifetime</span>
+            <span className="">Lifetime</span>
           </div>
-          <div className={styles.summaryCardAmount}>
-            ${userStats.totalSpent.toFixed(2)}
-          </div>
-          <p className={styles.summaryCardText}>
+          <div className="">${userStats.totalSpent.toFixed(2)}</div>
+          <p className="">
             Average: $
             {userStats.orderCounts.totalDoc > 0
               ? (userStats.totalSpent / userStats.orderCounts.totalDoc).toFixed(
@@ -441,32 +421,26 @@ export default function NavProfileTab({ orderData }) {
           </p>
         </div>
 
-        <div className={styles.summaryCard}>
-          <div className={styles.summaryCardHeader}>
+        <div className="">
+          <div className="">
             <h4>Latest Order</h4>
             {userStats.latestOrder && (
-              <span
-                className={`${styles.statusBadge} ${
-                  styles[userStats.latestOrder.status]
-                }`}
-              >
-                {userStats.latestOrder.status}
-              </span>
+              <span className="">{userStats.latestOrder.status}</span>
             )}
           </div>
           {userStats.latestOrder ? (
-            <div className={styles.summaryCardOrderInfo}>
-              <p className={styles.orderId}>#{userStats.latestOrder.invoice}</p>
-              <p className={styles.orderDate}>
+            <div className="">
+              <p className="">#{userStats.latestOrder.invoice}</p>
+              <p className="">
                 {dayjs(userStats.latestOrder.createdAt).format('MMM D, YYYY')}
               </p>
-              <p className={styles.orderAmount}>
+              <p className="">
                 ${userStats.latestOrder.totalAmount?.toFixed(2)}
               </p>
             </div>
           ) : (
-            <div className={styles.summaryCardOrderInfo}>
-              <p className={styles.summaryCardText}>No orders yet</p>
+            <div className="">
+              <p className="">No orders yet</p>
             </div>
           )}
         </div>

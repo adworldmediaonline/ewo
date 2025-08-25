@@ -1,44 +1,37 @@
 'use client';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import styles from './checkout-coupon.module.css';
 
 const CheckoutCoupon = ({ handleCouponCode, couponRef, couponApplyMsg }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { coupon_info } = useSelector(state => state.coupon);
 
   return (
-    <div className={styles.couponSection}>
-      <p className={styles.couponTrigger}>
+    <div className="">
+      <p className="">
         Have a coupon?
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          type="button"
-          className={styles.couponButton}
-        >
+        <button onClick={() => setIsOpen(!isOpen)} type="button" className="">
           Click here to enter your code
         </button>
       </p>
 
       {isOpen && (
-        <div className={styles.couponForm}>
+        <div className="">
           <form onSubmit={handleCouponCode}>
-            <label className={styles.couponLabel}>Coupon Code :</label>
-            <div className={styles.couponInputGroup}>
+            <label className="">Coupon Code :</label>
+            <div className="">
               <input
                 ref={couponRef}
                 type="text"
                 placeholder="Coupon"
-                className={styles.couponInput}
+                className=""
               />
-              <button type="submit" className={styles.couponSubmitBtn}>
+              <button type="submit" className="">
                 Apply
               </button>
             </div>
           </form>
-          {couponApplyMsg && (
-            <p className={styles.couponMessage}>{couponApplyMsg}</p>
-          )}
+          {couponApplyMsg && <p className="">{couponApplyMsg}</p>}
         </div>
       )}
     </div>

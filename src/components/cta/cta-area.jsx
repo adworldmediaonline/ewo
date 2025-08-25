@@ -10,7 +10,7 @@ import plane from '@assets/img/subscribe/plane.png';
 
 function Shape({ img, num }) {
   return (
-    <Image className={`tp-subscribe-shape-${num}`} src={img} alt="shape" />
+    <Image className="tp-subscribe-shape-${num}" src={img} alt="shape" />
   );
 }
 

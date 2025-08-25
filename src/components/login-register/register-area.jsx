@@ -1,12 +1,10 @@
 'use client';
-import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 // internal
 // import LoginShapes from './login-shapes';
 import RegisterForm from '../forms/register-form';
-import GoogleSignUp from './google-sign-up';
-import styles from './register-area.module.css';
 
 export default function RegisterArea() {
   const searchParams = useSearchParams();
@@ -24,18 +22,16 @@ export default function RegisterArea() {
 
   return (
     <>
-      <section className={`tp-login-area ${styles.registerSection}`}>
+      <section className="tp-login-area ">
         <div className="container">
           <div className="row justify-content-center">
             <div className="col-xl-5 col-lg-6 col-md-8">
-              <div className={`tp-login-wrapper ${styles.registerWrapper}`}>
+              <div className="tp-login-wrapper ">
                 {/* Clean Header */}
-                <div
-                  className={`tp-login-top text-center ${styles.registerHeader}`}
-                >
+                <div className="tp-login-top text-center ">
                   {/* Back Button */}
-                  <div className={styles.backButton}>
-                    <Link href="/" className={styles.backLink}>
+                  <div className="">
+                    <Link href="/" className="">
                       <svg
                         width="20"
                         height="20"
@@ -54,18 +50,16 @@ export default function RegisterArea() {
                     </Link>
                   </div>
 
-                  <div className={styles.brandSection}>
-                    <h1 className={`tp-login-title ${styles.registerTitle}`}>
-                      Create Account
-                    </h1>
-                    <p className={styles.registerSubtitle}>Join EWO today</p>
+                  <div className="">
+                    <h1 className="tp-login-title ">Create Account</h1>
+                    <p className="">Join EWO today</p>
                   </div>
 
                   {/* Redirect Message */}
                   {redirectMessage && (
-                    <div className={styles.redirectMessage}>
+                    <div className="">
                       <p>{redirectMessage}</p>
-                      <Link href="/checkout" className={styles.checkoutLink}>
+                      <Link href="/checkout" className="">
                         ← Return to checkout
                       </Link>
                     </div>
@@ -73,19 +67,19 @@ export default function RegisterArea() {
                 </div>
 
                 {/* Register Form */}
-                <div className={`tp-login-option ${styles.registerForm}`}>
+                <div className="tp-login-option ">
                   <RegisterForm redirectUrl={redirectTo} />
                 </div>
 
                 {/* Sign In Link */}
-                <div className={styles.signinSection}>
+                <div className="">
                   <p>
                     Already have an account?{' '}
                     <Link
                       href={
                         redirectTo ? `/login?redirect=${redirectTo}` : '/login'
                       }
-                      className={styles.signinLink}
+                      className=""
                     >
                       Sign in here
                     </Link>

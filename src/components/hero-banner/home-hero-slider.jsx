@@ -57,7 +57,7 @@ const sliderData = [
 
 function Shape({ img, num }) {
   return (
-    <Image className={`tp-slider-shape-${num}`} src={img} alt="slider-shape" priority />
+    <Image className="tp-slider-shape-${num}" src={img} alt="slider-shape" priority />
   );
 }
 

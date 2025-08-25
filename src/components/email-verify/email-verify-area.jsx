@@ -1,5 +1,5 @@
 'use client';
-import Wrapper from '@/layout/wrapper';
+import Wrapper from '@/components/wrapper';
 import { useConfirmEmailQuery } from '@/redux/features/auth/authApi';
 import { notifySuccess } from '@/utils/toast';
 import { useRouter } from 'next/navigation';

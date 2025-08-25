@@ -1,27 +1,23 @@
-import React from 'react';
-import styles from '../../../styleModules/Category.module.css';
+// Removed CSS module import; Tailwind-only styling
 import Link from 'next/link';
 
 function ProductCategoryDisplay({ title, categories }) {
-  const columnClass = categories.length > 2 ? styles.threeColumns : '';
+  const columnClass = '';
 
   return (
-    <div className={styles.productCategoryContainer}>
-      <h1 className={styles.productCategoryTitle}>{title}</h1>
-      <div className={styles.productCategoryDivider}></div>
+    <div className="">
+      <h1 className="">{title}</h1>
+      <div className=""></div>
 
-      <div className={`${styles.productCategoryGrid} ${columnClass}`}>
+      <div className="">
         {categories.map((category, index) => (
-          <div key={index} className={styles.productCard}>
-            <h2 className={styles.productTitle}>{category.title}</h2>
-            <Link
-              href={category.link || '/shop'}
-              className={styles.productLink}
-            >
+          <div key={index} className="">
+            <h2 className="">{category.title}</h2>
+            <Link href={category.link || '/shop'} className="">
               Browse Products
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className={styles.productLinkIcon}
+                className=""
                 width="24"
                 height="24"
                 viewBox="0 0 24 24"

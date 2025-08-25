@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 import * as Yup from 'yup';
 import ErrorMsg from '../common/error-msg';
-import styles from './profile-info.module.css';
+// Removed CSS module import; Tailwind-only styling
 
 // SVG Icons
 const CheckIcon = ({ className }) => (
@@ -95,34 +95,32 @@ export default function ProfileInfo() {
   const completionPercentage = getCompletionPercentage();
 
   return (
-    <div className={styles.profileInfoContainer}>
+    <div className="">
       {/* Profile Header */}
-      <div className={styles.profileHeader}>
-        <div className={styles.profileHeaderContent}>
-          <div className={styles.avatarSection}>
-            <div className={styles.avatarContainer}>
-              <div className={styles.avatar}>
+      <div className="">
+        <div className="">
+          <div className="">
+            <div className="">
+              <div className="">
                 {user?.name?.charAt(0)?.toUpperCase() || 'U'}
               </div>
             </div>
-            <div className={styles.headerInfo}>
-              <h2 className={styles.profileTitle}>Profile Information</h2>
-              <p className={styles.profileSubtitle}>
+            <div className="">
+              <h2 className="">Profile Information</h2>
+              <p className="">
                 Update your personal details and contact information
               </p>
             </div>
           </div>
 
-          <div className={styles.completionSection}>
-            <div className={styles.completionText}>
-              <span className={styles.completionLabel}>Profile Completion</span>
-              <span className={styles.completionValue}>
-                {completionPercentage}%
-              </span>
+          <div className="">
+            <div className="">
+              <span className="">Profile Completion</span>
+              <span className="">{completionPercentage}%</span>
             </div>
-            <div className={styles.progressBar}>
+            <div className="">
               <div
-                className={styles.progressFill}
+                className=""
                 style={{ width: `${completionPercentage}%` }}
               ></div>
             </div>
@@ -131,104 +129,80 @@ export default function ProfileInfo() {
       </div>
 
       {/* Single Form */}
-      <div className={styles.formContainer}>
-        <form onSubmit={handleSubmit(onSubmit)} className={styles.profileForm}>
+      <div className="">
+        <form onSubmit={handleSubmit(onSubmit)} className="">
           {/* Basic Information Section */}
-          <div className={styles.formSection}>
-            <h3 className={styles.sectionTitle}>Basic Information</h3>
+          <div className="">
+            <h3 className="">Basic Information</h3>
 
-            <div className={styles.formGrid}>
-              <div className={styles.formGroup}>
-                <label className={styles.formLabel}>
-                  Full Name <span className={styles.required}>*</span>
+            <div className="">
+              <div className="">
+                <label className="">
+                  Full Name <span className="">*</span>
                 </label>
-                <div className={styles.inputGroup}>
+                <div className="">
                   <input
                     type="text"
-                    className={`${styles.formInput} ${
-                      errors.name ? styles.inputError : ''
-                    } ${
-                      watchedValues.name && !errors.name
-                        ? styles.inputSuccess
-                        : ''
-                    }`}
+                    className=""
                     placeholder="Enter your full name"
                     {...register('name')}
                   />
                   {watchedValues.name && !errors.name && (
-                    <CheckIcon className={styles.successIcon} />
+                    <CheckIcon className="" />
                   )}
                 </div>
                 {errors.name && <ErrorMsg msg={errors.name.message} />}
               </div>
 
-              <div className={styles.formGroup}>
-                <label className={styles.formLabel}>
-                  Email Address <span className={styles.required}>*</span>
+              <div className="">
+                <label className="">
+                  Email Address <span className="">*</span>
                 </label>
-                <div className={styles.inputGroup}>
+                <div className="">
                   <input
                     type="email"
-                    className={`${styles.formInput} ${
-                      errors.email ? styles.inputError : ''
-                    } ${
-                      watchedValues.email && !errors.email
-                        ? styles.inputSuccess
-                        : ''
-                    }`}
+                    className=""
                     placeholder="Enter your email"
                     {...register('email')}
                   />
                   {watchedValues.email && !errors.email && (
-                    <CheckIcon className={styles.successIcon} />
+                    <CheckIcon className="" />
                   )}
                 </div>
                 {errors.email && <ErrorMsg msg={errors.email.message} />}
               </div>
 
-              <div className={styles.formGroup}>
-                <label className={styles.formLabel}>
-                  Phone Number <span className={styles.required}>*</span>
+              <div className="">
+                <label className="">
+                  Phone Number <span className="">*</span>
                 </label>
-                <div className={styles.inputGroup}>
+                <div className="">
                   <input
                     type="tel"
-                    className={`${styles.formInput} ${
-                      errors.phone ? styles.inputError : ''
-                    } ${
-                      watchedValues.phone && !errors.phone
-                        ? styles.inputSuccess
-                        : ''
-                    }`}
+                    className=""
                     placeholder="Enter your phone number"
                     {...register('phone')}
                   />
                   {watchedValues.phone && !errors.phone && (
-                    <CheckIcon className={styles.successIcon} />
+                    <CheckIcon className="" />
                   )}
                 </div>
                 {errors.phone && <ErrorMsg msg={errors.phone.message} />}
               </div>
 
-              <div className={styles.formGroup}>
-                <label className={styles.formLabel}>
-                  Bio <span className={styles.optional}>(Optional)</span>
+              <div className="">
+                <label className="">
+                  Bio <span className="">(Optional)</span>
                 </label>
-                <div className={styles.inputGroup}>
+                <div className="">
                   <textarea
-                    className={`${styles.formTextarea} ${
-                      errors.bio ? styles.inputError : ''
-                    } ${
-                      watchedValues.bio && !errors.bio
-                        ? styles.inputSuccess
-                        : ''
-                    }`}
+                    className=""
                     placeholder="Tell us about yourself"
                     rows="3"
                     {...register('bio')}
                   />
                   {watchedValues.bio && !errors.bio && (
-                    <CheckIcon className={styles.successIcon} />
+                    <CheckIcon className="" />
                   )}
                 </div>
                 {errors.bio && <ErrorMsg msg={errors.bio.message} />}
@@ -237,20 +211,18 @@ export default function ProfileInfo() {
           </div>
 
           {/* Address Information Section */}
-          <div className={styles.formSection}>
-            <h3 className={styles.sectionTitle}>Address Information</h3>
+          <div className="">
+            <h3 className="">Address Information</h3>
 
-            <div className={styles.formGrid}>
-              <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label className={styles.formLabel}>
-                  Address <span className={styles.required}>*</span>
+            <div className="">
+              <div className=" ">
+                <label className="">
+                  Address <span className="">*</span>
                 </label>
-                <div className={styles.inputGroup}>
+                <div className="">
                   <input
                     type="text"
-                    className={`${styles.formInput} ${
-                      errors.address ? styles.inputError : ''
-                    } ${
+                    className={` ${errors.address ? styles.inputError : ''} ${
                       watchedValues.address && !errors.address
                         ? styles.inputSuccess
                         : ''
@@ -259,7 +231,7 @@ export default function ProfileInfo() {
                     {...register('address')}
                   />
                   {watchedValues.address && !errors.address && (
-                    <CheckIcon className={styles.successIcon} />
+                    <CheckIcon className="" />
                   )}
                 </div>
                 {errors.address && <ErrorMsg msg={errors.address.message} />}
@@ -268,17 +240,11 @@ export default function ProfileInfo() {
           </div>
 
           {/* Submit Button */}
-          <div className={styles.formActions}>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className={`${styles.submitButton} ${
-                isLoading ? styles.loading : ''
-              }`}
-            >
+          <div className="">
+            <button type="submit" disabled={isLoading} className="">
               {isLoading ? (
                 <>
-                  <div className={styles.spinner}></div>
+                  <div className=""></div>
                   Updating...
                 </>
               ) : (

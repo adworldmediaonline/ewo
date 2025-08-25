@@ -1,6 +1,4 @@
-import React from 'react';
 import Link from 'next/link';
-import styles from '../../app/shop/shop.module.css';
 
 const ShopBreadcrumb = ({ title = 'Shop', subtitle }) => {
   // Function to format text with title case (first letter of each word capitalized)
@@ -16,21 +14,18 @@ const ShopBreadcrumb = ({ title = 'Shop', subtitle }) => {
     : formatTitleCase(title);
 
   return (
-    <div className={styles.breadcrumb}>
-      <div className={styles.breadcrumbContainer}>
+    <div className="">
+      <div className="">
         <nav aria-label="Breadcrumb">
-          <ol className={styles.breadcrumbList}>
-            <li className={styles.breadcrumbItem}>
-              <Link href="/" className={styles.breadcrumbLink}>
-                <span className={styles.breadcrumbText}>Home</span>
+          <ol className="">
+            <li className="">
+              <Link href="/" className="">
+                <span className="">Home</span>
               </Link>
             </li>
-            <li
-              className={`${styles.breadcrumbItem} ${styles.breadcrumbActive}`}
-              aria-current="page"
-            >
+            <li className=" " aria-current="page">
               <svg
-                className={styles.chevronIcon}
+                className=""
                 width="16"
                 height="16"
                 viewBox="0 0 24 24"
@@ -42,9 +37,7 @@ const ShopBreadcrumb = ({ title = 'Shop', subtitle }) => {
               >
                 <polyline points="9 18 15 12 9 6"></polyline>
               </svg>
-              <span className={styles.breadcrumbCurrent}>
-                {formattedSubtitle}
-              </span>
+              <span className="">{formattedSubtitle}</span>
             </li>
           </ol>
         </nav>

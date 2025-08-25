@@ -1,29 +1,26 @@
 import ProductItemWrapper from '../shop/product-item-wrapper';
-import styles from './CouponProductGrid.module.css';
 
 export default function CouponProductGrid({ products, coupon }) {
   if (!products || products.length === 0) {
     return (
-      <div className={styles.noProducts}>
+      <div className="">
         <p>No products available for this coupon.</p>
       </div>
     );
   }
 
   return (
-    <div className={styles.productGridContainer}>
-      <div className={styles.gridHeader}>
-        <h4 className={styles.gridTitle}>
-          Products Eligible for {coupon.couponCode}
-        </h4>
-        <span className={styles.productCount}>
+    <div className="">
+      <div className="">
+        <h4 className="">Products Eligible for {coupon.couponCode}</h4>
+        <span className="">
           {products.length} {products.length === 1 ? 'product' : 'products'}
         </span>
       </div>
 
-      <div className={styles.productGrid}>
+      <div className="">
         {products.map((product, index) => (
-          <div key={product._id || index} className={styles.productGridItem}>
+          <div key={product._id || index} className="">
             <ProductItemWrapper
               product={product}
               coupons={[coupon]} // Pass the current coupon to show it applies
@@ -33,10 +30,8 @@ export default function CouponProductGrid({ products, coupon }) {
       </div>
 
       {products.length > 8 && (
-        <div className={styles.viewMoreContainer}>
-          <button className={styles.viewMoreBtn}>
-            View All {products.length} Products
-          </button>
+        <div className="">
+          <button className="">View All {products.length} Products</button>
         </div>
       )}
     </div>

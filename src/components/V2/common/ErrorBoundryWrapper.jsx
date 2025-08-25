@@ -1,14 +1,13 @@
 'use client';
 
 import { ErrorBoundary } from 'react-error-boundary';
-import styles from './ErrorBoundryWrapper.module.css';
 
 function ErrorFallback({ error, resetErrorBoundary }) {
   return (
-    <div role="alert" className={styles.errorContainer}>
-      <div className={styles.content}>
+    <div role="alert" className="">
+      <div className="">
         <svg
-          className={styles.icon}
+          className=""
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -22,22 +21,19 @@ function ErrorFallback({ error, resetErrorBoundary }) {
           />
         </svg>
 
-        <h2 className={styles.title}>Oops! Something went wrong</h2>
+        <h2 className="">Oops! Something went wrong</h2>
         <div>
-          <p className={styles.message}>We encountered an unexpected error.</p>
-          <div className={styles.errorBox}>
-            <pre className={styles.errorText}>{error.message}</pre>
+          <p className="">We encountered an unexpected error.</p>
+          <div className="">
+            <pre className="">{error.message}</pre>
           </div>
         </div>
 
-        <div className={styles.buttonContainer}>
-          <button onClick={resetErrorBoundary} className={styles.primaryButton}>
+        <div className="">
+          <button onClick={resetErrorBoundary} className="">
             Try Again
           </button>
-          <button
-            onClick={() => (window.location.href = '/')}
-            className={styles.secondaryButton}
-          >
+          <button onClick={() => (window.location.href = '/')} className="">
             Return to Home
           </button>
         </div>

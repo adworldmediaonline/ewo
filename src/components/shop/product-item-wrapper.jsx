@@ -6,8 +6,8 @@ import { add_cart_product } from '@/redux/features/cartSlice';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import styles from '../../app/shop/shop.module.css';
-import ProductItem from '../products/fashion/product-item';
+import ProductItem from '../version-tsx/product-details/product-item';
+const styles = new Proxy({}, { get: () => '' });
 
 // Function to convert text to title case (first letter of each word capitalized)
 // const toTitleCase = str => {
@@ -100,16 +100,14 @@ export default function ProductItemWrapper({ product, coupons = [] }) {
   };
 
   return (
-    <div className={styles.productCard}>
-      <div className={styles.productCardInner}>
+    <div className="">
+      <div className="">
         <ProductItem product={formattedProduct} coupons={coupons} />
 
-        <div className={styles.productCardActions}>
+        <div className="">
           <button
             type="button"
-            className={`${styles.addToCartBtn} ${
-              isAddedToCart ? styles.active : ''
-            }`}
+            className={` ${isAddedToCart ? styles.active : ''}`}
             disabled={product.status === 'out-of-stock'}
             onClick={isAddedToCart ? handleViewCart : handleAddToCart}
           >
@@ -125,7 +123,7 @@ export default function ProductItemWrapper({ product, coupons = [] }) {
                 fill="currentColor"
               />
             </svg>
-            <span className={styles.cartBtnText}>
+            <span className="">
               {isAddedToCart ? 'View Cart' : 'Add to Cart'}
             </span>
           </button>

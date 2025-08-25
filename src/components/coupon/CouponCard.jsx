@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTimer } from 'react-timer-hook';
-import styles from './CouponCard.module.css';
+const styles = new Proxy({}, { get: () => '' });
 
 export default function CouponCard({ coupon }) {
   const [copySuccess, setCopySuccess] = useState(false);
@@ -33,65 +33,65 @@ export default function CouponCard({ coupon }) {
     !isRunning || (days === 0 && hours === 0 && minutes === 0 && seconds === 0);
 
   return (
-    <div className={`${styles.couponCard} ${isExpired ? styles.expired : ''}`}>
-      <div className={styles.couponHeader}>
-        <div className={styles.discountBadge}>
+    <div className=" ${isExpired ? styles.expired : ''}">
+      <div className="">
+        <div className="">
           {coupon.discountType === 'percentage'
             ? `${coupon.discountPercentage}% OFF`
             : `$${coupon.discountAmount} OFF`}
         </div>
 
-        <div className={styles.timer}>
-          <span className={styles.timerLabel}>
+        <div className="">
+          <span className="">
             {isExpired ? 'Expired' : 'Ends in:'}
           </span>
           {!isExpired && (
-            <div className={styles.countdown}>
+            <div className="">
               {days > 0 && (
-                <div className={styles.timeUnit}>
-                  <span className={styles.timeValue}>{days}</span>
-                  <span className={styles.timeLabel}>days</span>
+                <div className="">
+                  <span className="">{days}</span>
+                  <span className="">days</span>
                 </div>
               )}
-              <div className={styles.timeUnit}>
-                <span className={styles.timeValue}>
+              <div className="">
+                <span className="">
                   {hours.toString().padStart(2, '0')}
                 </span>
-                <span className={styles.timeLabel}>hrs</span>
+                <span className="">hrs</span>
               </div>
-              <div className={styles.timeUnit}>
-                <span className={styles.timeValue}>
+              <div className="">
+                <span className="">
                   {minutes.toString().padStart(2, '0')}
                 </span>
-                <span className={styles.timeLabel}>min</span>
+                <span className="">min</span>
               </div>
-              <div className={styles.timeUnit}>
-                <span className={styles.timeValue}>
+              <div className="">
+                <span className="">
                   {seconds.toString().padStart(2, '0')}
                 </span>
-                <span className={styles.timeLabel}>sec</span>
+                <span className="">sec</span>
               </div>
             </div>
           )}
           {isExpired && (
-            <div className={styles.expiredBadge}>
+            <div className="">
               <span>⏰ Expired</span>
             </div>
           )}
         </div>
       </div>
 
-      <div className={styles.couponContent}>
-        <div className={styles.leftContent}>
-          <div className={styles.couponCode}>
-            <span className={styles.codeLabel}>Code:</span>
+      <div className="">
+        <div className="">
+          <div className="">
+            <span className="">Code:</span>
             <div
-              className={styles.codeContainer}
+              className=""
               style={{ position: 'relative' }}
             >
-              <span className={styles.code}>{coupon.couponCode}</span>
+              <span className="">{coupon.couponCode}</span>
               <button
-                className={`${styles.copyButton} ${
+                className={` ${
                   copySuccess ? styles.copied : ''
                 }`}
                 onClick={handleCopyCode}
@@ -138,28 +138,28 @@ export default function CouponCard({ coupon }) {
                 )}
               </button>
               {copySuccess && (
-                <span className={styles.copyFeedback}>Copied!</span>
+                <span className="">Copied!</span>
               )}
             </div>
           </div>
         </div>
 
-        <div className={styles.rightContent}>
-          <div className={styles.couponDetails}>
-            <div className={styles.detailItem}>
-              <div className={styles.detailIcon}>📅</div>
-              <div className={styles.detailContent}>
-                <span className={styles.detailLabel}>Valid Until</span>
-                <span className={styles.detailValue}>
+        <div className="">
+          <div className="">
+            <div className="">
+              <div className="">📅</div>
+              <div className="">
+                <span className="">Valid Until</span>
+                <span className="">
                   {formatDate(coupon.endTime)}
                 </span>
               </div>
             </div>
-            <div className={styles.detailItem}>
-              <div className={styles.detailIcon}>📦</div>
-              <div className={styles.detailContent}>
-                <span className={styles.detailLabel}>Products</span>
-                <span className={styles.detailValue}>
+            <div className="">
+              <div className="">📦</div>
+              <div className="">
+                <span className="">Products</span>
+                <span className="">
                   {coupon.applicableProducts.length} items
                 </span>
               </div>
@@ -167,9 +167,9 @@ export default function CouponCard({ coupon }) {
           </div>
 
           {!isExpired && (
-            <div className={styles.urgencyBar}>
+            <div className="">
               <div
-                className={styles.urgencyFill}
+                className=""
                 style={{
                   width: `${Math.max(
                     15,

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 import * as Yup from 'yup';
-import styles from './change-password.module.css';
+// Removed CSS module import; Tailwind-only styling
 // internal
 import { useChangePasswordMutation } from '@/redux/features/auth/authApi';
 import { notifyError, notifySuccess } from '@/utils/toast';
@@ -127,10 +127,10 @@ const PasswordStrengthIndicator = ({ password }) => {
   const percentage = (strength.score / 6) * 100;
 
   return (
-    <div className={styles.passwordStrength}>
-      <div className={styles.strengthBar}>
+    <div className="">
+      <div className="">
         <div
-          className={styles.strengthFill}
+          className=""
           style={{
             width: `${percentage}%`,
             backgroundColor: strength.color,
@@ -138,10 +138,7 @@ const PasswordStrengthIndicator = ({ password }) => {
         ></div>
       </div>
       {password && (
-        <span
-          className={styles.strengthLabel}
-          style={{ color: strength.color }}
-        >
+        <span className="" style={{ color: strength.color }}>
           {strength.label}
         </span>
       )}
@@ -197,80 +194,78 @@ export default function ChangePassword() {
   };
 
   return (
-    <div className={styles.changePasswordContainer}>
+    <div className="">
       {/* Enhanced Header */}
-      <div className={styles.header}>
-        <div className={styles.headerContent}>
-          <div className={styles.headerIcon}>
-            <LockIcon className={styles.headerIconSvg} />
+      <div className="">
+        <div className="">
+          <div className="">
+            <LockIcon className="" />
           </div>
-          <h2 className={styles.headerTitle}>Change Password</h2>
-          <p className={styles.headerDescription}>
+          <h2 className="">Change Password</h2>
+          <p className="">
             Keep your account secure by using a strong, unique password
           </p>
         </div>
-        <div className={styles.securityBadge}>
-          <ShieldIcon className={styles.badgeIcon} />
+        <div className="">
+          <ShieldIcon className="" />
           <span>Secure</span>
         </div>
       </div>
 
       {/* Security Tips */}
-      <div className={styles.securityTips}>
-        <h3 className={styles.tipsTitle}>
-          <ShieldIcon className={styles.tipsIcon} />
+      <div className="">
+        <h3 className="">
+          <ShieldIcon className="" />
           Password Security Tips
         </h3>
-        <ul className={styles.tipsList}>
-          <li className={styles.tip}>
-            <CheckIcon className={styles.tipIcon} />
+        <ul className="">
+          <li className="">
+            <CheckIcon className="" />
             Use at least 8 characters with a mix of letters, numbers, and
             symbols
           </li>
-          <li className={styles.tip}>
-            <CheckIcon className={styles.tipIcon} />
+          <li className="">
+            <CheckIcon className="" />
             Avoid using personal information like names or birthdays
           </li>
-          <li className={styles.tip}>
-            <CheckIcon className={styles.tipIcon} />
+          <li className="">
+            <CheckIcon className="" />
             Don't reuse passwords from other accounts
           </li>
-          <li className={styles.tip}>
-            <CheckIcon className={styles.tipIcon} />
+          <li className="">
+            <CheckIcon className="" />
             Consider using a password manager
           </li>
         </ul>
       </div>
 
       {/* Password Form */}
-      <div className={styles.formContainer}>
+      <div className="">
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className={styles.formGrid}>
+          <div className="">
             {/* Current Password (not for Google users) */}
             {!user?.googleSignIn && (
-              <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                <label htmlFor="password" className={styles.formLabel}>
-                  Current Password <span className={styles.required}>*</span>
+              <div className=" ">
+                <label htmlFor="password" className="">
+                  Current Password <span className="">*</span>
                 </label>
-                <div className={styles.inputWrapper}>
+                <div className="">
                   <input
                     {...register('password')}
                     id="password"
                     type={showPasswords.current ? 'text' : 'password'}
-                    className={`${styles.formInput} ${
-                      errors.password ? styles.error : ''
-                    }`}
+                    className=""
                     placeholder="Enter your current password"
                   />
                   <button
                     type="button"
-                    className={styles.passwordToggle}
+                    className=""
                     onClick={() => togglePasswordVisibility('current')}
                   >
                     {showPasswords.current ? (
-                      <EyeOffIcon className={styles.toggleIcon} />
+                      <EyeOffIcon className="" />
                     ) : (
-                      <EyeIcon className={styles.toggleIcon} />
+                      <EyeIcon className="" />
                     )}
                   </button>
                 </div>
@@ -279,29 +274,27 @@ export default function ChangePassword() {
             )}
 
             {/* New Password */}
-            <div className={styles.formGroup}>
-              <label htmlFor="newPassword" className={styles.formLabel}>
-                New Password <span className={styles.required}>*</span>
+            <div className="">
+              <label htmlFor="newPassword" className="">
+                New Password <span className="">*</span>
               </label>
-              <div className={styles.inputWrapper}>
+              <div className="">
                 <input
                   {...register('newPassword')}
                   id="newPassword"
                   type={showPasswords.new ? 'text' : 'password'}
-                  className={`${styles.formInput} ${
-                    errors.newPassword ? styles.error : ''
-                  }`}
+                  className=""
                   placeholder="Enter your new password"
                 />
                 <button
                   type="button"
-                  className={styles.passwordToggle}
+                  className=""
                   onClick={() => togglePasswordVisibility('new')}
                 >
                   {showPasswords.new ? (
-                    <EyeOffIcon className={styles.toggleIcon} />
+                    <EyeOffIcon className="" />
                   ) : (
-                    <EyeIcon className={styles.toggleIcon} />
+                    <EyeIcon className="" />
                   )}
                 </button>
               </div>
@@ -310,29 +303,27 @@ export default function ChangePassword() {
             </div>
 
             {/* Confirm Password */}
-            <div className={styles.formGroup}>
-              <label htmlFor="confirmPassword" className={styles.formLabel}>
-                Confirm New Password <span className={styles.required}>*</span>
+            <div className="">
+              <label htmlFor="confirmPassword" className="">
+                Confirm New Password <span className="">*</span>
               </label>
-              <div className={styles.inputWrapper}>
+              <div className="">
                 <input
                   {...register('confirmPassword')}
                   id="confirmPassword"
                   type={showPasswords.confirm ? 'text' : 'password'}
-                  className={`${styles.formInput} ${
-                    errors.confirmPassword ? styles.error : ''
-                  }`}
+                  className=""
                   placeholder="Confirm your new password"
                 />
                 <button
                   type="button"
-                  className={styles.passwordToggle}
+                  className=""
                   onClick={() => togglePasswordVisibility('confirm')}
                 >
                   {showPasswords.confirm ? (
-                    <EyeOffIcon className={styles.toggleIcon} />
+                    <EyeOffIcon className="" />
                   ) : (
-                    <EyeIcon className={styles.toggleIcon} />
+                    <EyeIcon className="" />
                   )}
                 </button>
               </div>
@@ -341,22 +332,22 @@ export default function ChangePassword() {
           </div>
 
           {/* Security Information */}
-          <div className={styles.securityInfo}>
-            <div className={styles.infoItem}>
-              <CheckIcon className={styles.infoIcon} />
+          <div className="">
+            <div className="">
+              <CheckIcon className="" />
               <span>Password will be updated immediately</span>
             </div>
-            <div className={styles.infoItem}>
-              <CheckIcon className={styles.infoIcon} />
+            <div className="">
+              <CheckIcon className="" />
               <span>You'll remain logged in on this device</span>
             </div>
           </div>
 
           {/* Form Actions */}
-          <div className={styles.formActions}>
+          <div className="">
             <button
               type="button"
-              className={`${styles.actionButton} ${styles.secondary}`}
+              className=" "
               onClick={() => {
                 reset();
                 setShowPasswords({
@@ -368,16 +359,10 @@ export default function ChangePassword() {
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              className={`${styles.actionButton} ${styles.primary} ${
-                isLoading ? styles.loading : ''
-              }`}
-              disabled={isLoading}
-            >
+            <button type="submit" className="" disabled={isLoading}>
               {isLoading ? (
                 <>
-                  <div className={styles.spinner}></div>
+                  <div className=""></div>
                   Updating Password...
                 </>
               ) : (
@@ -389,7 +374,7 @@ export default function ChangePassword() {
       </div>
 
       {/* Last Updated Info */}
-      <div className={styles.lastUpdated}>
+      <div className="">
         <span>
           Password last updated:{' '}
           {user?.passwordUpdatedAt

@@ -1,5 +1,4 @@
 'use client';
-import styles from './profile-nav-tab.module.css';
 
 // SVG Icon Components
 const DashboardIcon = ({ className }) => (
@@ -97,20 +96,20 @@ function SingleNav({
 }) {
   return (
     <button
-      className={`${styles.navCard} ${active ? styles.active : ''}`}
+      className=" ${active ? styles.active : ''}"
       onClick={onClick}
       type="button"
     >
-      <div className={styles.cardContent}>
-        <div className={`${styles.cardIcon} ${styles[`${id}Icon`]}`}>
-          <IconComponent className={styles.iconSvg} />
-          {badge && <span className={styles.cardBadge}>{badge}</span>}
+      <div className="">
+        <div className="">
+          <IconComponent className="" />
+          {badge && <span className="">{badge}</span>}
         </div>
-        <div className={styles.cardInfo}>
-          <h4 className={styles.cardTitle}>{title}</h4>
-          <p className={styles.cardDescription}>{description}</p>
+        <div className="">
+          <h4 className="">{title}</h4>
+          <p className="">{description}</p>
         </div>
-        <ChevronRightIcon className={styles.cardArrow} />
+        <ChevronRightIcon className="" />
       </div>
     </button>
   );
@@ -118,15 +117,13 @@ function SingleNav({
 
 export default function ProfileNavTab({ activeTab, setActiveTab }) {
   return (
-    <div className={styles.profileNavContainer}>
-      <div className={styles.navHeader}>
-        <h3 className={styles.headerTitle}>Account Settings</h3>
-        <p className={styles.headerDescription}>
-          Manage your profile and preferences
-        </p>
+    <div className="">
+      <div className="">
+        <h3 className="">Account Settings</h3>
+        <p className="">Manage your profile and preferences</p>
       </div>
 
-      <nav className={styles.navigationSection}>
+      <nav className="">
         <div
           className="nav nav-tabs tp-tab-menu flex-column"
           id="profile-tab"
@@ -168,17 +165,17 @@ export default function ProfileNavTab({ activeTab, setActiveTab }) {
       </nav>
 
       {/* TODO: Uncomment when contact form feature is added */}
-      {/* <div className={styles.helpSection}>
-        <div className={styles.helpContent}>
-          <h4 className={styles.helpTitle}>
-            <SupportIcon className={styles.helpIcon} />
+      {/* <div className="">
+        <div className="">
+          <h4 className="">
+            <SupportIcon className="" />
             Need Help?
           </h4>
-          <p className={styles.helpText}>
+          <p className="">
             Contact our support team for assistance
           </p>
-          <a href="/contact" className={styles.helpButton}>
-            <SupportIcon className={styles.helpButtonIcon} />
+          <a href="/contact" className="">
+            <SupportIcon className="" />
             Get Support
           </a>
         </div>

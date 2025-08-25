@@ -1,19 +1,19 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // internal
+import OffCanvas from '@/components/common/off-canvas';
+import CartMiniSidebar from '@/components/version-tsx/cart-mini-sidebar';
+import useCartInfo from '@/hooks/use-cart-info';
+import useSticky from '@/hooks/use-sticky';
+import { openCartMini } from '@/redux/features/cartSlice';
+import { CartTwo, Menu, Search, Wishlist } from '@/svg';
 import logo_white from '@assets/img/logo/logo-white.svg';
 import logo_dark from '@assets/img/logo/logo.webp';
-import { CartTwo, Menu, Search, Wishlist } from '@/svg';
 import Menus from './header-com/menus';
-import useSticky from '@/hooks/use-sticky';
 import SearchBar from './header-com/search-bar';
-import OffCanvas from '@/components/common/off-canvas';
-import CartMiniSidebar from '@/components/common/cart-mini-sidebar';
-import useCartInfo from '@/hooks/use-cart-info';
-import { openCartMini } from '@/redux/features/cartSlice';
 
 const HeaderThree = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);

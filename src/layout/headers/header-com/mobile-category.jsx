@@ -77,7 +77,7 @@ const MobileCategory = ({ isCategoryActive, categoryType }) => {
         </a>
 
         {item.children && (
-          <ul className={`tp-submenu ${isActiveSubMenu === item.parent ? 'active':''}`}>
+          <ul className="tp-submenu ${isActiveSubMenu === item.parent ? 'active':''}">
             {item.children.map((child, i) => (
               <li
                 key={i}
