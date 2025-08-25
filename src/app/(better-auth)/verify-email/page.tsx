@@ -59,37 +59,37 @@ export default function VerifyEmailPage() {
     setIsLoading(true);
     setError('');
 
-    try {
-      const { data, error: verifyError } =
-        await authClient.emailOtp.verifyEmail({
-          email,
-          otp: otp.trim(),
-        });
-
-      if (verifyError) {
-        const errorMessage = verifyError.message || '';
-        if (errorMessage.includes('MAX_ATTEMPTS_EXCEEDED')) {
-          setError('Maximum attempts exceeded. Please request a new OTP.');
-        } else if (errorMessage.includes('INVALID_OTP')) {
-          setError('Invalid OTP. Please check your code and try again.');
-        } else if (errorMessage.includes('EXPIRED')) {
-          setError('OTP has expired. Please request a new one.');
-        } else {
-          setError(errorMessage || 'Verification failed. Please try again.');
-        }
-        return;
+    // Use better-auth's official callback pattern
+    const { error: verifyError } = await authClient.emailOtp.verifyEmail(
+      {
+        email,
+        otp: otp.trim(),
+      },
+      {
+        onRequest: () => {
+          setIsLoading(true);
+          setError('');
+        },
+        onSuccess: () => {
+          setSuccess(true);
+          // Let better-auth handle the session and redirect
+          setTimeout(() => {
+            router.push('/sign-in');
+            router.refresh();
+          }, 2000);
+        },
+        onError: ctx => {
+          setError(
+            ctx.error.message || 'Verification failed. Please try again.'
+          );
+          setIsLoading(false);
+        },
       }
+    );
 
-      setSuccess(true);
-      // Wait a moment for the session to be created, then redirect
-      setTimeout(() => {
-        router.push('/profile');
-        router.refresh(); // Refresh to update session state
-      }, 2000);
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
-      console.error('OTP verification error:', err);
-    } finally {
+    // Fallback error handling if callbacks don't work
+    if (verifyError && !error) {
+      setError(verifyError.message || 'Verification failed. Please try again.');
       setIsLoading(false);
     }
   };
@@ -98,26 +98,37 @@ export default function VerifyEmailPage() {
     setResendLoading(true);
     setError('');
 
-    try {
-      const { error: resendError } =
-        await authClient.emailOtp.sendVerificationOtp({
+    // Use better-auth's official callback pattern
+    const { error: resendError } =
+      await authClient.emailOtp.sendVerificationOtp(
+        {
           email,
           type: 'email-verification',
-        });
+        },
+        {
+          onRequest: () => {
+            setResendLoading(true);
+            setError('');
+          },
+          onSuccess: () => {
+            setResendCooldown(60); // 60 second cooldown
+            setOtp(''); // Clear current OTP
+            setResendLoading(false);
+          },
+          onError: ctx => {
+            setError(
+              ctx.error.message || 'Failed to resend OTP. Please try again.'
+            );
+            setResendLoading(false);
+          },
+        }
+      );
 
-      if (resendError) {
-        setError(
-          resendError.message || 'Failed to resend OTP. Please try again.'
-        );
-        return;
-      }
-
-      setResendCooldown(60); // 60 second cooldown
-      setOtp(''); // Clear current OTP
-    } catch (err) {
-      setError('Failed to resend OTP. Please try again.');
-      console.error('Resend OTP error:', err);
-    } finally {
+    // Fallback error handling if callbacks don't work
+    if (resendError && !error) {
+      setError(
+        resendError.message || 'Failed to resend OTP. Please try again.'
+      );
       setResendLoading(false);
     }
   };
@@ -133,8 +144,8 @@ export default function VerifyEmailPage() {
                 Email Verified!
               </h2>
               <p className="text-gray-600 mb-4">
-                Your email has been successfully verified. Redirecting to
-                profile...
+                Your email has been successfully verified. Redirecting to Sign
+                In...
               </p>
               <div className="flex justify-center">
                 <Loader2 className="h-6 w-6 animate-spin" />
