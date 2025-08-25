@@ -1,14 +1,11 @@
 {
-	"folders": [
-		{
-			"path": "../ewo-backend"
-		},
-		{
-			"path": "../ewo-admin"
-		},
-		{
-			"path": "."
-		}
-	],
-	"settings": {}
+  "folders": [
+    {
+      "path": "../ewo-backend"
+    },
+    {
+      "path": "."
+    }
+  ],
+  "settings": {}
 }

@@ -4,7 +4,6 @@ import { Toaster } from '@/components/ui/sonner';
 import Wrapper from '@/components/wrapper';
 import { GoogleTagManager } from '@next/third-parties/google';
 import { Lato } from 'next/font/google';
-import Script from 'next/script';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import Footer from '../components/version-tsx/footer';
 import HeaderV2 from '../components/version-tsx/header';
@@ -97,7 +96,7 @@ export default function RootLayout({ children }) {
         />
 
         {/* Tawk.to Script - Simple approach compatible with server components */}
-        <div suppressHydrationWarning>
+        {/* <div suppressHydrationWarning>
           <Script
             id="tawk-to-script"
             strategy="afterInteractive"
@@ -129,7 +128,7 @@ export default function RootLayout({ children }) {
               `,
             }}
           />
-        </div>
+        </div> */}
       </body>
     </html>
   );
