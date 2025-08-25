@@ -24,7 +24,8 @@ export const authClient = createAuthClient({
     }),
     nextCookies(),
   ],
-  baseURL: 'https://www.eastwestoffroad.com/',
+  baseURL: 'https://ewo-backend.vercel.app',
+  // baseURL: 'http://localhost:8090',
 });
 
 export type ClientSession = typeof authClient.$Infer.Session;
