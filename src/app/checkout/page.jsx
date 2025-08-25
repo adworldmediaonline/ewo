@@ -1,5 +1,3 @@
-import CheckoutArea from '@/components/version-tsx/checkout/checkout-area';
-import Wrapper from '@/components/wrapper';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,6 +6,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import CheckoutArea from '@/components/version-tsx/checkout/checkout-area';
+import Wrapper from '@/components/wrapper';
 
 export const metadata = {
   title: 'EWO - Checkout',
@@ -24,6 +24,10 @@ export default function CheckoutPage() {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink href="/">Home</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/cart">Cart</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
