@@ -5,11 +5,23 @@ import { authClient } from '@/lib/authClient';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-export default function GoogleSignIn() {
+interface GoogleSignInProps {
+  onSuccess?: () => void;
+  redirectPath?: string;
+}
+
+export default function GoogleSignIn({
+  onSuccess,
+  redirectPath = '/profile',
+}: GoogleSignInProps) {
   const [isLoading, setIsLoading] = useState(false);
+
   const handleGoogleSignUp = async () => {
     setIsLoading(true);
-    const cb = `${window.location.origin}/profile`;
+    const cb = redirectPath.startsWith('http')
+      ? redirectPath
+      : `${window.location.origin}${redirectPath}`;
+
     await authClient.signIn.social(
       {
         provider: 'google',
@@ -22,9 +34,9 @@ export default function GoogleSignIn() {
         },
         onSuccess: () => {
           setIsLoading(false);
-          // toast.success('Signed in successfully');
-          // router.refresh();
-          // router.push('/');
+          if (onSuccess) {
+            onSuccess();
+          }
         },
         onError: () => {
           setIsLoading(false);

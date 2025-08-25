@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 // internal
+import { AuthDialog } from '@/components/version-tsx/profile';
 import useCheckoutSubmit from '@/hooks/use-checkout-submit';
 import ThankYouModal from '../../common/thank-you-modal';
 
@@ -16,6 +17,7 @@ export default function CheckoutArea() {
   const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
   const [isGuest, setIsGuest] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
 
   useEffect(() => {
     const isAuthenticate = Cookies.get('userInfo');
@@ -42,9 +44,13 @@ export default function CheckoutArea() {
   } = checkoutData;
   const { cart_products } = useSelector(state => state.cart);
 
-  // Code to add "Sign in" link for guest users that redirects back to checkout
-  const loginWithRedirect = () => {
-    router.push('/login?redirect=/checkout');
+  // Handle auth dialog
+  const handleShowAuthDialog = () => {
+    setShowAuthDialog(true);
+  };
+
+  const handleCloseAuthDialog = () => {
+    setShowAuthDialog(false);
   };
 
   return (
@@ -83,9 +89,6 @@ export default function CheckoutArea() {
                     {isPending && (
                       <div className="text-center">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                        {/* <p className="mt-2 text-sm text-muted-foreground">
-                          Loading...
-                        </p> */}
                       </div>
                     )}
 
@@ -102,7 +105,7 @@ export default function CheckoutArea() {
                           </div>
                           <button
                             type="button"
-                            onClick={loginWithRedirect}
+                            onClick={handleShowAuthDialog}
                             className="text-primary hover:text-primary/90 underline"
                           >
                             Sign In Instead
@@ -111,27 +114,6 @@ export default function CheckoutArea() {
                       </div>
                     )}
 
-                    {/* {isGuest && (
-                      <div className="bg-muted rounded-lg p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium">
-                              ?
-                            </div>
-                            <span className="font-medium text-foreground">
-                              Checking out as Guest
-                            </span>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={loginWithRedirect}
-                            className="text-primary hover:text-primary/90 underline"
-                          >
-                            Sign In Instead
-                          </button>
-                        </div>
-                      </div>
-                    )} */}
                     <CheckoutBillingArea
                       register={register}
                       errors={errors}
@@ -146,6 +128,14 @@ export default function CheckoutArea() {
           )}
         </div>
       </section>
+
+      {/* Auth Dialog */}
+      <AuthDialog
+        isOpen={showAuthDialog}
+        onClose={handleCloseAuthDialog}
+        redirectPath="/checkout"
+        defaultTab="signin"
+      />
 
       {/* Thank You Modal */}
       <ThankYouModal

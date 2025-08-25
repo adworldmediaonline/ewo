@@ -1,3 +1,4 @@
+export { default as AuthDialog } from './auth-dialog';
 export { default as OrderCard } from './order-card';
 export { default as OrderStatusBadge } from './order-status-badge';
 export { default as ProfileActions } from './profile-actions';
@@ -8,7 +9,6 @@ export { default as ProfileHeader } from './profile-header';
 export { default as ProfileLayout } from './profile-layout';
 export { default as ProfileLoadingState } from './profile-loading-state';
 export { default as ProfileOrderStats } from './profile-order-stats';
-export { default as ProfileOrders } from './profile-orders';
 export { default as ProfileOrdersSection } from './profile-orders-section';
 export { default as ProfileOverview } from './profile-overview';
 export { default as ProfileSessionInfo } from './profile-session-info';
