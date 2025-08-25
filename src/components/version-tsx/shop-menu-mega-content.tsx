@@ -1,5 +1,6 @@
 'use client';
 
+import { NavigationMenuLink } from '@/components/ui/navigation-menu';
 import Image from 'next/image';
 import * as React from 'react';
 
@@ -39,80 +40,77 @@ export default function ShopMenuMegaContent({
 
           return (
             <div key={cat._id} className="group">
-              <button
-                type="button"
-                onClick={() => onSelectCategory(cat.parent)}
-                aria-label={`Browse ${cat.parent}`}
-                className="relative w-full overflow-hidden rounded-xl border border-border bg-card text-left shadow-sm transition-all duration-200 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              >
-                <div className="relative h-40 sm:h-48 md:h-56 w-full">
-                  {/* Background to avoid visible gaps when using object-contain */}
-                  <div className="absolute inset-0 bg-background" />
-                  {hasImage ? (
-                    <div className="absolute inset-0 p-2">
-                      <Image
-                        src={cat.img as string}
-                        alt={cat.parent}
-                        fill
-                        sizes="(max-width: 640px) 45vw, (max-width: 1024px) 22vw, 200px"
-                        className="object-contain transition-transform duration-300 group-hover:scale-105"
-                        priority={false}
-                      />
+              <div className="relative w-full overflow-hidden rounded-xl border border-border bg-card text-left shadow-sm transition-all duration-200 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                <NavigationMenuLink asChild className="block">
+                  <a href={`/shop?category=${cat.parent}`}>
+                    <div className="relative h-40 sm:h-48 md:h-56 w-full">
+                      {/* Background to avoid visible gaps when using object-contain */}
+                      <div className="absolute inset-0 bg-background" />
+                      {hasImage ? (
+                        <div className="absolute inset-0 p-2">
+                          <Image
+                            src={cat.img as string}
+                            alt={cat.parent}
+                            fill
+                            sizes="(max-width: 640px) 45vw, (max-width: 1024px) 22vw, 200px"
+                            className="object-contain transition-transform duration-300 group-hover:scale-105"
+                            priority={false}
+                          />
+                        </div>
+                      ) : (
+                        <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted/60" />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                      <div className="absolute left-0 bottom-0 p-4 sm:p-5">
+                        <h3 className="text-white text-lg sm:text-xl font-semibold tracking-tight">
+                          {cat.parent}
+                        </h3>
+                      </div>
                     </div>
-                  ) : (
-                    <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted/60" />
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                  <div className="absolute left-0 bottom-0 p-4 sm:p-5">
-                    <h3 className="text-white text-lg sm:text-xl font-semibold tracking-tight">
-                      {cat.parent}
-                    </h3>
-                    {childLabels.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {childLabels.map(child => (
-                          <span
-                            key={child}
+                  </a>
+                </NavigationMenuLink>
+
+                {/* Subcategories - positioned outside the main anchor tag */}
+                {childLabels.length > 0 && (
+                  <div className="absolute left-0 bottom-0 p-4 sm:p-5 z-10">
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {childLabels.map((child, index) => (
+                        <NavigationMenuLink
+                          key={index}
+                          asChild
+                          className="inline-flex cursor-pointer items-center rounded-full bg-white/90 px-2.5 py-1 text-xs font-medium text-foreground hover:bg-white transition-colors duration-200"
+                        >
+                          <a
+                            href={`/shop?category=${cat.parent}&subcategory=${child}`}
                             onClick={e => {
                               e.stopPropagation();
                               onSelectSubcategory(cat.parent, child);
                             }}
-                            role="link"
-                            tabIndex={0}
-                            onKeyDown={e => {
-                              if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                onSelectSubcategory(cat.parent, child);
-                              }
-                            }}
-                            className="inline-flex cursor-pointer items-center rounded-full bg-white/90 px-2.5 py-1 text-xs font-medium text-foreground hover:bg-white transition-colors duration-200"
                           >
                             {child}
-                          </span>
-                        ))}
-                        {cat.children && cat.children.length > 3 && (
-                          <span
+                          </a>
+                        </NavigationMenuLink>
+                      ))}
+                      {cat.children && cat.children.length > 3 && (
+                        <NavigationMenuLink
+                          asChild
+                          className="inline-flex cursor-pointer items-center rounded-full bg-white/80 px-2.5 py-1 text-xs font-medium text-foreground/80 hover:bg-white hover:text-foreground transition-colors duration-200"
+                        >
+                          <a
+                            href={`/shop?category=${cat.parent}`}
                             onClick={e => {
                               e.stopPropagation();
                               onSelectCategory(cat.parent);
                             }}
-                            role="link"
-                            tabIndex={0}
-                            onKeyDown={e => {
-                              if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                onSelectCategory(cat.parent);
-                              }
-                            }}
-                            className="inline-flex cursor-pointer items-center rounded-full bg-white/80 px-2.5 py-1 text-xs font-medium text-foreground/80 hover:bg-white hover:text-foreground transition-colors duration-200"
                           >
                             +{cat.children.length - 3} more
-                          </span>
-                        )}
-                      </div>
-                    )}
+                          </a>
+                        </NavigationMenuLink>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </button>
+                )}
+              </div>
             </div>
           );
         })}

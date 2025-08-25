@@ -43,6 +43,9 @@ export default function CartDropdown({
   const { subtotal, total, firstTimeDiscountAmount } = useCartInfo();
   const { navigateToCart, navigateToCheckout } = useGuestCartNavigation();
 
+  // Add state to control dropdown
+  const [open, setOpen] = React.useState(false);
+
   const {
     cart_products,
     totalShippingCost,
@@ -75,6 +78,22 @@ export default function CartDropdown({
     dispatch(remove_product({ title: item.title, id: item._id }));
   }
 
+  // Enhanced navigation functions that close dropdown
+  const handleViewAll = () => {
+    setOpen(false);
+    navigateToCart();
+  };
+
+  const handleViewCart = () => {
+    setOpen(false);
+    navigateToCart();
+  };
+
+  const handleCheckout = () => {
+    setOpen(false);
+    navigateToCheckout();
+  };
+
   function renderLinePrice(item: CartItem): string {
     const base = Number(item.price) || 0;
     const discount = Number(item.discount) || 0;
@@ -94,19 +113,8 @@ export default function CartDropdown({
     return Math.max(0, baseTotal + shipping - coupon);
   }, [total, totalShippingCost, total_coupon_discount]);
 
-  console.log(
-    'cart_products',
-    cart_products,
-    'totalShippingCost',
-    totalShippingCost,
-    'shippingDiscount',
-    shippingDiscount,
-    'firstTimeDiscount',
-    firstTimeDiscount
-  );
-
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
@@ -127,7 +135,7 @@ export default function CartDropdown({
                 variant="ghost"
                 size="sm"
                 className="h-7 px-2 text-xs"
-                onClick={navigateToCart}
+                onClick={handleViewAll}
               >
                 View all
               </Button>
@@ -144,6 +152,7 @@ export default function CartDropdown({
                     href={`/product/${item.slug || item._id}`}
                     className="relative h-14 w-14 overflow-hidden rounded-md bg-muted"
                     aria-label={item.title}
+                    onClick={() => setOpen(false)}
                   >
                     <Image
                       src={item.img}
@@ -157,6 +166,7 @@ export default function CartDropdown({
                     <Link
                       href={`/product/${item.slug || item._id}`}
                       className="line-clamp-2 text-sm font-medium"
+                      onClick={() => setOpen(false)}
                     >
                       {item.title}
                     </Link>
@@ -258,12 +268,12 @@ export default function CartDropdown({
               <div className="grid grid-cols-2 gap-2 pt-2">
                 <Button
                   variant="outline"
-                  onClick={navigateToCart}
+                  onClick={handleViewCart}
                   className="w-full"
                 >
                   View Cart
                 </Button>
-                <Button onClick={navigateToCheckout} className="w-full">
+                <Button onClick={handleCheckout} className="w-full">
                   Checkout
                 </Button>
               </div>

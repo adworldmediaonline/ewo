@@ -2,7 +2,7 @@ import {
   emailOTPClient,
   inferAdditionalFields,
 } from 'better-auth/client/plugins';
-
+import { nextCookies } from 'better-auth/next-js';
 import { createAuthClient } from 'better-auth/react';
 
 const BACKEND_URL =
@@ -22,6 +22,7 @@ export const authClient = createAuthClient({
         },
       },
     }),
+    nextCookies(),
   ],
   baseURL: BACKEND_URL,
 });
