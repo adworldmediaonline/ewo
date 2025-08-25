@@ -25,6 +25,9 @@ export const authClient = createAuthClient({
     process.env.NODE_ENV === 'development'
       ? process.env.NEXT_PUBLIC_BACKEND_URL_LOCAL
       : process.env.NEXT_PUBLIC_BACKEND_URL_PROD,
+  fetchOptions: {
+    credentials: 'include',
+  },
 });
 
 export type ClientSession = typeof authClient.$Infer.Session;

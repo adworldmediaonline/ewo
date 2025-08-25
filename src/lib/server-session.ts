@@ -1,34 +1,34 @@
+import { betterFetch } from '@better-fetch/fetch';
+import { Session, User } from 'better-auth';
 import { headers } from 'next/headers';
 import { cache } from 'react';
 
+type FullSession = {
+  session: Session;
+  user: User & { role: string };
+};
+
 export const getServerSession = cache(async () => {
   try {
-    const headersList = await headers();
-    const cookies = headersList.get('cookie') || '';
+    const { data, error } = await betterFetch<FullSession>(
+      '/api/auth/get-session',
+      {
+        baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8090',
+        headers: {
+          cookie: (await headers()).get('cookie') || '',
+        },
+        credentials: 'include',
+      }
+    );
 
-    // Get session from your backend's /api/me endpoint
-    const baseURL =
-      process.env.NODE_ENV === 'development'
-        ? process.env.NEXT_PUBLIC_BACKEND_URL_LOCAL || 'http://localhost:8090'
-        : process.env.NEXT_PUBLIC_BACKEND_URL_PROD ||
-          'https://ewo-backend.vercel.app';
-
-    const response = await fetch(`${baseURL}/api/me`, {
-      headers: {
-        cookie: cookies,
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store', // Don't cache session data
-    });
-
-    if (!response.ok) {
+    if (error) {
+      console.error('Error fetching session:', error);
       return null;
     }
 
-    const session = await response.json();
-    return session;
+    return data;
   } catch (error) {
-    console.error('Server session error:', error);
+    console.error('Error fetching session:', error);
     return null;
   }
 });

@@ -43,12 +43,23 @@ export function SignInForm({
     setError('');
 
     try {
-      const { data, error: signInError } = await authClient.signIn.email({
-        email,
-        password,
-        // rememberMe,
-        callbackURL: redirectPath,
-      });
+      const { data, error: signInError } = await authClient.signIn.email(
+        {
+          email,
+          password,
+          // rememberMe,
+          callbackURL: redirectPath,
+        },
+        {
+          onSuccess: () => {
+            // Handle successful sign-in
+            console.log('✅ Sign-in successful');
+          },
+          onError: ctx => {
+            setError(ctx.error.message || 'Sign in failed');
+          },
+        }
+      );
 
       if (signInError) {
         setError(signInError.message || 'Sign in failed');

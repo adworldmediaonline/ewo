@@ -70,10 +70,29 @@ export default function SignInOTPPage() {
     setError('');
 
     try {
-      const { data, error: signInError } = await authClient.signIn.emailOtp({
-        email,
-        otp: otp.trim(),
-      });
+      const { data, error: signInError } = await authClient.signIn.emailOtp(
+        {
+          email,
+          otp: otp.trim(),
+        },
+        {
+          onSuccess: () => {
+            console.log('✅ OTP Sign-in successful');
+          },
+          onError: ctx => {
+            const errorMessage = ctx.error.message || '';
+            if (errorMessage.includes('MAX_ATTEMPTS_EXCEEDED')) {
+              setError('Maximum attempts exceeded. Please request a new OTP.');
+            } else if (errorMessage.includes('INVALID_OTP')) {
+              setError('Invalid OTP. Please check your code and try again.');
+            } else if (errorMessage.includes('EXPIRED')) {
+              setError('OTP has expired. Please request a new one.');
+            } else {
+              setError(errorMessage || 'Sign-in failed. Please try again.');
+            }
+          },
+        }
+      );
 
       if (signInError) {
         const errorMessage = signInError.message || '';

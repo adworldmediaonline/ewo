@@ -39,13 +39,8 @@ export function HeaderActions({
   // signout
   const handleSignOut = () => {
     startTransition(async () => {
-      await authClient.signOut({
-        fetchOptions: {
-          onSuccess: () => {
-            router.push('/sign-in'); // redirect to login page
-          },
-        },
-      });
+      await authClient.signOut();
+      router.push('/sign-in'); // redirect to login page
     });
   };
 
