@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import useCartInfo from '@/hooks/use-cart-info';
 import { authClient } from '@/lib/authClient';
-import { openCartMini } from '@/redux/features/cartSlice';
 import { Heart, LogOut, Settings, ShoppingCart, User } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -36,11 +35,6 @@ export function HeaderActions({
   const wishlist: unknown[] = useSelector(
     (s: any) => s?.wishlist?.wishlist ?? []
   );
-  const user = useSelector((s: any) => s?.auth?.user ?? null);
-
-  function handleOpenCart() {
-    dispatch(openCartMini());
-  }
 
   // signout
   const handleSignOut = () => {
@@ -103,12 +97,11 @@ export function HeaderActions({
           </button>
         </CartDropdown>
 
-        {isPending ? (
+        {/* {isPending ? (
           <div className="flex items-center space-x-2">
             <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
-            <span className="text-sm text-muted-foreground">Loading...</span>
           </div>
-        ) : null}
+        ) : null} */}
 
         {session ? (
           <DropdownMenu>
