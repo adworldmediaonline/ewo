@@ -1,10 +1,10 @@
 import Providers from '@/components/provider';
-import TawkToChat from '@/components/tawk-to-chat';
+
 import { Toaster } from '@/components/ui/sonner';
 import Wrapper from '@/components/wrapper';
 import { GoogleTagManager } from '@next/third-parties/google';
-import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Lato } from 'next/font/google';
+import Script from 'next/script';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import Footer from '../components/version-tsx/footer';
 import HeaderV2 from '../components/version-tsx/header';
@@ -84,8 +84,7 @@ export default function RootLayout({ children }) {
             </div>
           </Wrapper>
         </Providers>
-        <SpeedInsights />
-        <TawkToChat />
+
         <Toaster
           // position="top-center"
           toastOptions={{
@@ -96,6 +95,41 @@ export default function RootLayout({ children }) {
             default: 'bg-gray-500 text-white',
           }}
         />
+
+        {/* Tawk.to Script - Simple approach compatible with server components */}
+        <div suppressHydrationWarning>
+          <Script
+            id="tawk-to-script"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function() {
+                  if (typeof window === 'undefined') return;
+                  if (window.Tawk_API) return;
+
+                  try {
+                    window.Tawk_API = window.Tawk_API || {};
+                    window.Tawk_LoadStart = new Date();
+
+                    var script = document.createElement('script');
+                    script.async = true;
+                    script.src = 'https://embed.tawk.to/68901758770617192577a56d/1j1pdmd5n';
+                    script.charset = 'UTF-8';
+                    script.setAttribute('crossorigin', '*');
+
+                    script.onerror = function() {
+                      console.warn('Failed to load Tawk.to script');
+                    };
+
+                    document.head.appendChild(script);
+                  } catch (error) {
+                    console.warn('Error initializing Tawk.to:', error);
+                  }
+                })();
+              `,
+            }}
+          />
+        </div>
       </body>
     </html>
   );

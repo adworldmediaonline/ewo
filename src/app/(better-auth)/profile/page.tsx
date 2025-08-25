@@ -6,7 +6,7 @@ import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useQueryState } from 'nuqs';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 // Import reusable components
 import {
@@ -22,6 +22,9 @@ export default function DashboardPage() {
   const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
 
+  // Add client-side state to prevent hydration mismatches
+  const [isClient, setIsClient] = useState(false);
+
   // Use nuqs to persist active tab in URL
   const [activeTab, setActiveTab] = useQueryState('tab', {
     defaultValue: 'overview',
@@ -33,15 +36,22 @@ export default function DashboardPage() {
   });
 
   useEffect(() => {
+    // Set client-side flag to prevent hydration mismatches
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
     if (!isPending && !session) {
       router.push('/sign-in');
     }
   }, [session, isPending, router]);
 
-  if (isPending) {
+  // Show loading state until client-side hydration is complete
+  if (!isClient || isPending) {
     return <ProfileLoadingState />;
   }
 
+  // Don't render anything if no session (will redirect)
   if (!session) {
     return null;
   }

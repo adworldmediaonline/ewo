@@ -1,5 +1,6 @@
 'use client';
 
+import ClientOnlyWrapper from '@/components/client-only-wrapper';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -177,7 +178,9 @@ const ProfileLayout: React.FC<ProfileLayoutProps> = ({
               </SheetTrigger>
               <SheetContent side="left" className="w-80 p-0">
                 <SheetTitle className="sr-only">Profile</SheetTitle>
-                <SidebarContent />
+                <ClientOnlyWrapper>
+                  <SidebarContent />
+                </ClientOnlyWrapper>
               </SheetContent>
             </Sheet>
             <div>
@@ -199,7 +202,9 @@ const ProfileLayout: React.FC<ProfileLayoutProps> = ({
       <div className="flex">
         {/* Desktop Sidebar */}
         <aside className="hidden lg:block w-80 border-r border-border/50 bg-background/50 sticky top-0 h-screen overflow-y-auto">
-          <SidebarContent />
+          <ClientOnlyWrapper>
+            <SidebarContent />
+          </ClientOnlyWrapper>
         </aside>
 
         {/* Main Content */}
