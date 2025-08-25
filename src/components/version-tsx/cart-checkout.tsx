@@ -45,13 +45,13 @@ export default function CartCheckout() {
 
   // Calculate totals helper function
   const calculateTotals = () => {
-    let currentSubtotal = subtotal;
-    let currentShipping = totalShippingCost;
-    let currentAddressDiscount = address_discount || 0;
-    let currentFirstTimeDiscount = firstTimeDiscount.isApplied
+    const currentSubtotal = subtotal;
+    const currentShipping = totalShippingCost;
+    const currentAddressDiscount = address_discount || 0;
+    const currentFirstTimeDiscount = firstTimeDiscount.isApplied
       ? firstTimeDiscountAmount
       : 0;
-    let currentCouponDiscount = total_coupon_discount || 0;
+    const currentCouponDiscount = total_coupon_discount || 0;
 
     return {
       subtotal: currentSubtotal,
