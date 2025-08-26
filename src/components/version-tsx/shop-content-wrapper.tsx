@@ -101,6 +101,53 @@ export default function ShopContentWrapper({
   const [isError, _setIsError] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
+  // Function to fetch products with current filters (for filter changes)
+  const fetchFilteredProducts = useCallback(
+    async (page = 1) => {
+      _setIsLoading(true);
+      try {
+        const params = new URLSearchParams();
+
+        // Add current filters
+        if (filters.search) params.set('search', filters.search);
+        if (filters.category) params.set('category', filters.category);
+        if (filters.subcategory) params.set('subcategory', filters.subcategory);
+        if (filters.sortBy) params.set('sortBy', filters.sortBy);
+        if (filters.sortOrder) params.set('sortOrder', filters.sortOrder);
+
+        // Add pagination params
+        params.set('page', page.toString());
+        params.set('limit', '8');
+
+        const apiUrl = `${
+          process.env.NEXT_PUBLIC_API_BASE_URL
+        }/api/product/paginated?${params.toString()}`;
+        console.log('Fetching filtered products from API:', apiUrl);
+
+        const response = await fetch(apiUrl);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.success && data.data) {
+          // Replace products with new filtered results
+          _setProducts(data.data);
+          _setPagination(data.pagination);
+          setCurrentPage(page);
+        }
+      } catch (error) {
+        console.error('Error fetching filtered products:', error);
+        _setIsError(true);
+      } finally {
+        _setIsLoading(false);
+      }
+    },
+    [filters]
+  );
+
   // Function to load more products
   const handleLoadMore = useCallback(async () => {
     if (isLoadingMore || !pagination?.hasNextPage) return;
@@ -163,6 +210,26 @@ export default function ShopContentWrapper({
     filters.subcategory,
     filters.sortBy,
     filters.sortOrder,
+  ]);
+
+  // Fetch new products when filters change (debounced to avoid too many API calls)
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      // Don't fetch on initial load since we already have initial products
+      if (products.length > 0) {
+        fetchFilteredProducts(1);
+      }
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [
+    filters.search,
+    filters.category,
+    filters.subcategory,
+    filters.sortBy,
+    filters.sortOrder,
+    fetchFilteredProducts,
+    products.length,
   ]);
 
   // Synchronize URL with filters when they change
@@ -241,8 +308,11 @@ export default function ShopContentWrapper({
       const newUrl = queryString ? `/shop?${queryString}` : '/shop';
       console.log('Generated URL:', newUrl);
       router.push(newUrl);
+
+      // Fetch new products with updated filters
+      fetchFilteredProducts(1);
     },
-    [router]
+    [router, fetchFilteredProducts]
   );
 
   const handleClearFilters = useCallback(() => {
@@ -255,7 +325,10 @@ export default function ShopContentWrapper({
     });
     // Clear URL parameters when filters are cleared
     router.push('/shop');
-  }, [router]);
+
+    // Fetch products without filters
+    fetchFilteredProducts(1);
+  }, [router, fetchFilteredProducts]);
 
   const handleAddToCart = useCallback(
     (product: Product) => {
