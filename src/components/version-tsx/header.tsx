@@ -2,10 +2,8 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 
 import { PRIMARY_LINKS } from '@/appdata/navigation';
-import useCartInfo from '@/hooks/use-cart-info';
 // import { openCartMini } from '@/redux/features/cartSlice';
 import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
 // import CartMiniSheet from './cart-mini-sheet';
@@ -27,41 +25,16 @@ function toSlug(label: string): string {
     .replace(/\s+/g, '-');
 }
 
-// interface CategoryItem {
-//   _id: string;
-//   parent: string;
-//   status?: string;
-//   products?: unknown[];
-//   children?: string[];
-//   img?: string;
-// }
-
 export default function HeaderV2(): React.ReactElement {
   const pathname = usePathname();
   const router = useRouter();
-  const _dispatch = useDispatch();
-
-  const _wishlist: unknown[] = useSelector(
-    (s: any) => s?.wishlist?.wishlist ?? []
-  );
-  const _user: { name?: string; imageURL?: string } | null = useSelector(
-    (s: any) => s?.auth?.user ?? null
-  );
-  const _quantity = useCartInfo();
 
   const { data } = useGetShowCategoryQuery(undefined as unknown as void);
   const categories: MenuCategoryItem[] = (data?.result ??
     []) as MenuCategoryItem[];
-  const _visibleCategories = categories.filter(
-    c => (c.products?.length ?? 0) > 0 && c.status === 'Show'
-  );
 
   const mobileSearchRef = React.useRef<HTMLInputElement>(null);
   const desktopSearchRef = React.useRef<HTMLInputElement>(null);
-
-  // function handleOpenCart(): void {
-  //   dispatch(openCartMini());
-  // }
 
   function handleCategoryRoute(title: string): void {
     const slug = toSlug(title);
@@ -115,7 +88,6 @@ export default function HeaderV2(): React.ReactElement {
           </div>
         </div>
       </header>
-      {/* <CartMiniSheet /> */}
     </>
   );
 }
