@@ -4,9 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import { PRIMARY_LINKS } from '@/appdata/navigation';
-// import { openCartMini } from '@/redux/features/cartSlice';
-import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
-// import CartMiniSheet from './cart-mini-sheet';
+import { toSlug } from '@/lib/server-data';
 import DesktopNav from './desktop-nav';
 import HeaderActions from './header-actions';
 import HeaderBrand from './header-brand';
@@ -14,24 +12,15 @@ import HeaderMenuButton from './header-menu-button';
 import HeaderSearch from './header-search';
 import { CategoryItem as MenuCategoryItem } from './shop-menu-content';
 
-// Consistent slug generation function
-function toSlug(label: string): string {
-  if (!label) return '';
-  return label
-    .toLowerCase()
-    .replace(/&/g, 'and') // Replace & with 'and' for better URL readability
-    .replace(/[^a-z0-9\s-]/g, '')
-    .trim()
-    .replace(/\s+/g, '-');
+interface HeaderV2Props {
+  categories: MenuCategoryItem[];
 }
 
-export default function HeaderV2(): React.ReactElement {
+export default function HeaderV2({
+  categories,
+}: HeaderV2Props): React.ReactElement {
   const pathname = usePathname();
   const router = useRouter();
-
-  const { data } = useGetShowCategoryQuery(undefined as unknown as void);
-  const categories: MenuCategoryItem[] = (data?.result ??
-    []) as MenuCategoryItem[];
 
   const mobileSearchRef = React.useRef<HTMLInputElement>(null);
   const desktopSearchRef = React.useRef<HTMLInputElement>(null);

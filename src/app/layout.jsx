@@ -7,7 +7,7 @@ import { Lato } from 'next/font/google';
 import Image from 'next/image';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import Footer from '../components/version-tsx/footer';
-import HeaderV2 from '../components/version-tsx/header';
+import HeaderWrapper from '../components/version-tsx/header-wrapper';
 import './globals.css';
 
 export const metadata = {
@@ -76,7 +76,7 @@ export default function RootLayout({ children }) {
         <Providers>
           <Wrapper>
             <div className="flex flex-col min-h-screen">
-              <HeaderV2 />
+              <HeaderWrapper />
               <main className="flex-grow">
                 <NuqsAdapter>{children}</NuqsAdapter>
               </main>
