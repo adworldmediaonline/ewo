@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { authClient } from '@/lib/authClient';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useQueryState } from 'nuqs';
 
@@ -13,6 +13,7 @@ import {
   ProfileOrderStats,
   ProfileSettings,
 } from '@/components/version-tsx/profile';
+import NotAuthenticated from '../../../components/version-tsx/profile/not-authenticated';
 
 export default function DashboardPage() {
   const { data: session, isPending } = authClient.useSession();
@@ -27,11 +28,15 @@ export default function DashboardPage() {
   });
 
   if (isPending) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="w-10 h-10 animate-spin" />
+      </div>
+    );
   }
 
   if (!session) {
-    return <div>Not Authenticated</div>;
+    return <NotAuthenticated />;
   }
 
   const renderTabContent = () => {
