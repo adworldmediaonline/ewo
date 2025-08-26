@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { CategoryItem } from '@/lib/server-data';
+import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
 import { Search, X } from 'lucide-react';
 import * as React from 'react';
 
@@ -38,7 +38,6 @@ export interface ShopFilters {
 
 interface ShopFiltersProps {
   filters: ShopFilters;
-  categories: CategoryItem[];
   onFiltersChange: (filters: ShopFilters) => void;
   onClearFilters: () => void;
 }
@@ -55,10 +54,10 @@ const sortOptions = [
 
 export default function ShopFilters({
   filters,
-  categories,
   onFiltersChange,
   onClearFilters,
 }: ShopFiltersProps): React.ReactElement {
+  const { data: categories } = useGetShowCategoryQuery('');
   const [localSearch, setLocalSearch] = React.useState(filters.search);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -147,7 +146,7 @@ export default function ShopFilters({
         <Label className="text-sm font-medium">Categories</Label>
         <ScrollArea className="h-[300px]">
           <div className="space-y-2">
-            {categories?.map((cat: CategoryItem) => (
+            {categories?.result?.map((cat: any) => (
               <Button
                 key={cat._id}
                 variant={
@@ -158,7 +157,7 @@ export default function ShopFilters({
                 onClick={() => handleCategoryChange(cat.parent)}
               >
                 {cat.parent}
-                {cat.products && cat.products.length > 0 && (
+                {cat.products?.length > 0 && (
                   <Badge variant="secondary" className="ml-auto">
                     {cat.products.length}
                   </Badge>
@@ -177,8 +176,8 @@ export default function ShopFilters({
             <Label className="text-sm font-medium">Subcategories</Label>
             <ScrollArea className="h-[200px]">
               <div className="space-y-2">
-                {categories
-                  ?.find((cat: CategoryItem) => cat.parent === filters.category)
+                {categories?.result
+                  ?.find((cat: any) => cat.parent === filters.category)
                   ?.children?.map((subcat: string) => (
                     <Button
                       key={subcat}

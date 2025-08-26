@@ -8,12 +8,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import {
-  CategoryItem,
-  PaginatedProductsResponse,
-  ProductFilters,
-} from '@/lib/server-data';
 import { add_cart_product } from '@/redux/features/cartSlice';
+import { useGetPaginatedProductsQuery } from '@/redux/features/productApi';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { Filter, Search } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -44,17 +40,7 @@ function toSlug(label: string): string {
 //     .replace(/\b\w/g, l => l.toUpperCase());
 // }
 
-interface ShopContentWrapperProps {
-  initialCategories: CategoryItem[];
-  initialProducts: PaginatedProductsResponse;
-  initialFilters: ProductFilters;
-}
-
-export default function ShopContentWrapper({
-  initialCategories,
-  initialProducts,
-  initialFilters,
-}: ShopContentWrapperProps) {
+export default function ShopContentWrapper() {
   const dispatch = useDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -63,13 +49,16 @@ export default function ShopContentWrapper({
   );
   const { wishlist: _wishlist } = useSelector((state: any) => state.wishlist);
 
-  // Initialize filters from server data or URL parameters
+  // Initialize filters from URL parameters
+  const initialCategory = searchParams.get('category') || '';
+  const initialSubcategory = searchParams.get('subcategory') || '';
+
   const [filters, setFilters] = useState<ShopFiltersType>({
-    search: initialFilters.search || '',
-    category: initialFilters.category || '',
-    subcategory: initialFilters.subcategory || '',
-    sortBy: initialFilters.sortBy || 'skuArrangementOrderNo',
-    sortOrder: initialFilters.sortOrder || 'asc',
+    search: '',
+    category: initialCategory,
+    subcategory: initialSubcategory,
+    sortBy: 'skuArrangementOrderNo',
+    sortOrder: 'asc',
   });
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -84,8 +73,8 @@ export default function ShopContentWrapper({
     currentPageRef.current = currentPage;
   }, [currentPage]);
 
-  // Convert filters to API format (for future client-side pagination)
-  const _apiFilters = useMemo(() => {
+  // Convert filters to API format
+  const apiFilters = useMemo(() => {
     const apiFiltersObj = {
       ...filters,
       page: currentPage,
@@ -94,112 +83,25 @@ export default function ShopContentWrapper({
     return apiFiltersObj;
   }, [filters, currentPage]);
 
-  // Use initial data from server, will be updated via client-side fetching for pagination
-  const [products, _setProducts] = useState(initialProducts.data);
-  const [pagination, _setPagination] = useState(initialProducts.pagination);
-  const [isLoading, _setIsLoading] = useState(false);
-  const [isError, _setIsError] = useState(false);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-
-  // Function to fetch products with current filters (for filter changes)
-  const fetchFilteredProducts = useCallback(
-    async (page = 1) => {
-      _setIsLoading(true);
-      try {
-        const params = new URLSearchParams();
-
-        // Add current filters
-        if (filters.search) params.set('search', filters.search);
-        if (filters.category) params.set('category', filters.category);
-        if (filters.subcategory) params.set('subcategory', filters.subcategory);
-        if (filters.sortBy) params.set('sortBy', filters.sortBy);
-        if (filters.sortOrder) params.set('sortOrder', filters.sortOrder);
-
-        // Add pagination params
-        params.set('page', page.toString());
-        params.set('limit', '8');
-
-        const apiUrl = `${
-          process.env.NEXT_PUBLIC_API_BASE_URL
-        }/api/product/paginated?${params.toString()}`;
-        console.log('Fetching filtered products from API:', apiUrl);
-
-        const response = await fetch(apiUrl);
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        if (data.success && data.data) {
-          // Replace products with new filtered results
-          _setProducts(data.data);
-          _setPagination(data.pagination);
-          setCurrentPage(page);
-        }
-      } catch (error) {
-        console.error('Error fetching filtered products:', error);
-        _setIsError(true);
-      } finally {
-        _setIsLoading(false);
-      }
-    },
-    [filters]
+  const { data, isLoading, isError } = useGetPaginatedProductsQuery(
+    apiFilters,
+    {
+      // Force refetch when page changes
+      refetchOnMountOrArgChange: true,
+    }
   );
 
-  // Function to load more products
-  const handleLoadMore = useCallback(async () => {
-    if (isLoadingMore || !pagination?.hasNextPage) return;
+  const products = data?.data || [];
+  const pagination = data?.pagination;
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-    setIsLoadingMore(true);
-    try {
-      const nextPage = currentPage + 1;
-      const params = new URLSearchParams();
-
-      // Add current filters
-      if (filters.search) params.set('search', filters.search);
-      if (filters.category) params.set('category', filters.category);
-      if (filters.subcategory) params.set('subcategory', filters.subcategory);
-      if (filters.sortBy) params.set('sortBy', filters.sortBy);
-      if (filters.sortOrder) params.set('sortOrder', filters.sortOrder);
-
-      // Add pagination params
-      params.set('page', nextPage.toString());
-      params.set('limit', '8');
-
-      const apiUrl = `${
-        process.env.NEXT_PUBLIC_API_BASE_URL
-      }/api/product/paginated?${params.toString()}`;
-      console.log('Fetching from API:', apiUrl);
-
-      const response = await fetch(apiUrl);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (data.success && data.data) {
-        // Append new products to existing ones
-        _setProducts((prev: any[]) => [...prev, ...data.data]);
-        _setPagination(data.pagination);
-        setCurrentPage(nextPage);
-      }
-    } catch (error) {
-      console.error('Error loading more products:', error);
-    } finally {
-      setIsLoadingMore(false);
-    }
-  }, [currentPage, filters, pagination?.hasNextPage, isLoadingMore]);
-
-  // Load more products when scroll reaches bottom (for infinite scroll)
+  // Load more products when scroll reaches bottom
   useEffect(() => {
     if (inView && pagination?.hasNextPage && !isLoadingMore) {
-      handleLoadMore();
+      const nextPage = currentPageRef.current + 1;
+      setCurrentPage(nextPage);
     }
-  }, [inView, pagination?.hasNextPage, isLoadingMore, handleLoadMore]);
+  }, [inView, pagination?.hasNextPage, isLoadingMore]);
 
   // Reset page when filters change
   useEffect(() => {
@@ -210,26 +112,6 @@ export default function ShopContentWrapper({
     filters.subcategory,
     filters.sortBy,
     filters.sortOrder,
-  ]);
-
-  // Fetch new products when filters change (debounced to avoid too many API calls)
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      // Don't fetch on initial load since we already have initial products
-      if (products.length > 0) {
-        fetchFilteredProducts(1);
-      }
-    }, 300); // 300ms debounce
-
-    return () => clearTimeout(timeoutId);
-  }, [
-    filters.search,
-    filters.category,
-    filters.subcategory,
-    filters.sortBy,
-    filters.sortOrder,
-    fetchFilteredProducts,
-    products.length,
   ]);
 
   // Synchronize URL with filters when they change
@@ -308,11 +190,8 @@ export default function ShopContentWrapper({
       const newUrl = queryString ? `/shop?${queryString}` : '/shop';
       console.log('Generated URL:', newUrl);
       router.push(newUrl);
-
-      // Fetch new products with updated filters
-      fetchFilteredProducts(1);
     },
-    [router, fetchFilteredProducts]
+    [router]
   );
 
   const handleClearFilters = useCallback(() => {
@@ -325,10 +204,20 @@ export default function ShopContentWrapper({
     });
     // Clear URL parameters when filters are cleared
     router.push('/shop');
+  }, [router]);
 
-    // Fetch products without filters
-    fetchFilteredProducts(1);
-  }, [router, fetchFilteredProducts]);
+  const handleLoadMore = useCallback(async () => {
+    if (pagination?.hasNextPage && !isLoadingMore) {
+      setIsLoadingMore(true);
+
+      // Increment page and trigger new API call
+      const nextPage = currentPageRef.current + 1;
+      setCurrentPage(nextPage);
+
+      // Small delay to show loading state
+      setTimeout(() => setIsLoadingMore(false), 1000);
+    }
+  }, [pagination?.hasNextPage, isLoadingMore]);
 
   const handleAddToCart = useCallback(
     (product: Product) => {
@@ -398,7 +287,6 @@ export default function ShopContentWrapper({
             <div className="sticky top-6">
               <ShopFilters
                 filters={filters}
-                categories={initialCategories}
                 onFiltersChange={handleFiltersChange}
                 onClearFilters={handleClearFilters}
               />
@@ -425,7 +313,6 @@ export default function ShopContentWrapper({
                   </SheetHeader>
                   <ShopFilters
                     filters={filters}
-                    categories={initialCategories}
                     onFiltersChange={handleFiltersChange}
                     onClearFilters={handleClearFilters}
                   />
@@ -482,10 +369,10 @@ export default function ShopContentWrapper({
                     ))}
                 </div>
 
-                {/* Infinite Scroll Loading Indicator */}
+                {/* Load More Section */}
                 {pagination?.hasNextPage && (
                   <div ref={loadMoreRef} className="mt-8 text-center">
-                    {isLoadingMore && (
+                    {isLoadingMore ? (
                       <div className="flex justify-center">
                         <div className="flex items-center gap-2">
                           <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
@@ -494,6 +381,14 @@ export default function ShopContentWrapper({
                           </span>
                         </div>
                       </div>
+                    ) : (
+                      <Button
+                        onClick={handleLoadMore}
+                        variant="outline"
+                        className="mx-auto"
+                      >
+                        Loading More Products
+                      </Button>
                     )}
                   </div>
                 )}
