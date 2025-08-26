@@ -46,12 +46,19 @@ async function fetchFromAPI<T>(
 // Cached categories fetch - this is the key optimization
 export const getCategories = unstable_cache(
   async () => {
-    // During build time, return empty array to avoid prerender errors
-    if (process.env.NODE_ENV === 'production') {
+    // Only return empty array during build/export, not during runtime
+    if (
+      process.env.NODE_ENV === 'production' &&
+      !process.env.NEXT_PUBLIC_API_BASE_URL
+    ) {
+      console.warn(
+        'Production build without API URL, returning empty categories'
+      );
       return [];
     }
 
     try {
+      console.log('Fetching categories from API...');
       const data = await fetchFromAPI<{ result: CategoryItem[] }>(
         '/api/category/show'
       );
@@ -63,12 +70,17 @@ export const getCategories = unstable_cache(
         return [];
       }
 
-      return categories.filter(
+      const filteredCategories = categories.filter(
         category =>
           category &&
           (category.products?.length ?? 0) > 0 &&
           category.status === 'Show'
       );
+
+      console.log(
+        `Fetched ${filteredCategories.length} categories successfully`
+      );
+      return filteredCategories;
     } catch (error) {
       console.error('Error fetching categories:', error);
       return [];
@@ -84,8 +96,11 @@ export const getCategories = unstable_cache(
 // Get categories for specific product type
 export const getProductTypeCategories = unstable_cache(
   async (type: string) => {
-    // During build time, return empty array to avoid prerender errors
-    if (process.env.NODE_ENV === 'production') {
+    // Only return empty array during build/export, not during runtime
+    if (
+      process.env.NODE_ENV === 'production' &&
+      !process.env.NEXT_PUBLIC_API_BASE_URL
+    ) {
       return [];
     }
 
@@ -113,8 +128,11 @@ export const getProductTypeCategories = unstable_cache(
 // Get all categories (for admin/management)
 export const getAllCategories = unstable_cache(
   async () => {
-    // During build time, return empty array to avoid prerender errors
-    if (process.env.NODE_ENV === 'production') {
+    // Only return empty array during build/export, not during runtime
+    if (
+      process.env.NODE_ENV === 'production' &&
+      !process.env.NEXT_PUBLIC_API_BASE_URL
+    ) {
       return [];
     }
 
@@ -139,8 +157,11 @@ export const getAllCategories = unstable_cache(
 // Get single category by ID
 export const getCategoryById = unstable_cache(
   async (id: string) => {
-    // During build time, return null to avoid prerender errors
-    if (process.env.NODE_ENV === 'production') {
+    // Only return null during build/export, not during runtime
+    if (
+      process.env.NODE_ENV === 'production' &&
+      !process.env.NEXT_PUBLIC_API_BASE_URL
+    ) {
       return null;
     }
 
