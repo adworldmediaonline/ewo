@@ -54,7 +54,7 @@ export function SignUpForm({
     setError('');
     setSuccess('');
 
-    const { data, error: signUpError } = await authClient.signUp.email(
+    const { data: _data, error: signUpError } = await authClient.signUp.email(
       {
         email,
         password,

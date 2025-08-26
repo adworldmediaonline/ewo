@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import { useEffect } from 'react';
 
 export default function MetaPixel() {
@@ -50,9 +51,9 @@ export default function MetaPixel() {
     <>
       {/* Meta Pixel noscript fallback */}
       <noscript>
-        <img
-          height="1"
-          width="1"
+        <Image
+          height={1}
+          width={1}
           style={{ display: 'none' }}
           src={`https://www.facebook.com/tr?id=${PIXEL_ID}&ev=PageView&noscript=1`}
           alt="Meta Pixel"

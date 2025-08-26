@@ -35,8 +35,8 @@ const ProfileLayout: React.FC<ProfileLayoutProps> = ({
   user,
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const router = useRouter();
-  const pathname = usePathname();
+  const _router = useRouter();
+  const _pathname = usePathname();
 
   const navigationItems = [
     {

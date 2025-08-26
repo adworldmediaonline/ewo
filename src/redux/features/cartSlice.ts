@@ -69,9 +69,9 @@ const checkFirstTimeCustomer = (): boolean => {
 };
 
 // Helper function to mark discount as used (should only be called on order completion)
-const markDiscountAsUsed = (): void => {
-  localStorage.setItem('first_time_discount_used', 'true');
-};
+// const markDiscountAsUsed = (): void => {
+//   localStorage.setItem('first_time_discount_used', 'true');
+// };
 
 // Helper function to calculate shipping discount
 const calculateShippingDiscount = (items: CartProduct[]): number => {
@@ -128,8 +128,8 @@ export const cartSlice = createSlice({
   reducers: {
     add_cart_product: (state, { payload }: PayloadAction<CartProduct>) => {
       // Check if this is the first product being added to cart
-      const isFirstProduct = state.cart_products.length === 0;
-      const isFirstTimeCustomer = checkFirstTimeCustomer();
+      // const isFirstProduct = state.cart_products.length === 0;
+      // const isFirstTimeCustomer = checkFirstTimeCustomer();
 
       // Create unique identifier that includes selected option if present
       const productId = payload.selectedOption

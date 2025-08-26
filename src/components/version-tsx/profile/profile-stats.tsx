@@ -1,15 +1,15 @@
 'use client';
 
-import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { 
-  ShoppingBag, 
-  Heart, 
-  Star, 
+import React from 'react';
+
+import {
+  Award,
   Clock,
+  Heart,
+  ShoppingBag,
+  Star,
   TrendingUp,
-  Award
 } from 'lucide-react';
 
 interface ProfileStatsProps {
@@ -30,43 +30,43 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({ stats }) => {
       label: 'Total Orders',
       value: stats.totalOrders.toString(),
       description: 'Orders placed',
-      color: 'bg-blue-500/10 text-blue-600'
+      color: 'bg-blue-500/10 text-blue-600',
     },
     {
       icon: TrendingUp,
       label: 'Total Spent',
       value: `$${stats.totalSpent.toFixed(2)}`,
       description: 'Lifetime spending',
-      color: 'bg-green-500/10 text-green-600'
+      color: 'bg-green-500/10 text-green-600',
     },
     {
       icon: Heart,
       label: 'Wishlist Items',
       value: stats.wishlistItems.toString(),
       description: 'Saved products',
-      color: 'bg-pink-500/10 text-pink-600'
+      color: 'bg-pink-500/10 text-pink-600',
     },
     {
       icon: Star,
       label: 'Reviews',
       value: stats.reviews.toString(),
       description: 'Product reviews',
-      color: 'bg-yellow-500/10 text-yellow-600'
+      color: 'bg-yellow-500/10 text-yellow-600',
     },
     {
       icon: Clock,
       label: 'Member Since',
       value: stats.memberSince,
       description: 'Join date',
-      color: 'bg-purple-500/10 text-purple-600'
+      color: 'bg-purple-500/10 text-purple-600',
     },
     {
       icon: Award,
       label: 'Loyalty Points',
       value: stats.loyaltyPoints?.toString() || '0',
       description: 'Earned points',
-      color: 'bg-orange-500/10 text-orange-600'
-    }
+      color: 'bg-orange-500/10 text-orange-600',
+    },
   ];
 
   return (
@@ -85,9 +85,7 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({ stats }) => {
           </CardHeader>
           <CardContent>
             <div className="space-y-1">
-              <p className="text-2xl font-bold text-foreground">
-                {item.value}
-              </p>
+              <p className="text-2xl font-bold text-foreground">{item.value}</p>
               <p className="text-xs text-muted-foreground">
                 {item.description}
               </p>

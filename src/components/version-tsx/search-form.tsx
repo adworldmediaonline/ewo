@@ -54,60 +54,63 @@ export default function SearchForm({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const fetchSuggestions = async (term: string): Promise<void> => {
-    if (!term || term.length < 2) {
-      setSuggestions([]);
-      setShowSuggestions(false);
-      setMessage('');
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      setError(null);
-      setMessage('');
-
-      const response = await fetch(
-        `${API_URL}/api/product/suggestions?term=${encodeURIComponent(term)}`,
-        {
-          method: 'GET',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (data?.success) {
-        setSuggestions(data.suggestions);
-        setShowSuggestions(true);
-        setMessage(data.message || '');
-      } else {
+  const fetchSuggestions = React.useCallback(
+    async (term: string): Promise<void> => {
+      if (!term || term.length < 2) {
         setSuggestions([]);
         setShowSuggestions(false);
         setMessage('');
+        return;
       }
-    } catch (err: unknown) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Something went wrong';
-      setError(errorMessage);
-      setSuggestions([]);
-      setShowSuggestions(false);
-      setMessage('');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
-  const debouncedFetchSuggestions = React.useCallback(
-    debounce(fetchSuggestions, 300),
+      try {
+        setIsLoading(true);
+        setError(null);
+        setMessage('');
+
+        const response = await fetch(
+          `${API_URL}/api/product/suggestions?term=${encodeURIComponent(term)}`,
+          {
+            method: 'GET',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data?.success) {
+          setSuggestions(data.suggestions);
+          setShowSuggestions(true);
+          setMessage(data.message || '');
+        } else {
+          setSuggestions([]);
+          setShowSuggestions(false);
+          setMessage('');
+        }
+      } catch (err: unknown) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Something went wrong';
+        setError(errorMessage);
+        setSuggestions([]);
+        setShowSuggestions(false);
+        setMessage('');
+      } finally {
+        setIsLoading(false);
+      }
+    },
     []
+  );
+
+  const debouncedFetchSuggestions = React.useMemo(
+    () => debounce(fetchSuggestions, 300),
+    [fetchSuggestions]
   );
 
   // Handle input change

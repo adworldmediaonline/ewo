@@ -31,6 +31,7 @@ import {
   Truck,
   User,
 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 // Loading State Component
@@ -191,7 +192,7 @@ export default function OrderArea({ orderId }: { orderId: string }) {
     cart,
     shippingCost,
     discount,
-    totalAmount,
+    // totalAmount,
     paymentMethod,
     status,
     email,
@@ -600,9 +601,11 @@ export default function OrderArea({ orderId }: { orderId: string }) {
                   className="flex items-center gap-4 p-4 rounded-lg border bg-muted/30"
                 >
                   <div className="w-16 h-16 flex-shrink-0">
-                    <img
+                    <Image
                       src={item.img}
                       alt={item.title}
+                      width={64}
+                      height={64}
                       className="w-full h-full object-cover rounded-md"
                     />
                   </div>

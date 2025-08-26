@@ -41,7 +41,7 @@ export const productApi = apiSlice.injectEndpoints({
       },
       serializeQueryArgs: ({ queryArgs }) => {
         // Create a stable cache key that excludes the page number
-        const { page, ...rest } = queryArgs;
+        const { page: _page, ...rest } = queryArgs;
         return JSON.stringify(rest);
       },
       merge: (currentCache, newItems, { arg }) => {
@@ -63,15 +63,15 @@ export const productApi = apiSlice.injectEndpoints({
       forceRefetch: ({ currentArg, previousArg }) => {
         // Force refetch when filters change (not just page)
         if (!previousArg || !currentArg) return true;
-        const { page: currentPage, ...currentFilters } = currentArg;
-        const { page: previousPage, ...previousFilters } = previousArg;
+        const { page: _currentPage, ...currentFilters } = currentArg;
+        const { page: _previousPage, ...previousFilters } = previousArg;
         return (
           JSON.stringify(currentFilters) !== JSON.stringify(previousFilters)
         );
       },
       // Add a key to ensure re-fetching when page changes
       keepUnusedDataFor: 0,
-      providesTags: (result, error, arg) =>
+      providesTags: (result, _error, _arg) =>
         result
           ? [
               ...result.data.map(({ _id }) => ({
@@ -97,12 +97,12 @@ export const productApi = apiSlice.injectEndpoints({
     // get single product
     getProduct: builder.query({
       query: (id: string) => `/api/product/single-product/${id}`,
-      providesTags: (result, error, id) => [{ type: 'Product', id }],
+      providesTags: (result, _error, id) => [{ type: 'Product', id }],
     }),
     // get related products
     getRelatedProducts: builder.query({
       query: (id: string) => `/api/product/related-product/${id}`,
-      providesTags: (result, error, id) => [{ type: 'RelatedProducts', id }],
+      providesTags: (result, _error, id) => [{ type: 'RelatedProducts', id }],
     }),
   }),
 });

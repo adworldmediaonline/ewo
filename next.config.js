@@ -3,22 +3,27 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: "https",
+        protocol: 'https',
         hostname: 'i.ibb.co',
-        pathname: "**",
+        pathname: '**',
       },
       {
-        protocol: "https",
+        protocol: 'https',
         hostname: 'res.cloudinary.com',
-        pathname: "**",
+        pathname: '**',
       },
       {
-        protocol: "https",
+        protocol: 'https',
         hostname: 'lh3.googleusercontent.com',
-        pathname: "**",
-      }
+        pathname: '**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.facebook.com',
+        pathname: '**',
+      },
     ],
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

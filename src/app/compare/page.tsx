@@ -5,7 +5,7 @@
 // import Wrapper from '@/components/wrapper';
 
 import { Metadata } from 'next';
-import { de } from 'zod/v4/locales';
+// import { de } from 'zod/v4/locales';
 
 export const metadata: Metadata = {
   title: 'EWO - Compare',

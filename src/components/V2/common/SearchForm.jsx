@@ -5,7 +5,7 @@ import { replaceTextCharacters } from '@/lib/replaceTextCharacters';
 import { debounce } from 'lodash';
 import Form from 'next/form';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import SearchButton from './SearchButton';
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:7000';
@@ -41,7 +41,7 @@ export default function SearchForm({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const fetchSuggestions = async term => {
+  const fetchSuggestions = useCallback(async term => {
     if (!term || term.length < 2) {
       setSuggestions([]);
       setShowSuggestions(false);
@@ -90,11 +90,11 @@ export default function SearchForm({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const debouncedFetchSuggestions = useCallback(
-    debounce(fetchSuggestions, 300),
-    []
+  const debouncedFetchSuggestions = useMemo(
+    () => debounce(fetchSuggestions, 300),
+    [fetchSuggestions]
   );
 
   // Handle input change
