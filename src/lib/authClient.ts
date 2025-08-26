@@ -5,8 +5,13 @@ import {
 import { createAuthClient } from 'better-auth/react';
 
 export const authClient = createAuthClient({
-  // baseURL: 'http://localhost:8090/api/auth',
-  baseURL: 'https://ewo-backend.vercel.app/api/auth',
+  // baseURL: 'http://localhost:8090',
+  baseURL: 'https://ewo-backend.vercel.app',
+  // 🔑 Ensure cookies flow cross-site
+  fetchOptions: {
+    credentials: 'include',
+  },
+
   plugins: [
     emailOTPClient(),
     inferAdditionalFields({
