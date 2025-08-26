@@ -44,7 +44,9 @@ export default function ShopContentWrapper() {
   const dispatch = useDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { cart_products: _cart_products } = useSelector((state: any) => state.cart);
+  const { cart_products: _cart_products } = useSelector(
+    (state: any) => state.cart
+  );
   const { wishlist: _wishlist } = useSelector((state: any) => state.wishlist);
 
   // Initialize filters from URL parameters
@@ -142,7 +144,14 @@ export default function ShopContentWrapper() {
         sortOrder: currentSortOrder as 'asc' | 'desc',
       });
     }
-  }, [searchParams, filters.search, filters.category, filters.subcategory, filters.sortBy, filters.sortOrder]);
+  }, [
+    searchParams,
+    filters.search,
+    filters.category,
+    filters.subcategory,
+    filters.sortBy,
+    filters.sortOrder,
+  ]);
 
   const handleFiltersChange = useCallback(
     (newFilters: ShopFiltersType) => {
