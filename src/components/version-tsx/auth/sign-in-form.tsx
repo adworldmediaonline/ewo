@@ -32,7 +32,7 @@ export function SignInForm({
 }: SignInFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(true);
+  const [_rememberMe, _setRememberMe] = useState(true);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -43,7 +43,7 @@ export function SignInForm({
     setError('');
 
     try {
-      const { data, error: signInError } = await authClient.signIn.email(
+      const { data: _data, error: signInError } = await authClient.signIn.email(
         {
           email,
           password,

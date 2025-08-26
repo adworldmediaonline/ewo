@@ -3,7 +3,9 @@ import { usePathname } from 'next/navigation';
 import { PropsWithChildren } from 'react';
 import TawkToChat from '../tawk-to-chat';
 
-export default function CurrentPath({ children }: PropsWithChildren) {
+export default function CurrentPath({
+  children: _children,
+}: PropsWithChildren) {
   const pathname = usePathname();
 
   const content = () => {

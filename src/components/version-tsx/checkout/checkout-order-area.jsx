@@ -1,7 +1,9 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import Image from 'next/image';
 // internal
+import { ScrollArea } from '@/components/ui/scroll-area';
 import useCartInfo from '@/hooks/use-cart-info';
 import {
   add_cart_product,
@@ -9,7 +11,6 @@ import {
 } from '@/redux/features/cartSlice';
 import { load_applied_coupons } from '@/redux/features/coupon/couponSlice';
 import { Minus, Plus } from '@/svg';
-import { ScrollArea } from '@/components/ui/scroll-area';
 // Removed CSS module import; Tailwind-only styling
 
 export default function CheckoutOrderArea({ checkoutData, isGuest }) {
@@ -181,9 +182,11 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
             >
               <div className="flex items-center space-x-3 md:space-x-4">
                 <div className="w-12 h-12 md:w-16 md:h-16 rounded-md overflow-hidden">
-                  <img
+                  <Image
                     src={item.img || '/placeholder-product.png'}
                     alt={item.title}
+                    width={64}
+                    height={64}
                     className="w-full h-full object-cover"
                   />
                 </div>

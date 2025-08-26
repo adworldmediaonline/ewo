@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
-import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 // Define CartProduct and CartState types locally (from cartSlice.ts)
 interface SelectedOption {
   title: string;
@@ -80,10 +80,10 @@ import {
 } from '@/components/ui/alert-dialog';
 
 export default function CartArea() {
-  const { cart_products, firstTimeDiscount } = useSelector(
+  const { cart_products } = useSelector(
     (state: RootState) => state.cart as CartState
   );
-  const { firstTimeDiscountAmount } = useCartInfo();
+  const { firstTimeDiscountAmount: _firstTimeDiscountAmount } = useCartInfo();
   const dispatch = useDispatch();
   const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
 

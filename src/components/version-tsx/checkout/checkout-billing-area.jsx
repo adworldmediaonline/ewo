@@ -112,7 +112,7 @@ const CheckoutBillingArea = ({
       }
       setCities([]);
     }
-  }, [selectedCountry]);
+  }, [selectedCountry, selectedState]);
 
   useEffect(() => {
     if (selectedCountry && selectedState) {

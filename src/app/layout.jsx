@@ -4,6 +4,7 @@ import { Toaster } from '@/components/ui/sonner';
 import Wrapper from '@/components/wrapper';
 import { GoogleTagManager } from '@next/third-parties/google';
 import { Lato } from 'next/font/google';
+import Image from 'next/image';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import Footer from '../components/version-tsx/footer';
 import HeaderV2 from '../components/version-tsx/header';
@@ -57,9 +58,9 @@ export default function RootLayout({ children }) {
           }}
         />
         <noscript>
-          <img
-            height="1"
-            width="1"
+          <Image
+            height={1}
+            width={1}
             style={{ display: 'none' }}
             src="https://www.facebook.com/tr?id=595879356450357&ev=PageView&noscript=1"
             alt=""
@@ -96,12 +97,12 @@ export default function RootLayout({ children }) {
         />
 
         {/* Tawk.to Script - Simple approach compatible with server components */}
-        {/* <div suppressHydrationWarning>
-          <Script
-            id="tawk-to-script"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `
+
+        {/* <Script
+          id="tawk-to-script"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
                 (function() {
                   if (typeof window === 'undefined') return;
                   if (window.Tawk_API) return;
@@ -126,9 +127,8 @@ export default function RootLayout({ children }) {
                   }
                 })();
               `,
-            }}
-          />
-        </div> */}
+          }}
+        /> */}
       </body>
     </html>
   );

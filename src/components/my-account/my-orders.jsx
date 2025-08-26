@@ -1,5 +1,6 @@
 'use client';
 import dayjs from 'dayjs';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 const styles = new Proxy({}, { get: () => '' });
@@ -169,14 +170,14 @@ const OrderTimeline = ({ order }) => {
           return (
             <div
               key={stage.key}
-              className={` ${
-                isCompleted ? styles.completed : ''
-              } ${isCurrent ? styles.current : ''}`}
+              className={` ${isCompleted ? styles.completed : ''} ${
+                isCurrent ? styles.current : ''
+              }`}
             >
               <div
-                className={` ${
-                  isCompleted ? styles.completed : ''
-                } ${isCurrent ? styles.current : ''}`}
+                className={` ${isCompleted ? styles.completed : ''} ${
+                  isCurrent ? styles.current : ''
+                }`}
               >
                 <IconComponent status={stage.key} />
               </div>
@@ -274,9 +275,7 @@ export default function MyOrders({ orderData }) {
       <div className="">
         <div className="">🛒</div>
         <h3 className="">No Orders Yet!</h3>
-        <p className="">
-          Start shopping to see your orders here
-        </p>
+        <p className="">Start shopping to see your orders here</p>
         <Link href="/shop" className="">
           Start Shopping
         </Link>
@@ -292,9 +291,7 @@ export default function MyOrders({ orderData }) {
           {Object.entries(filterCounts).map(([key, count]) => (
             <button
               key={key}
-              className={` ${
-                filter === key ? styles.active : ''
-              }`}
+              className={` ${filter === key ? styles.active : ''}`}
               onClick={() => setFilter(key)}
             >
               {key.charAt(0).toUpperCase() + key.slice(1)}
@@ -312,10 +309,7 @@ export default function MyOrders({ orderData }) {
           return (
             <div key={order._id} className="">
               {/* Order Header */}
-              <div
-                className=""
-                onClick={() => toggleOrderExpansion(order._id)}
-              >
+              <div className="" onClick={() => toggleOrderExpansion(order._id)}>
                 <div className="">
                   <div className="">
                     <div className="">
@@ -346,9 +340,7 @@ export default function MyOrders({ orderData }) {
                     </div>
 
                     <span
-                      className={` ${
-                        styles[getStatusClass(order.status)]
-                      }`}
+                      className={` ${styles[getStatusClass(order.status)]}`}
                     >
                       {formatStatusText(order.status)}
                     </span>
@@ -367,35 +359,29 @@ export default function MyOrders({ orderData }) {
                   {/* Order Items */}
                   {order.cart && order.cart.length > 0 && (
                     <div className="">
-                      <h5 className="">
-                        Order Items ({order.cart.length})
-                      </h5>
+                      <h5 className="">Order Items ({order.cart.length})</h5>
                       <div className="">
                         {order.cart.slice(0, 3).map((item, index) => (
                           <div key={index} className="">
-                            <img
+                            <Image
                               src={
                                 item.img ||
                                 item.image?.url ||
                                 '/placeholder.png'
                               }
                               alt={item.title}
+                              width={50}
+                              height={50}
                               className=""
                               onError={e => {
                                 e.target.src = '/placeholder.png';
                               }}
                             />
                             <div className="">
-                              <h6 className="">
-                                {item.title}
-                              </h6>
-                              <p className="">
-                                ${item.price?.toFixed(2)} each
-                              </p>
+                              <h6 className="">{item.title}</h6>
+                              <p className="">${item.price?.toFixed(2)} each</p>
                             </div>
-                            <div className="">
-                              {item.orderQuantity}
-                            </div>
+                            <div className="">{item.orderQuantity}</div>
                             <div className="">
                               ${(item.price * item.orderQuantity).toFixed(2)}
                             </div>
@@ -436,16 +422,12 @@ export default function MyOrders({ orderData }) {
                       {/* First Time Discount */}
                       {order.firstTimeDiscount?.isApplied &&
                         order.firstTimeDiscount?.amount > 0 && (
-                          <div
-                            className=" "
-                          >
+                          <div className=" ">
                             <span className="">
                               🎉 First-time order discount (-
                               {order.firstTimeDiscount?.percentage || 10}%):
                             </span>
-                            <span
-                              className=" "
-                            >
+                            <span className=" ">
                               -${order.firstTimeDiscount.amount.toFixed(2)}
                             </span>
                           </div>
@@ -456,17 +438,12 @@ export default function MyOrders({ orderData }) {
                         order.appliedCoupons.length > 0 && (
                           <>
                             {order.appliedCoupons.map((coupon, index) => (
-                              <div
-                                key={index}
-                                className=" "
-                              >
+                              <div key={index} className=" ">
                                 <span className="">
                                   Coupon {coupon.couponCode} ({coupon.title}
                                   ):
                                 </span>
-                                <span
-                                  className=" "
-                                >
+                                <span className=" ">
                                   -$
                                   {(
                                     coupon.discountAmount ||
@@ -483,16 +460,12 @@ export default function MyOrders({ orderData }) {
                       {!order.appliedCoupons?.length &&
                         order.appliedCoupon &&
                         order.appliedCoupon.discountAmount > 0 && (
-                          <div
-                            className=" "
-                          >
+                          <div className=" ">
                             <span className="">
                               Coupon {order.appliedCoupon.couponCode} (
                               {order.appliedCoupon.title}):
                             </span>
-                            <span
-                              className=" "
-                            >
+                            <span className=" ">
                               -${order.appliedCoupon.discountAmount.toFixed(2)}
                             </span>
                           </div>
@@ -502,28 +475,18 @@ export default function MyOrders({ orderData }) {
                       {!order.appliedCoupons?.length &&
                         !order.appliedCoupon?.discountAmount &&
                         order.discount > 0 && (
-                          <div
-                            className=" "
-                          >
-                            <span className="">
-                              💰 Discount:
-                            </span>
-                            <span
-                              className=" "
-                            >
+                          <div className=" ">
+                            <span className="">💰 Discount:</span>
+                            <span className=" ">
                               -${order.discount.toFixed(2)}
                             </span>
                           </div>
                         )}
 
                       {/* Total */}
-                      <div
-                        className=" "
-                      >
+                      <div className=" ">
                         <span className="">Total:</span>
-                        <span
-                          className=" "
-                        >
+                        <span className=" ">
                           ${order.totalAmount?.toFixed(2) || '0.00'}
                         </span>
                       </div>
@@ -533,14 +496,10 @@ export default function MyOrders({ orderData }) {
                   {/* Shipping Information */}
                   {order.address && (
                     <div className="">
-                      <h5 className="">
-                        Shipping Information
-                      </h5>
+                      <h5 className="">Shipping Information</h5>
                       <div className="">
                         <div className="">
-                          <span className="">
-                            Delivery Address:
-                          </span>
+                          <span className="">Delivery Address:</span>
                           <span className="">
                             {order.name}, {order.address}, {order.city},{' '}
                             {order.state} {order.zipCode}
@@ -548,12 +507,8 @@ export default function MyOrders({ orderData }) {
                         </div>
                         {order.shippingDetails?.trackingNumber && (
                           <div className="">
-                            <span className="">
-                              Tracking Number:
-                            </span>
-                            <span
-                              className=" "
-                            >
+                            <span className="">Tracking Number:</span>
+                            <span className=" ">
                               {order.shippingDetails.trackingNumber}
                             </span>
                           </div>
@@ -564,18 +519,11 @@ export default function MyOrders({ orderData }) {
 
                   {/* Order Actions */}
                   <div className="">
-                    <Link
-                      href={`/order/${order._id}`}
-                      className=" "
-                    >
+                    <Link href={`/order/${order._id}`} className=" ">
                       View Details
                     </Link>
                     {order.status?.toLowerCase() === 'delivered' && (
-                      <button
-                        className=" "
-                      >
-                        Leave Review
-                      </button>
+                      <button className=" ">Leave Review</button>
                     )}
                   </div>
                 </div>
@@ -589,13 +537,8 @@ export default function MyOrders({ orderData }) {
         <div className="">
           <div className="">🔍</div>
           <h4 className="">No {filter} orders found</h4>
-          <p className="">
-            Try changing the filter to see more orders
-          </p>
-          <button
-            className=""
-            onClick={() => setFilter('all')}
-          >
+          <p className="">Try changing the filter to see more orders</p>
+          <button className="" onClick={() => setFilter('all')}>
             Show All Orders
           </button>
         </div>

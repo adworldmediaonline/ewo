@@ -106,7 +106,7 @@ const CategoryCardSkeleton = () => (
 );
 
 export default function CategoryShowcase() {
-  const { data, isLoading, isError, refetch } =
+  const { data, isLoading, isError } =
     useGetShowCategoryQuery('category-showcase');
   const router = useRouter();
 

@@ -50,7 +50,7 @@ export default function DashboardPage() {
   useEffect(() => {
     if (session) {
       const interval = setInterval(() => {
-        authClient.getSession().then(({ data }) => {
+        authClient.getSession().then(({ data: _data }) => {
           // Session will be automatically updated by the authClient
         });
       }, 60000); // Refresh every minute

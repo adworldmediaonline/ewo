@@ -1,19 +1,19 @@
 'use client';
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { 
-  Package, 
-  Calendar, 
-  DollarSign, 
-  Eye,
-  Clock,
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React from 'react';
+
+import {
+  AlertCircle,
+  Calendar,
   CheckCircle,
+  Clock,
+  DollarSign,
+  Eye,
+  Package,
   XCircle,
-  AlertCircle
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -40,10 +40,10 @@ interface ProfileOrdersProps {
   onViewOrder?: (orderId: string) => void;
 }
 
-const ProfileOrders: React.FC<ProfileOrdersProps> = ({ 
-  orders, 
-  isLoading = false, 
-  onViewOrder 
+const ProfileOrders: React.FC<ProfileOrdersProps> = ({
+  orders,
+  isLoading = false,
+  onViewOrder,
 }) => {
   const getStatusIcon = (status: string) => {
     switch (status.toLowerCase()) {
@@ -90,7 +90,7 @@ const ProfileOrders: React.FC<ProfileOrdersProps> = ({
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
+            {[1, 2, 3].map(i => (
               <div key={i} className="animate-pulse">
                 <div className="h-20 bg-muted rounded-lg"></div>
               </div>
@@ -138,14 +138,19 @@ const ProfileOrders: React.FC<ProfileOrdersProps> = ({
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {orders.slice(0, 5).map((order) => (
-            <div key={order._id} className="border rounded-lg p-4 hover:shadow-sm transition-shadow">
+          {orders.slice(0, 5).map(order => (
+            <div
+              key={order._id}
+              className="border rounded-lg p-4 hover:shadow-sm transition-shadow"
+            >
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div className="flex-1 space-y-3">
                   <div className="flex items-center gap-3">
-                    <Badge 
-                      variant="outline" 
-                      className={`${getStatusColor(order.status)} flex items-center gap-1`}
+                    <Badge
+                      variant="outline"
+                      className={`${getStatusColor(
+                        order.status
+                      )} flex items-center gap-1`}
                     >
                       {getStatusIcon(order.status)}
                       {order.status}
@@ -154,11 +159,13 @@ const ProfileOrders: React.FC<ProfileOrdersProps> = ({
                       #{order.orderNumber}
                     </span>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <Calendar className="h-4 w-4" />
-                      <span>{new Date(order.orderDate).toLocaleDateString()}</span>
+                      <span>
+                        {new Date(order.orderDate).toLocaleDateString()}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <DollarSign className="h-4 w-4" />
@@ -169,10 +176,13 @@ const ProfileOrders: React.FC<ProfileOrdersProps> = ({
                       <span>{order.items.length} item(s)</span>
                     </div>
                   </div>
-                  
+
                   <div className="flex flex-wrap gap-2">
                     {order.items.slice(0, 3).map((item, index) => (
-                      <div key={index} className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <div
+                        key={index}
+                        className="flex items-center gap-2 text-xs text-muted-foreground"
+                      >
                         <span>{item.product.title}</span>
                         <span className="text-xs">×{item.quantity}</span>
                       </div>
@@ -184,7 +194,7 @@ const ProfileOrders: React.FC<ProfileOrdersProps> = ({
                     )}
                   </div>
                 </div>
-                
+
                 <div className="flex flex-col gap-2">
                   <Button
                     variant="outline"
@@ -199,7 +209,7 @@ const ProfileOrders: React.FC<ProfileOrdersProps> = ({
               </div>
             </div>
           ))}
-          
+
           {orders.length > 5 && (
             <div className="pt-4 border-t">
               <Button variant="outline" className="w-full" asChild>

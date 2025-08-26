@@ -1,12 +1,12 @@
 'use client';
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { User, Mail, Phone, MapPin, Calendar, Edit } from 'lucide-react';
+import { Edit, Mail, MapPin, Phone } from 'lucide-react';
+import React from 'react';
 
 interface ProfileHeaderProps {
   user: {
@@ -58,7 +58,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onEdit }) => {
               {getInitials(user.name)}
             </AvatarFallback>
           </Avatar>
-          
+
           <div className="flex-1 space-y-4">
             <div>
               <h2 className="text-3xl font-bold text-foreground mb-2">
@@ -68,20 +68,20 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onEdit }) => {
                 Member since {user.joinDate || 'N/A'}
               </Badge>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-center gap-3 text-muted-foreground">
                 <Mail className="h-4 w-4" />
                 <span className="text-sm">{user.email}</span>
               </div>
-              
+
               {user.phone && (
                 <div className="flex items-center gap-3 text-muted-foreground">
                   <Phone className="h-4 w-4" />
                   <span className="text-sm">{user.phone}</span>
                 </div>
               )}
-              
+
               {user.address && (
                 <div className="flex items-center gap-3 text-muted-foreground md:col-span-2">
                   <MapPin className="h-4 w-4" />
@@ -91,7 +91,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onEdit }) => {
             </div>
           </div>
         </div>
-        
+
         <Separator />
       </CardContent>
     </Card>

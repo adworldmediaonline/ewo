@@ -1,22 +1,20 @@
 'use client';
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { 
-  Settings, 
-  Shield, 
-  Heart, 
-  ShoppingBag, 
-  Star, 
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Heart,
   HelpCircle,
   LogOut,
+  MapPin,
+  Settings,
+  Shield,
+  ShoppingBag,
+  Star,
   User,
-  CreditCard,
-  MapPin
 } from 'lucide-react';
 import Link from 'next/link';
+import React from 'react';
 
 interface ProfileActionsProps {
   onLogout?: () => void;
@@ -27,7 +25,7 @@ interface ProfileActionsProps {
 const ProfileActions: React.FC<ProfileActionsProps> = ({
   onLogout,
   onEditProfile,
-  onChangePassword
+  onChangePassword,
 }) => {
   const actionGroups = [
     {
@@ -38,23 +36,23 @@ const ProfileActions: React.FC<ProfileActionsProps> = ({
           label: 'Edit Profile',
           description: 'Update your personal information',
           onClick: onEditProfile,
-          variant: 'outline' as const
+          variant: 'outline' as const,
         },
         {
           icon: Shield,
           label: 'Change Password',
           description: 'Update your account password',
           onClick: onChangePassword,
-          variant: 'outline' as const
+          variant: 'outline' as const,
         },
         {
           icon: Settings,
           label: 'Account Settings',
           description: 'Manage your account preferences',
           href: '/settings',
-          variant: 'outline' as const
-        }
-      ]
+          variant: 'outline' as const,
+        },
+      ],
     },
     {
       title: 'Shopping & Orders',
@@ -64,23 +62,23 @@ const ProfileActions: React.FC<ProfileActionsProps> = ({
           label: 'My Orders',
           description: 'View and track your orders',
           href: '/orders',
-          variant: 'outline' as const
+          variant: 'outline' as const,
         },
         {
           icon: Heart,
           label: 'Wishlist',
           description: 'View your saved products',
           href: '/wishlist',
-          variant: 'outline' as const
+          variant: 'outline' as const,
         },
         {
           icon: Star,
           label: 'My Reviews',
           description: 'Manage your product reviews',
           href: '/reviews',
-          variant: 'outline' as const
-        }
-      ]
+          variant: 'outline' as const,
+        },
+      ],
     },
     {
       title: 'Support & Help',
@@ -90,17 +88,17 @@ const ProfileActions: React.FC<ProfileActionsProps> = ({
           label: 'Help Center',
           description: 'Get help and support',
           href: '/help',
-          variant: 'outline' as const
+          variant: 'outline' as const,
         },
         {
           icon: MapPin,
           label: 'Contact Support',
           description: 'Reach out to our team',
           href: '/contact',
-          variant: 'outline' as const
-        }
-      ]
-    }
+          variant: 'outline' as const,
+        },
+      ],
+    },
   ];
 
   return (
@@ -153,14 +151,10 @@ const ProfileActions: React.FC<ProfileActionsProps> = ({
           </CardContent>
         </Card>
       ))}
-      
+
       <Card className="border-destructive/20">
         <CardContent className="pt-6">
-          <Button
-            variant="destructive"
-            className="w-full"
-            onClick={onLogout}
-          >
+          <Button variant="destructive" className="w-full" onClick={onLogout}>
             <LogOut className="h-4 w-4 mr-2" />
             Sign Out
           </Button>

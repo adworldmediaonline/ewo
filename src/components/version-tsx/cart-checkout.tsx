@@ -13,13 +13,8 @@ import {
 import { notifyError, notifySuccess } from '@/utils/toast';
 
 export default function CartCheckout() {
-  const {
-    total,
-    totalWithShipping,
-    subtotal,
-    firstTimeDiscountAmount,
-    firstTimeDiscount,
-  } = useCartInfo();
+  const { subtotal, firstTimeDiscountAmount, firstTimeDiscount } =
+    useCartInfo();
 
   const dispatch = useDispatch();
   const couponInputRef = useRef<HTMLInputElement>(null);

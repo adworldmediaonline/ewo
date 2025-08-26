@@ -28,9 +28,9 @@ export function HeaderActions({
   showBadges = true,
 }: HeaderActionsProps): React.ReactElement {
   const router = useRouter();
-  const { data: session, isPending } = authClient.useSession();
+  const { data: session } = authClient.useSession();
   const [isPendingSignOut, startTransition] = React.useTransition();
-  const dispatch = useDispatch();
+  const _dispatch = useDispatch();
   const { quantity } = useCartInfo();
   const wishlist: unknown[] = useSelector(
     (s: any) => s?.wishlist?.wishlist ?? []

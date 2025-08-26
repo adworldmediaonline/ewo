@@ -32,20 +32,20 @@ function toSlug(label: string): string {
 }
 
 // Convert slug back to readable category name
-function fromSlug(slug: string): string {
-  if (!slug) return '';
-  return slug
-    .replace(/-/g, ' ')
-    .replace(/\band\b/g, '&')
-    .replace(/\b\w/g, l => l.toUpperCase());
-}
+// function fromSlug(slug: string): string {
+//   if (!slug) return '';
+//   return slug
+//     .replace(/-/g, ' ')
+//     .replace(/\band\b/g, '&')
+//     .replace(/\b\w/g, l => l.toUpperCase());
+// }
 
 export default function ShopContentWrapper() {
   const dispatch = useDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { cart_products } = useSelector((state: any) => state.cart);
-  const { wishlist } = useSelector((state: any) => state.wishlist);
+  const { cart_products: _cart_products } = useSelector((state: any) => state.cart);
+  const { wishlist: _wishlist } = useSelector((state: any) => state.wishlist);
 
   // Initialize filters from URL parameters
   const initialCategory = searchParams.get('category') || '';
@@ -81,7 +81,7 @@ export default function ShopContentWrapper() {
     return apiFiltersObj;
   }, [filters, currentPage]);
 
-  const { data, isLoading, isError, error } = useGetPaginatedProductsQuery(
+  const { data, isLoading, isError } = useGetPaginatedProductsQuery(
     apiFilters,
     {
       // Force refetch when page changes
@@ -142,7 +142,7 @@ export default function ShopContentWrapper() {
         sortOrder: currentSortOrder as 'asc' | 'desc',
       });
     }
-  }, [searchParams]);
+  }, [searchParams, filters.search, filters.category, filters.subcategory, filters.sortBy, filters.sortOrder]);
 
   const handleFiltersChange = useCallback(
     (newFilters: ShopFiltersType) => {
