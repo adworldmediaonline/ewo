@@ -8,8 +8,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import {
+  CategoryItem,
+  PaginatedProductsResponse,
+  ProductFilters,
+} from '@/lib/server-data';
 import { add_cart_product } from '@/redux/features/cartSlice';
-import { useGetPaginatedProductsQuery } from '@/redux/features/productApi';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { Filter, Search } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -40,23 +44,32 @@ function toSlug(label: string): string {
 //     .replace(/\b\w/g, l => l.toUpperCase());
 // }
 
-export default function ShopContentWrapper() {
+interface ShopContentWrapperProps {
+  initialCategories: CategoryItem[];
+  initialProducts: PaginatedProductsResponse;
+  initialFilters: ProductFilters;
+}
+
+export default function ShopContentWrapper({
+  initialCategories,
+  initialProducts,
+  initialFilters,
+}: ShopContentWrapperProps) {
   const dispatch = useDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { cart_products: _cart_products } = useSelector((state: any) => state.cart);
+  const { cart_products: _cart_products } = useSelector(
+    (state: any) => state.cart
+  );
   const { wishlist: _wishlist } = useSelector((state: any) => state.wishlist);
 
-  // Initialize filters from URL parameters
-  const initialCategory = searchParams.get('category') || '';
-  const initialSubcategory = searchParams.get('subcategory') || '';
-
+  // Initialize filters from server data or URL parameters
   const [filters, setFilters] = useState<ShopFiltersType>({
-    search: '',
-    category: initialCategory,
-    subcategory: initialSubcategory,
-    sortBy: 'skuArrangementOrderNo',
-    sortOrder: 'asc',
+    search: initialFilters.search || '',
+    category: initialFilters.category || '',
+    subcategory: initialFilters.subcategory || '',
+    sortBy: initialFilters.sortBy || 'skuArrangementOrderNo',
+    sortOrder: initialFilters.sortOrder || 'asc',
   });
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -71,8 +84,8 @@ export default function ShopContentWrapper() {
     currentPageRef.current = currentPage;
   }, [currentPage]);
 
-  // Convert filters to API format
-  const apiFilters = useMemo(() => {
+  // Convert filters to API format (for future client-side pagination)
+  const _apiFilters = useMemo(() => {
     const apiFiltersObj = {
       ...filters,
       page: currentPage,
@@ -81,25 +94,65 @@ export default function ShopContentWrapper() {
     return apiFiltersObj;
   }, [filters, currentPage]);
 
-  const { data, isLoading, isError } = useGetPaginatedProductsQuery(
-    apiFilters,
-    {
-      // Force refetch when page changes
-      refetchOnMountOrArgChange: true,
-    }
-  );
-
-  const products = data?.data || [];
-  const pagination = data?.pagination;
+  // Use initial data from server, will be updated via client-side fetching for pagination
+  const [products, _setProducts] = useState(initialProducts.data);
+  const [pagination, _setPagination] = useState(initialProducts.pagination);
+  const [isLoading, _setIsLoading] = useState(false);
+  const [isError, _setIsError] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  // Load more products when scroll reaches bottom
+  // Function to load more products
+  const handleLoadMore = useCallback(async () => {
+    if (isLoadingMore || !pagination?.hasNextPage) return;
+
+    setIsLoadingMore(true);
+    try {
+      const nextPage = currentPage + 1;
+      const params = new URLSearchParams();
+
+      // Add current filters
+      if (filters.search) params.set('search', filters.search);
+      if (filters.category) params.set('category', filters.category);
+      if (filters.subcategory) params.set('subcategory', filters.subcategory);
+      if (filters.sortBy) params.set('sortBy', filters.sortBy);
+      if (filters.sortOrder) params.set('sortOrder', filters.sortOrder);
+
+      // Add pagination params
+      params.set('page', nextPage.toString());
+      params.set('limit', '8');
+
+      const apiUrl = `${
+        process.env.NEXT_PUBLIC_API_BASE_URL
+      }/api/product/paginated?${params.toString()}`;
+      console.log('Fetching from API:', apiUrl);
+
+      const response = await fetch(apiUrl);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success && data.data) {
+        // Append new products to existing ones
+        _setProducts((prev: any[]) => [...prev, ...data.data]);
+        _setPagination(data.pagination);
+        setCurrentPage(nextPage);
+      }
+    } catch (error) {
+      console.error('Error loading more products:', error);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [currentPage, filters, pagination?.hasNextPage, isLoadingMore]);
+
+  // Load more products when scroll reaches bottom (for infinite scroll)
   useEffect(() => {
     if (inView && pagination?.hasNextPage && !isLoadingMore) {
-      const nextPage = currentPageRef.current + 1;
-      setCurrentPage(nextPage);
+      handleLoadMore();
     }
-  }, [inView, pagination?.hasNextPage, isLoadingMore]);
+  }, [inView, pagination?.hasNextPage, isLoadingMore, handleLoadMore]);
 
   // Reset page when filters change
   useEffect(() => {
@@ -142,7 +195,14 @@ export default function ShopContentWrapper() {
         sortOrder: currentSortOrder as 'asc' | 'desc',
       });
     }
-  }, [searchParams, filters.search, filters.category, filters.subcategory, filters.sortBy, filters.sortOrder]);
+  }, [
+    searchParams,
+    filters.search,
+    filters.category,
+    filters.subcategory,
+    filters.sortBy,
+    filters.sortOrder,
+  ]);
 
   const handleFiltersChange = useCallback(
     (newFilters: ShopFiltersType) => {
@@ -196,19 +256,6 @@ export default function ShopContentWrapper() {
     // Clear URL parameters when filters are cleared
     router.push('/shop');
   }, [router]);
-
-  const handleLoadMore = useCallback(async () => {
-    if (pagination?.hasNextPage && !isLoadingMore) {
-      setIsLoadingMore(true);
-
-      // Increment page and trigger new API call
-      const nextPage = currentPageRef.current + 1;
-      setCurrentPage(nextPage);
-
-      // Small delay to show loading state
-      setTimeout(() => setIsLoadingMore(false), 1000);
-    }
-  }, [pagination?.hasNextPage, isLoadingMore]);
 
   const handleAddToCart = useCallback(
     (product: Product) => {
@@ -278,6 +325,7 @@ export default function ShopContentWrapper() {
             <div className="sticky top-6">
               <ShopFilters
                 filters={filters}
+                categories={initialCategories}
                 onFiltersChange={handleFiltersChange}
                 onClearFilters={handleClearFilters}
               />
@@ -304,6 +352,7 @@ export default function ShopContentWrapper() {
                   </SheetHeader>
                   <ShopFilters
                     filters={filters}
+                    categories={initialCategories}
                     onFiltersChange={handleFiltersChange}
                     onClearFilters={handleClearFilters}
                   />
@@ -360,10 +409,10 @@ export default function ShopContentWrapper() {
                     ))}
                 </div>
 
-                {/* Load More Section */}
+                {/* Infinite Scroll Loading Indicator */}
                 {pagination?.hasNextPage && (
                   <div ref={loadMoreRef} className="mt-8 text-center">
-                    {isLoadingMore ? (
+                    {isLoadingMore && (
                       <div className="flex justify-center">
                         <div className="flex items-center gap-2">
                           <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
@@ -372,14 +421,6 @@ export default function ShopContentWrapper() {
                           </span>
                         </div>
                       </div>
-                    ) : (
-                      <Button
-                        onClick={handleLoadMore}
-                        variant="outline"
-                        className="mx-auto"
-                      >
-                        Loading More Products
-                      </Button>
                     )}
                   </div>
                 )}

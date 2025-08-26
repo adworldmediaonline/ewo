@@ -191,3 +191,114 @@ export function toSlug(label: string): string {
     .trim()
     .replace(/\s+/g, '-');
 }
+
+// Product interfaces
+export interface Product {
+  _id: string;
+  title: string;
+  slug: string;
+  img?: string;
+  imageURLs?: string[];
+  price: number;
+  finalPriceDiscount?: number;
+  updatedPrice?: number;
+  category: {
+    id: string;
+    name: string;
+  };
+  status: string;
+  quantity: number;
+  shipping?: {
+    price: number;
+    description?: string;
+  };
+  reviews?: any[];
+}
+
+export interface ProductFilters {
+  page?: number;
+  limit?: number;
+  search?: string;
+  category?: string;
+  subcategory?: string;
+  minPrice?: string;
+  maxPrice?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface PaginatedProductsResponse {
+  data: Product[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalProducts: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
+}
+
+// Cached product fetching - optimized for shop page
+export const getPaginatedProducts = unstable_cache(
+  async (filters: ProductFilters): Promise<PaginatedProductsResponse> => {
+    // Only return empty data during build/export, not during runtime
+    if (
+      process.env.NODE_ENV === 'production' &&
+      !process.env.NEXT_PUBLIC_API_BASE_URL
+    ) {
+      return {
+        data: [],
+        pagination: {
+          currentPage: 1,
+          totalPages: 0,
+          totalProducts: 0,
+          hasNextPage: false,
+          hasPrevPage: false,
+        },
+      };
+    }
+
+    try {
+      const params = new URLSearchParams();
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== '') {
+          params.append(key, value.toString());
+        }
+      });
+
+      const data = await fetchFromAPI<{
+        success: boolean;
+        data: Product[];
+        pagination: any;
+      }>(`/api/product/paginated?${params.toString()}`);
+
+      return {
+        data: data.data || [],
+        pagination: data.pagination || {
+          currentPage: 1,
+          totalPages: 0,
+          totalProducts: 0,
+          hasNextPage: false,
+          hasPrevPage: false,
+        },
+      };
+    } catch (error) {
+      console.error('Error fetching paginated products:', error);
+      return {
+        data: [],
+        pagination: {
+          currentPage: 1,
+          totalPages: 0,
+          totalProducts: 0,
+          hasNextPage: false,
+          hasPrevPage: false,
+        },
+      };
+    }
+  },
+  ['paginated-products'],
+  {
+    revalidate: 300, // 5 minutes
+    tags: ['products'],
+  }
+);
