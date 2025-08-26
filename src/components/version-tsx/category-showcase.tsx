@@ -1,14 +1,14 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
+
+import { toSlug } from '@/lib/server-data';
 import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import * as React from 'react';
 
-interface ApiCategoryItem {
+interface CategoryItem {
   _id: string;
   parent: string;
   description?: string;
@@ -20,18 +20,12 @@ interface ApiCategoryItem {
   updatedAt?: string;
 }
 
-function toSlug(label: string): string {
-  if (!label) return '';
-  return label
-    .toLowerCase()
-    .replace(/&/g, 'and') // Replace & with 'and' for better URL readability
-    .replace(/[^a-z0-9\s-]/g, '')
-    .trim()
-    .replace(/\s+/g, '-');
+interface CategoryShowcaseProps {
+  categories: CategoryItem[];
 }
 
 interface CategoryCardProps {
-  item: ApiCategoryItem;
+  item: CategoryItem;
   onClick: (parent: string) => void;
   onClickChild: (parent: string, child: string) => void;
 }
@@ -101,23 +95,10 @@ const CategoryCard = ({ item, onClick, onClickChild }: CategoryCardProps) => {
   );
 };
 
-const CategoryCardSkeleton = () => (
-  <div className="relative h-40 sm:h-48 md:h-56 w-full overflow-hidden rounded-xl border border-border bg-muted/40 animate-pulse" />
-);
-
-export default function CategoryShowcase() {
-  const { data, isLoading, isError } =
-    useGetShowCategoryQuery('category-showcase');
+export default function CategoryShowcase({
+  categories,
+}: CategoryShowcaseProps) {
   const router = useRouter();
-
-  const items: ApiCategoryItem[] = React.useMemo(() => {
-    const result = (data as any)?.result ?? (data as any) ?? [];
-    return Array.isArray(result)
-      ? (result as ApiCategoryItem[]).filter(
-          c => (c.products?.length ?? 0) > 0 && c.status === 'Show'
-        )
-      : [];
-  }, [data]);
 
   const handleParent = (parent: string) => {
     const slug = toSlug(parent);
@@ -156,25 +137,15 @@ export default function CategoryShowcase() {
           </Button>
         </div>
 
-        {isError && (
-          <div className="rounded-md border border-destructive/40 bg-destructive/10 p-4 text-destructive">
-            Failed to load categories.
-          </div>
-        )}
-
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
-          {isLoading
-            ? Array.from({ length: 6 }).map((_, i) => (
-                <CategoryCardSkeleton key={i} />
-              ))
-            : items.map(item => (
-                <CategoryCard
-                  key={item._id}
-                  item={item}
-                  onClick={handleParent}
-                  onClickChild={handleChild}
-                />
-              ))}
+          {categories.map(item => (
+            <CategoryCard
+              key={item._id}
+              item={item}
+              onClick={handleParent}
+              onClickChild={handleChild}
+            />
+          ))}
         </div>
       </div>
     </section>

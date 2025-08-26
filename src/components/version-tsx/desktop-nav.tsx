@@ -29,7 +29,7 @@ export default function DesktopNav({
 }: DesktopNavProps): React.ReactElement {
   const visibleCategories = React.useMemo(
     () =>
-      categories.filter(
+      (categories || []).filter(
         c => (c.products?.length ?? 0) > 0 && c.status === 'Show'
       ),
     [categories]
