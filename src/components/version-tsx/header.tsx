@@ -13,7 +13,7 @@ import HeaderSearch from './header-search';
 import { CategoryItem as MenuCategoryItem } from './shop-menu-content';
 
 interface HeaderV2Props {
-  categories: MenuCategoryItem[];
+  categories?: MenuCategoryItem[];
 }
 
 export default function HeaderV2({
@@ -53,7 +53,7 @@ export default function HeaderV2({
             <div className="hidden md:block shrink-0">
               <DesktopNav
                 pathname={pathname}
-                categories={categories}
+                categories={categories || []}
                 onSelectCategory={handleCategoryRoute}
                 onSelectSubcategory={handleChildCategoryRoute}
               />

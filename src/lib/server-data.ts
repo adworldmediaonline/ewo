@@ -28,11 +28,6 @@ async function fetchFromAPI<T>(
         'Content-Type': 'application/json',
         ...options?.headers,
       },
-      next: {
-        // Cache for 5 minutes by default
-        revalidate: 300,
-        tags: ['categories', 'products'],
-      },
     });
 
     if (!response.ok) {
@@ -50,17 +45,34 @@ async function fetchFromAPI<T>(
 
 // Cached categories fetch - this is the key optimization
 export const getCategories = unstable_cache(
-  async (): Promise<CategoryItem[]> => {
-    const data = await fetchFromAPI<{ result: CategoryItem[] }>(
-      '/api/category/show'
-    );
+  async () => {
+    // During build time, return empty array to avoid prerender errors
+    if (process.env.NODE_ENV === 'production') {
+      return [];
+    }
 
-    // Filter and process categories
-    const categories = data.result || [];
-    return categories.filter(
-      category =>
-        (category.products?.length ?? 0) > 0 && category.status === 'Show'
-    );
+    try {
+      const data = await fetchFromAPI<{ result: CategoryItem[] }>(
+        '/api/category/show'
+      );
+
+      // Filter and process categories with safe fallbacks
+      const categories = data?.result || [];
+      if (!Array.isArray(categories)) {
+        console.warn('Categories data is not an array, returning empty array');
+        return [];
+      }
+
+      return categories.filter(
+        category =>
+          category &&
+          (category.products?.length ?? 0) > 0 &&
+          category.status === 'Show'
+      );
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      return [];
+    }
   },
   ['categories-data'],
   {
@@ -71,11 +83,25 @@ export const getCategories = unstable_cache(
 
 // Get categories for specific product type
 export const getProductTypeCategories = unstable_cache(
-  async (type: string): Promise<CategoryItem[]> => {
-    const data = await fetchFromAPI<{ result: CategoryItem[] }>(
-      `/api/category/show/${type}`
-    );
-    return data.result || [];
+  async (type: string) => {
+    // During build time, return empty array to avoid prerender errors
+    if (process.env.NODE_ENV === 'production') {
+      return [];
+    }
+
+    try {
+      const data = await fetchFromAPI<{ result: CategoryItem[] }>(
+        `/api/category/show/${type}`
+      );
+      const categories = data?.result || [];
+      return Array.isArray(categories) ? categories : [];
+    } catch (error) {
+      console.error(
+        `Error fetching product type categories for ${type}:`,
+        error
+      );
+      return [];
+    }
   },
   ['product-type-categories'],
   {
@@ -86,11 +112,22 @@ export const getProductTypeCategories = unstable_cache(
 
 // Get all categories (for admin/management)
 export const getAllCategories = unstable_cache(
-  async (): Promise<CategoryItem[]> => {
-    const data = await fetchFromAPI<{ result: CategoryItem[] }>(
-      '/api/category/all'
-    );
-    return data.result || [];
+  async () => {
+    // During build time, return empty array to avoid prerender errors
+    if (process.env.NODE_ENV === 'production') {
+      return [];
+    }
+
+    try {
+      const data = await fetchFromAPI<{ result: CategoryItem[] }>(
+        '/api/category/all'
+      );
+      const categories = data?.result || [];
+      return Array.isArray(categories) ? categories : [];
+    } catch (error) {
+      console.error('Error fetching all categories:', error);
+      return [];
+    }
   },
   ['all-categories'],
   {
@@ -101,7 +138,12 @@ export const getAllCategories = unstable_cache(
 
 // Get single category by ID
 export const getCategoryById = unstable_cache(
-  async (id: string): Promise<CategoryItem | null> => {
+  async (id: string) => {
+    // During build time, return null to avoid prerender errors
+    if (process.env.NODE_ENV === 'production') {
+      return null;
+    }
+
     try {
       const data = await fetchFromAPI<{ result: CategoryItem }>(
         `/api/category/get/${id}`
