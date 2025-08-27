@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { useGetShowCategoryQuery } from '@/redux/features/categoryApi';
+import { CategoryItem } from '@/lib/server-data';
 import { Search, X } from 'lucide-react';
 import * as React from 'react';
 
@@ -40,6 +40,7 @@ interface ShopFiltersProps {
   filters: ShopFilters;
   onFiltersChange: (filters: ShopFilters) => void;
   onClearFilters: () => void;
+  categories: CategoryItem[];
 }
 
 const sortOptions = [
@@ -56,9 +57,10 @@ export default function ShopFilters({
   filters,
   onFiltersChange,
   onClearFilters,
+  categories,
 }: ShopFiltersProps): React.ReactElement {
-  const { data: categories } = useGetShowCategoryQuery('');
   const [localSearch, setLocalSearch] = React.useState(filters.search);
+  const [isProcessingFilter, setIsProcessingFilter] = React.useState(false);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,18 +68,20 @@ export default function ShopFilters({
   };
 
   const handleCategoryChange = (category: string) => {
-    const newCategory = filters.category === category ? '' : category;
+    if (isProcessingFilter) return;
+
+    setIsProcessingFilter(true);
+
+    const categorySlug = toSlug(category);
+    const newCategory = filters.category === categorySlug ? '' : categorySlug;
+
     onFiltersChange({
       ...filters,
       category: newCategory,
-      subcategory: '', // Reset subcategory when category changes
     });
-  };
 
-  const handleSubcategoryChange = (subcategory: string) => {
-    const newSubcategory =
-      filters.subcategory === subcategory ? '' : subcategory;
-    onFiltersChange({ ...filters, subcategory: newSubcategory });
+    // Reset processing flag after a short delay
+    setTimeout(() => setIsProcessingFilter(false), 200);
   };
 
   const handleSortChange = (sortBy: string) => {
@@ -90,11 +94,7 @@ export default function ShopFilters({
   };
 
   const hasActiveFilters =
-    filters.search ||
-    filters.category ||
-    filters.subcategory ||
-    filters.sortBy ||
-    filters.sortOrder;
+    filters.search || filters.category || filters.sortBy || filters.sortOrder;
 
   return (
     <div className="w-full space-y-6">
@@ -117,26 +117,67 @@ export default function ShopFilters({
         </form>
       </div>
 
-      <Separator />
-
-      {/* Sort Options */}
+      {/* Compact Controls Header */}
       <div className="space-y-3">
-        <Label className="text-sm font-medium">Sort By</Label>
-        <Select
-          onValueChange={handleSortChange}
-          value={`${filters.sortBy}-${filters.sortOrder}`}
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Select a sort option" />
-          </SelectTrigger>
-          <SelectContent>
-            {sortOptions.map(option => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex items-center justify-between gap-2">
+          <Label className="text-sm font-medium flex items-center gap-2">
+            Sort & Filter
+            {hasActiveFilters && (
+              <Badge variant="secondary" className="text-xs">
+                {
+                  [
+                    filters.search,
+                    filters.category,
+                    filters.sortBy !== 'skuArrangementOrderNo'
+                      ? filters.sortBy
+                      : '',
+                    filters.sortOrder !== 'asc' ? filters.sortOrder : '',
+                  ].filter(Boolean).length
+                }
+              </Badge>
+            )}
+          </Label>
+          {hasActiveFilters && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+              onClick={onClearFilters}
+            >
+              <X className="h-3 w-3" />
+            </Button>
+          )}
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Select
+            onValueChange={handleSortChange}
+            value={`${filters.sortBy}-${filters.sortOrder}`}
+          >
+            <SelectTrigger className="flex-1 h-9">
+              <SelectValue placeholder="Sort by..." />
+            </SelectTrigger>
+            <SelectContent>
+              {sortOptions.map(option => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {hasActiveFilters && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="px-3 h-9 whitespace-nowrap sm:w-auto"
+              onClick={onClearFilters}
+            >
+              <X className="h-3 w-3 mr-1" />
+              Clear
+            </Button>
+          )}
+        </div>
       </div>
 
       <Separator />
@@ -146,74 +187,32 @@ export default function ShopFilters({
         <Label className="text-sm font-medium">Categories</Label>
         <ScrollArea className="h-[300px]">
           <div className="space-y-2">
-            {categories?.result?.map((cat: any) => (
-              <Button
-                key={cat._id}
-                variant={
-                  filters.category === toSlug(cat.parent) ? 'default' : 'ghost'
-                }
-                size="sm"
-                className="w-full justify-start"
-                onClick={() => handleCategoryChange(cat.parent)}
-              >
-                {cat.parent}
-                {cat.products?.length > 0 && (
-                  <Badge variant="secondary" className="ml-auto">
-                    {cat.products.length}
-                  </Badge>
-                )}
-              </Button>
-            ))}
+            {categories?.map((cat: CategoryItem) => {
+              const categorySlug = toSlug(cat.parent);
+              const isSelected = filters.category === categorySlug;
+
+              return (
+                <Button
+                  key={cat._id}
+                  variant={isSelected ? 'default' : 'ghost'}
+                  size="sm"
+                  className="w-full justify-between"
+                  onClick={() => handleCategoryChange(cat.parent)}
+                >
+                  <span>{cat.parent}</span>
+                  <div className="flex items-center gap-1">
+                    {cat.products?.length && cat.products.length > 0 && (
+                      <Badge variant="secondary" className="text-xs">
+                        {cat.products.length}
+                      </Badge>
+                    )}
+                  </div>
+                </Button>
+              );
+            })}
           </div>
         </ScrollArea>
       </div>
-
-      {/* Subcategories - Only show when a category is selected */}
-      {filters.category && (
-        <>
-          <Separator />
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">Subcategories</Label>
-            <ScrollArea className="h-[200px]">
-              <div className="space-y-2">
-                {categories?.result
-                  ?.find((cat: any) => cat.parent === filters.category)
-                  ?.children?.map((subcat: string) => (
-                    <Button
-                      key={subcat}
-                      variant={
-                        filters.subcategory === toSlug(subcat)
-                          ? 'default'
-                          : 'ghost'
-                      }
-                      size="sm"
-                      className="w-full justify-start"
-                      onClick={() => handleSubcategoryChange(subcat)}
-                    >
-                      {subcat}
-                    </Button>
-                  ))}
-              </div>
-            </ScrollArea>
-          </div>
-        </>
-      )}
-
-      {/* Clear Filters */}
-      {hasActiveFilters && (
-        <>
-          <Separator />
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full"
-            onClick={onClearFilters}
-          >
-            <X className="h-4 w-4 mr-2" />
-            Clear All Filters
-          </Button>
-        </>
-      )}
     </div>
   );
 }
