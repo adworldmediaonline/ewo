@@ -1,13 +1,23 @@
 'use client';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { CategoryItem } from '@/lib/server-data';
 import { add_cart_product } from '@/redux/features/cartSlice';
 import { useGetPaginatedProductsQuery } from '@/redux/features/productApi';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
@@ -40,7 +50,13 @@ function toSlug(label: string): string {
 //     .replace(/\b\w/g, l => l.toUpperCase());
 // }
 
-export default function ShopContentWrapper() {
+interface ShopContentWrapperProps {
+  categories: CategoryItem[];
+}
+
+export default function ShopContentWrapper({
+  categories,
+}: ShopContentWrapperProps) {
   const dispatch = useDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -51,22 +67,114 @@ export default function ShopContentWrapper() {
 
   // Initialize filters from URL parameters
   const initialCategory = searchParams.get('category') || '';
-  const initialSubcategory = searchParams.get('subcategory') || '';
 
   const [filters, setFilters] = useState<ShopFiltersType>({
     search: '',
     category: initialCategory,
-    subcategory: initialSubcategory,
+    subcategory: '', // Removed subcategory support
     sortBy: 'skuArrangementOrderNo',
     sortOrder: 'asc',
   });
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  const [localSearch, setLocalSearch] = useState(filters.search);
+  const [pendingFilters, setPendingFilters] = useState<ShopFiltersType | null>(
+    null
+  );
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const currentPageRef = useRef(currentPage);
   const isUpdatingFromUrl = useRef(false);
 
   const { ref: loadMoreRef, inView } = useInView();
+
+  const sortOptions = [
+    { value: 'skuArrangementOrderNo-asc', label: 'Default Order' },
+    { value: 'createdAt-desc', label: 'Newest First' },
+    { value: 'createdAt-asc', label: 'Oldest First' },
+    { value: 'price-asc', label: 'Price: Low to High' },
+    { value: 'price-desc', label: 'Price: High to Low' },
+    { value: 'title-asc', label: 'Name: A to Z' },
+    { value: 'title-desc', label: 'Name: Z to A' },
+  ];
+
+  const hasActiveFilters =
+    filters.search || filters.category || filters.sortBy || filters.sortOrder;
+
+  // Mobile dropdown handlers
+  const handleDropdownOpenChange = (open: boolean) => {
+    setIsDropdownOpen(open);
+    if (open) {
+      // Initialize pending filters with current filters when opening
+      setPendingFilters({ ...filters });
+      setLocalSearch(filters.search);
+    } else {
+      // Reset pending filters when closing without applying
+      setPendingFilters(null);
+      setLocalSearch(filters.search);
+    }
+  };
+
+  const handleMobileSearchChange = (value: string) => {
+    setLocalSearch(value);
+    if (pendingFilters) {
+      setPendingFilters(prev => ({
+        ...prev!,
+        search: value,
+      }));
+    }
+  };
+
+  const handleMobileSortChange = (sortValue: string) => {
+    const [field, order] = sortValue.split('-');
+    if (pendingFilters) {
+      setPendingFilters(prev => ({
+        ...prev!,
+        sortBy: field,
+        sortOrder: order as 'asc' | 'desc',
+      }));
+    }
+  };
+
+  const handleMobileCategoryChange = (categorySlug: string) => {
+    if (pendingFilters) {
+      const newCategory =
+        pendingFilters.category === categorySlug ? '' : categorySlug;
+      setPendingFilters(prev => ({
+        ...prev!,
+        category: newCategory,
+      }));
+    }
+  };
+
+  const handleApplyFilters = () => {
+    if (pendingFilters) {
+      // Update localSearch to match the applied search
+      setLocalSearch(pendingFilters.search);
+      handleFiltersChange(pendingFilters);
+      setPendingFilters(null);
+      setIsDropdownOpen(false);
+    }
+  };
+
+  const handleCancelFilters = () => {
+    setPendingFilters(null);
+    setLocalSearch(filters.search);
+    setIsDropdownOpen(false);
+  };
+
+  const getDisplayFilters = () => {
+    return pendingFilters || filters;
+  };
+
+  const hasPendingChanges = () => {
+    if (!pendingFilters) return false;
+    return (
+      pendingFilters.search !== filters.search ||
+      pendingFilters.category !== filters.category ||
+      pendingFilters.sortBy !== filters.sortBy ||
+      pendingFilters.sortOrder !== filters.sortOrder
+    );
+  };
 
   // Update ref when currentPage changes
   useEffect(() => {
@@ -106,13 +214,7 @@ export default function ShopContentWrapper() {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [
-    filters.search,
-    filters.category,
-    filters.subcategory,
-    filters.sortBy,
-    filters.sortOrder,
-  ]);
+  }, [filters.search, filters.category, filters.sortBy, filters.sortOrder]);
 
   // Synchronize URL with filters when they change
   useEffect(() => {
@@ -124,39 +226,32 @@ export default function ShopContentWrapper() {
     const params = new URLSearchParams(searchParams);
     const currentSearch = params.get('search') || '';
     const currentCategory = params.get('category') || '';
-    const currentSubcategory = params.get('subcategory') || '';
     const currentSortBy = params.get('sortBy') || 'skuArrangementOrderNo';
     const currentSortOrder = params.get('sortOrder') || 'asc';
 
     // Only update if there's a mismatch
-    if (
+    const hasChanges =
       currentSearch !== filters.search ||
       currentCategory !== filters.category ||
-      currentSubcategory !== filters.subcategory ||
       currentSortBy !== filters.sortBy ||
-      currentSortOrder !== filters.sortOrder
-    ) {
+      currentSortOrder !== filters.sortOrder;
+
+    if (hasChanges) {
       setFilters({
         search: currentSearch,
         category: currentCategory,
-        subcategory: currentSubcategory,
+        subcategory: '', // Always empty since we removed subcategory support
         sortBy: currentSortBy,
         sortOrder: currentSortOrder as 'asc' | 'desc',
       });
+
+      // Update local search state to match URL
+      setLocalSearch(currentSearch);
     }
-  }, [
-    searchParams,
-    filters.search,
-    filters.category,
-    filters.subcategory,
-    filters.sortBy,
-    filters.sortOrder,
-  ]);
+  }, [searchParams]); // Only depend on searchParams to avoid infinite loops
 
   const handleFiltersChange = useCallback(
     (newFilters: ShopFiltersType) => {
-      console.log('handleFiltersChange called with:', newFilters);
-
       setFilters(newFilters);
 
       // Set flag to prevent infinite loop in URL sync
@@ -166,20 +261,14 @@ export default function ShopContentWrapper() {
       const params = new URLSearchParams();
       if (newFilters.search) params.set('search', newFilters.search);
       if (newFilters.category) {
-        const slugifiedCategory = toSlug(newFilters.category);
-        console.log('Category conversion:', {
-          original: newFilters.category,
-          slugified: slugifiedCategory,
-        });
-        params.set('category', slugifiedCategory);
-      }
-      if (newFilters.subcategory) {
-        const slugifiedSubcategory = toSlug(newFilters.subcategory);
-        console.log('Subcategory conversion:', {
-          original: newFilters.subcategory,
-          slugified: slugifiedSubcategory,
-        });
-        params.set('subcategory', slugifiedSubcategory);
+        // Check if category is already a slug (contains hyphens and no spaces)
+        const isAlreadySlug =
+          newFilters.category.includes('-') &&
+          !newFilters.category.includes(' ');
+        const categoryParam = isAlreadySlug
+          ? newFilters.category
+          : toSlug(newFilters.category);
+        params.set('category', categoryParam);
       }
       if (newFilters.sortBy !== 'skuArrangementOrderNo')
         params.set('sortBy', newFilters.sortBy);
@@ -188,7 +277,6 @@ export default function ShopContentWrapper() {
 
       const queryString = params.toString();
       const newUrl = queryString ? `/shop?${queryString}` : '/shop';
-      console.log('Generated URL:', newUrl);
       router.push(newUrl);
     },
     [router]
@@ -198,7 +286,7 @@ export default function ShopContentWrapper() {
     setFilters({
       search: '',
       category: '',
-      subcategory: '',
+      subcategory: '', // Keep empty for consistency
       sortBy: 'skuArrangementOrderNo',
       sortOrder: 'asc',
     });
@@ -256,26 +344,18 @@ export default function ShopContentWrapper() {
     [dispatch]
   );
 
-  const breadcrumbItems = [{ label: 'Shop', href: '/shop', isCurrent: true }];
+  const breadcrumbItems = [
+    { label: 'Shop', href: '/shop', isCurrent: !filters.category },
+  ];
 
   if (filters.category) {
     breadcrumbItems.splice(1, 0, {
       label: filters.category,
       href: `/shop?category=${filters.category}`,
-      isCurrent: false,
-    });
-  }
-
-  if (filters.subcategory) {
-    breadcrumbItems.splice(2, 0, {
-      label: filters.subcategory,
-      href: `/shop?category=${filters.category}&subcategory=${filters.subcategory}`,
       isCurrent: true,
     });
-    // Update the category breadcrumb to not be current
-    if (breadcrumbItems.length > 1) {
-      breadcrumbItems[1].isCurrent = false;
-    }
+    // Update the shop breadcrumb to not be current when category is selected
+    breadcrumbItems[0].isCurrent = false;
   }
 
   return (
@@ -289,35 +369,184 @@ export default function ShopContentWrapper() {
                 filters={filters}
                 onFiltersChange={handleFiltersChange}
                 onClearFilters={handleClearFilters}
+                categories={categories}
               />
             </div>
           </div>
 
           {/* Products Grid */}
           <div className="flex-1">
-            {/* Mobile Filters Button */}
+            {/* Mobile Filters Dropdown */}
             <div className="flex items-center gap-2 mb-6 lg:hidden">
-              <Sheet
-                open={isMobileFiltersOpen}
-                onOpenChange={setIsMobileFiltersOpen}
+              <DropdownMenu
+                open={isDropdownOpen}
+                onOpenChange={handleDropdownOpenChange}
               >
-                <SheetTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Filter className="h-4 w-4 mr-2" />
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <Filter className="h-4 w-4" />
                     Filters
+                    {hasActiveFilters && (
+                      <Badge variant="secondary" className="text-xs ml-1">
+                        {
+                          [
+                            filters.search,
+                            filters.category,
+                            filters.sortBy !== 'skuArrangementOrderNo'
+                              ? filters.sortBy
+                              : '',
+                            filters.sortOrder !== 'asc'
+                              ? filters.sortOrder
+                              : '',
+                          ].filter(Boolean).length
+                        }
+                      </Badge>
+                    )}
+                    {hasPendingChanges() && (
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse ml-1" />
+                    )}
                   </Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="w-80">
-                  <SheetHeader>
-                    <SheetTitle className="text-left">Filters</SheetTitle>
-                  </SheetHeader>
-                  <ShopFilters
-                    filters={filters}
-                    onFiltersChange={handleFiltersChange}
-                    onClearFilters={handleClearFilters}
-                  />
-                </SheetContent>
-              </Sheet>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-80 p-4">
+                  <div className="space-y-4">
+                    {/* Search */}
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="mobile-search"
+                        className="text-sm font-medium"
+                      >
+                        Search Products
+                      </Label>
+                      <div className="flex gap-2">
+                        <Input
+                          id="mobile-search"
+                          placeholder="Search products..."
+                          value={getDisplayFilters().search}
+                          onChange={e =>
+                            handleMobileSearchChange(e.target.value)
+                          }
+                          className="flex-1 h-9"
+                        />
+                      </div>
+                    </div>
+
+                    <DropdownMenuSeparator />
+
+                    {/* Sort */}
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Sort By</Label>
+                      <Select
+                        onValueChange={handleMobileSortChange}
+                        value={`${getDisplayFilters().sortBy}-${
+                          getDisplayFilters().sortOrder
+                        }`}
+                      >
+                        <SelectTrigger className="w-full h-9">
+                          <SelectValue placeholder="Select sort option" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {sortOptions.map(option => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <DropdownMenuSeparator />
+
+                    {/* Categories */}
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Categories</Label>
+                      <div className="max-h-32 overflow-y-auto space-y-1">
+                        {categories?.map((cat: CategoryItem) => {
+                          const categorySlug = toSlug(cat.parent);
+                          const isSelected =
+                            getDisplayFilters().category === categorySlug;
+
+                          return (
+                            <Button
+                              key={cat._id}
+                              variant={isSelected ? 'default' : 'ghost'}
+                              size="sm"
+                              className="w-full justify-between h-8 text-sm"
+                              onClick={() =>
+                                handleMobileCategoryChange(categorySlug)
+                              }
+                            >
+                              <span className="truncate">{cat.parent}</span>
+                              {cat.products?.length &&
+                                cat.products.length > 0 && (
+                                  <Badge
+                                    variant="secondary"
+                                    className="text-xs ml-1"
+                                  >
+                                    {cat.products.length}
+                                  </Badge>
+                                )}
+                            </Button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <DropdownMenuSeparator />
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 pt-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
+                        onClick={handleCancelFilters}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="flex-1"
+                        onClick={handleApplyFilters}
+                        disabled={!hasPendingChanges()}
+                      >
+                        Apply Filters
+                        {hasPendingChanges() && (
+                          <Badge variant="secondary" className="text-xs ml-2">
+                            {
+                              [
+                                pendingFilters!.search !== filters.search
+                                  ? 'search'
+                                  : '',
+                                pendingFilters!.category !== filters.category
+                                  ? 'category'
+                                  : '',
+                                pendingFilters!.sortBy !== filters.sortBy ||
+                                pendingFilters!.sortOrder !== filters.sortOrder
+                                  ? 'sort'
+                                  : '',
+                              ].filter(Boolean).length
+                            }
+                          </Badge>
+                        )}
+                      </Button>
+                    </div>
+
+                    {hasActiveFilters && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full text-muted-foreground hover:text-destructive"
+                          onClick={handleClearFilters}
+                        >
+                          Clear All Filters
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
 
             {isError ? (
