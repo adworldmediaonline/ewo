@@ -10,6 +10,10 @@ export const authClient = createAuthClient({
   // 🔑 Ensure cookies flow cross-site
   fetchOptions: {
     credentials: 'include',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
   },
 
   plugins: [
