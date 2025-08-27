@@ -9,9 +9,9 @@ export const authClient = createAuthClient({
   baseURL: 'https://ewo-backend.vercel.app',
   basePath: '/api/auth',
   // 🔑 Ensure cookies flow cross-site
-  // fetchOptions: {
-  //   credentials: 'include',
-  // },
+  fetchOptions: {
+    credentials: 'include',
+  },
 
   plugins: [
     emailOTPClient(),
