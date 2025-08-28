@@ -1,9 +1,19 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { getCurrentJWT, tokenStorage } from '../../lib/authClient';
 
+// Get base URL with fallback for different environments
+const getBaseURL = () => {
+  return process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8090';
+};
+
+const baseURL = getBaseURL();
+
+console.log('🔧 RTK Query API Configuration:');
+console.log('  - Base URL:', baseURL);
+
 // Enhanced baseQuery with Better Auth support (following official docs)
 const baseQueryWithAuth = fetchBaseQuery({
-  baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8090',
+  baseUrl: baseURL,
   prepareHeaders: async (headers, { getState, endpoint }) => {
     // Add content type
     headers.set('Content-Type', 'application/json');
