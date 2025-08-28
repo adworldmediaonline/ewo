@@ -2,7 +2,8 @@ import { createAuthClient } from 'better-auth/react';
 
 // Create the auth client following official docs
 export const authClient = createAuthClient({
-  baseURL: 'http://localhost:8090',
+  // baseURL: 'http://localhost:8090',
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
 
   // Configure fetchOptions to handle Bearer tokens and JWT following official docs
   fetchOptions: {
@@ -99,12 +100,15 @@ export const getJWTToken = async () => {
       throw new Error('No Bearer token available');
     }
 
-    const response = await fetch('http://localhost:8090/api/auth/token', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      credentials: 'include',
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/token`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: 'include',
+      }
+    );
 
     if (!response.ok) {
       throw new Error('Failed to get JWT token');
