@@ -1,3 +1,4 @@
+import { emailOTPClient } from 'better-auth/client/plugins';
 import { createAuthClient } from 'better-auth/react';
 
 // Create the auth client following official docs
@@ -26,6 +27,9 @@ export const authClient = createAuthClient({
       token: () => localStorage.getItem('bearer_token') || '', // following official docs
     },
   },
+
+  // Add the emailOTPClient plugin as required by official docs
+  plugins: [emailOTPClient()],
 });
 
 // Export specific methods as recommended in docs

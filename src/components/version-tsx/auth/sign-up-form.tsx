@@ -54,33 +54,28 @@ export function SignUpForm({
     setError('');
     setSuccess('');
 
-    const { data: _data, error: signUpError } = await authClient.signUp.email(
-      {
+    try {
+      // Use the correct Better Auth method for email/password sign-up
+      const { data, error: signUpError } = await authClient.signUp.email({
         email,
         password,
         name,
         callbackURL: redirectPath,
-      },
-      {
-        onRequest: () => {
-          setIsLoading(true);
-        },
-        onSuccess: () => {
-          // Redirect to OTP verification page with email parameter
-          router.push(`/verify-email?email=${encodeURIComponent(email)}`);
-        },
-        onError: ctx => {
-          setError(ctx.error.message || 'Sign up failed');
-          setIsLoading(false);
-        },
+      });
+
+      if (signUpError) {
+        setError(signUpError.message || 'Sign up failed');
+        setIsLoading(false);
+        return;
       }
-    );
 
-    if (signUpError) {
-      setError(signUpError.message || 'Sign up failed');
+      // Redirect to OTP verification page with email parameter
+      router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+    } catch (err) {
+      setError('Sign up failed');
+      setIsLoading(false);
+      console.error('Sign-up error:', err);
     }
-
-    setIsLoading(false);
   };
 
   const formContent = (

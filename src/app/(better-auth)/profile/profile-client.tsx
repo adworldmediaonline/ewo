@@ -26,10 +26,9 @@ export default function ProfileClient({ initialSession }: ProfileClientProps) {
   });
 
   // Use RTK Query for profile data
-  const { data: profileData, isLoading: isProfileLoading } =
-    useGetUserProfileQuery(undefined, {
-      skip: !session,
-    });
+  const { data: profileData } = useGetUserProfileQuery(undefined, {
+    skip: !session,
+  });
 
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
 
