@@ -1,2 +1,2 @@
-export { default as CouponCard } from './CouponCard';
-export { default as CouponProductGrid } from './CouponProductGrid';
+export { default as CouponCard } from '../version-tsx/coupon/coupon-card';
+export { default as CouponProductGrid } from '../version-tsx/coupon/coupon-product-grid';

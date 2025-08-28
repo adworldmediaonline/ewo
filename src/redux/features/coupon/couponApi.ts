@@ -31,7 +31,7 @@ export const authApi = apiSlice.injectEndpoints({
 
     // get all coupons
     getAllActiveCoupons: builder.query({
-      query: () => 'api/coupon/list-all',
+      query: () => 'api/coupon/valid/list',
       providesTags: ['Coupon'],
       keepUnusedDataFor: 300,
     }),
