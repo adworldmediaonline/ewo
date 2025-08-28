@@ -66,14 +66,14 @@ export default function Footer() {
                   Shopping Cart
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   href="/compare"
                   className="text-muted-foreground hover:text-primary-foreground"
                 >
                   Compare Products
                 </Link>
-              </li>
+              </li> */}
             </ul>
           </div>
 
