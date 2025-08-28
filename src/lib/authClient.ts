@@ -49,7 +49,6 @@ export const authClient = createAuthClient({
 
 // Export specific methods as recommended in docs
 export const { signIn, signUp, useSession } = authClient;
-
 // Token storage utilities for JWT/Bearer support (following official docs)
 const TOKEN_KEY = 'bearer_token'; // Use the same key as in fetchOptions
 const JWT_KEY = 'jwt_token';
