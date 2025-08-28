@@ -5,6 +5,7 @@ import Wrapper from '@/components/wrapper';
 import { GoogleTagManager } from '@next/third-parties/google';
 import { Lato } from 'next/font/google';
 import Image from 'next/image';
+import Script from 'next/script';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import Footer from '../components/version-tsx/footer';
 import HeaderWrapper from '../components/version-tsx/header-wrapper';
@@ -98,7 +99,7 @@ export default function RootLayout({ children }) {
 
         {/* Tawk.to Script - Simple approach compatible with server components */}
 
-        {/* <Script
+        <Script
           id="tawk-to-script"
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
@@ -128,7 +129,7 @@ export default function RootLayout({ children }) {
                 })();
               `,
           }}
-        /> */}
+        />
       </body>
     </html>
   );
