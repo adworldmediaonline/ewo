@@ -1,34 +1,66 @@
-import { betterFetch } from '@better-fetch/fetch';
-import { Session, User } from 'better-auth';
-import { headers } from 'next/headers';
-import { cache } from 'react';
+import { cookies } from 'next/headers';
 
-type FullSession = {
-  session: Session;
-  user: User & { role: string };
-};
-
-export const getServerSession = cache(async () => {
+// Server-side session utility for Better Auth
+export async function getServerSession() {
   try {
-    const { data, error } = await betterFetch<FullSession>(
-      '/api/auth/get-session',
+    const cookieStore = await cookies();
+
+    // Get the session cookie
+    const sessionCookie = cookieStore.get('better-auth-session');
+
+    if (!sessionCookie) {
+      return null;
+    }
+
+    // Make a request to the backend to verify the session
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8090'}/api/me`,
       {
-        baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8090',
         headers: {
-          cookie: (await headers()).get('cookie') || '',
+          Cookie: `better-auth-session=${sessionCookie.value}`,
         },
         credentials: 'include',
       }
     );
 
-    if (error) {
-      console.error('Error fetching session:', error);
+    if (!response.ok) {
       return null;
     }
 
-    return data;
+    const session = await response.json();
+    return session;
   } catch (error) {
-    console.error('Error fetching session:', error);
+    console.error('Failed to get server session:', error);
     return null;
   }
-});
+}
+
+// Alternative: Get session from JWT token in Authorization header
+export async function getServerSessionFromToken(authorization?: string) {
+  try {
+    if (!authorization || !authorization.startsWith('Bearer ')) {
+      return null;
+    }
+
+    const token = authorization.substring(7);
+
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8090'}/api/me`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const session = await response.json();
+    return session;
+  } catch (error) {
+    console.error('Failed to get server session from token:', error);
+    return null;
+  }
+}
