@@ -1,10 +1,25 @@
 import { emailOTPClient } from 'better-auth/client/plugins';
 import { createAuthClient } from 'better-auth/react';
 
+// Get base URL with fallback for different environments
+const getBaseURL = () => {
+  if (typeof window !== 'undefined') {
+    // Client-side: use environment variable or fallback
+    return process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8090';
+  }
+  // Server-side: use environment variable or fallback
+  return process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8090';
+};
+
+const baseURL = getBaseURL();
+
+console.log('🔧 Frontend Auth Client Configuration:');
+console.log('  - Base URL:', baseURL);
+console.log('  - Environment:', process.env.NODE_ENV);
+
 // Create the auth client following official docs
 export const authClient = createAuthClient({
-  // baseURL: 'http://localhost:8090',
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  baseURL: baseURL,
 
   // Configure fetchOptions to handle Bearer tokens and JWT following official docs
   fetchOptions: {
@@ -104,15 +119,12 @@ export const getJWTToken = async () => {
       throw new Error('No Bearer token available');
     }
 
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/token`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: 'include',
-      }
-    );
+    const response = await fetch(`${baseURL}/api/auth/token`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: 'include',
+    });
 
     if (!response.ok) {
       throw new Error('Failed to get JWT token');
