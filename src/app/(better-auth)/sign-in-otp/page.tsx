@@ -38,7 +38,8 @@ export default function SignInOTPPage() {
     setError('');
 
     try {
-      const { error: sendError } =
+      // Use the correct Better Auth method for sending OTP
+      const { data, error: sendError } =
         await authClient.emailOtp.sendVerificationOtp({
           email: email.trim(),
           type: 'sign-in',
@@ -46,15 +47,16 @@ export default function SignInOTPPage() {
 
       if (sendError) {
         setError(sendError.message || 'Failed to send OTP. Please try again.');
+        setIsLoading(false);
         return;
       }
 
       setStep('otp');
       setResendCooldown(60);
+      setIsLoading(false);
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
       console.error('Send OTP error:', err);
-    } finally {
       setIsLoading(false);
     }
   };
@@ -70,29 +72,11 @@ export default function SignInOTPPage() {
     setError('');
 
     try {
-      const { data, error: signInError } = await authClient.signIn.emailOtp(
-        {
-          email,
-          otp: otp.trim(),
-        },
-        {
-          onSuccess: () => {
-            console.log('✅ OTP Sign-in successful');
-          },
-          onError: ctx => {
-            const errorMessage = ctx.error.message || '';
-            if (errorMessage.includes('MAX_ATTEMPTS_EXCEEDED')) {
-              setError('Maximum attempts exceeded. Please request a new OTP.');
-            } else if (errorMessage.includes('INVALID_OTP')) {
-              setError('Invalid OTP. Please check your code and try again.');
-            } else if (errorMessage.includes('EXPIRED')) {
-              setError('OTP has expired. Please request a new one.');
-            } else {
-              setError(errorMessage || 'Sign-in failed. Please try again.');
-            }
-          },
-        }
-      );
+      // Use the correct Better Auth method for signing in with OTP
+      const { data, error: signInError } = await authClient.signIn.emailOtp({
+        email,
+        otp: otp.trim(),
+      });
 
       if (signInError) {
         const errorMessage = signInError.message || '';
@@ -105,6 +89,7 @@ export default function SignInOTPPage() {
         } else {
           setError(errorMessage || 'Sign-in failed. Please try again.');
         }
+        setIsLoading(false);
         return;
       }
 
@@ -114,7 +99,6 @@ export default function SignInOTPPage() {
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
       console.error('OTP sign-in error:', err);
-    } finally {
       setIsLoading(false);
     }
   };
@@ -124,7 +108,8 @@ export default function SignInOTPPage() {
     setError('');
 
     try {
-      const { error: resendError } =
+      // Use the correct Better Auth method for sending OTP
+      const { data, error: resendError } =
         await authClient.emailOtp.sendVerificationOtp({
           email,
           type: 'sign-in',
@@ -134,15 +119,16 @@ export default function SignInOTPPage() {
         setError(
           resendError.message || 'Failed to resend OTP. Please try again.'
         );
+        setIsLoading(false);
         return;
       }
 
       setResendCooldown(60);
       setOtp('');
+      setIsLoading(false);
     } catch (err) {
       setError('Failed to resend OTP. Please try again.');
       console.error('Resend OTP error:', err);
-    } finally {
       setIsLoading(false);
     }
   };

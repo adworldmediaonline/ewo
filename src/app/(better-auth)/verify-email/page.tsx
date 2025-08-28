@@ -59,37 +59,31 @@ export default function VerifyEmailPage() {
     setIsLoading(true);
     setError('');
 
-    // Use better-auth's official callback pattern
-    const { error: verifyError } = await authClient.emailOtp.verifyEmail(
-      {
-        email,
-        otp: otp.trim(),
-      },
-      {
-        onRequest: () => {
-          setIsLoading(true);
-          setError('');
-        },
-        onSuccess: () => {
-          setSuccess(true);
-          // Let better-auth handle the session and redirect
-          setTimeout(() => {
-            router.push('/sign-in');
-            router.refresh();
-          }, 2000);
-        },
-        onError: ctx => {
-          setError(
-            ctx.error.message || 'Verification failed. Please try again.'
-          );
-          setIsLoading(false);
-        },
-      }
-    );
+    try {
+      // Use the correct Better Auth method for verifying email with OTP
+      const { data, error: verifyError } =
+        await authClient.emailOtp.verifyEmail({
+          email,
+          otp: otp.trim(),
+        });
 
-    // Fallback error handling if callbacks don't work
-    if (verifyError && !error) {
-      setError(verifyError.message || 'Verification failed. Please try again.');
+      if (verifyError) {
+        setError(
+          verifyError.message || 'Verification failed. Please try again.'
+        );
+        setIsLoading(false);
+        return;
+      }
+
+      setSuccess(true);
+      // Let better-auth handle the session and redirect
+      setTimeout(() => {
+        router.push('/sign-in');
+        router.refresh();
+      }, 2000);
+    } catch (err) {
+      setError('Verification failed. Please try again.');
+      console.error('OTP verification error:', err);
       setIsLoading(false);
     }
   };
@@ -98,37 +92,28 @@ export default function VerifyEmailPage() {
     setResendLoading(true);
     setError('');
 
-    // Use better-auth's official callback pattern
-    const { error: resendError } =
-      await authClient.emailOtp.sendVerificationOtp(
-        {
+    try {
+      // Use the correct Better Auth method for sending verification OTP
+      const { data, error: resendError } =
+        await authClient.emailOtp.sendVerificationOtp({
           email,
           type: 'email-verification',
-        },
-        {
-          onRequest: () => {
-            setResendLoading(true);
-            setError('');
-          },
-          onSuccess: () => {
-            setResendCooldown(60); // 60 second cooldown
-            setOtp(''); // Clear current OTP
-            setResendLoading(false);
-          },
-          onError: ctx => {
-            setError(
-              ctx.error.message || 'Failed to resend OTP. Please try again.'
-            );
-            setResendLoading(false);
-          },
-        }
-      );
+        });
 
-    // Fallback error handling if callbacks don't work
-    if (resendError && !error) {
-      setError(
-        resendError.message || 'Failed to resend OTP. Please try again.'
-      );
+      if (resendError) {
+        setError(
+          resendError.message || 'Failed to resend OTP. Please try again.'
+        );
+        setResendLoading(false);
+        return;
+      }
+
+      setResendCooldown(60); // 60 second cooldown
+      setOtp(''); // Clear current OTP
+      setResendLoading(false);
+    } catch (err) {
+      setError('Failed to resend OTP. Please try again.');
+      console.error('Resend OTP error:', err);
       setResendLoading(false);
     }
   };

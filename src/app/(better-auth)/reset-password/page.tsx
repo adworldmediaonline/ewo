@@ -61,35 +61,32 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    // Use better-auth's official callback pattern
-    const { error: sendError } = await authClient.forgetPassword.emailOtp(
-      {
-        email: email.trim(),
-      },
-      {
-        onRequest: () => {
-          setIsLoading(true);
-          setError('');
-        },
-        onSuccess: () => {
-          setStep('otp');
-          setResendCooldown(60);
-        },
-        onError: ctx => {
-          setError(
-            ctx.error.message || 'Failed to send reset code. Please try again.'
-          );
-          setIsLoading(false);
-        },
-      }
-    );
+    setIsLoading(true);
+    setError('');
 
-    // Fallback error handling if callbacks don't work
-    if (sendError && !error) {
-      setError(
-        sendError.message || 'Failed to send reset code. Please try again.'
-      );
+    try {
+      // Use the correct Better Auth method for sending OTP
+      const { data, error: sendError } =
+        await authClient.emailOtp.sendVerificationOtp({
+          email: email.trim(),
+          type: 'forget-password',
+        });
+
+      if (sendError) {
+        setError(
+          sendError.message || 'Failed to send reset code. Please try again.'
+        );
+        setIsLoading(false);
+        return;
+      }
+
+      setStep('otp');
+      setResendCooldown(60);
       setIsLoading(false);
+    } catch (err) {
+      setError('Failed to send reset code. Please try again.');
+      setIsLoading(false);
+      console.error('Send OTP error:', err);
     }
   };
 
@@ -100,53 +97,39 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    // Use better-auth's official callback pattern
-    const { error: verifyError } =
-      await authClient.emailOtp.checkVerificationOtp(
-        {
+    setIsLoading(true);
+    setError('');
+
+    try {
+      // Use the correct Better Auth method for checking OTP
+      const { data, error: verifyError } =
+        await authClient.emailOtp.checkVerificationOtp({
           email,
           type: 'forget-password',
           otp: otp.trim(),
-        },
-        {
-          onRequest: () => {
-            setIsLoading(true);
-            setError('');
-          },
-          onSuccess: () => {
-            setStep('password');
-          },
-          onError: ctx => {
-            const errorMessage = ctx.error.message || '';
-            if (errorMessage.includes('MAX_ATTEMPTS_EXCEEDED')) {
-              setError('Maximum attempts exceeded. Please request a new code.');
-            } else if (errorMessage.includes('INVALID_OTP')) {
-              setError('Invalid code. Please check and try again.');
-            } else if (errorMessage.includes('EXPIRED')) {
-              setError('Code has expired. Please request a new one.');
-            } else {
-              setError(
-                errorMessage || 'Verification failed. Please try again.'
-              );
-            }
-            setIsLoading(false);
-          },
-        }
-      );
+        });
 
-    // Fallback error handling if callbacks don't work
-    if (verifyError && !error) {
-      const errorMessage = verifyError.message || '';
-      if (errorMessage.includes('MAX_ATTEMPTS_EXCEEDED')) {
-        setError('Maximum attempts exceeded. Please request a new code.');
-      } else if (errorMessage.includes('INVALID_OTP')) {
-        setError('Invalid code. Please check and try again.');
-      } else if (errorMessage.includes('EXPIRED')) {
-        setError('Code has expired. Please request a new one.');
-      } else {
-        setError(errorMessage || 'Verification failed. Please try again.');
+      if (verifyError) {
+        const errorMessage = verifyError.message || '';
+        if (errorMessage.includes('MAX_ATTEMPTS_EXCEEDED')) {
+          setError('Maximum attempts exceeded. Please request a new code.');
+        } else if (errorMessage.includes('INVALID_OTP')) {
+          setError('Invalid code. Please check and try again.');
+        } else if (errorMessage.includes('EXPIRED')) {
+          setError('Code has expired. Please request a new one.');
+        } else {
+          setError(errorMessage || 'Verification failed. Please try again.');
+        }
+        setIsLoading(false);
+        return;
       }
+
+      setStep('password');
       setIsLoading(false);
+    } catch (err) {
+      setError('Verification failed. Please try again.');
+      setIsLoading(false);
+      console.error('OTP verification error:', err);
     }
   };
 
@@ -168,69 +151,62 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    // Use better-auth's official callback pattern
-    const { error: resetError } = await authClient.emailOtp.resetPassword(
-      {
-        email,
-        otp,
-        password: newPassword,
-      },
-      {
-        onRequest: () => {
-          setIsLoading(true);
-          setError('');
-        },
-        onSuccess: () => {
-          setStep('success');
-        },
-        onError: ctx => {
-          setError(
-            ctx.error.message || 'Failed to reset password. Please try again.'
-          );
-          setIsLoading(false);
-        },
-      }
-    );
+    setIsLoading(true);
+    setError('');
 
-    // Fallback error handling if callbacks don't work
-    if (resetError && !error) {
-      setError(
-        resetError.message || 'Failed to reset password. Please try again.'
-      );
+    try {
+      // Use the correct Better Auth method for resetting password
+      const { data, error: resetError } =
+        await authClient.emailOtp.resetPassword({
+          email,
+          otp,
+          password: newPassword,
+        });
+
+      if (resetError) {
+        setError(
+          resetError.message || 'Failed to reset password. Please try again.'
+        );
+        setIsLoading(false);
+        return;
+      }
+
+      setStep('success');
       setIsLoading(false);
+    } catch (err) {
+      setError('Failed to reset password. Please try again.');
+      setIsLoading(false);
+      console.error('Reset password error:', err);
     }
   };
 
   const handleResendOTP = async () => {
-    // Use better-auth's official callback pattern
-    const { error: resendError } = await authClient.forgetPassword.emailOtp(
-      {
-        email,
-      },
-      {
-        onRequest: () => {
-          setIsLoading(true);
-          setError('');
-        },
-        onSuccess: () => {
-          setResendCooldown(60);
-          setOtp('');
-        },
-        onError: ctx => {
-          setError(
-            ctx.error.message || 'Failed to resend code. Please try again.'
-          );
-          setIsLoading(false);
-        },
-      }
-    );
+    setIsLoading(true);
+    setError('');
 
-    // Fallback error handling if callbacks don't work
-    if (resendError && !error) {
-      setError(
-        resendError.message || 'Failed to resend code. Please try again.'
-      );
+    try {
+      // Use the correct Better Auth method for sending OTP
+      const { data, error: resendError } =
+        await authClient.emailOtp.sendVerificationOtp({
+          email,
+          type: 'forget-password',
+        });
+
+      if (resendError) {
+        setError(
+          resendError.message || 'Failed to resend code. Please try again.'
+        );
+        setIsLoading(false);
+        return;
+      }
+
+      setResendCooldown(60);
+      setOtp('');
       setIsLoading(false);
+    } catch (err) {
+      setError('Failed to resend code. Please try again.');
+      setIsLoading(false);
+      console.error('Resend OTP error:', err);
     }
   };
 

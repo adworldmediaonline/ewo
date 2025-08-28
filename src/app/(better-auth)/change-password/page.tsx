@@ -82,7 +82,8 @@ export default function ChangePasswordPage() {
     setError('');
 
     try {
-      const { error: changeError } = await authClient.changePassword({
+      // Use the correct Better Auth method for changing password
+      const { data, error: changeError } = await authClient.changePassword({
         currentPassword,
         newPassword,
         revokeOtherSessions,
@@ -97,6 +98,7 @@ export default function ChangePasswordPage() {
               'Failed to change password. Please try again.'
           );
         }
+        setIsLoading(false);
         return;
       }
 
@@ -104,7 +106,6 @@ export default function ChangePasswordPage() {
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
       console.error('Change password error:', err);
-    } finally {
       setIsLoading(false);
     }
   };

@@ -34,37 +34,33 @@ export default function ForgotPasswordPage() {
       return;
     }
 
-    // Use better-auth's official callback pattern
-    const { error: resetError } = await authClient.forgetPassword.emailOtp(
-      {
-        email: email.trim(),
-      },
-      {
-        onRequest: () => {
-          setIsLoading(true);
-          setError('');
-        },
-        onSuccess: () => {
-          // OTP sent successfully, show OTP input
-          setOtpSent(true);
-          setResendCooldown(60);
-          setIsLoading(false);
-        },
-        onError: ctx => {
-          setError(
-            ctx.error.message || 'Failed to send reset code. Please try again.'
-          );
-          setIsLoading(false);
-        },
-      }
-    );
+    setIsLoading(true);
+    setError('');
 
-    // Fallback error handling if callbacks don't work
-    if (resetError && !error) {
-      setError(
-        resetError.message || 'Failed to send reset code. Please try again.'
-      );
+    try {
+      // Use the correct Better Auth method for sending OTP
+      const { data, error: resetError } =
+        await authClient.emailOtp.sendVerificationOtp({
+          email: email.trim(),
+          type: 'forget-password',
+        });
+
+      if (resetError) {
+        setError(
+          resetError.message || 'Failed to send reset code. Please try again.'
+        );
+        setIsLoading(false);
+        return;
+      }
+
+      // OTP sent successfully, show OTP input
+      setOtpSent(true);
+      setResendCooldown(60);
       setIsLoading(false);
+    } catch (err) {
+      setError('Failed to send reset code. Please try again.');
+      setIsLoading(false);
+      console.error('Send OTP error:', err);
     }
   };
 
@@ -79,7 +75,8 @@ export default function ForgotPasswordPage() {
     setError('');
 
     try {
-      const { error: verifyError } =
+      // Use the correct Better Auth method for checking OTP
+      const { data, error: verifyError } =
         await authClient.emailOtp.checkVerificationOtp({
           email,
           type: 'forget-password',
@@ -97,6 +94,7 @@ export default function ForgotPasswordPage() {
         } else {
           setError(errorMessage || 'Verification failed. Please try again.');
         }
+        setIsLoading(false);
         return;
       }
 
@@ -107,7 +105,6 @@ export default function ForgotPasswordPage() {
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
       console.error('OTP verification error:', err);
-    } finally {
       setIsLoading(false);
     }
   };
@@ -117,23 +114,26 @@ export default function ForgotPasswordPage() {
     setError('');
 
     try {
-      const { error: resendError } = await authClient.forgetPassword.emailOtp({
-        email,
-      });
+      const { data, error: resendError } =
+        await authClient.emailOtp.sendVerificationOtp({
+          email,
+          type: 'forget-password',
+        });
 
       if (resendError) {
         setError(
           resendError.message || 'Failed to resend code. Please try again.'
         );
+        setIsLoading(false);
         return;
       }
 
       setResendCooldown(60);
       setOtp('');
+      setIsLoading(false);
     } catch (err) {
       setError('Failed to resend code. Please try again.');
       console.error('Resend OTP error:', err);
-    } finally {
       setIsLoading(false);
     }
   };

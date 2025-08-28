@@ -1,186 +1,158 @@
-import { apiSlice } from '@/redux/api/apiSlice';
-import Cookies from 'js-cookie';
-import { userLoggedIn } from './authSlice';
+import { apiSlice } from '../../api/apiSlice';
+import {
+  setSession,
+  updateUser,
+  userLoggedIn,
+  userLoggedOut,
+} from './authSlice';
 
 export const authApi = apiSlice.injectEndpoints({
-  overrideExisting: true,
   endpoints: builder => ({
-    registerUser: builder.mutation({
-      query: data => ({
-        url: 'api/user/signup',
-        method: 'POST',
-        body: data,
-      }),
-    }),
-    // signUpProvider
-    signUpProvider: builder.mutation({
-      query: token => ({
-        url: `api/user/register/${token}`,
-        method: 'POST',
-      }),
-
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+    // Get current session (Better Auth)
+    getSession: builder.query({
+      query: () => '/api/me',
+      providesTags: ['Auth'],
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
-          const result = await queryFulfilled;
-
-          Cookies.set(
-            'userInfo',
-            JSON.stringify({
-              accessToken: result.data.data.token,
-              user: result.data.data.user,
-            }),
-            { expires: 0.5 }
-          );
-
-          dispatch(
-            userLoggedIn({
-              accessToken: result.data.data.token,
-              user: result.data.data.user,
-            })
-          );
-        } catch (err) {
-          // do nothing
+          const { data } = await queryFulfilled;
+          if (data) {
+            dispatch(setSession(data));
+          }
+        } catch (error) {
+          console.warn('Failed to get session:', error);
         }
       },
     }),
-    // login
-    loginUser: builder.mutation({
-      query: data => ({
-        url: 'api/user/login',
+
+    // Sign in with email/password (Better Auth)
+    signIn: builder.mutation({
+      query: credentials => ({
+        url: '/api/auth/signin',
         method: 'POST',
-        body: data,
+        body: credentials,
       }),
-
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+      invalidatesTags: ['Auth'],
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
-          const result = await queryFulfilled;
-
-          Cookies.set(
-            'userInfo',
-            JSON.stringify({
-              accessToken: result.data.data.token,
-              user: result.data.data.user,
-            }),
-            { expires: 0.5 }
-          );
-
-          dispatch(
-            userLoggedIn({
-              accessToken: result.data.data.token,
-              user: result.data.data.user,
-            })
-          );
-        } catch (err) {
-          // do nothing
+          const { data } = await queryFulfilled;
+          if (data) {
+            dispatch(setSession(data));
+          }
+        } catch (error) {
+          console.error('Sign in failed:', error);
         }
       },
     }),
-    // get me
-    getUser: builder.query({
-      query: () => 'api/user/me',
 
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
-        try {
-          const result = await queryFulfilled;
-          dispatch(
-            userLoggedIn({
-              user: result.data,
-            })
-          );
-        } catch (err) {
-          // do nothing
-        }
-      },
-    }),
-    // confirmEmail
-    confirmEmail: builder.query({
-      query: token => `api/user/confirmEmail/${token}`,
-
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
-        try {
-          const result = await queryFulfilled;
-
-          Cookies.set(
-            'userInfo',
-            JSON.stringify({
-              accessToken: result.data.data.token,
-              user: result.data.data.user,
-            }),
-            { expires: 0.5 }
-          );
-
-          dispatch(
-            userLoggedIn({
-              accessToken: result.data.data.token,
-              user: result.data.data.user,
-            })
-          );
-        } catch (err) {
-          // do nothing
-        }
-      },
-    }),
-    // resend verification
-    resendVerification: builder.mutation({
-      query: data => ({
-        url: 'api/user/resend-verification',
+    // Sign up with email/password (Better Auth)
+    signUp: builder.mutation({
+      query: userData => ({
+        url: '/api/auth/signup',
         method: 'POST',
-        body: data,
+        body: userData,
       }),
+      invalidatesTags: ['Auth'],
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data) {
+            dispatch(setSession(data));
+          }
+        } catch (error) {
+          console.error('Sign up failed:', error);
+        }
+      },
     }),
-    // reset password
-    resetPassword: builder.mutation({
-      query: data => ({
-        url: 'api/user/forget-password',
-        method: 'PATCH',
-        body: data,
+
+    // Sign out (Better Auth)
+    signOut: builder.mutation({
+      query: () => ({
+        url: '/api/auth/signout',
+        method: 'POST',
       }),
+      invalidatesTags: ['Auth'],
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          dispatch(userLoggedOut());
+        } catch (error) {
+          console.error('Sign out failed:', error);
+          // Force logout even if API call fails
+          dispatch(userLoggedOut());
+        }
+      },
     }),
-    // confirmForgotPassword
-    confirmForgotPassword: builder.mutation({
-      query: data => ({
-        url: 'api/user/confirm-forget-password',
-        method: 'PATCH',
-        body: data,
-      }),
-    }),
-    // change password
-    changePassword: builder.mutation({
-      query: data => ({
-        url: 'api/user/change-password',
-        method: 'PATCH',
-        body: data,
-      }),
-    }),
-    // updateProfile password
+
+    // Update profile
     updateProfile: builder.mutation({
-      query: ({ id, ...data }) => ({
-        url: `/api/user/update-user/${id}`,
+      query: profileData => ({
+        url: '/api/user/profile',
         method: 'PUT',
-        body: data,
+        body: profileData,
       }),
-
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+      invalidatesTags: ['Auth', 'User'],
+      async onQueryStarted(profileData, { dispatch, queryFulfilled }) {
         try {
-          const result = await queryFulfilled;
+          const { data } = await queryFulfilled;
+          if (data) {
+            dispatch(updateUser(data));
+          }
+        } catch (error) {
+          console.error('Profile update failed:', error);
+        }
+      },
+    }),
 
-          Cookies.set(
-            'userInfo',
-            JSON.stringify({
-              accessToken: result.data.data.token,
-              user: result.data.data.user,
-            }),
-            { expires: 0.5 }
-          );
+    // Get user profile
+    getUserProfile: builder.query({
+      query: () => '/api/user/profile',
+      providesTags: ['User'],
+    }),
 
-          dispatch(
-            userLoggedIn({
-              accessToken: result.data.data.token,
-              user: result.data.data.user,
-            })
-          );
-        } catch (err) {
-          // do nothing
+    // Legacy authentication endpoints (for backward compatibility)
+    legacySignIn: builder.mutation({
+      query: credentials => ({
+        url: '/api/user/login',
+        method: 'POST',
+        body: credentials,
+      }),
+      invalidatesTags: ['Auth'],
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data?.accessToken && data?.user) {
+            dispatch(userLoggedIn(data));
+          }
+        } catch (error) {
+          console.error('Legacy sign in failed:', error);
+        }
+      },
+    }),
+
+    legacySignUp: builder.mutation({
+      query: userData => ({
+        url: '/api/user/register',
+        method: 'POST',
+        body: userData,
+      }),
+      invalidatesTags: ['Auth'],
+    }),
+
+    // Check authentication status
+    checkAuth: builder.query({
+      query: () => '/api/me',
+      providesTags: ['Auth'],
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data) {
+            dispatch(setSession(data));
+          } else {
+            dispatch(userLoggedOut());
+          }
+        } catch (error) {
+          console.warn('Auth check failed:', error);
+          dispatch(userLoggedOut());
         }
       },
     }),
@@ -188,13 +160,13 @@ export const authApi = apiSlice.injectEndpoints({
 });
 
 export const {
-  useLoginUserMutation,
-  useRegisterUserMutation,
-  useConfirmEmailQuery,
-  useResendVerificationMutation,
-  useResetPasswordMutation,
-  useConfirmForgotPasswordMutation,
-  useChangePasswordMutation,
+  useGetSessionQuery,
+  useSignInMutation,
+  useSignUpMutation,
+  useSignOutMutation,
   useUpdateProfileMutation,
-  useSignUpProviderMutation,
+  useGetUserProfileQuery,
+  useLegacySignInMutation,
+  useLegacySignUpMutation,
+  useCheckAuthQuery,
 } = authApi;

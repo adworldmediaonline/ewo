@@ -43,23 +43,12 @@ export function SignInForm({
     setError('');
 
     try {
-      const { data: _data, error: signInError } = await authClient.signIn.email(
-        {
-          email,
-          password,
-          // rememberMe,
-          callbackURL: redirectPath,
-        },
-        {
-          onSuccess: () => {
-            // Handle successful sign-in
-            console.log('✅ Sign-in successful');
-          },
-          onError: ctx => {
-            setError(ctx.error.message || 'Sign in failed');
-          },
-        }
-      );
+      // Use the correct Better Auth method for email/password sign-in
+      const { data, error: signInError } = await authClient.signIn.email({
+        email,
+        password,
+        callbackURL: redirectPath,
+      });
 
       if (signInError) {
         setError(signInError.message || 'Sign in failed');
