@@ -1,6 +1,27 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = {
+// Types
+interface Coupon {
+  _id: string;
+  couponCode: string;
+  discountType: 'percentage' | 'amount';
+  discountPercentage?: number;
+  discountAmount?: number;
+  endTime: string;
+  discount?: number;
+  applicableProducts: any[];
+}
+
+interface CouponState {
+  coupon_info: any;
+  applied_coupons: Coupon[];
+  total_coupon_discount: number;
+  coupon_error: any;
+  coupon_loading: boolean;
+  last_applied_coupon: Coupon | null;
+}
+
+const initialState: CouponState = {
   coupon_info: undefined,
   applied_coupons: [],
   total_coupon_discount: 0,
