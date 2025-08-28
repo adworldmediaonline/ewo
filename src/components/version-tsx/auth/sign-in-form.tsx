@@ -16,7 +16,7 @@ import { useState } from 'react';
 // import { Checkbox } from '@/components/ui/checkbox';
 import { authClient } from '@/lib/authClient';
 import { AlertCircle, Loader2 } from 'lucide-react';
-// import GoogleSignIn from './google-signin';
+import GoogleSignIn from './google-signin';
 // import { Checkbox } from '@/components/ui/checkbox';
 
 interface SignInFormProps {
@@ -82,9 +82,9 @@ export function SignInForm({
       )}
 
       {/* Google Sign In */}
-      {/* <GoogleSignIn onSuccess={onSuccess} redirectPath={redirectPath} /> */}
+      <GoogleSignIn onSuccess={onSuccess} redirectPath={redirectPath} />
 
-      {/* <div className="relative">
+      <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
         </div>
@@ -93,7 +93,7 @@ export function SignInForm({
             Or continue with email
           </span>
         </div>
-      </div> */}
+      </div>
 
       {/* Email/Password Sign In */}
       <form onSubmit={handleEmailPasswordSignIn} className="space-y-4">

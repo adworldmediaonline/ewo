@@ -15,7 +15,7 @@ import { authClient } from '@/lib/authClient';
 import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-// import GoogleSignIn from './google-signin';
+import GoogleSignIn from './google-signin';
 
 interface SignUpFormProps {
   onSuccess?: () => void;
@@ -95,9 +95,9 @@ export function SignUpForm({
       )}
 
       {/* Google Sign Up */}
-      {/* <GoogleSignIn onSuccess={onSuccess} redirectPath={redirectPath} /> */}
+      <GoogleSignIn onSuccess={onSuccess} redirectPath={redirectPath} />
 
-      {/* <div className="relative">
+      <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
         </div>
@@ -106,7 +106,7 @@ export function SignUpForm({
             Or continue with email
           </span>
         </div>
-      </div> */}
+      </div>
 
       {/* Email/Password Sign Up */}
       <form onSubmit={handleSignUp} className="space-y-4">
