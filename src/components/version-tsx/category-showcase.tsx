@@ -51,6 +51,7 @@ const CategoryCard = ({ item }: CategoryCardProps) => {
     <div className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card text-left shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring h-full">
       {/* Main category link - covers the image and title area */}
       <Link
+        // scroll={true}
         href={`/shop?category=${toSlug(item.parent)}`}
         className="flex-1 flex flex-col"
         aria-label={`Browse ${item.parent}`}
