@@ -7,7 +7,15 @@ import {
 } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
+import { authClient } from '@/lib/authClient';
 import { replaceTextCharacters } from '@/lib/replaceTextCharacters';
 import {
   add_cart_product,
@@ -25,6 +33,7 @@ import {
   Heart,
   MessageSquare,
   Package,
+  Plus,
   ShoppingCart,
   Star,
   Tag,
@@ -109,8 +118,18 @@ export default function DetailsWrapper({
   } = productItem || {};
   const [ratingVal, setRatingVal] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
+  const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
+  const { data: session } = authClient.useSession();
   const dispatch = useDispatch();
   const { orderQuantity, cart_products } = useSelector(state => state.cart);
+
+  const handleReviewButtonClick = () => {
+    if (!session) {
+      // The toast will be shown by the ReviewForm component when submit is clicked
+      return;
+    }
+    setIsReviewDialogOpen(true);
+  };
 
   useEffect(() => {
     if (reviews && reviews.length > 0) {
@@ -463,7 +482,34 @@ export default function DetailsWrapper({
                       ))}
                     </div>
                     <Separator />
-                    <ReviewForm productId={productItem?._id} />
+
+                    {/* Add Review Button */}
+                    <div className="flex justify-center">
+                      <Dialog
+                        open={isReviewDialogOpen}
+                        onOpenChange={setIsReviewDialogOpen}
+                      >
+                        <DialogTrigger asChild>
+                          <Button
+                            onClick={handleReviewButtonClick}
+                            className="flex items-center gap-2"
+                            variant="outline"
+                          >
+                            <Plus className="w-4 h-4" />
+                            Add Review
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                          <DialogHeader>
+                            <DialogTitle>Write a Review</DialogTitle>
+                          </DialogHeader>
+                          <ReviewForm
+                            productId={productItem?._id}
+                            onSuccess={() => setIsReviewDialogOpen(false)}
+                          />
+                        </DialogContent>
+                      </Dialog>
+                    </div>
                   </>
                 ) : (
                   <div className="text-center py-8">
@@ -473,7 +519,34 @@ export default function DetailsWrapper({
                       Be the first to review this product!
                     </p>
                     <Separator className="my-6" />
-                    <ReviewForm productId={productItem?._id} />
+
+                    {/* Add Review Button */}
+                    <div className="flex justify-center">
+                      <Dialog
+                        open={isReviewDialogOpen}
+                        onOpenChange={setIsReviewDialogOpen}
+                      >
+                        <DialogTrigger asChild>
+                          <Button
+                            onClick={handleReviewButtonClick}
+                            className="flex items-center gap-2"
+                            variant="outline"
+                          >
+                            <Plus className="w-4 h-4" />
+                            Add Review
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                          <DialogHeader>
+                            <DialogTitle>Write a Review</DialogTitle>
+                          </DialogHeader>
+                          <ReviewForm
+                            productId={productItem?._id}
+                            onSuccess={() => setIsReviewDialogOpen(false)}
+                          />
+                        </DialogContent>
+                      </Dialog>
+                    </div>
                   </div>
                 )}
               </div>
