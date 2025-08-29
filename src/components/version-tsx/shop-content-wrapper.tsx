@@ -85,6 +85,7 @@ export default function ShopContentWrapper({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const currentPageRef = useRef(currentPage);
   const isUpdatingFromUrl = useRef(false);
+  const isFilterChanging = useRef(false); // New ref to track filter changes
 
   const { ref: loadMoreRef, inView } = useInView();
 
@@ -187,6 +188,18 @@ export default function ShopContentWrapper({
     currentPageRef.current = currentPage;
   }, [currentPage]);
 
+  // Reset filter changing flag after filters have settled
+  useEffect(() => {
+    if (isFilterChanging.current) {
+      const timer = setTimeout(() => {
+        isFilterChanging.current = false;
+        console.log('Filter changing flag reset to false');
+      }, 200); // Allow time for state to settle
+
+      return () => clearTimeout(timer);
+    }
+  }, [filters]);
+
   // Convert filters to API format
   const apiFilters = useMemo(() => {
     const apiFiltersObj = {
@@ -202,6 +215,8 @@ export default function ShopContentWrapper({
     {
       // Force refetch when page changes
       refetchOnMountOrArgChange: true,
+      // Skip query if filters are currently changing to prevent race conditions
+      skip: isFilterChanging.current,
     }
   );
 
@@ -251,6 +266,9 @@ export default function ShopContentWrapper({
       currentSortOrder !== filters.sortOrder;
 
     if (hasChanges) {
+      // Set flag to prevent race conditions
+      isFilterChanging.current = true;
+
       setFilters({
         search: currentSearch,
         category: currentCategory,
