@@ -148,6 +148,8 @@ export default function ShopContentWrapper({
       setPendingFilters(prev => ({
         ...prev!,
         category: newCategory,
+        // Clear subcategory when selecting a new category
+        subcategory: newCategory ? '' : prev!.subcategory,
       }));
     }
   };
@@ -188,18 +190,6 @@ export default function ShopContentWrapper({
     currentPageRef.current = currentPage;
   }, [currentPage]);
 
-  // Reset filter changing flag after filters have settled
-  useEffect(() => {
-    if (isFilterChanging.current) {
-      const timer = setTimeout(() => {
-        isFilterChanging.current = false;
-        console.log('Filter changing flag reset to false');
-      }, 200); // Allow time for state to settle
-
-      return () => clearTimeout(timer);
-    }
-  }, [filters]);
-
   // Convert filters to API format
   const apiFilters = useMemo(() => {
     const apiFiltersObj = {
@@ -215,8 +205,6 @@ export default function ShopContentWrapper({
     {
       // Force refetch when page changes
       refetchOnMountOrArgChange: true,
-      // Skip query if filters are currently changing to prevent race conditions
-      skip: isFilterChanging.current,
     }
   );
 
@@ -284,7 +272,18 @@ export default function ShopContentWrapper({
 
   const handleFiltersChange = useCallback(
     (newFilters: ShopFiltersType) => {
-      setFilters(newFilters);
+      // IMPORTANT: Clear subcategory when only parent category is selected
+      // This ensures that clicking on a parent category in sidebar clears any previous subcategory
+      const updatedFilters = { ...newFilters };
+      if (updatedFilters.category && !updatedFilters.subcategory) {
+        updatedFilters.subcategory = '';
+        console.log(
+          'Clearing subcategory in filter state for category:',
+          updatedFilters.category
+        );
+      }
+
+      setFilters(updatedFilters);
 
       // Set flag to prevent infinite loop in URL sync
       isUpdatingFromUrl.current = true;
@@ -301,6 +300,14 @@ export default function ShopContentWrapper({
           ? newFilters.category
           : toSlug(newFilters.category);
         params.set('category', categoryParam);
+
+        // IMPORTANT: Clear subcategory when only parent category is selected
+        // This ensures that clicking on a parent category in sidebar clears any previous subcategory
+        if (!newFilters.subcategory) {
+          // Explicitly remove subcategory from URL when only parent category is selected
+          params.delete('subcategory');
+          console.log('Clearing subcategory parameter from URL');
+        }
       }
       if (newFilters.subcategory) {
         const isAlreadySlug =
@@ -318,6 +325,16 @@ export default function ShopContentWrapper({
 
       const queryString = params.toString();
       const newUrl = queryString ? `/shop?${queryString}` : '/shop';
+
+      // Debug logging for URL changes
+      console.log('URL Update:', {
+        newFilters: newFilters,
+        params: Object.fromEntries(params.entries()),
+        newUrl: newUrl,
+        hasSubcategory: params.has('subcategory'),
+        subcategoryValue: params.get('subcategory'),
+      });
+
       router.push(newUrl);
     },
     [router]
