@@ -192,12 +192,13 @@ export default function ProductItem({
     >
       <Link href={`/product/${product.slug}`} className="block flex-1">
         <CardContent className="p-0 h-full flex flex-col">
-          <div className="relative aspect-square overflow-hidden p-1">
+          {/* Image Container - Fixed height to prevent cutting */}
+          <div className="relative w-full h-64 overflow-hidden p-2">
             {/* Coupon Badge */}
             {coupons && coupons.length > 0 && (
               <Badge
                 variant="destructive"
-                className="absolute left-2 top-2 z-10 font-semibold"
+                className="absolute left-3 top-3 z-10 font-semibold"
               >
                 <Tag className="h-3 w-3 mr-1" />
                 {coupons[0].discountType === 'percentage'
@@ -210,7 +211,7 @@ export default function ProductItem({
             {discountPercentage > 0 && !coupons?.length && (
               <Badge
                 variant="destructive"
-                className="absolute left-2 top-2 z-10 font-semibold"
+                className="absolute left-3 top-3 z-10 font-semibold"
               >
                 -{discountPercentage}%
               </Badge>
@@ -220,28 +221,29 @@ export default function ProductItem({
             {product.status === 'out-of-stock' && (
               <Badge
                 variant="secondary"
-                className="absolute right-2 top-2 z-10"
+                className="absolute right-3 top-3 z-10"
               >
                 Out of Stock
               </Badge>
             )}
 
-            {/* Product Image */}
-            <div className="relative h-full w-full overflow-hidden">
+            {/* Product Image - Improved sizing and positioning */}
+            <div className="relative h-full w-full overflow-hidden rounded-lg">
               {imageUrl ? (
                 <Image
                   src={imageUrl}
                   alt={product.title}
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className={`object-contain transition-transform duration-300 ${
+                  className={`object-cover transition-transform duration-300 ${
                     isHovered ? 'scale-105' : 'scale-100'
                   }`}
                   onLoad={() => setIsImageLoading(false)}
                   priority={false}
+                  style={{ objectPosition: 'center' }}
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center bg-muted">
+                <div className="flex h-full w-full items-center justify-center bg-muted rounded-lg">
                   <span className="text-muted-foreground text-sm">
                     No Image
                   </span>
@@ -250,16 +252,16 @@ export default function ProductItem({
 
               {/* Loading Overlay */}
               {isImageLoading && (
-                <div className="absolute inset-0 bg-muted animate-pulse" />
+                <div className="absolute inset-0 bg-muted animate-pulse rounded-lg" />
               )}
 
               {/* Quick Action Buttons */}
               <div
-                className={`absolute inset-0 bg-black/20 opacity-0 transition-all duration-300 ${
+                className={`absolute inset-0 bg-black/20 opacity-0 transition-all duration-300 rounded-lg ${
                   isHovered ? 'opacity-100' : ''
                 }`}
               >
-                <div className="absolute right-2 top-2 flex flex-col gap-2">
+                <div className="absolute right-3 top-3 flex flex-col gap-2">
                   <Button
                     size="icon"
                     variant="outline"
@@ -300,19 +302,19 @@ export default function ProductItem({
         </CardContent>
       </Link>
 
-      {/* Product Info - Flexible Layout */}
-      <div className="flex flex-col h-full px-4 pb-4 pt-1 flex-1">
-        <div className="flex-1 space-y-2">
+      {/* Product Info - Improved layout and spacing */}
+      <div className="flex flex-col h-full px-4 pb-4 pt-2 flex-1">
+        <div className="flex-1 space-y-3">
           {/* Category */}
           {product.category && (
-            <div className="text-xs text-muted-foreground uppercase tracking-wide">
+            <div className="text-xs text-muted-foreground uppercase tracking-wide font-medium">
               {product.category.name}
             </div>
           )}
 
-          {/* Title */}
+          {/* Title - No more cutting, full visibility */}
           <Link href={`/product/${product.slug}`} className="block">
-            <h3 className="text-sm font-medium leading-tight hover:text-primary transition-colors cursor-pointer line-clamp-2 min-h-[2.5rem] mb-1">
+            <h3 className="text-sm font-medium leading-tight hover:text-primary transition-colors cursor-pointer mb-2 min-h-[3rem] flex items-start">
               {product.title}
             </h3>
           </Link>
@@ -338,7 +340,7 @@ export default function ProductItem({
         </div>
 
         {/* Price and Button - Fixed at Bottom */}
-        <div className="mt-auto pt-3 space-y-3">
+        <div className="mt-auto pt-4 space-y-3">
           {/* Price */}
           <div className="flex items-center gap-2">
             {product.updatedPrice &&

@@ -29,7 +29,7 @@ export default function Banner({
   mobileTitle,
   subtitle,
   description,
-  href = '/shop',
+  href = '/coupon',
   priority = false,
   showButton = false,
   buttonText = 'Shop Now',
@@ -71,7 +71,7 @@ export default function Banner({
   return (
     <section aria-label="Banner" className="relative w-full">
       {/* Desktop / Large screens */}
-      <Link href="/shop" className="relative hidden md:block w-full">
+      <Link href="/coupon" className="relative hidden md:block w-full">
         <AspectRatio ratio={getAspectRatio()} className="w-full">
           <CldImage
             alt={desktopTitle || 'Banner image'}
@@ -91,7 +91,7 @@ export default function Banner({
       </Link>
 
       {/* Mobile / Small screens */}
-      <Link href="/shop" className="relative block md:hidden w-full">
+      <Link href="/coupon" className="relative block md:hidden w-full">
         <div
           className="relative w-full"
           style={{ height: `${mobileHeight}px` }}
