@@ -44,9 +44,16 @@ const CategoryCard = ({ item }: CategoryCardProps) => {
     e.stopPropagation();
     const parentSlug = toSlug(parent);
     const childSlug = toSlug(child);
+
+    // Navigate to subcategory
     router.push(`/shop?category=${parentSlug}&subcategory=${childSlug}`, {
       scroll: true,
     });
+
+    // Ensure scroll to top works reliably
+    // setTimeout(() => {
+    //   window.scrollTo({ top: 0, behavior: 'smooth' });
+    // }, 100);
   };
 
   return (
