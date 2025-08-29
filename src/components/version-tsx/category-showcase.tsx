@@ -46,9 +46,7 @@ const CategoryCard = ({ item }: CategoryCardProps) => {
     const childSlug = toSlug(child);
 
     // Navigate to subcategory
-    router.push(`/shop?category=${parentSlug}&subcategory=${childSlug}`, {
-      scroll: true,
-    });
+    router.push(`/shop?category=${parentSlug}&subcategory=${childSlug}`);
 
     // Ensure scroll to top works reliably
     // setTimeout(() => {
