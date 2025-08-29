@@ -9,6 +9,7 @@ import Script from 'next/script';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import Footer from '../components/version-tsx/footer';
 import HeaderWrapper from '../components/version-tsx/header-wrapper';
+import ScrollToTop from '../components/version-tsx/scroll-to-top';
 import './globals.css';
 
 export const metadata = {
@@ -73,6 +74,7 @@ export default function RootLayout({ children }) {
         className={`${lato.variable} ${lato.className} $antialiased flex min-h-screen flex-col`}
         suppressHydrationWarning
       >
+        <ScrollToTop />
         {/* {quattrocento.variable} ${quattrocento.className} */}
         <Providers>
           <Wrapper>
