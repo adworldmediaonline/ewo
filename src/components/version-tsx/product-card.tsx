@@ -142,7 +142,7 @@ export default function ProductCard({
     >
       <Link href={`/product/${product.slug}`} className="block">
         <CardContent className="p-0">
-          <div className="relative aspect-square overflow-hidden">
+          <div className="relative aspect-square overflow-hidden p-1">
             {/* Discount Badge */}
             {product.finalPriceDiscount &&
               product.finalPriceDiscount < product.price && (
@@ -171,14 +171,14 @@ export default function ProductCard({
             )}
 
             {/* Product Image */}
-            <div className="relative h-full w-full">
+            <div className="relative h-full w-full overflow-hidden">
               {imageUrl ? (
                 <Image
                   src={imageUrl}
                   alt={product.title}
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className={`object-cover transition-transform duration-300 ${
+                  className={`object-contain transition-transform duration-300 ${
                     isHovered ? 'scale-105' : 'scale-100'
                   }`}
                   onLoad={() => setIsImageLoading(false)}
@@ -245,10 +245,10 @@ export default function ProductCard({
       </Link>
 
       {/* Product Info - Fixed Layout */}
-      <div className="flex flex-col h-full px-4 pb-4 pt-2">
+      <div className="flex flex-col h-full px-4 pb-4 pt-1">
         <div className="flex-1">
           <Link href={`/product/${product.slug}`} className="block">
-            <h3 className="mb-1.5 text-sm font-medium leading-tight hover:text-primary transition-colors cursor-pointer">
+            <h3 className="mb-1 text-sm font-medium leading-tight hover:text-primary transition-colors cursor-pointer">
               {product.title}
             </h3>
           </Link>
