@@ -78,6 +78,8 @@ export default function ShopFilters({
     onFiltersChange({
       ...filters,
       category: newCategory,
+      // IMPORTANT: Clear subcategory when selecting a new category
+      subcategory: '',
     });
 
     // Reset processing flag after a short delay
