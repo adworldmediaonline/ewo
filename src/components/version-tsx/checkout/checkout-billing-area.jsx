@@ -16,7 +16,7 @@ const CheckoutBillingArea = ({
   setValue,
   checkoutData,
 }) => {
-  const { data: session, isPending } = authClient.useSession();
+  const { data: session } = authClient.useSession();
   const { user } = useSelector(state => state.auth);
   const { isCheckoutSubmitting } = useSelector(state => state.order);
   const dispatch = useDispatch();
@@ -35,22 +35,21 @@ const CheckoutBillingArea = ({
   } = checkoutData;
 
   const {
-    cart_products,
     totalShippingCost,
     shippingDiscount,
     firstTimeDiscount,
-    total_coupon_discount,
-    discountAmount,
     addressDiscountAmount,
   } = useSelector(state => state.cart);
 
-  const { total, totalWithShipping, subtotal, firstTimeDiscountAmount } =
-    useCartInfo();
+  const { total, subtotal, firstTimeDiscountAmount } = useCartInfo();
 
-  // Enhanced multiple coupon state
-  const { applied_coupons, coupon_error, coupon_loading } = useSelector(
-    state => state.coupon
-  );
+  // Enhanced multiple coupon state - get coupon discount from coupon state like cart dropdown
+  const {
+    applied_coupons,
+    total_coupon_discount,
+    coupon_error,
+    coupon_loading,
+  } = useSelector(state => state.coupon);
 
   // Load applied coupons on component mount
   useEffect(() => {
@@ -219,62 +218,20 @@ const CheckoutBillingArea = ({
   const discountPercentage =
     shippingDiscount > 0 ? (shippingDiscount * 100).toFixed(0) : 0;
 
-  // Calculate final total with all discounts
+  // Calculate final total with all discounts - Simplified to match cart dropdown logic
   const calculateFinalTotal = () => {
-    // Ensure we have a valid base total
-    const baseTotal = Number(totalWithShipping);
-
-    // If totalWithShipping is NaN or invalid, calculate it manually
-    if (isNaN(baseTotal) || baseTotal <= 0) {
-      const cartTotal =
-        cart_products?.reduce(
-          (sum, item) => sum + Number(item.price) * Number(item.orderQuantity),
-          0
-        ) || 0;
-
-      const shipping = Number(totalShippingCost) || 0;
-      const firstTimeDiscountAmt = Number(firstTimeDiscountAmount) || 0;
-
-      const manualTotal = cartTotal + shipping - firstTimeDiscountAmt;
-
-      let finalTotal = manualTotal;
-
-      // Subtract multiple coupon discounts
-      if (Number(total_coupon_discount) > 0) {
-        finalTotal -= Number(total_coupon_discount);
-      } else if (Number(discountAmount) > 0) {
-        // Fall back to legacy discount amount
-        finalTotal -= Number(discountAmount);
-      }
-
-      // Subtract address discount
-      const addressDiscount = Number(addressDiscountAmount) || 0;
-      if (addressDiscount > 0) {
-        finalTotal -= addressDiscount;
-      }
-
-      return Math.max(0, finalTotal);
-    }
-
-    let finalTotal = baseTotal;
-
-    // Subtract multiple coupon discounts
-    if (Number(total_coupon_discount) > 0) {
-      finalTotal -= Number(total_coupon_discount);
-    } else if (Number(discountAmount) > 0) {
-      // Fall back to legacy discount amount
-      finalTotal -= Number(discountAmount);
-    }
-
-    // Subtract address discount
+    // Use the same logic as cart dropdown for consistency
+    // total already includes first-time discount, so use it directly
+    const baseTotal = Number(total) || 0;
+    const shipping = Number(totalShippingCost) || 0;
+    const couponDiscount = Number(total_coupon_discount) || 0;
     const addressDiscount = Number(addressDiscountAmount) || 0;
-    if (addressDiscount > 0) {
-      finalTotal -= addressDiscount;
-    }
 
-    // Ensure total doesn't go below 0 and is a valid number
-    const result = Math.max(0, finalTotal);
-    return isNaN(result) ? 0 : result;
+    // Calculate: Base Total + Shipping - Coupon Discounts - Address Discount
+    const finalTotal = baseTotal + shipping - couponDiscount - addressDiscount;
+
+    // Ensure total doesn't go below 0
+    return Math.max(0, finalTotal);
   };
 
   return (
@@ -580,10 +537,7 @@ const CheckoutBillingArea = ({
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">Subtotal</span>
               <span className="font-medium text-foreground">
-                $
-                {(
-                  Number(firstTimeDiscount.isApplied ? subtotal : total) || 0
-                ).toFixed(2)}
+                ${(Number(subtotal) || 0).toFixed(2)}
               </span>
             </div>
 
@@ -615,17 +569,6 @@ const CheckoutBillingArea = ({
                 </span>
               </div>
             )}
-
-            {/* Legacy fallback for single coupon */}
-            {Number(total_coupon_discount) === 0 &&
-              Number(discountAmount) > 0 && (
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Coupon Discount</span>
-                  <span className="font-medium text-foreground">
-                    -${Number(discountAmount).toFixed(2)}
-                  </span>
-                </div>
-              )}
 
             {/* Address discount */}
             {Number(addressDiscountAmount) > 0 && (
