@@ -192,7 +192,7 @@ export default function ProductItem({
     >
       <Link href={`/product/${product.slug}`} className="block flex-1">
         <CardContent className="p-0 h-full flex flex-col">
-          <div className="relative aspect-square overflow-hidden">
+          <div className="relative aspect-square overflow-hidden p-1">
             {/* Coupon Badge */}
             {coupons && coupons.length > 0 && (
               <Badge
@@ -227,14 +227,14 @@ export default function ProductItem({
             )}
 
             {/* Product Image */}
-            <div className="relative h-full w-full">
+            <div className="relative h-full w-full overflow-hidden">
               {imageUrl ? (
                 <Image
                   src={imageUrl}
                   alt={product.title}
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className={`object-cover transition-transform duration-300 ${
+                  className={`object-contain transition-transform duration-300 ${
                     isHovered ? 'scale-105' : 'scale-100'
                   }`}
                   onLoad={() => setIsImageLoading(false)}
@@ -301,7 +301,7 @@ export default function ProductItem({
       </Link>
 
       {/* Product Info - Flexible Layout */}
-      <div className="flex flex-col h-full px-4 pb-4 pt-3 flex-1">
+      <div className="flex flex-col h-full px-4 pb-4 pt-1 flex-1">
         <div className="flex-1 space-y-2">
           {/* Category */}
           {product.category && (
@@ -312,7 +312,7 @@ export default function ProductItem({
 
           {/* Title */}
           <Link href={`/product/${product.slug}`} className="block">
-            <h3 className="text-sm font-medium leading-tight hover:text-primary transition-colors cursor-pointer line-clamp-2 min-h-[2.5rem]">
+            <h3 className="text-sm font-medium leading-tight hover:text-primary transition-colors cursor-pointer line-clamp-2 min-h-[2.5rem] mb-1">
               {product.title}
             </h3>
           </Link>
