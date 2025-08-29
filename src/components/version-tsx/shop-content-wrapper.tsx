@@ -67,11 +67,12 @@ export default function ShopContentWrapper({
 
   // Initialize filters from URL parameters
   const initialCategory = searchParams.get('category') || '';
+  const initialSubcategory = searchParams.get('subcategory') || '';
 
   const [filters, setFilters] = useState<ShopFiltersType>({
     search: '',
     category: initialCategory,
-    subcategory: '', // Removed subcategory support
+    subcategory: initialSubcategory, // Restore subcategory support
     sortBy: 'skuArrangementOrderNo',
     sortOrder: 'asc',
   });
@@ -84,6 +85,7 @@ export default function ShopContentWrapper({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const currentPageRef = useRef(currentPage);
   const isUpdatingFromUrl = useRef(false);
+  const isFilterChanging = useRef(false); // New ref to track filter changes
 
   const { ref: loadMoreRef, inView } = useInView();
 
@@ -98,7 +100,11 @@ export default function ShopContentWrapper({
   ];
 
   const hasActiveFilters =
-    filters.search || filters.category || filters.sortBy || filters.sortOrder;
+    filters.search ||
+    filters.category ||
+    filters.subcategory ||
+    filters.sortBy ||
+    filters.sortOrder;
 
   // Mobile dropdown handlers
   const handleDropdownOpenChange = (open: boolean) => {
@@ -171,6 +177,7 @@ export default function ShopContentWrapper({
     return (
       pendingFilters.search !== filters.search ||
       pendingFilters.category !== filters.category ||
+      pendingFilters.subcategory !== filters.subcategory ||
       pendingFilters.sortBy !== filters.sortBy ||
       pendingFilters.sortOrder !== filters.sortOrder
     );
@@ -180,6 +187,18 @@ export default function ShopContentWrapper({
   useEffect(() => {
     currentPageRef.current = currentPage;
   }, [currentPage]);
+
+  // Reset filter changing flag after filters have settled
+  useEffect(() => {
+    if (isFilterChanging.current) {
+      const timer = setTimeout(() => {
+        isFilterChanging.current = false;
+        console.log('Filter changing flag reset to false');
+      }, 200); // Allow time for state to settle
+
+      return () => clearTimeout(timer);
+    }
+  }, [filters]);
 
   // Convert filters to API format
   const apiFilters = useMemo(() => {
@@ -196,6 +215,8 @@ export default function ShopContentWrapper({
     {
       // Force refetch when page changes
       refetchOnMountOrArgChange: true,
+      // Skip query if filters are currently changing to prevent race conditions
+      skip: isFilterChanging.current,
     }
   );
 
@@ -214,7 +235,13 @@ export default function ShopContentWrapper({
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [filters.search, filters.category, filters.sortBy, filters.sortOrder]);
+  }, [
+    filters.search,
+    filters.category,
+    filters.subcategory,
+    filters.sortBy,
+    filters.sortOrder,
+  ]);
 
   // Synchronize URL with filters when they change
   useEffect(() => {
@@ -226,6 +253,7 @@ export default function ShopContentWrapper({
     const params = new URLSearchParams(searchParams);
     const currentSearch = params.get('search') || '';
     const currentCategory = params.get('category') || '';
+    const currentSubcategory = params.get('subcategory') || '';
     const currentSortBy = params.get('sortBy') || 'skuArrangementOrderNo';
     const currentSortOrder = params.get('sortOrder') || 'asc';
 
@@ -233,14 +261,18 @@ export default function ShopContentWrapper({
     const hasChanges =
       currentSearch !== filters.search ||
       currentCategory !== filters.category ||
+      currentSubcategory !== filters.subcategory ||
       currentSortBy !== filters.sortBy ||
       currentSortOrder !== filters.sortOrder;
 
     if (hasChanges) {
+      // Set flag to prevent race conditions
+      isFilterChanging.current = true;
+
       setFilters({
         search: currentSearch,
         category: currentCategory,
-        subcategory: '', // Always empty since we removed subcategory support
+        subcategory: currentSubcategory, // Restore subcategory support
         sortBy: currentSortBy,
         sortOrder: currentSortOrder as 'asc' | 'desc',
       });
@@ -269,6 +301,15 @@ export default function ShopContentWrapper({
           ? newFilters.category
           : toSlug(newFilters.category);
         params.set('category', categoryParam);
+      }
+      if (newFilters.subcategory) {
+        const isAlreadySlug =
+          newFilters.subcategory.includes('-') &&
+          !newFilters.subcategory.includes(' ');
+        const subcategoryParam = isAlreadySlug
+          ? newFilters.subcategory
+          : toSlug(newFilters.subcategory);
+        params.set('subcategory', subcategoryParam);
       }
       if (newFilters.sortBy !== 'skuArrangementOrderNo')
         params.set('sortBy', newFilters.sortBy);
@@ -352,10 +393,22 @@ export default function ShopContentWrapper({
     breadcrumbItems.splice(1, 0, {
       label: filters.category,
       href: `/shop?category=${filters.category}`,
-      isCurrent: true,
+      isCurrent: !filters.subcategory,
     });
     // Update the shop breadcrumb to not be current when category is selected
     breadcrumbItems[0].isCurrent = false;
+  }
+
+  if (filters.subcategory) {
+    breadcrumbItems.splice(2, 0, {
+      label: filters.subcategory,
+      href: `/shop?category=${filters.category}&subcategory=${filters.subcategory}`,
+      isCurrent: true,
+    });
+    // Update the category breadcrumb to not be current when subcategory is selected
+    if (breadcrumbItems[1]) {
+      breadcrumbItems[1].isCurrent = false;
+    }
   }
 
   return (
@@ -466,26 +519,70 @@ export default function ShopContentWrapper({
                             getDisplayFilters().category === categorySlug;
 
                           return (
-                            <Button
-                              key={cat._id}
-                              variant={isSelected ? 'default' : 'ghost'}
-                              size="sm"
-                              className="w-full justify-between h-8 text-sm"
-                              onClick={() =>
-                                handleMobileCategoryChange(categorySlug)
-                              }
-                            >
-                              <span className="truncate">{cat.parent}</span>
-                              {cat.products?.length &&
-                                cat.products.length > 0 && (
-                                  <Badge
-                                    variant="secondary"
-                                    className="text-xs ml-1"
-                                  >
-                                    {cat.products.length}
-                                  </Badge>
+                            <div key={cat._id} className="space-y-1">
+                              <Button
+                                variant={isSelected ? 'default' : 'ghost'}
+                                size="sm"
+                                className="w-full justify-between h-8 text-sm"
+                                onClick={() =>
+                                  handleMobileCategoryChange(categorySlug)
+                                }
+                              >
+                                <span className="truncate">{cat.parent}</span>
+                                {cat.products?.length &&
+                                  cat.products.length > 0 && (
+                                    <Badge
+                                      variant="secondary"
+                                      className="text-xs ml-1"
+                                    >
+                                      {cat.products.length}
+                                    </Badge>
+                                  )}
+                              </Button>
+
+                              {/* Subcategories */}
+                              {isSelected &&
+                                cat.children &&
+                                cat.children.length > 0 && (
+                                  <div className="ml-4 space-y-1">
+                                    {cat.children.map((child: string) => {
+                                      const childSlug = toSlug(child);
+                                      const isChildSelected =
+                                        getDisplayFilters().subcategory ===
+                                        childSlug;
+
+                                      return (
+                                        <Button
+                                          key={child}
+                                          variant={
+                                            isChildSelected
+                                              ? 'default'
+                                              : 'ghost'
+                                          }
+                                          size="sm"
+                                          className="w-full justify-between h-6 text-xs"
+                                          onClick={() => {
+                                            if (pendingFilters) {
+                                              const newSubcategory =
+                                                isChildSelected
+                                                  ? ''
+                                                  : childSlug;
+                                              setPendingFilters(prev => ({
+                                                ...prev!,
+                                                subcategory: newSubcategory,
+                                              }));
+                                            }
+                                          }}
+                                        >
+                                          <span className="truncate">
+                                            {child}
+                                          </span>
+                                        </Button>
+                                      );
+                                    })}
+                                  </div>
                                 )}
-                            </Button>
+                            </div>
                           );
                         })}
                       </div>
