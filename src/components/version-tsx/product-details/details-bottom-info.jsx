@@ -1,13 +1,39 @@
 'use client';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CheckCircle, FileText, MessageSquare, Truck } from 'lucide-react';
+import { authClient } from '@/lib/authClient';
+import {
+  CheckCircle,
+  FileText,
+  MessageSquare,
+  Plus,
+  Truck,
+} from 'lucide-react';
+import { useState } from 'react';
 import ReviewForm from './review-form';
 import ReviewItem from './review-item';
 
 const DetailsBottomInfo = ({ productItem }) => {
   const { description, reviews = [], specifications = {} } = productItem || {};
+  const { data: session } = authClient.useSession();
+  const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
+
+  const handleReviewButtonClick = () => {
+    if (!session) {
+      // The toast will be shown by the ReviewForm component when submit is clicked
+      return;
+    }
+    setIsReviewDialogOpen(true);
+  };
 
   return (
     <div className="lg:hidden">
@@ -71,7 +97,34 @@ const DetailsBottomInfo = ({ productItem }) => {
                     ))}
                   </div>
                   <Separator />
-                  <ReviewForm productId={productItem?._id} />
+
+                  {/* Add Review Button */}
+                  <div className="flex justify-center">
+                    <Dialog
+                      open={isReviewDialogOpen}
+                      onOpenChange={setIsReviewDialogOpen}
+                    >
+                      <DialogTrigger asChild>
+                        <Button
+                          onClick={handleReviewButtonClick}
+                          className="flex items-center gap-2"
+                          variant="outline"
+                        >
+                          <Plus className="w-4 h-4" />
+                          Add Review
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle>Write a Review</DialogTitle>
+                        </DialogHeader>
+                        <ReviewForm
+                          productId={productItem?._id}
+                          onSuccess={() => setIsReviewDialogOpen(false)}
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  </div>
                 </>
               ) : (
                 <div className="text-center py-8">
@@ -81,7 +134,34 @@ const DetailsBottomInfo = ({ productItem }) => {
                     Be the first to review this product!
                   </p>
                   <Separator className="my-6" />
-                  <ReviewForm productId={productItem?._id} />
+
+                  {/* Add Review Button */}
+                  <div className="flex justify-center">
+                    <Dialog
+                      open={isReviewDialogOpen}
+                      onOpenChange={setIsReviewDialogOpen}
+                    >
+                      <DialogTrigger asChild>
+                        <Button
+                          onClick={handleReviewButtonClick}
+                          className="flex items-center gap-2"
+                          variant="outline"
+                        >
+                          <Plus className="w-4 h-4" />
+                          Add Review
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle>Write a Review</DialogTitle>
+                        </DialogHeader>
+                        <ReviewForm
+                          productId={productItem?._id}
+                          onSuccess={() => setIsReviewDialogOpen(false)}
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  </div>
                 </div>
               )}
             </CardContent>
