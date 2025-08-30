@@ -57,7 +57,7 @@ export function SignInForm({
       }
 
       // If successful, handle success
-      console.log('✅ Sign-in successful');
+
       if (onSuccess) {
         onSuccess();
       } else {

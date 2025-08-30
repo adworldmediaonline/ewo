@@ -38,8 +38,6 @@ const ProfileOrdersSection: React.FC<ProfileOrdersSectionProps> = ({
 
   const orders = ordersData?.orders || [];
 
-  console.log('ordersData', ordersData);
-
   // Loading state
   if (ordersLoading) {
     return (
