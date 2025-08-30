@@ -5,6 +5,7 @@ import { load_applied_coupons } from '@/redux/features/coupon/couponSlice';
 import { reset_address_discount } from '@/redux/features/order/orderSlice';
 import { CardElement } from '@stripe/react-stripe-js';
 import { City, Country, State } from 'country-state-city';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ErrorMsg from '../../common/error-msg';
@@ -462,7 +463,14 @@ const CheckoutBillingArea = ({
             {/* Enhanced coupon messages */}
             {couponApplyMsg && (
               <div className="text-sm text-destructive mt-1">
-                {couponApplyMsg}
+                {couponApplyMsg}. Please check for the available products.
+                <Link
+                  href="/coupon"
+                  className="text-primary underline ml-2"
+                  target="_blank"
+                >
+                  Click here
+                </Link>
               </div>
             )}
 
