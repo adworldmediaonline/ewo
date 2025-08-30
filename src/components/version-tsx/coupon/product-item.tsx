@@ -163,6 +163,15 @@ export default function ProductItem({
       finalPriceDiscount: product.finalPriceDiscount || product.price,
     };
 
+    // Debug logging for shipping data
+    if (!product.shipping || !product.shipping.price) {
+      console.warn('Product missing shipping data:', {
+        productId: product._id,
+        title: product.title,
+        shipping: product.shipping,
+      });
+    }
+
     dispatch(add_cart_product(cartProduct));
   };
 
