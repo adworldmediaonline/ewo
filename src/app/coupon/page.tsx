@@ -25,7 +25,6 @@ import Link from 'next/link';
 
 export default function CouponPage() {
   const { data: coupons, isLoading, error } = useGetAllActiveCouponsQuery({});
-  console.log(coupons);
 
   if (isLoading) {
     return (
