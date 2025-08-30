@@ -16,7 +16,7 @@ export default function ProductDetailsContent({ productItem }) {
   const handleImageActive = img => {
     setActiveImg(img);
   };
-  // console.log('productItem', productItem);
+
   return (
     <>
       {/* Main product section - Desktop: Side by side, Mobile: Stacked */}

@@ -58,7 +58,6 @@ export const getCategories = unstable_cache(
     }
 
     try {
-      console.log('Fetching categories from API...');
       const data = await fetchFromAPI<{ result: CategoryItem[] }>(
         '/api/category/show'
       );
@@ -77,9 +76,6 @@ export const getCategories = unstable_cache(
           category.status === 'Show'
       );
 
-      console.log(
-        `Fetched ${filteredCategories.length} categories successfully`
-      );
       return filteredCategories;
     } catch (error) {
       console.error('Error fetching categories:', error);

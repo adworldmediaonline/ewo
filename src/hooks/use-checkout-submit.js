@@ -45,11 +45,6 @@ const useCheckoutSubmit = () => {
   // cart_products
   const { cart_products, firstTimeDiscount } = useSelector(state => state.cart);
 
-  // authenticated user
-  // const { user } = useSelector(state => state.auth);
-
-  // console.log('🔑 session', session?.user?.id);
-
   // shipping_info
   const { shipping_info } = useSelector(state => state.order);
   // total amount

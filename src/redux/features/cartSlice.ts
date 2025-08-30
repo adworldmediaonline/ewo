@@ -285,10 +285,6 @@ export const cartSlice = createSlice({
       const storedShippingCost = getLocalStorage('shipping_cost');
       if (storedShippingCost !== null && storedShippingCost !== undefined) {
         state.totalShippingCost = Number(storedShippingCost);
-        console.log(
-          'Restored shipping cost from localStorage:',
-          state.totalShippingCost
-        );
       }
 
       // Update shipping costs and first-time discount when getting cart products
@@ -336,15 +332,7 @@ export const cartSlice = createSlice({
       state.firstTimeDiscount.isApplied = false;
     },
     // Debug action to check cart state
-    debugCartState: state => {
-      console.log('Cart State Debug:', {
-        cartProducts: state.cart_products,
-        totalShippingCost: state.totalShippingCost,
-        shippingDiscount: state.shippingDiscount,
-        localStorageCart: getLocalStorage('cart_products'),
-        localStorageShipping: getLocalStorage('shipping_cost'),
-      });
-    },
+    debugCartState: state => {},
   },
 });
 

@@ -193,8 +193,6 @@ export default function ProductItem({
     dispatch(add_to_wishlist(wishlistProduct));
   };
 
-  console.log(product);
-
   return (
     <Card
       className="group relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 border-border hover:border-primary/20 p-0 h-full flex flex-col"

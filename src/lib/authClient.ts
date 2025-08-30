@@ -13,10 +13,6 @@ const getBaseURL = () => {
 
 const baseURL = getBaseURL();
 
-console.log('🔧 Frontend Auth Client Configuration:');
-console.log('  - Base URL:', baseURL);
-console.log('  - Environment:', process.env.NODE_ENV);
-
 // Create the auth client following official docs
 export const authClient = createAuthClient({
   baseURL: baseURL,

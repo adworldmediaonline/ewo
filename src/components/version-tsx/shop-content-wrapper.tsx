@@ -277,10 +277,6 @@ export default function ShopContentWrapper({
       const updatedFilters = { ...newFilters };
       if (updatedFilters.category && !updatedFilters.subcategory) {
         updatedFilters.subcategory = '';
-        console.log(
-          'Clearing subcategory in filter state for category:',
-          updatedFilters.category
-        );
       }
 
       setFilters(updatedFilters);
@@ -306,7 +302,6 @@ export default function ShopContentWrapper({
         if (!newFilters.subcategory) {
           // Explicitly remove subcategory from URL when only parent category is selected
           params.delete('subcategory');
-          console.log('Clearing subcategory parameter from URL');
         }
       }
       if (newFilters.subcategory) {
@@ -325,15 +320,6 @@ export default function ShopContentWrapper({
 
       const queryString = params.toString();
       const newUrl = queryString ? `/shop?${queryString}` : '/shop';
-
-      // Debug logging for URL changes
-      console.log('URL Update:', {
-        newFilters: newFilters,
-        params: Object.fromEntries(params.entries()),
-        newUrl: newUrl,
-        hasSubcategory: params.has('subcategory'),
-        subcategoryValue: params.get('subcategory'),
-      });
 
       router.push(newUrl);
     },

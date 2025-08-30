@@ -8,9 +8,6 @@ const getBaseURL = () => {
 
 const baseURL = getBaseURL();
 
-console.log('🔧 RTK Query API Configuration:');
-console.log('  - Base URL:', baseURL);
-
 // Enhanced baseQuery with Better Auth support (following official docs)
 const baseQueryWithAuth = fetchBaseQuery({
   baseUrl: baseURL,

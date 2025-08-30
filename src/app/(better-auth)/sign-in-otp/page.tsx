@@ -93,7 +93,6 @@ export default function SignInOTPPage() {
         return;
       }
 
-      console.log('✅ OTP Sign-in successful:', data);
       router.push('/profile');
       router.refresh();
     } catch (err) {
