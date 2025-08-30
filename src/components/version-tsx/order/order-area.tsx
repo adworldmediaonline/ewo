@@ -508,15 +508,16 @@ export default function OrderArea({ orderId }: { orderId: string }) {
 
               <Separator />
 
+              {/* Total calculation: Subtotal + Shipping - All Discounts */}
               <div className="flex justify-between items-center text-lg font-bold">
                 <span>Total</span>
                 <span className="text-primary">
                   $
                   {(
-                    subtotal -
-                    firstTimeDiscountAmount -
-                    couponDiscounts +
+                    subtotal +
                     parseFloat(shippingCost) -
+                    firstTimeDiscountAmount -
+                    couponDiscounts -
                     otherDiscounts
                   ).toFixed(2)}
                 </span>
