@@ -1,11 +1,13 @@
 'use client';
 import useCartInfo from '@/hooks/use-cart-info';
 import { authClient } from '@/lib/authClient';
+import { useGetAllActiveCouponsQuery } from '@/redux/features/coupon/couponApi';
 import { load_applied_coupons } from '@/redux/features/coupon/couponSlice';
 import { reset_address_discount } from '@/redux/features/order/orderSlice';
 import { CardElement } from '@stripe/react-stripe-js';
 import { City, Country, State } from 'country-state-city';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ErrorMsg from '../../common/error-msg';
@@ -52,10 +54,194 @@ const CheckoutBillingArea = ({
     coupon_loading,
   } = useSelector(state => state.coupon);
 
+  // Get URL search parameters for auto-fill functionality
+  const searchParams = useSearchParams();
+
+  // Fetch all active coupons from backend for smart auto-fill
+  const {
+    data: activeCouponsData,
+    isLoading: couponsLoading,
+    isError: couponsError,
+  } = useGetAllActiveCouponsQuery();
+
   // Load applied coupons on component mount
   useEffect(() => {
     dispatch(load_applied_coupons());
   }, [dispatch]);
+
+  // Smart auto-fill coupon code from various sources including backend
+  useEffect(() => {
+    const autoFillCouponCode = () => {
+      console.log('🎟️ Auto-fill: Starting smart coupon auto-fill check...');
+      console.log('🎟️ Auto-fill: couponsLoading:', couponsLoading);
+      console.log('🎟️ Auto-fill: activeCouponsData:', activeCouponsData);
+      console.log('🎟️ Auto-fill: couponRef.current:', couponRef.current);
+      console.log('🎟️ Auto-fill: applied_coupons:', applied_coupons);
+
+      // Don't proceed if coupons are still loading or ref is not available
+      if (couponsLoading || !couponRef.current || couponRef.current.value) {
+        if (couponsLoading)
+          console.log('⏳ Auto-fill: Still loading coupons...');
+        if (!couponRef.current)
+          console.log('⚠️ Auto-fill: couponRef not available');
+        if (couponRef.current?.value)
+          console.log(
+            'ℹ️ Auto-fill: Input field already has value:',
+            couponRef.current.value
+          );
+        return;
+      }
+
+      let couponCodeToFill = null;
+
+      // Priority order for coupon sources:
+      // 1. URL parameter 'coupon' or 'couponCode' or 'code' (highest priority)
+      // 2. localStorage 'pendingCouponCode'
+      // 3. Smart selection from backend active coupons (best coupon logic)
+
+      // Check URL parameters first (highest priority)
+      const urlCoupon =
+        searchParams.get('coupon') ||
+        searchParams.get('couponCode') ||
+        searchParams.get('code');
+
+      if (urlCoupon) {
+        couponCodeToFill = urlCoupon.trim();
+        console.log('🎟️ Auto-fill: Found URL coupon:', couponCodeToFill);
+      }
+
+      // Check localStorage for pending coupon
+      if (!couponCodeToFill) {
+        const pendingCoupon = localStorage.getItem('pendingCouponCode');
+        if (pendingCoupon) {
+          console.log(
+            '🎟️ Auto-fill: Found localStorage coupon:',
+            pendingCoupon
+          );
+          try {
+            const parsed = JSON.parse(pendingCoupon);
+            couponCodeToFill =
+              typeof parsed === 'string' ? parsed : parsed.code;
+          } catch {
+            couponCodeToFill = pendingCoupon;
+          }
+        } else {
+          console.log('🎟️ Auto-fill: No localStorage coupon found');
+        }
+      }
+
+      // Smart selection from backend active coupons (if no URL/localStorage coupon)
+      if (
+        !couponCodeToFill &&
+        activeCouponsData?.success &&
+        activeCouponsData?.data?.length > 0
+      ) {
+        console.log('🎟️ Auto-fill: Looking for best coupon from backend...');
+
+        const availableCoupons = activeCouponsData.data.filter(coupon => {
+          // Filter out already applied coupons
+          const isAlreadyApplied = applied_coupons.some(
+            appliedCoupon =>
+              appliedCoupon.couponCode?.toLowerCase() ===
+              coupon.couponCode?.toLowerCase()
+          );
+          return (
+            !isAlreadyApplied && coupon.status === 'active' && coupon.couponCode
+          );
+        });
+
+        console.log('🎟️ Auto-fill: Available coupons:', availableCoupons);
+
+        if (availableCoupons.length > 0) {
+          // Smart logic to select the best coupon:
+          // 1. Priority by discount amount (highest first)
+          // 2. Priority by minimum amount (lowest first, easier to qualify)
+          // 3. Priority by discount percentage (highest first)
+
+          const bestCoupon = availableCoupons.reduce((best, current) => {
+            // Priority 1: Higher discount amount
+            const bestDiscount = best.discountAmount || 0;
+            const currentDiscount = current.discountAmount || 0;
+
+            if (currentDiscount > bestDiscount) return current;
+            if (currentDiscount < bestDiscount) return best;
+
+            // Priority 2: Lower minimum amount (easier to qualify)
+            const bestMinimum = best.minimumAmount || 0;
+            const currentMinimum = current.minimumAmount || 0;
+
+            if (currentMinimum < bestMinimum) return current;
+            if (currentMinimum > bestMinimum) return best;
+
+            // Priority 3: Higher discount percentage
+            const bestPercentage = best.discountPercentage || 0;
+            const currentPercentage = current.discountPercentage || 0;
+
+            return currentPercentage > bestPercentage ? current : best;
+          });
+
+          couponCodeToFill = bestCoupon.couponCode;
+          console.log('🎯 Auto-fill: Selected best coupon:', {
+            code: bestCoupon.couponCode,
+            discountAmount: bestCoupon.discountAmount,
+            discountPercentage: bestCoupon.discountPercentage,
+            minimumAmount: bestCoupon.minimumAmount,
+            title: bestCoupon.title,
+          });
+        } else {
+          console.log('ℹ️ Auto-fill: No available coupons to auto-fill');
+        }
+      }
+
+      // If we found a coupon code and the input field is available and empty
+      if (couponCodeToFill && couponRef.current && !couponRef.current.value) {
+        // Check if this coupon is not already applied
+        const isAlreadyApplied = applied_coupons.some(
+          coupon =>
+            coupon.couponCode?.toLowerCase() === couponCodeToFill.toLowerCase()
+        );
+
+        console.log('🎟️ Auto-fill: isAlreadyApplied:', isAlreadyApplied);
+
+        if (!isAlreadyApplied) {
+          couponRef.current.value = couponCodeToFill;
+          console.log('✅ Auto-filled coupon code:', couponCodeToFill);
+
+          // Clear the localStorage after auto-filling to prevent re-filling
+          if (localStorage.getItem('pendingCouponCode')) {
+            localStorage.removeItem('pendingCouponCode');
+            console.log('🎟️ Auto-fill: Cleared localStorage');
+          }
+        } else {
+          console.log(
+            '⚠️ Auto-fill: Coupon already applied, skipping auto-fill'
+          );
+        }
+      } else {
+        if (!couponCodeToFill) {
+          console.log('ℹ️ Auto-fill: No coupon code found to auto-fill');
+        } else if (!couponRef.current) {
+          console.log('⚠️ Auto-fill: couponRef not available');
+        } else if (couponRef.current.value) {
+          console.log(
+            'ℹ️ Auto-fill: Input field already has value:',
+            couponRef.current.value
+          );
+        }
+      }
+    };
+
+    // Small delay to ensure the ref is available and coupons are loaded
+    const timeoutId = setTimeout(autoFillCouponCode, 200);
+
+    return () => clearTimeout(timeoutId);
+  }, [
+    searchParams,
+    applied_coupons,
+    couponRef,
+    activeCouponsData,
+    couponsLoading,
+  ]);
 
   const countries = Country.getAllCountries();
   const defaultCountry = countries.find(country => country.isoCode === 'US');
@@ -471,6 +657,61 @@ const CheckoutBillingArea = ({
                 >
                   Click here
                 </Link>
+              </div>
+            )}
+
+            {/* Auto-fill helper messages */}
+            {couponsLoading && (
+              <div className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
+                <svg
+                  className="w-4 h-4 text-primary animate-spin"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm6 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1h-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Looking for the best coupon for you...
+              </div>
+            )}
+
+            {!couponsLoading &&
+              couponRef.current?.value &&
+              applied_coupons.length === 0 && (
+                <div className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
+                  <svg
+                    className="w-4 h-4 text-primary"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  Coupon code pre-filled. Click "Apply" to activate the
+                  discount.
+                </div>
+              )}
+
+            {couponsError && (
+              <div className="text-sm text-destructive mt-1 flex items-center gap-1">
+                <svg
+                  className="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Unable to load coupons. Please enter manually.
               </div>
             )}
 

@@ -1,4 +1,5 @@
 'use client';
+import { navigateToCheckoutWithCoupon as navigateWithCoupon } from '@/utils/coupon-auto-fill';
 import { usePathname, useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -22,14 +23,25 @@ export default function useGuestCartNavigation() {
     return;
   };
 
-  const navigateToCheckout = () => {
-    router.push('/checkout');
+  const navigateToCheckout = (couponCode = null) => {
+    if (couponCode) {
+      navigateWithCoupon(router, couponCode);
+    } else {
+      router.push('/checkout');
+    }
+    return;
+  };
+
+  // Enhanced navigation function for checkout with coupon pre-fill
+  const navigateToCheckoutWithCoupon = couponCode => {
+    navigateWithCoupon(router, couponCode);
     return;
   };
 
   return {
     navigateToCart,
     navigateToCheckout,
+    navigateToCheckoutWithCoupon,
     isAuthenticated: !!user,
     hasCartItems: cart_products.length > 0,
   };

@@ -116,7 +116,7 @@ const useCheckoutSubmit = () => {
     },
   });
 
-  let couponRef = useRef('');
+  let couponRef = useRef(null);
 
   // Load applied coupons on component mount
   useEffect(() => {
