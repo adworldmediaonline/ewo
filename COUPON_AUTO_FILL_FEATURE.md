@@ -19,6 +19,7 @@ The smart coupon auto-fill feature automatically pre-populates the best availabl
 - **Duplicate Prevention**: Checks if coupons are already applied before auto-filling
 - **Clean State Management**: Automatically clears localStorage after auto-filling
 - **Real-time UI Feedback**: Shows loading states and helpful messages
+- **Discount Preview**: Displays the discount percentage/amount for auto-filled coupons
 - **Error Handling**: Gracefully handles API failures with fallback messaging
 
 ## Usage Examples
@@ -70,6 +71,14 @@ navigateToCheckoutWithCoupon('SAVE20');
 - Shows helpful message when code is pre-filled
 - Maintains all existing functionality
 
+### Cart Checkout Component
+
+- Same smart auto-fill functionality on the cart page
+- **Always-visible coupon form**: Coupon section is always displayed (no toggle button)
+- Consistent user experience across cart and checkout
+- Identical logic and UI feedback messages
+- Clean, streamlined interface
+
 ### Guest Cart Navigation Hook
 
 - Enhanced with coupon auto-fill support
@@ -80,15 +89,22 @@ navigateToCheckoutWithCoupon('SAVE20');
 
 1. **`/src/components/version-tsx/checkout/checkout-billing-area.jsx`**
 
-   - Added auto-fill logic with multiple source detection
+   - Added smart auto-fill logic with backend integration
    - Added helpful UI messages for pre-filled codes
+   - Fetches active coupons and selects the best one
 
-2. **`/src/hooks/useGuestCartNavigation.js`**
+2. **`/src/components/version-tsx/cart-checkout.tsx`**
+
+   - Added identical smart auto-fill functionality
+   - Consistent user experience with checkout page
+   - Same backend integration and UI feedback
+
+3. **`/src/hooks/useGuestCartNavigation.js`**
 
    - Enhanced with coupon auto-fill support
    - Backward compatible with existing API
 
-3. **`/src/utils/coupon-auto-fill.js`** (New)
+4. **`/src/utils/coupon-auto-fill.js`** (New)
    - Utility functions for managing coupon auto-fill
    - Helper functions for navigation with coupons
 
@@ -98,9 +114,11 @@ navigateToCheckoutWithCoupon('SAVE20');
 
 1. **URL Parameter**: Visit `/checkout?coupon=TEST20` - should auto-fill "TEST20"
 2. **localStorage**: Set code via other page, navigate to checkout - should auto-fill
-3. **Already Applied**: Auto-fill should not occur if coupon already applied
-4. **Manual Entry**: Should not overwrite manually entered codes
-5. **Multiple Sources**: URL parameter should take priority over localStorage
+3. **Backend Selection**: Navigate to checkout with no params - should auto-fill best coupon
+4. **Discount Display**: Should show discount badge (e.g., "🎯 20% OFF") below pre-filled code
+5. **Already Applied**: Auto-fill should not occur if coupon already applied
+6. **Manual Entry**: Should not overwrite manually entered codes
+7. **Multiple Sources**: URL parameter should take priority over localStorage
 
 ### Manual Testing
 

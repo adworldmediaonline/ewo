@@ -73,17 +73,34 @@ function testLocalStorageAutoFill() {
   );
 
   console.log('✅ Set test coupon in localStorage');
-  console.log('💡 Navigate to /checkout to see auto-fill in action');
+  console.log('💡 Navigate to /cart or /checkout to see auto-fill in action');
+  console.log('🎯 On cart page: Should auto-show coupon form and fill code');
+}
+
+// Test cart page auto-fill functionality
+function testCartAutoFill() {
+  console.log('🧪 Testing cart auto-fill functionality...');
+
+  // Set a test coupon for cart
+  localStorage.setItem('pendingCouponCode', 'CART_AUTO_FILL_TEST');
+
+  console.log('✅ Set test coupon for cart auto-fill');
+  console.log('💡 Navigate to /cart - should automatically:');
+  console.log('   1. Coupon form is always visible (no toggle)');
+  console.log('   2. Fill the coupon code in the input field');
+  console.log('   3. Show helpful message');
 }
 
 // Export for console use
 if (typeof window !== 'undefined') {
   window.testCouponFetch = testCouponFetch;
   window.testLocalStorageAutoFill = testLocalStorageAutoFill;
+  window.testCartAutoFill = testCartAutoFill;
 
   console.log('🔧 Test functions available:');
   console.log('- testCouponFetch() - Test backend API');
   console.log('- testLocalStorageAutoFill() - Test localStorage auto-fill');
+  console.log('- testCartAutoFill() - Test cart auto-fill functionality');
 }
 
 // Auto-run if in browser
@@ -92,4 +109,4 @@ if (typeof window !== 'undefined' && window.location) {
   testCouponFetch();
 }
 
-export { testCouponFetch, testLocalStorageAutoFill };
+export { testCartAutoFill, testCouponFetch, testLocalStorageAutoFill };
