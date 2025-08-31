@@ -8,6 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import useCartInfo from '@/hooks/use-cart-info';
 import {
   add_cart_product,
+  get_cart_products,
   quantityDecrement,
 } from '@/redux/features/cartSlice';
 import { useGetAllActiveCouponsQuery } from '@/redux/features/coupon/couponApi';
@@ -19,6 +20,9 @@ import { CardElement } from '@stripe/react-stripe-js';
 export default function CheckoutOrderArea({ checkoutData, isGuest }) {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
+
+  // Track if cart data has been loaded to prevent showing zeros
+  const [cartDataLoaded, setCartDataLoaded] = useState(false);
 
   // Save discount values locally to preserve during checkout
   const [savedAddressDiscount, setSavedAddressDiscount] = useState(0);
@@ -84,10 +88,48 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
     isError: couponsError,
   } = useGetAllActiveCouponsQuery();
 
-  // Load applied coupons on component mount
+  // Load applied coupons on component mount and ensure cart data is loaded
   useEffect(() => {
     dispatch(load_applied_coupons());
+
+    // Ensure cart data is loaded from localStorage
+    dispatch(get_cart_products());
+
+    // Quick check if data is immediately available
+    const quickCheck = setTimeout(() => {
+      const hasCartData =
+        cart_products.length > 0 || subtotal > 0 || totalShippingCost > 0;
+      if (hasCartData || (cart_products.length === 0 && subtotal === 0)) {
+        setCartDataLoaded(true);
+      }
+    }, 100); // Very short delay to allow Redux update
+
+    return () => clearTimeout(quickCheck);
   }, [dispatch]);
+
+  // Monitor cart data loading state
+  useEffect(() => {
+    // Check if cart data has meaningful values or if there are products
+    const hasCartData =
+      cart_products.length > 0 || subtotal > 0 || totalShippingCost > 0;
+
+    if (hasCartData || (cart_products.length === 0 && subtotal === 0)) {
+      // Data is loaded (either with products or confirmed empty cart)
+      setCartDataLoaded(true);
+    }
+  }, [cart_products, subtotal, totalShippingCost]);
+
+  // Fallback: Set as loaded after a short delay to prevent infinite loading
+  useEffect(() => {
+    const fallbackTimer = setTimeout(() => {
+      if (!cartDataLoaded) {
+        console.warn('Cart data loading timeout, displaying anyway');
+        setCartDataLoaded(true);
+      }
+    }, 2000); // 2 second fallback
+
+    return () => clearTimeout(fallbackTimer);
+  }, [cartDataLoaded]);
 
   // Smart auto-fill coupon code from various sources including backend
   useEffect(() => {
@@ -411,6 +453,23 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
   const handleDecrement = product => {
     dispatch(quantityDecrement(product));
   };
+
+  // Show loading state while cart data is being loaded
+  if (!cartDataLoaded) {
+    return (
+      <div className="bg-card rounded-lg shadow-sm p-4 md:p-6 border border-border">
+        <h3 className="text-xl font-semibold text-foreground mb-4 md:mb-6">
+          Your Order
+        </h3>
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <span className="ml-2 text-muted-foreground">
+            Loading order details...
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-card rounded-lg shadow-sm p-4 md:p-6 border border-border">
