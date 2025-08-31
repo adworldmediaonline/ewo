@@ -25,6 +25,16 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
   const [savedDiscountEligible, setSavedDiscountEligible] = useState(null);
   const [savedDiscountMessage, setSavedDiscountMessage] = useState('');
 
+  // Save all order summary data during processing to preserve UI
+  const [savedOrderSummary, setSavedOrderSummary] = useState({
+    subtotal: 0,
+    shipping: 0,
+    firstTimeDiscountAmount: 0,
+    totalCouponDiscount: 0,
+    appliedCoupons: [],
+    finalTotal: 0,
+  });
+
   // State to store the auto-filled coupon info for percentage display
   const [autoFilledCoupon, setAutoFilledCoupon] = useState(null);
 
@@ -270,26 +280,6 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
     isCheckoutSubmitting,
   ]);
 
-  // Use saved or current values depending on checkout state
-  const displayAddressDiscount = isCheckoutSubmit
-    ? savedAddressDiscount
-    : addressDiscountAmount;
-  const displayDiscountEligible = isCheckoutSubmit
-    ? savedDiscountEligible
-    : address_discount_eligible;
-  const displayDiscountMessage = isCheckoutSubmit
-    ? savedDiscountMessage
-    : address_discount_message;
-
-  // Update shipping cost in checkout data when it changes
-  useEffect(() => {
-    handleShippingCost(totalShippingCost);
-  }, [totalShippingCost, handleShippingCost]);
-
-  // Calculate discount percentage to display
-  const discountPercentage =
-    shippingDiscount > 0 ? (shippingDiscount * 100).toFixed(0) : 0;
-
   // Calculate final total with all discounts
   const calculateFinalTotal = () => {
     // Ensure we have a valid base total
@@ -347,6 +337,70 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
     const result = Math.max(0, finalTotal);
     return isNaN(result) ? 0 : result;
   };
+
+  // Save complete order summary data when processing begins
+  useEffect(() => {
+    if (!isCheckoutSubmit && !isCheckoutSubmitting && !processingPayment) {
+      // Save current order summary state
+      setSavedOrderSummary({
+        subtotal: subtotal,
+        shipping: totalShippingCost,
+        firstTimeDiscountAmount: firstTimeDiscountAmount,
+        totalCouponDiscount: total_coupon_discount,
+        appliedCoupons: applied_coupons,
+        finalTotal: calculateFinalTotal(),
+      });
+    }
+  }, [
+    subtotal,
+    totalShippingCost,
+    firstTimeDiscountAmount,
+    total_coupon_discount,
+    applied_coupons,
+    isCheckoutSubmit,
+    isCheckoutSubmitting,
+    processingPayment,
+  ]);
+
+  // Use saved or current values depending on checkout state
+  const displayAddressDiscount = isCheckoutSubmit
+    ? savedAddressDiscount
+    : addressDiscountAmount;
+  const displayDiscountEligible = isCheckoutSubmit
+    ? savedDiscountEligible
+    : address_discount_eligible;
+  const displayDiscountMessage = isCheckoutSubmit
+    ? savedDiscountMessage
+    : address_discount_message;
+
+  // Use saved order summary data during processing
+  const isProcessing =
+    isCheckoutSubmit || isCheckoutSubmitting || processingPayment;
+  const displaySubtotal = isProcessing ? savedOrderSummary.subtotal : subtotal;
+  const displayShipping = isProcessing
+    ? savedOrderSummary.shipping
+    : totalShippingCost;
+  const displayFirstTimeDiscount = isProcessing
+    ? savedOrderSummary.firstTimeDiscountAmount
+    : firstTimeDiscountAmount;
+  const displayTotalCouponDiscount = isProcessing
+    ? savedOrderSummary.totalCouponDiscount
+    : total_coupon_discount;
+  const displayAppliedCoupons = isProcessing
+    ? savedOrderSummary.appliedCoupons
+    : applied_coupons;
+  const displayFinalTotal = isProcessing
+    ? savedOrderSummary.finalTotal
+    : calculateFinalTotal();
+
+  // Update shipping cost in checkout data when it changes
+  useEffect(() => {
+    handleShippingCost(totalShippingCost);
+  }, [totalShippingCost, handleShippingCost]);
+
+  // Calculate discount percentage to display
+  const discountPercentage =
+    shippingDiscount > 0 ? (shippingDiscount * 100).toFixed(0) : 0;
 
   // handle add product quantity
   const handleAddProduct = product => {
@@ -483,7 +537,7 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
 
           {!couponsLoading &&
             couponRef.current?.value &&
-            applied_coupons.length === 0 &&
+            displayAppliedCoupons.length === 0 &&
             autoFilledCoupon &&
             autoFilledCoupon.discountPercentage && (
               <div className="mt-3 p-3 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg">
@@ -535,13 +589,13 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
           )}
 
           {/* Applied coupons display */}
-          {applied_coupons.length > 0 && (
+          {displayAppliedCoupons.length > 0 && (
             <div className="mt-3 p-3 bg-muted rounded-md">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="font-medium text-foreground text-sm">
-                  Applied Coupons ({applied_coupons.length})
+                  Applied Coupons ({displayAppliedCoupons.length})
                 </h4>
-                {applied_coupons.length > 1 && (
+                {displayAppliedCoupons.length > 1 && (
                   <button
                     type="button"
                     onClick={handleClearAllCoupons}
@@ -554,7 +608,7 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
               </div>
 
               <div className="space-y-2">
-                {applied_coupons.map((coupon, index) => (
+                {displayAppliedCoupons.map((coupon, index) => (
                   <div
                     key={coupon.couponCode || index}
                     className="flex items-center justify-between p-2 bg-background rounded text-xs"
@@ -589,14 +643,14 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Subtotal</span>
             <span className="font-medium text-foreground">
-              ${(Number(subtotal) || 0).toFixed(2)}
+              ${(Number(displaySubtotal) || 0).toFixed(2)}
             </span>
           </div>
 
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Shipping</span>
             <span className="font-medium text-foreground">
-              ${(Number(totalShippingCost) || 0).toFixed(2)}
+              ${(Number(displayShipping) || 0).toFixed(2)}
               {discountPercentage > 0 && (
                 <span className="ml-2 text-xs bg-green-100 text-green-600 px-1.5 py-0.5 rounded">
                   {discountPercentage}% off
@@ -606,18 +660,18 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
           </div>
 
           {/* Multiple coupon discounts display */}
-          {Number(total_coupon_discount) > 0 && (
+          {Number(displayTotalCouponDiscount) > 0 && (
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">
                 Coupon Discounts
-                {applied_coupons.length > 1 && (
+                {displayAppliedCoupons.length > 1 && (
                   <span className="ml-2 text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">
-                    {applied_coupons.length} coupons
+                    {displayAppliedCoupons.length} coupons
                   </span>
                 )}
               </span>
               <span className="font-medium text-foreground">
-                -${Number(total_coupon_discount).toFixed(2)}
+                -${Number(displayTotalCouponDiscount).toFixed(2)}
               </span>
             </div>
           )}
@@ -639,7 +693,7 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
                 First-time discount (-{firstTimeDiscount.percentage}%):
               </span>
               <span className="font-medium text-foreground">
-                -${Number(firstTimeDiscountAmount || 0).toFixed(2)}
+                -${Number(displayFirstTimeDiscount || 0).toFixed(2)}
               </span>
             </div>
           )}
@@ -650,7 +704,7 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
           <div className="flex items-center justify-between">
             <span className="text-lg font-semibold text-foreground">Total</span>
             <span className="text-lg font-semibold text-foreground">
-              ${calculateFinalTotal().toFixed(2)}
+              ${displayFinalTotal.toFixed(2)}
             </span>
           </div>
         </div>
@@ -716,7 +770,7 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
                 Processing Your Order...
               </span>
             ) : (
-              `Complete Purchase - $${calculateFinalTotal().toFixed(2)}`
+              `Complete Purchase - $${displayFinalTotal.toFixed(2)}`
             )}
           </button>
         </div>
