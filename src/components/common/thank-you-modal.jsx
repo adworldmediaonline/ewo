@@ -56,7 +56,7 @@ const ThankYouModal = ({ isOpen, onClose, orderData = {}, onContinue }) => {
             {orderData.orderId && (
               <div className="mt-4 p-3 bg-muted rounded-md">
                 <p className="text-lg font-medium text-foreground">
-                  Order #{orderData.orderId}
+                  Order #{orderData?.customOrderId || orderData?.orderId}
                 </p>
               </div>
             )}

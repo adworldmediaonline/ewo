@@ -643,6 +643,7 @@ const useCheckoutSubmit = () => {
           // Show Thank You Modal for COD orders
           setOrderDataForModal({
             orderId: orderId,
+            customOrderId: res.data?.order?.orderId,
           });
           setShowThankYouModal(true);
 
@@ -750,6 +751,7 @@ const useCheckoutSubmit = () => {
                 // Set order data and show Thank You modal
                 setOrderDataForModal({
                   orderId: orderId,
+                  customOrderId: res.data?.order?.orderId,
                 });
                 setShowThankYouModal(true);
 
@@ -854,6 +856,7 @@ const useCheckoutSubmit = () => {
                 // Set order data and show Thank You modal
                 setOrderDataForModal({
                   orderId: orderId,
+                  customOrderId: res.data?.order?.orderId,
                 });
                 setShowThankYouModal(true);
               })
