@@ -133,7 +133,6 @@ export const getJWTToken = async () => {
 
     throw new Error('No JWT token in response');
   } catch (error) {
-    console.error('Failed to get JWT token:', error);
     throw error;
   }
 };
@@ -144,7 +143,6 @@ export const refreshTokens = async () => {
     const response = await authClient.getSession();
     return response;
   } catch (error) {
-    console.error('Failed to refresh tokens:', error);
     tokenStorage.clearTokens();
     throw error;
   }

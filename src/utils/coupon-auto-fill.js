@@ -11,7 +11,6 @@
  */
 export const setPendingCouponCode = (couponCode, options = {}) => {
   if (!couponCode || typeof couponCode !== 'string') {
-    console.warn('Invalid coupon code provided to setPendingCouponCode');
     return;
   }
 
@@ -25,10 +24,7 @@ export const setPendingCouponCode = (couponCode, options = {}) => {
     };
 
     localStorage.setItem('pendingCouponCode', JSON.stringify(couponData));
-    console.log(`Pending coupon code set: ${couponCode}`);
-  } catch (error) {
-    console.error('Failed to set pending coupon code:', error);
-  }
+  } catch (error) {}
 };
 
 /**
@@ -51,7 +47,6 @@ export const getPendingCouponCode = () => {
 
     return typeof parsed === 'string' ? parsed : parsed.code;
   } catch (error) {
-    console.error('Failed to get pending coupon code:', error);
     return null;
   }
 };
@@ -62,9 +57,7 @@ export const getPendingCouponCode = () => {
 export const clearPendingCouponCode = () => {
   try {
     localStorage.removeItem('pendingCouponCode');
-  } catch (error) {
-    console.error('Failed to clear pending coupon code:', error);
-  }
+  } catch (error) {}
 };
 
 /**
@@ -80,9 +73,6 @@ export const navigateToCheckoutWithCoupon = (
   options = {}
 ) => {
   if (!router || !couponCode) {
-    console.warn(
-      'Router and coupon code are required for navigateToCheckoutWithCoupon'
-    );
     return;
   }
 

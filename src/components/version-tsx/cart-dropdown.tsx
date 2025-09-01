@@ -75,7 +75,7 @@ export default function CartDropdown({
     data: activeCouponsData,
     isLoading: couponsLoading,
     isError: couponsError,
-  } = useGetAllActiveCouponsQuery();
+  } = useGetAllActiveCouponsQuery({});
 
   const items: CartItem[] = Array.isArray(cart_products) ? cart_products : [];
 
@@ -129,17 +129,21 @@ export default function CartDropdown({
         activeCouponsData?.success &&
         activeCouponsData?.data?.length > 0
       ) {
-        const availableCoupons = activeCouponsData.data.filter(coupon => {
-          // Filter out already applied coupons
-          const isAlreadyApplied = applied_coupons.some(
-            appliedCoupon =>
-              appliedCoupon.couponCode?.toLowerCase() ===
-              coupon.couponCode?.toLowerCase()
-          );
-          return (
-            !isAlreadyApplied && coupon.status === 'active' && coupon.couponCode
-          );
-        });
+        const availableCoupons = activeCouponsData.data.filter(
+          (coupon: any) => {
+            // Filter out already applied coupons
+            const isAlreadyApplied = applied_coupons.some(
+              (appliedCoupon: any) =>
+                appliedCoupon.couponCode?.toLowerCase() ===
+                coupon.couponCode?.toLowerCase()
+            );
+            return (
+              !isAlreadyApplied &&
+              coupon.status === 'active' &&
+              coupon.couponCode
+            );
+          }
+        );
 
         if (availableCoupons.length > 0) {
           // Smart logic to select the best coupon:
@@ -147,27 +151,29 @@ export default function CartDropdown({
           // 2. Priority by minimum amount (lowest first, easier to qualify)
           // 3. Priority by discount percentage (highest first)
 
-          const bestCoupon = availableCoupons.reduce((best, current) => {
-            // Priority 1: Higher discount amount
-            const bestDiscount = best.discountAmount || 0;
-            const currentDiscount = current.discountAmount || 0;
+          const bestCoupon = availableCoupons.reduce(
+            (best: any, current: any) => {
+              // Priority 1: Higher discount amount
+              const bestDiscount = best.discountAmount || 0;
+              const currentDiscount = current.discountAmount || 0;
 
-            if (currentDiscount > bestDiscount) return current;
-            if (currentDiscount < bestDiscount) return best;
+              if (currentDiscount > bestDiscount) return current;
+              if (currentDiscount < bestDiscount) return best;
 
-            // Priority 2: Lower minimum amount (easier to qualify)
-            const bestMinimum = best.minimumAmount || 0;
-            const currentMinimum = current.minimumAmount || 0;
+              // Priority 2: Lower minimum amount (easier to qualify)
+              const bestMinimum = best.minimumAmount || 0;
+              const currentMinimum = current.minimumAmount || 0;
 
-            if (currentMinimum < bestMinimum) return current;
-            if (currentMinimum > bestMinimum) return best;
+              if (currentMinimum < bestMinimum) return current;
+              if (currentMinimum > bestMinimum) return best;
 
-            // Priority 3: Higher discount percentage
-            const bestPercentage = best.discountPercentage || 0;
-            const currentPercentage = current.discountPercentage || 0;
+              // Priority 3: Higher discount percentage
+              const bestPercentage = best.discountPercentage || 0;
+              const currentPercentage = current.discountPercentage || 0;
 
-            return currentPercentage > bestPercentage ? current : best;
-          });
+              return currentPercentage > bestPercentage ? current : best;
+            }
+          );
 
           couponCodeToFill = bestCoupon.couponCode;
           setAutoFilledCoupon(bestCoupon);
@@ -177,8 +183,8 @@ export default function CartDropdown({
       // If we found a coupon code and it's not already applied
       if (couponCodeToFill) {
         const isAlreadyApplied = applied_coupons.some(
-          coupon =>
-            coupon.couponCode?.toLowerCase() === couponCodeToFill.toLowerCase()
+          (coupon: any) =>
+            coupon.couponCode?.toLowerCase() === couponCodeToFill?.toLowerCase()
         );
 
         if (!isAlreadyApplied) {
@@ -266,12 +272,11 @@ export default function CartDropdown({
           setCouponCode('');
           setAutoFilledCoupon(null);
         } else {
-          console.error('Coupon validation failed:', data.message);
         }
       } else {
         // Multiple coupons - use multiple validation endpoint
         const allCouponCodes = [
-          ...applied_coupons.map(c => c.couponCode),
+          ...applied_coupons.map((c: any) => c.couponCode),
           couponCode.trim(),
         ];
 
@@ -315,11 +320,9 @@ export default function CartDropdown({
           setCouponCode('');
           setAutoFilledCoupon(null);
         } else {
-          console.error('Multiple coupon validation failed:', data.message);
         }
       }
     } catch (error) {
-      console.error('Failed to apply coupon:', error);
     } finally {
       setIsApplyingCoupon(false);
     }
@@ -511,7 +514,7 @@ export default function CartDropdown({
               {/* Applied Coupons */}
               {applied_coupons.length > 0 && (
                 <div className="mb-2 space-y-1">
-                  {applied_coupons.map((coupon, index) => (
+                  {applied_coupons.map((coupon: any, index: number) => (
                     <div
                       key={index}
                       className="flex items-center justify-between p-2 bg-emerald-50 border border-emerald-200 rounded-md"

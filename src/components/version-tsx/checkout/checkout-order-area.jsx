@@ -123,7 +123,6 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
   useEffect(() => {
     const fallbackTimer = setTimeout(() => {
       if (!cartDataLoaded) {
-        console.warn('Cart data loading timeout, displaying anyway');
         setCartDataLoaded(true);
       }
     }, 2000); // 2 second fallback
@@ -134,23 +133,8 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
   // Smart auto-fill coupon code from various sources including backend
   useEffect(() => {
     const autoFillCouponCode = () => {
-      console.log('🎟️ Auto-fill: Starting smart coupon auto-fill check...');
-      console.log('🎟️ Auto-fill: couponsLoading:', couponsLoading);
-      console.log('🎟️ Auto-fill: activeCouponsData:', activeCouponsData);
-      console.log('🎟️ Auto-fill: couponRef.current:', couponRef.current);
-      console.log('🎟️ Auto-fill: applied_coupons:', applied_coupons);
-
       // Don't proceed if coupons are still loading or ref is not available
       if (couponsLoading || !couponRef.current || couponRef.current.value) {
-        if (couponsLoading)
-          console.log('⏳ Auto-fill: Still loading coupons...');
-        if (!couponRef.current)
-          console.log('⚠️ Auto-fill: couponRef not available');
-        if (couponRef.current?.value)
-          console.log(
-            'ℹ️ Auto-fill: Input field already has value:',
-            couponRef.current.value
-          );
         return;
       }
 
@@ -169,17 +153,12 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
 
       if (urlCoupon) {
         couponCodeToFill = urlCoupon.trim();
-        console.log('🎟️ Auto-fill: Found URL coupon:', couponCodeToFill);
       }
 
       // Check localStorage for pending coupon
       if (!couponCodeToFill) {
         const pendingCoupon = localStorage.getItem('pendingCouponCode');
         if (pendingCoupon) {
-          console.log(
-            '🎟️ Auto-fill: Found localStorage coupon:',
-            pendingCoupon
-          );
           try {
             const parsed = JSON.parse(pendingCoupon);
             couponCodeToFill =
@@ -188,7 +167,6 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
             couponCodeToFill = pendingCoupon;
           }
         } else {
-          console.log('🎟️ Auto-fill: No localStorage coupon found');
         }
       }
 
@@ -198,8 +176,6 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
         activeCouponsData?.success &&
         activeCouponsData?.data?.length > 0
       ) {
-        console.log('🎟️ Auto-fill: Looking for best coupon from backend...');
-
         const availableCoupons = activeCouponsData.data.filter(coupon => {
           // Filter out already applied coupons
           const isAlreadyApplied = applied_coupons.some(
@@ -211,8 +187,6 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
             !isAlreadyApplied && coupon.status === 'active' && coupon.couponCode
           );
         });
-
-        console.log('🎟️ Auto-fill: Available coupons:', availableCoupons);
 
         if (availableCoupons.length > 0) {
           // Smart logic to select the best coupon:
@@ -244,16 +218,7 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
 
           couponCodeToFill = bestCoupon.couponCode;
           setAutoFilledCoupon(bestCoupon); // Store the coupon data for percentage display
-
-          console.log('🎯 Auto-fill: Selected best coupon:', {
-            code: bestCoupon.couponCode,
-            discountAmount: bestCoupon.discountAmount,
-            discountPercentage: bestCoupon.discountPercentage,
-            minimumAmount: bestCoupon.minimumAmount,
-            title: bestCoupon.title,
-          });
         } else {
-          console.log('ℹ️ Auto-fill: No available coupons to auto-fill');
         }
       }
 
@@ -265,32 +230,19 @@ export default function CheckoutOrderArea({ checkoutData, isGuest }) {
             coupon.couponCode?.toLowerCase() === couponCodeToFill.toLowerCase()
         );
 
-        console.log('🎟️ Auto-fill: isAlreadyApplied:', isAlreadyApplied);
-
         if (!isAlreadyApplied) {
           couponRef.current.value = couponCodeToFill;
-          console.log('✅ Auto-filled coupon code:', couponCodeToFill);
 
           // Clear the localStorage after auto-filling to prevent re-filling
           if (localStorage.getItem('pendingCouponCode')) {
             localStorage.removeItem('pendingCouponCode');
-            console.log('🎟️ Auto-fill: Cleared localStorage');
           }
         } else {
-          console.log(
-            '⚠️ Auto-fill: Coupon already applied, skipping auto-fill'
-          );
         }
       } else {
         if (!couponCodeToFill) {
-          console.log('ℹ️ Auto-fill: No coupon code found to auto-fill');
         } else if (!couponRef.current) {
-          console.log('⚠️ Auto-fill: couponRef not available');
         } else if (couponRef.current.value) {
-          console.log(
-            'ℹ️ Auto-fill: Input field already has value:',
-            couponRef.current.value
-          );
         }
       }
     };

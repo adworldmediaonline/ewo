@@ -29,7 +29,7 @@ export const useAuthCheck = () => {
       dispatch(setSession(session));
     } else if (error) {
       // Handle authentication errors
-      console.warn('Authentication check failed:', error);
+
       dispatch(userLoggedOut());
     }
   }, [session, error, dispatch]);

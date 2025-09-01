@@ -38,7 +38,6 @@ async function fetchFromAPI<T>(
 
     return response.json();
   } catch (error) {
-    console.error(`Error fetching from ${endpoint}:`, error);
     throw error;
   }
 }
@@ -51,9 +50,6 @@ export const getCategories = unstable_cache(
       process.env.NODE_ENV === 'production' &&
       !process.env.NEXT_PUBLIC_API_BASE_URL
     ) {
-      console.warn(
-        'Production build without API URL, returning empty categories'
-      );
       return [];
     }
 
@@ -65,7 +61,6 @@ export const getCategories = unstable_cache(
       // Filter and process categories with safe fallbacks
       const categories = data?.result || [];
       if (!Array.isArray(categories)) {
-        console.warn('Categories data is not an array, returning empty array');
         return [];
       }
 
@@ -78,7 +73,6 @@ export const getCategories = unstable_cache(
 
       return filteredCategories;
     } catch (error) {
-      console.error('Error fetching categories:', error);
       return [];
     }
   },
@@ -107,10 +101,6 @@ export const getProductTypeCategories = unstable_cache(
       const categories = data?.result || [];
       return Array.isArray(categories) ? categories : [];
     } catch (error) {
-      console.error(
-        `Error fetching product type categories for ${type}:`,
-        error
-      );
       return [];
     }
   },
@@ -139,7 +129,6 @@ export const getAllCategories = unstable_cache(
       const categories = data?.result || [];
       return Array.isArray(categories) ? categories : [];
     } catch (error) {
-      console.error('Error fetching all categories:', error);
       return [];
     }
   },

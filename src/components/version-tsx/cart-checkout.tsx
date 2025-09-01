@@ -31,7 +31,7 @@ export default function CartCheckout() {
     data: activeCouponsData,
     isLoading: couponsLoading,
     isError: couponsError,
-  } = useGetAllActiveCouponsQuery();
+  } = useGetAllActiveCouponsQuery({});
 
   const { totalShippingCost, shippingDiscount, cart_products } = useSelector(
     (state: any) => state.cart
@@ -52,33 +52,17 @@ export default function CartCheckout() {
   // Smart auto-fill coupon code from various sources including backend
   useEffect(() => {
     const autoFillCouponCode = () => {
-      console.log(
-        '🎟️ Cart Auto-fill: Starting smart coupon auto-fill check...'
-      );
-      console.log('🎟️ Cart Auto-fill: couponsLoading:', couponsLoading);
-      console.log('🎟️ Cart Auto-fill: activeCouponsData:', activeCouponsData);
-      console.log(
-        '🎟️ Cart Auto-fill: couponInputRef.current:',
-        couponInputRef.current
-      );
-      console.log('🎟️ Cart Auto-fill: applied_coupons:', applied_coupons);
-
       // Don't proceed if coupons are still loading
       if (couponsLoading) {
-        console.log('⏳ Cart Auto-fill: Still loading coupons...');
         return;
       }
 
       // If input already has value, don't proceed
       if (couponInputRef.current?.value) {
-        console.log(
-          'ℹ️ Cart Auto-fill: Input field already has value:',
-          couponInputRef.current.value
-        );
         return;
       }
 
-      let couponCodeToFill = null;
+      let couponCodeToFill: string | null = null;
 
       // Priority order for coupon sources:
       // 1. URL parameter 'coupon' or 'couponCode' or 'code' (highest priority)
@@ -93,17 +77,12 @@ export default function CartCheckout() {
 
       if (urlCoupon) {
         couponCodeToFill = urlCoupon.trim();
-        console.log('🎟️ Cart Auto-fill: Found URL coupon:', couponCodeToFill);
       }
 
       // Check localStorage for pending coupon
       if (!couponCodeToFill) {
         const pendingCoupon = localStorage.getItem('pendingCouponCode');
         if (pendingCoupon) {
-          console.log(
-            '🎟️ Cart Auto-fill: Found localStorage coupon:',
-            pendingCoupon
-          );
           try {
             const parsed = JSON.parse(pendingCoupon);
             couponCodeToFill =
@@ -112,7 +91,6 @@ export default function CartCheckout() {
             couponCodeToFill = pendingCoupon;
           }
         } else {
-          console.log('🎟️ Cart Auto-fill: No localStorage coupon found');
         }
       }
 
@@ -122,23 +100,21 @@ export default function CartCheckout() {
         activeCouponsData?.success &&
         activeCouponsData?.data?.length > 0
       ) {
-        console.log(
-          '🎟️ Cart Auto-fill: Looking for best coupon from backend...'
+        const availableCoupons = activeCouponsData.data.filter(
+          (coupon: any) => {
+            // Filter out already applied coupons
+            const isAlreadyApplied = applied_coupons.some(
+              (appliedCoupon: any) =>
+                appliedCoupon.couponCode?.toLowerCase() ===
+                coupon.couponCode?.toLowerCase()
+            );
+            return (
+              !isAlreadyApplied &&
+              coupon.status === 'active' &&
+              coupon.couponCode
+            );
+          }
         );
-
-        const availableCoupons = activeCouponsData.data.filter(coupon => {
-          // Filter out already applied coupons
-          const isAlreadyApplied = applied_coupons.some(
-            appliedCoupon =>
-              appliedCoupon.couponCode?.toLowerCase() ===
-              coupon.couponCode?.toLowerCase()
-          );
-          return (
-            !isAlreadyApplied && coupon.status === 'active' && coupon.couponCode
-          );
-        });
-
-        console.log('🎟️ Cart Auto-fill: Available coupons:', availableCoupons);
 
         if (availableCoupons.length > 0) {
           // Smart logic to select the best coupon:
@@ -146,40 +122,33 @@ export default function CartCheckout() {
           // 2. Priority by minimum amount (lowest first, easier to qualify)
           // 3. Priority by discount percentage (highest first)
 
-          const bestCoupon = availableCoupons.reduce((best, current) => {
-            // Priority 1: Higher discount amount
-            const bestDiscount = best.discountAmount || 0;
-            const currentDiscount = current.discountAmount || 0;
+          const bestCoupon = availableCoupons.reduce(
+            (best: any, current: any) => {
+              // Priority 1: Higher discount amount
+              const bestDiscount = best.discountAmount || 0;
+              const currentDiscount = current.discountAmount || 0;
 
-            if (currentDiscount > bestDiscount) return current;
-            if (currentDiscount < bestDiscount) return best;
+              if (currentDiscount > bestDiscount) return current;
+              if (currentDiscount < bestDiscount) return best;
 
-            // Priority 2: Lower minimum amount (easier to qualify)
-            const bestMinimum = best.minimumAmount || 0;
-            const currentMinimum = current.minimumAmount || 0;
+              // Priority 2: Lower minimum amount (easier to qualify)
+              const bestMinimum = best.minimumAmount || 0;
+              const currentMinimum = current.minimumAmount || 0;
 
-            if (currentMinimum < bestMinimum) return current;
-            if (currentMinimum > bestMinimum) return best;
+              if (currentMinimum < bestMinimum) return current;
+              if (currentMinimum > bestMinimum) return best;
 
-            // Priority 3: Higher discount percentage
-            const bestPercentage = best.discountPercentage || 0;
-            const currentPercentage = current.discountPercentage || 0;
+              // Priority 3: Higher discount percentage
+              const bestPercentage = best.discountPercentage || 0;
+              const currentPercentage = current.discountPercentage || 0;
 
-            return currentPercentage > bestPercentage ? current : best;
-          });
+              return currentPercentage > bestPercentage ? current : best;
+            }
+          );
 
           couponCodeToFill = bestCoupon.couponCode;
           setAutoFilledCoupon(bestCoupon); // Store the coupon data for percentage display
-
-          console.log('🎯 Cart Auto-fill: Selected best coupon:', {
-            code: bestCoupon.couponCode,
-            discountAmount: bestCoupon.discountAmount,
-            discountPercentage: bestCoupon.discountPercentage,
-            minimumAmount: bestCoupon.minimumAmount,
-            title: bestCoupon.title,
-          });
         } else {
-          console.log('ℹ️ Cart Auto-fill: No available coupons to auto-fill');
         }
       }
 
@@ -187,29 +156,23 @@ export default function CartCheckout() {
       if (couponCodeToFill) {
         // Double-check if this coupon is not already applied
         const isAlreadyApplied = applied_coupons.some(
-          coupon =>
-            coupon.couponCode?.toLowerCase() === couponCodeToFill.toLowerCase()
+          (coupon: any) =>
+            coupon.couponCode?.toLowerCase() === couponCodeToFill?.toLowerCase()
         );
 
         if (!isAlreadyApplied) {
           // Form is always visible now, fill directly
           if (couponInputRef.current && !couponInputRef.current.value) {
             couponInputRef.current.value = couponCodeToFill;
-            console.log('✅ Cart Auto-filled coupon code:', couponCodeToFill);
 
             // Clear the localStorage after auto-filling to prevent re-filling
             if (localStorage.getItem('pendingCouponCode')) {
               localStorage.removeItem('pendingCouponCode');
-              console.log('🎟️ Cart Auto-fill: Cleared localStorage');
             }
           }
         } else {
-          console.log(
-            '⚠️ Cart Auto-fill: Coupon already applied, skipping auto-fill'
-          );
         }
       } else {
-        console.log('ℹ️ Cart Auto-fill: No coupon code found to auto-fill');
       }
     };
 
