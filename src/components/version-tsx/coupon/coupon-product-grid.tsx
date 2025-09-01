@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, Package } from 'lucide-react';
+import { Eye, Handbag, Package } from 'lucide-react';
+import Link from 'next/link';
 import ProductItem from './product-item';
 
 export interface Product {
@@ -37,6 +38,7 @@ export interface Coupon {
   discountAmount?: number;
   endTime: string;
   applicableProducts: Product[];
+  applicableType?: 'all' | 'product' | 'category' | 'brand';
 }
 
 interface CouponProductGridProps {
@@ -48,6 +50,33 @@ export default function CouponProductGrid({
   products,
   coupon,
 }: CouponProductGridProps) {
+  // If coupon applies to all products, show shop button instead of product grid
+  if (coupon.applicableType === 'all') {
+    return (
+      <div className="text-center py-8">
+        <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-4">
+          <Handbag className="h-8 w-8 text-primary" />
+        </div>
+        <h4 className="text-xl font-semibold text-foreground mb-2">
+          This coupon applies to all products!
+        </h4>
+        <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+          Browse our entire collection and use coupon code{' '}
+          <span className="font-mono font-bold text-primary">
+            {coupon.couponCode}
+          </span>{' '}
+          at checkout to get your discount.
+        </p>
+        <Button asChild size="lg" className="px-8">
+          <Link href="/shop" className="flex items-center gap-2">
+            <Handbag className="h-5 w-5" />
+            Shop All Products
+          </Link>
+        </Button>
+      </div>
+    );
+  }
+
   if (!products || products.length === 0) {
     return (
       <div className="text-center py-8">

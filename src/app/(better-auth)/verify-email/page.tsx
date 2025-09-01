@@ -83,7 +83,7 @@ export default function VerifyEmailPage() {
       }, 2000);
     } catch (err) {
       setError('Verification failed. Please try again.');
-      console.error('OTP verification error:', err);
+
       setIsLoading(false);
     }
   };
@@ -113,7 +113,7 @@ export default function VerifyEmailPage() {
       setResendLoading(false);
     } catch (err) {
       setError('Failed to resend OTP. Please try again.');
-      console.error('Resend OTP error:', err);
+
       setResendLoading(false);
     }
   };

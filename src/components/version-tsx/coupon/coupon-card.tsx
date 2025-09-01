@@ -15,6 +15,7 @@ export interface Coupon {
   discountAmount?: number;
   endTime: string;
   applicableProducts: any[];
+  applicableType?: 'all' | 'product' | 'category' | 'brand';
   description?: string;
   minimumOrderAmount?: number;
 }
@@ -198,7 +199,9 @@ export default function CouponCard({ coupon }: CouponCardProps) {
                 </div>
                 <div className="text-xs text-muted-foreground">Products</div>
                 <div className="text-sm font-medium">
-                  {coupon.applicableProducts.length} items
+                  {coupon.applicableType === 'all'
+                    ? 'All Products'
+                    : `${coupon.applicableProducts.length} items`}
                 </div>
               </div>
             </div>

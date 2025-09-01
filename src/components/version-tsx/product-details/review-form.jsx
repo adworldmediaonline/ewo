@@ -137,8 +137,6 @@ export default function ReviewForm({ productId, onSuccess }) {
         onSuccess();
       }
     } catch (error) {
-      console.error('Review submission error:', error);
-
       // Handle specific error cases
       if (error?.data?.message) {
         toast.error(error.data.message);

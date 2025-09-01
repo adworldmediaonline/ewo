@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -18,6 +19,13 @@ import {
   quantityDecrement,
   remove_product,
 } from '@/redux/features/cartSlice';
+import { useGetAllActiveCouponsQuery } from '@/redux/features/coupon/couponApi';
+import {
+  add_applied_coupon,
+  clear_all_coupons,
+  load_applied_coupons,
+  remove_applied_coupon,
+} from '@/redux/features/coupon/couponSlice';
 import { X as XIcon } from 'lucide-react';
 
 interface CartItem {
@@ -40,11 +48,17 @@ export default function CartDropdown({
   children: React.ReactNode;
 }): React.ReactElement {
   const dispatch = useDispatch();
+  const searchParams = useSearchParams();
   const { subtotal, total, firstTimeDiscountAmount } = useCartInfo();
   const { navigateToCart, navigateToCheckout } = useGuestCartNavigation();
 
   // Add state to control dropdown
   const [open, setOpen] = React.useState(false);
+
+  // Coupon functionality state
+  const [couponCode, setCouponCode] = React.useState('');
+  const [isApplyingCoupon, setIsApplyingCoupon] = React.useState(false);
+  const [autoFilledCoupon, setAutoFilledCoupon] = React.useState<any>(null);
 
   const {
     cart_products,
@@ -56,7 +70,268 @@ export default function CartDropdown({
     (s: any) => s.coupon ?? {}
   );
 
+  // Fetch all active coupons from backend for smart auto-fill
+  const {
+    data: activeCouponsData,
+    isLoading: couponsLoading,
+    isError: couponsError,
+  } = useGetAllActiveCouponsQuery({});
+
   const items: CartItem[] = Array.isArray(cart_products) ? cart_products : [];
+
+  // Load applied coupons on component mount
+  React.useEffect(() => {
+    dispatch(load_applied_coupons());
+  }, [dispatch]);
+
+  // Smart auto-fill coupon code from various sources including backend
+  React.useEffect(() => {
+    const autoFillCouponCode = () => {
+      // Don't proceed if coupons are still loading or input already has value
+      if (couponsLoading || couponCode) {
+        return;
+      }
+
+      let couponCodeToFill = null;
+
+      // Priority order for coupon sources:
+      // 1. URL parameter 'coupon' or 'couponCode' or 'code' (highest priority)
+      // 2. localStorage 'pendingCouponCode'
+      // 3. Smart selection from backend active coupons (best coupon logic)
+
+      // Check URL parameters first (highest priority)
+      const urlCoupon =
+        searchParams.get('coupon') ||
+        searchParams.get('couponCode') ||
+        searchParams.get('code');
+
+      if (urlCoupon) {
+        couponCodeToFill = urlCoupon.trim();
+      }
+
+      // Check localStorage for pending coupon
+      if (!couponCodeToFill) {
+        const pendingCoupon = localStorage.getItem('pendingCouponCode');
+        if (pendingCoupon) {
+          try {
+            const parsed = JSON.parse(pendingCoupon);
+            couponCodeToFill =
+              typeof parsed === 'string' ? parsed : parsed.code;
+          } catch {
+            couponCodeToFill = pendingCoupon;
+          }
+        }
+      }
+
+      // Smart selection from backend active coupons (if no URL/localStorage coupon)
+      if (
+        !couponCodeToFill &&
+        activeCouponsData?.success &&
+        activeCouponsData?.data?.length > 0
+      ) {
+        const availableCoupons = activeCouponsData.data.filter(
+          (coupon: any) => {
+            // Filter out already applied coupons
+            const isAlreadyApplied = applied_coupons.some(
+              (appliedCoupon: any) =>
+                appliedCoupon.couponCode?.toLowerCase() ===
+                coupon.couponCode?.toLowerCase()
+            );
+            return (
+              !isAlreadyApplied &&
+              coupon.status === 'active' &&
+              coupon.couponCode
+            );
+          }
+        );
+
+        if (availableCoupons.length > 0) {
+          // Smart logic to select the best coupon:
+          // 1. Priority by discount amount (highest first)
+          // 2. Priority by minimum amount (lowest first, easier to qualify)
+          // 3. Priority by discount percentage (highest first)
+
+          const bestCoupon = availableCoupons.reduce(
+            (best: any, current: any) => {
+              // Priority 1: Higher discount amount
+              const bestDiscount = best.discountAmount || 0;
+              const currentDiscount = current.discountAmount || 0;
+
+              if (currentDiscount > bestDiscount) return current;
+              if (currentDiscount < bestDiscount) return best;
+
+              // Priority 2: Lower minimum amount (easier to qualify)
+              const bestMinimum = best.minimumAmount || 0;
+              const currentMinimum = current.minimumAmount || 0;
+
+              if (currentMinimum < bestMinimum) return current;
+              if (currentMinimum > bestMinimum) return best;
+
+              // Priority 3: Higher discount percentage
+              const bestPercentage = best.discountPercentage || 0;
+              const currentPercentage = current.discountPercentage || 0;
+
+              return currentPercentage > bestPercentage ? current : best;
+            }
+          );
+
+          couponCodeToFill = bestCoupon.couponCode;
+          setAutoFilledCoupon(bestCoupon);
+        }
+      }
+
+      // If we found a coupon code and it's not already applied
+      if (couponCodeToFill) {
+        const isAlreadyApplied = applied_coupons.some(
+          (coupon: any) =>
+            coupon.couponCode?.toLowerCase() === couponCodeToFill?.toLowerCase()
+        );
+
+        if (!isAlreadyApplied) {
+          setCouponCode(couponCodeToFill);
+
+          // Clear the localStorage after auto-filling to prevent re-filling
+          if (localStorage.getItem('pendingCouponCode')) {
+            localStorage.removeItem('pendingCouponCode');
+          }
+        }
+      }
+    };
+
+    // Small delay to ensure the component is ready
+    const timeoutId = setTimeout(autoFillCouponCode, 200);
+
+    return () => clearTimeout(timeoutId);
+  }, [
+    searchParams,
+    applied_coupons,
+    activeCouponsData,
+    couponsLoading,
+    couponCode,
+  ]);
+
+  // Calculate totals for coupon validation
+  const calculateTotals = () => {
+    const subtotal = Number(total || 0);
+    const shipping = Number(totalShippingCost || 0);
+    const firstTimeDiscount = Number(firstTimeDiscountAmount || 0);
+    const addressDiscount = 0; // Not available in dropdown context
+    const currentCouponDiscount = Number(total_coupon_discount || 0);
+
+    return {
+      subtotal,
+      shipping,
+      firstTimeDiscount,
+      addressDiscount,
+      currentCouponDiscount,
+    };
+  };
+
+  // Handle coupon application
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim() || isApplyingCoupon) return;
+
+    setIsApplyingCoupon(true);
+
+    try {
+      const totals = calculateTotals();
+
+      if (applied_coupons.length === 0) {
+        // First coupon - use validation endpoint
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/coupon/validate`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              couponCode: couponCode.trim(),
+              cartItems: cart_products,
+              cartTotal:
+                totals.subtotal +
+                totals.shipping -
+                totals.addressDiscount -
+                totals.firstTimeDiscount,
+              cartSubtotal: totals.subtotal,
+              shippingCost: totals.shipping,
+            }),
+          }
+        );
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          dispatch(
+            add_applied_coupon({
+              _id: data.data.couponId,
+              couponCode: data.data.couponCode,
+              discount: data.data.discount,
+              discountType: data.data.discountType,
+              title: data.data.title || data.data.couponCode,
+            })
+          );
+          setCouponCode('');
+          setAutoFilledCoupon(null);
+        } else {
+        }
+      } else {
+        // Multiple coupons - use multiple validation endpoint
+        const allCouponCodes = [
+          ...applied_coupons.map((c: any) => c.couponCode),
+          couponCode.trim(),
+        ];
+
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/coupon/validate-multiple`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              couponCodes: allCouponCodes,
+              cartItems: cart_products,
+              cartTotal:
+                totals.subtotal +
+                totals.shipping -
+                totals.addressDiscount -
+                totals.firstTimeDiscount,
+              cartSubtotal: totals.subtotal,
+              shippingCost: totals.shipping,
+            }),
+          }
+        );
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          // Clear existing coupons and add all validated ones
+          dispatch(clear_all_coupons());
+
+          data.data.forEach((coupon: any) => {
+            dispatch(
+              add_applied_coupon({
+                _id: coupon.couponId,
+                couponCode: coupon.couponCode,
+                discount: coupon.discount,
+                discountType: coupon.discountType,
+                title: coupon.title || coupon.couponCode,
+              })
+            );
+          });
+
+          setCouponCode('');
+          setAutoFilledCoupon(null);
+        } else {
+        }
+      }
+    } catch (error) {
+    } finally {
+      setIsApplyingCoupon(false);
+    }
+  };
+
+  // Handle coupon removal
+  const handleRemoveCoupon = (couponCodeToRemove: string) => {
+    dispatch(remove_applied_coupon(couponCodeToRemove));
+  };
 
   function handleIncrement(item: CartItem): void {
     dispatch(
@@ -215,6 +490,76 @@ export default function CartDropdown({
                 </div>
               ))}
             </div>
+
+            {/* Coupon Section */}
+            <div className="px-3 py-2 border-t border-border/60">
+              {/* Auto-filled coupon message */}
+              {autoFilledCoupon && (
+                <div className="mb-2 p-2 bg-gradient-to-r from-emerald-50 to-blue-50 border border-emerald-200 rounded-md">
+                  <div className="flex items-center gap-2">
+                    <span className="text-emerald-600 text-xs">🎯</span>
+                    <span className="text-xs text-emerald-700 font-medium">
+                      Best Coupon Found! Click Apply to save{' '}
+                      {autoFilledCoupon.discountPercentage
+                        ? `${autoFilledCoupon.discountPercentage}%`
+                        : autoFilledCoupon.discountAmount
+                        ? `$${autoFilledCoupon.discountAmount}`
+                        : 'money'}{' '}
+                      on your order
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Applied Coupons */}
+              {applied_coupons.length > 0 && (
+                <div className="mb-2 space-y-1">
+                  {applied_coupons.map((coupon: any, index: number) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-2 bg-emerald-50 border border-emerald-200 rounded-md"
+                    >
+                      <span className="text-xs text-emerald-700 font-medium">
+                        {coupon.couponCode}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-emerald-600">
+                          -${coupon.discount || 0}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveCoupon(coupon.couponCode)}
+                          className="text-emerald-500 hover:text-emerald-700 text-xs"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Coupon Input */}
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={couponCode}
+                  onChange={e => setCouponCode(e.target.value)}
+                  placeholder="Enter coupon code"
+                  className="flex-1 px-2 py-1 text-xs border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
+                  onKeyPress={e => e.key === 'Enter' && handleApplyCoupon()}
+                />
+                <Button
+                  onClick={handleApplyCoupon}
+                  disabled={!couponCode.trim() || isApplyingCoupon}
+                  size="sm"
+                  className="px-3 py-1 text-xs h-auto"
+                >
+                  {isApplyingCoupon ? 'Applying...' : 'Apply'}
+                </Button>
+              </div>
+            </div>
+
             {/* Summary (no separators) */}
             <div className="px-3 py-3 space-y-2 text-sm">
               <div className="flex items-center justify-between">

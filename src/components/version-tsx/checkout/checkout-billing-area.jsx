@@ -1,11 +1,9 @@
 'use client';
 import useCartInfo from '@/hooks/use-cart-info';
 import { authClient } from '@/lib/authClient';
-import { load_applied_coupons } from '@/redux/features/coupon/couponSlice';
 import { reset_address_discount } from '@/redux/features/order/orderSlice';
-import { CardElement } from '@stripe/react-stripe-js';
+
 import { City, Country, State } from 'country-state-city';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ErrorMsg from '../../common/error-msg';
@@ -28,34 +26,16 @@ const CheckoutBillingArea = ({
     processingPayment,
     cardError,
     register: checkoutRegister,
-    handleCouponSubmit,
-    handleRemoveCoupon,
-    handleClearAllCoupons,
-    couponRef,
-    couponApplyMsg,
   } = checkoutData;
 
-  const {
-    totalShippingCost,
-    shippingDiscount,
-    firstTimeDiscount,
-    addressDiscountAmount,
-  } = useSelector(state => state.cart);
+  const { totalShippingCost, addressDiscountAmount } = useSelector(
+    state => state.cart
+  );
 
-  const { total, subtotal, firstTimeDiscountAmount } = useCartInfo();
+  const { total } = useCartInfo();
 
   // Enhanced multiple coupon state - get coupon discount from coupon state like cart dropdown
-  const {
-    applied_coupons,
-    total_coupon_discount,
-    coupon_error,
-    coupon_loading,
-  } = useSelector(state => state.coupon);
-
-  // Load applied coupons on component mount
-  useEffect(() => {
-    dispatch(load_applied_coupons());
-  }, [dispatch]);
+  const { total_coupon_discount } = useSelector(state => state.coupon);
 
   const countries = Country.getAllCountries();
   const defaultCountry = countries.find(country => country.isoCode === 'US');
@@ -214,10 +194,6 @@ const CheckoutBillingArea = ({
       zipCode,
     }));
   };
-
-  // Calculate discount percentage to display
-  const discountPercentage =
-    shippingDiscount > 0 ? (shippingDiscount * 100).toFixed(0) : 0;
 
   // Calculate final total with all discounts - Simplified to match cart dropdown logic
   const calculateFinalTotal = () => {
@@ -430,266 +406,7 @@ const CheckoutBillingArea = ({
           </div>
         </div>
 
-        {/* Order Summary Section */}
-        <div className="border-t border-border pt-6">
-          <h3 className="text-xl font-semibold text-foreground mb-4">
-            Order Summary
-          </h3>
-
-          {/* Coupon Section */}
-          <div className="mb-6">
-            <div className="flex items-center space-x-2 mb-3">
-              <input
-                ref={couponRef}
-                type="text"
-                placeholder="Add coupon code"
-                className="flex-1 px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring text-sm"
-                disabled={
-                  coupon_loading || isCheckoutSubmit || processingPayment
-                }
-              />
-              <button
-                type="button"
-                onClick={handleCouponSubmit}
-                className="px-3 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 text-sm"
-                disabled={
-                  coupon_loading || isCheckoutSubmit || processingPayment
-                }
-              >
-                {coupon_loading ? 'Applying...' : 'Apply'}
-              </button>
-            </div>
-
-            {/* Enhanced coupon messages */}
-            {couponApplyMsg && (
-              <div className="text-sm text-destructive mt-1">
-                {couponApplyMsg}. Please check for the available products.
-                <Link
-                  href="/coupon"
-                  className="text-primary underline ml-2"
-                  target="_blank"
-                >
-                  Click here
-                </Link>
-              </div>
-            )}
-
-            {/* Display multiple applied coupons */}
-            {applied_coupons.length > 0 && (
-              <div className="mt-3 p-3 bg-muted rounded-md">
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-medium text-foreground text-sm">
-                    Applied Coupons ({applied_coupons.length})
-                  </h4>
-                  {applied_coupons.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={handleClearAllCoupons}
-                      className="text-xs text-destructive hover:text-destructive/90 underline"
-                      disabled={isCheckoutSubmit || processingPayment}
-                    >
-                      Remove All
-                    </button>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  {applied_coupons.map((coupon, index) => (
-                    <div
-                      key={coupon.couponCode || index}
-                      className="flex items-center justify-between p-2 bg-background rounded text-xs"
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2">
-                          <span className="font-medium text-foreground">
-                            {coupon.couponCode}
-                          </span>
-                          <span className="text-muted-foreground">
-                            {coupon.title}
-                          </span>
-                          <span className="font-medium text-foreground">
-                            -${Number(coupon.discount || 0).toFixed(2)}
-                          </span>
-                        </div>
-                        {coupon.applicableProductNames &&
-                          coupon.applicableProductNames.length > 0 && (
-                            <span className="text-xs text-muted-foreground">
-                              Applied to:{' '}
-                              {coupon.applicableProductNames
-                                .slice(0, 2)
-                                .join(', ')}
-                              {coupon.applicableProductNames.length > 2 &&
-                                ` +${
-                                  coupon.applicableProductNames.length - 2
-                                } more`}
-                            </span>
-                          )}
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveCoupon(coupon.couponCode)}
-                        className="text-destructive hover:text-destructive/90 ml-2"
-                        disabled={isCheckoutSubmit || processingPayment}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Pricing Summary */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span className="font-medium text-foreground">
-                ${(Number(subtotal) || 0).toFixed(2)}
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Shipping</span>
-              <span className="font-medium text-foreground">
-                ${(Number(totalShippingCost) || 0).toFixed(2)}
-                {discountPercentage > 0 && (
-                  <span className="ml-2 text-xs bg-green-100 text-green-600 px-1.5 py-0.5 rounded">
-                    {discountPercentage}% off
-                  </span>
-                )}
-              </span>
-            </div>
-
-            {/* Multiple coupon discounts display */}
-            {Number(total_coupon_discount) > 0 && (
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">
-                  Coupon Discounts
-                  {applied_coupons.length > 1 && (
-                    <span className="ml-2 text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">
-                      {applied_coupons.length} coupons
-                    </span>
-                  )}
-                </span>
-                <span className="font-medium text-foreground">
-                  -${Number(total_coupon_discount).toFixed(2)}
-                </span>
-              </div>
-            )}
-
-            {/* Address discount */}
-            {Number(addressDiscountAmount) > 0 && (
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Address Discount</span>
-                <span className="font-medium text-foreground">
-                  -${Number(addressDiscountAmount).toFixed(2)}
-                </span>
-              </div>
-            )}
-
-            {/* First-time discount */}
-            {firstTimeDiscount.isApplied > 0 && (
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">
-                  First-time order discount (-{firstTimeDiscount.percentage}
-                  %)
-                </span>
-                <span className="font-medium text-green-600">
-                  -${(Number(firstTimeDiscountAmount) || 0).toFixed(2)}
-                </span>
-              </div>
-            )}
-
-            <div className="flex items-center justify-between pt-4 border-t border-border">
-              <span className="text-lg font-semibold text-foreground">
-                Total
-              </span>
-              <span className="text-lg font-semibold text-foreground">
-                ${calculateFinalTotal().toFixed(2)}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Payment Information */}
-        <div className="border-t border-border pt-6">
-          <h4 className="text-lg font-semibold text-foreground mb-4">
-            Payment Information
-          </h4>
-          <div className="p-4 bg-muted rounded-md">
-            <CardElement
-              options={{
-                style: {
-                  base: {
-                    fontSize: '16px',
-                    color: '#424770',
-                    '::placeholder': {
-                      color: '#aab7c4',
-                    },
-                    fontFamily: 'var(--font-lato), "Lato", sans-serif',
-                  },
-                  invalid: {
-                    color: '#9e2146',
-                  },
-                },
-              }}
-            />
-            {cardError && (
-              <div className="mt-2 text-destructive text-sm">
-                <small>Payment could not be processed:</small>
-                <strong>{cardError}</strong>
-                <div>
-                  <small>Please check your card details and try again.</small>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Secure Checkout Badge */}
-        <div className="flex items-start space-x-3 p-4 bg-muted rounded-md">
-          <svg
-            className="w-5 h-5 text-primary flex-shrink-0 mt-0.5"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path
-              fillRule="evenodd"
-              d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <div>
-            <div className="font-medium text-foreground">
-              Secure Checkout - SSL Encrypted
-            </div>
-            <div className="text-sm text-muted-foreground">
-              Ensuring your financial and personal details are secure during
-              every transaction.
-            </div>
-          </div>
-        </div>
-
-        {/* Complete Purchase Button */}
-        <button
-          type="submit"
-          disabled={!stripe || isCheckoutSubmit || processingPayment}
-          className="w-full py-3 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 font-medium"
-        >
-          {processingPayment ? (
-            <span className="flex items-center justify-center">
-              <span
-                className="spinner-border spinner-border-sm me-2"
-                role="status"
-                aria-hidden="true"
-              ></span>
-              Processing Your Order...
-            </span>
-          ) : (
-            `Complete Purchase - $${calculateFinalTotal().toFixed(2)}`
-          )}
-        </button>
+        {/* Order Summary and Complete Purchase moved to right side - see checkout-order-area.jsx */}
 
         {/* Hidden payment and shipping inputs for form validation */}
         <div style={{ display: 'none' }}>

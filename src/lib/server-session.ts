@@ -30,7 +30,6 @@ export async function getServerSession() {
     const session = await response.json();
     return session;
   } catch (error) {
-    console.error('Failed to get server session:', error);
     return null;
   }
 }
@@ -60,7 +59,6 @@ export async function getServerSessionFromToken(authorization?: string) {
     const session = await response.json();
     return session;
   } catch (error) {
-    console.error('Failed to get server session from token:', error);
     return null;
   }
 }

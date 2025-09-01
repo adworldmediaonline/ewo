@@ -73,18 +73,10 @@ export default function CheckoutArea() {
           {cart_products.length > 0 && (
             <form onSubmit={handleSubmit(submitHandler)} noValidate>
               {/* Mobile: Order summary first, then billing details */}
-              {/* Desktop: Order summary on left (sticky), billing details on right */}
+              {/* Desktop: Billing details on left, order summary on right (sticky) */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
-                {/* Order summary - full width on mobile, 5/12 width on desktop (sticky) */}
-                <div className="lg:col-span-5 lg:sticky lg:top-4 lg:self-start">
-                  <CheckoutOrderArea
-                    checkoutData={checkoutData}
-                    isGuest={isGuest}
-                  />
-                </div>
-
                 {/* Billing details - full width on mobile, 7/12 width on desktop */}
-                <div className="lg:col-span-7">
+                <div className="lg:col-span-7 order-2 lg:order-1">
                   <div className="space-y-6">
                     {isPending && (
                       <div className="text-center">
@@ -122,6 +114,14 @@ export default function CheckoutArea() {
                       checkoutData={checkoutData}
                     />
                   </div>
+                </div>
+
+                {/* Order summary - full width on mobile (displayed first), 5/12 width on desktop (sticky) */}
+                <div className="lg:col-span-5 order-1 lg:order-2 lg:sticky lg:top-4 lg:self-start">
+                  <CheckoutOrderArea
+                    checkoutData={checkoutData}
+                    isGuest={isGuest}
+                  />
                 </div>
               </div>
             </form>
