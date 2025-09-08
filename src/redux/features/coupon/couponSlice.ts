@@ -39,7 +39,7 @@ export const couponSlice = createSlice({
 
       localStorage.setItem('couponInfo', JSON.stringify(payload));
     },
-    get_coupons: (state, { payload }) => {
+    get_coupons: state => {
       const data = localStorage.getItem('couponInfo');
       if (data) {
         state.coupon_info = JSON.parse(data);

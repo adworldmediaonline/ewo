@@ -9,8 +9,7 @@ interface BannerProps {
   mobilePublicId?: string;
   desktopTitle?: string;
   mobileTitle?: string;
-  subtitle?: string;
-  description?: string;
+
   href?: string;
   priority?: boolean;
   showButton?: boolean;
@@ -27,17 +26,12 @@ export default function Banner({
   mobilePublicId,
   desktopTitle,
   mobileTitle,
-  subtitle,
-  description,
-  href = '/coupon',
+
   priority = false,
-  showButton = false,
-  buttonText = 'Shop Now',
+
   gradientPosition = 'left',
   aspectRatio = 3.69,
   mobileHeight = 200,
-  showPromoContent = false,
-  promoCode,
 }: BannerProps) {
   const mobileImage = mobilePublicId || desktopPublicId;
 

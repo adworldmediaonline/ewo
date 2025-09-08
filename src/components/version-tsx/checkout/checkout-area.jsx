@@ -1,11 +1,10 @@
 'use client';
-import Cookies from 'js-cookie';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
 // internal
-import { AuthDialog } from '@/components/version-tsx/profile';
+// import { AuthDialog } from '@/components/version-tsx/profile';
 import useCheckoutSubmit from '@/hooks/use-checkout-submit';
 import ThankYouModal from '../../common/thank-you-modal';
 
@@ -16,15 +15,8 @@ import CheckoutOrderArea from './checkout-order-area';
 export default function CheckoutArea() {
   const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
-  const [isGuest, setIsGuest] = useState(false);
-  const [showAuthDialog, setShowAuthDialog] = useState(false);
 
-  useEffect(() => {
-    const isAuthenticate = Cookies.get('userInfo');
-    if (!isAuthenticate) {
-      setIsGuest(true);
-    }
-  }, []);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
 
   const checkoutData = useCheckoutSubmit();
   const {
@@ -45,13 +37,13 @@ export default function CheckoutArea() {
   const { cart_products } = useSelector(state => state.cart);
 
   // Handle auth dialog
-  const handleShowAuthDialog = () => {
-    setShowAuthDialog(true);
-  };
+  // const handleShowAuthDialog = () => {
+  //   setShowAuthDialog(true);
+  // };
 
-  const handleCloseAuthDialog = () => {
-    setShowAuthDialog(false);
-  };
+  // const handleCloseAuthDialog = () => {
+  //   setShowAuthDialog(false);
+  // };
 
   return (
     <>
@@ -95,13 +87,20 @@ export default function CheckoutArea() {
                               Checking out as Guest
                             </span>
                           </div>
-                          <button
+                          {/* <button
                             type="button"
                             onClick={handleShowAuthDialog}
                             className="text-primary hover:text-primary/90 underline"
                           >
                             Sign In Instead
-                          </button>
+                          </button> */}
+
+                          <Link
+                            href="/sign-in"
+                            className="text-primary hover:text-primary/90 underline"
+                          >
+                            Sign In Instead
+                          </Link>
                         </div>
                       </div>
                     )}
@@ -110,7 +109,6 @@ export default function CheckoutArea() {
                       register={register}
                       errors={errors}
                       setValue={setValue}
-                      isGuest={isGuest}
                       checkoutData={checkoutData}
                     />
                   </div>
@@ -118,10 +116,7 @@ export default function CheckoutArea() {
 
                 {/* Order summary - full width on mobile (displayed first), 5/12 width on desktop (sticky) */}
                 <div className="lg:col-span-5 order-1 lg:order-2 lg:sticky lg:top-4 lg:self-start">
-                  <CheckoutOrderArea
-                    checkoutData={checkoutData}
-                    isGuest={isGuest}
-                  />
+                  <CheckoutOrderArea checkoutData={checkoutData} />
                 </div>
               </div>
             </form>
@@ -130,12 +125,12 @@ export default function CheckoutArea() {
       </section>
 
       {/* Auth Dialog */}
-      <AuthDialog
+      {/* <AuthDialog
         isOpen={showAuthDialog}
         onClose={handleCloseAuthDialog}
         redirectPath="/checkout"
         defaultTab="signin"
-      />
+      /> */}
 
       {/* Thank You Modal */}
       <ThankYouModal

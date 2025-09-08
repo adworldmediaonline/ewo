@@ -147,6 +147,7 @@ export default function ProductItem({
       slug: product.slug,
       shipping: product.shipping || { price: 0 },
       finalPriceDiscount: product.finalPriceDiscount || product.price,
+      sku: product.sku || '',
     };
 
     dispatch(add_cart_product(cartProduct));
@@ -165,6 +166,7 @@ export default function ProductItem({
       slug: product.slug,
       finalPriceDiscount: product.finalPriceDiscount,
       updatedPrice: product.updatedPrice,
+      sku: product.sku || '',
     };
 
     dispatch(add_to_wishlist(wishlistProduct));

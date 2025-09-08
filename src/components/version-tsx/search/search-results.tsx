@@ -1,30 +1,4 @@
-import ProductItem from './product-item';
-
-interface Product {
-  _id: string;
-  title: string;
-  slug: string;
-  sku?: string;
-  productType?: string;
-  img?: string;
-  imageURLs?: string[];
-  price: number;
-  updatedPrice?: number;
-  finalPriceDiscount?: number;
-  category?: {
-    name: string;
-    id: string;
-  };
-  status: string;
-  quantity: number;
-  shipping?: {
-    price: number;
-    description?: string;
-  };
-  reviews?: Array<{
-    rating: number;
-  }>;
-}
+import ProductItem, { Product } from './product-item';
 
 interface SearchResultsProps {
   products: Product[];

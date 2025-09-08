@@ -1,13 +1,13 @@
 'use client';
-import React, { useEffect, useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { hideCartConfirmation } from '@/redux/features/cartSlice';
-import useGuestCartNavigation from '@/hooks/useGuestCartNavigation';
+import { useCallback, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
 import Image from 'next/image';
 
 export default function CartConfirmationModal() {
   const dispatch = useDispatch();
-  const { navigateToCart } = useGuestCartNavigation();
+
   const { cart_products, showCartConfirmation, lastAddedProduct } = useSelector(
     state => state.cart
   );
@@ -41,7 +41,6 @@ export default function CartConfirmationModal() {
 
   const handleViewCart = () => {
     dispatch(hideCartConfirmation());
-    navigateToCart();
   };
 
   const handleContinueShopping = () => {

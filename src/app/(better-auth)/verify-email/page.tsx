@@ -1,5 +1,4 @@
 'use client';
-
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -8,238 +7,224 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from '@/components/ui/input-otp';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Suspense, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
+import { authClient } from '../../../lib/authClient';
 
-import { AlertCircle, CheckCircle, Loader2, Mail } from 'lucide-react';
+const formSchema = z.object({
+  otp: z.string(),
+});
 
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { authClient } from '@/lib/authClient';
-
-export default function VerifyEmailPage() {
-  const [otp, setOtp] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
-  const [email, setEmail] = useState('');
-  const [resendLoading, setResendLoading] = useState(false);
-  const [resendCooldown, setResendCooldown] = useState(0);
-
-  const router = useRouter();
+// Separate component for the form that uses search params
+function VerifyEmailForm() {
   const searchParams = useSearchParams();
+  const email = searchParams.get('email');
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      otp: '',
+    },
+  });
 
-  useEffect(() => {
-    const emailParam = searchParams.get('email');
-    if (emailParam) {
-      setEmail(emailParam);
-    } else {
-      // If no email in URL, redirect to signup
-      router.push('/sign-up');
-    }
-  }, [searchParams, router]);
-
-  useEffect(() => {
-    if (resendCooldown > 0) {
-      const timer = setTimeout(
-        () => setResendCooldown(resendCooldown - 1),
-        1000
-      );
-      return () => clearTimeout(timer);
-    }
-  }, [resendCooldown]);
-
-  const handleVerifyOTP = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!otp.trim() || otp.length !== 6) {
-      setError('Please enter a valid 6-digit OTP');
-      return;
-    }
-
-    setIsLoading(true);
-    setError('');
-
-    try {
-      // Use the correct Better Auth method for verifying email with OTP
-      const { data, error: verifyError } =
-        await authClient.emailOtp.verifyEmail({
-          email,
-          otp: otp.trim(),
-        });
-
-      if (verifyError) {
-        setError(
-          verifyError.message || 'Verification failed. Please try again.'
-        );
-        setIsLoading(false);
-        return;
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values);
+    await authClient.emailOtp.verifyEmail(
+      {
+        email: email || '', // required
+        otp: values.otp, // required
+      },
+      {
+        onRequest: () => {
+          setIsLoading(true);
+        },
+        onSuccess: () => {
+          setIsLoading(false);
+          router.push('/profile');
+        },
+        onError: ctx => {
+          setIsLoading(false);
+          setError(ctx.error?.message);
+        },
       }
-
-      setSuccess(true);
-      // Let better-auth handle the session and redirect
-      setTimeout(() => {
-        router.push('/sign-in');
-        router.refresh();
-      }, 2000);
-    } catch (err) {
-      setError('Verification failed. Please try again.');
-
-      setIsLoading(false);
-    }
-  };
-
-  const handleResendOTP = async () => {
-    setResendLoading(true);
-    setError('');
-
-    try {
-      // Use the correct Better Auth method for sending verification OTP
-      const { data, error: resendError } =
-        await authClient.emailOtp.sendVerificationOtp({
-          email,
-          type: 'email-verification',
-        });
-
-      if (resendError) {
-        setError(
-          resendError.message || 'Failed to resend OTP. Please try again.'
-        );
-        setResendLoading(false);
-        return;
-      }
-
-      setResendCooldown(60); // 60 second cooldown
-      setOtp(''); // Clear current OTP
-      setResendLoading(false);
-    } catch (err) {
-      setError('Failed to resend OTP. Please try again.');
-
-      setResendLoading(false);
-    }
-  };
-
-  if (success) {
-    return (
-      <div className="min-h-auto py-8 flex items-center justify-center bg-gray-50">
-        <Card className="w-full max-w-md">
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <CheckCircle className="mx-auto h-12 w-12 text-green-500 mb-4" />
-              <h2 className="text-2xl font-bold text-green-600 mb-2">
-                Email Verified!
-              </h2>
-              <p className="text-gray-600 mb-4">
-                Your email has been successfully verified. Redirecting to Sign
-                In...
-              </p>
-              <div className="flex justify-center">
-                <Loader2 className="h-6 w-6 animate-spin" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+    );
+    toast(
+      <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+        <code className="text-white">{JSON.stringify(values, null, 2)}</code>
+      </pre>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-            <Mail className="h-6 w-6 text-blue-600" />
-          </div>
-          <CardTitle className="text-2xl font-bold">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/20 p-4">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="space-y-1 text-center">
+          <CardTitle className="text-2xl font-bold tracking-tight">
             Verify Your Email
           </CardTitle>
-          <CardDescription>
-            We've sent a 6-digit verification code to{' '}
-            <span className="font-medium text-gray-900">{email}</span>
+          <CardDescription className="text-muted-foreground">
+            Enter the 6-digit code sent to your email address
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleVerifyOTP} className="space-y-4">
-            <div>
-              <label
-                htmlFor="otp"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Verification Code
-              </label>
-              <Input
-                id="otp"
-                type="text"
-                placeholder="Enter 6-digit code"
-                value={otp}
-                onChange={e => {
-                  const value = e.target.value.replace(/\D/g, '').slice(0, 6);
-                  setOtp(value);
-                  setError('');
-                }}
-                className="text-center text-lg tracking-widest"
-                maxLength={6}
-                autoComplete="one-time-code"
-                disabled={isLoading}
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {error && (
+                <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
+                  {error}
+                </div>
+              )}
+
+              <FormField
+                control={form.control}
+                name="otp"
+                render={({ field }) => (
+                  <FormItem className="space-y-4">
+                    <FormLabel className="text-sm font-medium text-center block">
+                      Verification Code
+                    </FormLabel>
+                    <FormControl>
+                      <div className="flex justify-center">
+                        <InputOTP
+                          maxLength={6}
+                          className="gap-2"
+                          disabled={isLoading}
+                          {...field}
+                        >
+                          <InputOTPGroup>
+                            <InputOTPSlot
+                              index={0}
+                              className="w-12 h-12 text-lg"
+                            />
+                            <InputOTPSlot
+                              index={1}
+                              className="w-12 h-12 text-lg"
+                            />
+                            <InputOTPSlot
+                              index={2}
+                              className="w-12 h-12 text-lg"
+                            />
+                          </InputOTPGroup>
+                          <InputOTPSeparator />
+                          <InputOTPGroup>
+                            <InputOTPSlot
+                              index={3}
+                              className="w-12 h-12 text-lg"
+                            />
+                            <InputOTPSlot
+                              index={4}
+                              className="w-12 h-12 text-lg"
+                            />
+                            <InputOTPSlot
+                              index={5}
+                              className="w-12 h-12 text-lg"
+                            />
+                          </InputOTPGroup>
+                        </InputOTP>
+                      </div>
+                    </FormControl>
+                    <FormDescription className="text-xs text-center">
+                      Check your email for the verification code
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            {error && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isLoading}
+                size="lg"
+              >
+                {isLoading ? (
+                  <>
+                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
+                    Verifying...
+                  </>
+                ) : (
+                  'Verify Email'
+                )}
+              </Button>
+            </form>
+          </Form>
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading || otp.length !== 6}
+          <div className="mt-6 text-center text-sm text-muted-foreground">
+            Didn&apos;t receive the code?{' '}
+            <button
+              type="button"
+              className="font-medium text-primary hover:text-primary/80 underline underline-offset-4 transition-colors"
+              onClick={() => {
+                // You could add resend functionality here
+                console.log('Resend code requested');
+              }}
             >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Verifying...
-                </>
-              ) : (
-                'Verify Email'
-              )}
-            </Button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600 mb-2">
-              Didn't receive the code?
-            </p>
-            <Button
-              variant="ghost"
-              onClick={handleResendOTP}
-              disabled={resendLoading || resendCooldown > 0}
-              className="text-blue-600 hover:text-blue-700"
-            >
-              {resendLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Sending...
-                </>
-              ) : resendCooldown > 0 ? (
-                `Resend in ${resendCooldown}s`
-              ) : (
-                'Resend Code'
-              )}
-            </Button>
-          </div>
-
-          <div className="mt-4 text-center">
-            <Button
-              variant="link"
-              onClick={() => router.push('/sign-up')}
-              className="text-sm text-gray-500 hover:text-gray-700"
-            >
-              ← Back to Sign Up
-            </Button>
+              Resend code
+            </button>
           </div>
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+// Loading component for Suspense fallback
+function VerifyEmailLoading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/20 p-4">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="space-y-1 text-center">
+          <div className="h-6 bg-muted rounded animate-pulse mx-auto w-3/4"></div>
+          <div className="h-4 bg-muted/60 rounded animate-pulse mx-auto w-1/2"></div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <div className="h-4 bg-muted rounded animate-pulse w-1/3 mx-auto"></div>
+              <div className="flex justify-center gap-2">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-12 h-12 bg-muted rounded animate-pulse"
+                  ></div>
+                ))}
+              </div>
+              <div className="h-3 bg-muted/60 rounded animate-pulse w-2/3 mx-auto"></div>
+            </div>
+            <div className="h-11 bg-muted rounded animate-pulse w-full"></div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// Main page component with Suspense boundary
+export default function VerifyEmailOTPPage() {
+  return (
+    <Suspense fallback={<VerifyEmailLoading />}>
+      <VerifyEmailForm />
+    </Suspense>
   );
 }

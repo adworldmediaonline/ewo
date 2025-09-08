@@ -161,6 +161,7 @@ export default function ProductItem({
       slug: product.slug,
       shipping: product.shipping || { price: 0 },
       finalPriceDiscount: product.finalPriceDiscount || product.price,
+      sku: product.sku || '',
     };
 
     // Debug logging for shipping data
@@ -177,6 +178,7 @@ export default function ProductItem({
     const wishlistProduct = {
       _id: product._id,
       title: product.title,
+      sku: product.sku || '',
       img: imageUrl || '',
       price: product.price,
       category: product.category,

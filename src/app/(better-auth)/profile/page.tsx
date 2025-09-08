@@ -87,6 +87,12 @@ export default function DashboardPage() {
                   </p>
                 </div>
                 <Button asChild size="lg" className="flex items-center gap-2">
+                  <Link href="/checkout">
+                    Go to Checkout
+                    <ArrowRight className="w-5 h-5" />
+                  </Link>
+                </Button>
+                <Button asChild size="lg" className="flex items-center gap-2">
                   <Link href="/shop">
                     Continue Shopping
                     <ArrowRight className="w-5 h-5" />

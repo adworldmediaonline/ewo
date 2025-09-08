@@ -7,7 +7,7 @@
       "path": "."
     },
     {
-      "path": "../ewo-admin"
+      "path": "../ewo-admin-nextjs15"
     }
   ],
   "settings": {}

@@ -363,6 +363,7 @@ export default function ShopContentWrapper({
         slug: product.slug,
         shipping: product.shipping || { price: 0 }, // Use product's actual shipping
         finalPriceDiscount: product.finalPriceDiscount || product.price || 0,
+        sku: product.sku,
       };
 
       dispatch(add_cart_product(cartProduct));
@@ -379,6 +380,7 @@ export default function ShopContentWrapper({
         price: product.price,
         category: product.category,
         slug: product.slug,
+        sku: product.sku,
         finalPriceDiscount: product.finalPriceDiscount,
         updatedPrice: product.updatedPrice,
       };
