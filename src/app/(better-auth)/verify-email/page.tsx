@@ -26,7 +26,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 import { z } from 'zod';
 import { authClient } from '../../../lib/authClient';
 
@@ -61,18 +60,15 @@ function VerifyEmailForm() {
         },
         onSuccess: () => {
           setIsLoading(false);
-          router.push('/profile');
+          // TODO: Enable this when we have a way to auto sign in after verification
+          // router.push('/profile');
+          router.push('/sign-in');
         },
         onError: ctx => {
           setIsLoading(false);
           setError(ctx.error?.message);
         },
       }
-    );
-    toast(
-      <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-        <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-      </pre>
     );
   }
 
