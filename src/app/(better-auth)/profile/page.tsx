@@ -1,33 +1,3 @@
-// 'use client';
-
-// import { authClient } from '../../../lib/authClient';
-
-// export default function ProfilePage() {
-//   const {
-//     data: session,
-//     isPending: sessionLoading,
-//     error: sessionError,
-//   } = authClient.useSession();
-
-//   if (sessionLoading) {
-//     return <div>Loading...</div>;
-//   }
-
-//   if (sessionError) {
-//     return <div>Error: {sessionError.message}</div>;
-//   }
-
-//   if (!session) {
-//     return <div>Not authenticated</div>;
-//   }
-
-//   if (!session.user) {
-//     return <div>No user</div>;
-//   }
-
-//   return <div>{JSON.stringify(session, null, 2)}</div>;
-// }
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -43,10 +13,12 @@ import {
   ProfileOrderStats,
   ProfileSettings,
 } from '@/components/version-tsx/profile';
-import NotAuthenticated from '../../../components/version-tsx/profile/not-authenticated';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function DashboardPage() {
   const { data: session, isPending } = authClient.useSession();
+  const router = useRouter();
 
   const [activeTab, setActiveTab] = useQueryState('tab', {
     defaultValue: 'overview',
@@ -57,16 +29,35 @@ export default function DashboardPage() {
     },
   });
 
+  useEffect(() => {
+    if (!isPending && session) {
+      if (!session) {
+        router.push('/sign-in');
+      } else if (session.user.role === 'admin') {
+        router.push('/sign-in');
+      } else if (session.user.role === 'super-admin') {
+        router.push('/sign-in');
+      } else if (session.user.role !== 'user') {
+        router.push('/sign-in');
+      }
+    }
+  }, [session, isPending, router]);
+
   if (isPending) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 className="w-10 h-10 animate-spin" />
+      <div className="flex justify-center items-center h-screen">
+        <Loader2 className="animate-spin" />
       </div>
     );
   }
 
-  if (!session) {
-    return <NotAuthenticated />;
+  // Show loading while redirecting
+  if (!session || !session.user) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader2 className="animate-spin" />
+      </div>
+    );
   }
 
   const renderTabContent = () => {
