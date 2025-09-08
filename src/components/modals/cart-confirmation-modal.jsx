@@ -4,6 +4,7 @@ import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function CartConfirmationModal() {
   const dispatch = useDispatch();
@@ -43,10 +44,6 @@ export default function CartConfirmationModal() {
     dispatch(hideCartConfirmation());
   };
 
-  const handleContinueShopping = () => {
-    dispatch(hideCartConfirmation());
-  };
-
   if (!showCartConfirmation) return null;
 
   const totalItems = cart_products.reduce(
@@ -67,66 +64,68 @@ export default function CartConfirmationModal() {
           }
         }}
       >
-        <div className="cart-confirmation-content">
-          {/* Product Images - Stacked */}
-          <div className="product-images-container">
-            {cart_products.length > 0 ? (
-              <div className="product-images-stack">
-                {cart_products.slice(-3).map((product, index) => (
-                  <div
-                    key={`${product._id}-${index}`}
-                    className="product-image-wrapper"
-                    style={{
-                      zIndex: cart_products.length - index,
-                      transform: `translateX(${index * -8}px)`,
-                    }}
-                  >
-                    <Image
-                      src={product.img}
-                      alt={product.title || 'Product'}
-                      width={32}
-                      height={32}
-                      className="product-image"
+        <Link href="/cart">
+          <div className="cart-confirmation-content">
+            {/* Product Images - Stacked */}
+            <div className="product-images-container">
+              {cart_products.length > 0 ? (
+                <div className="product-images-stack">
+                  {cart_products.slice(-3).map((product, index) => (
+                    <div
+                      key={`${product._id}-${index}`}
+                      className="product-image-wrapper"
+                      style={{
+                        zIndex: cart_products.length - index,
+                        transform: `translateX(${index * -8}px)`,
+                      }}
+                    >
+                      <Image
+                        src={product.img}
+                        alt={product.title || 'Product'}
+                        width={32}
+                        height={32}
+                        className="product-image"
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="product-placeholder">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M3 3H5L5.4 5M7 13H17L21 5H5.4M7 13L5.4 5M7 13L4.7 15.3C4.3 15.7 4.6 16.5 5.1 16.5H17M17 13V17A2 2 0 0 1 15 19H9A2 2 0 0 1 7 17V13M17 13H7"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="product-placeholder">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M3 3H5L5.4 5M7 13H17L21 5H5.4M7 13L5.4 5M7 13L4.7 15.3C4.3 15.7 4.6 16.5 5.1 16.5H17M17 13V17A2 2 0 0 1 15 19H9A2 2 0 0 1 7 17V13M17 13H7"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div>
-            )}
-          </div>
+                  </svg>
+                </div>
+              )}
+            </div>
 
-          {/* Text Content */}
-          <div className="cart-text-content">
-            <span className="view-cart-text">View cart</span>
-            <span className="item-count">
-              {totalItems} item{totalItems !== 1 ? 's' : ''}
-            </span>
-          </div>
+            {/* Text Content */}
+            <div className="cart-text-content">
+              <span className="view-cart-text">View cart</span>
+              <span className="item-count">
+                {totalItems} item{totalItems !== 1 ? 's' : ''}
+              </span>
+            </div>
 
-          {/* Arrow */}
-          <div className="arrow-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M9 18L15 12L9 6"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            {/* Arrow */}
+            <div className="arrow-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M9 18L15 12L9 6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
           </div>
-        </div>
+        </Link>
       </div>
 
       <style jsx>{`
