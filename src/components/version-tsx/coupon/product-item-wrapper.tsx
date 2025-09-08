@@ -13,7 +13,7 @@ interface Product {
   _id: string;
   title: string;
   slug: string;
-  sku?: string;
+  sku: string;
   productType?: string;
   img?: string;
   imageURLs?: string[];

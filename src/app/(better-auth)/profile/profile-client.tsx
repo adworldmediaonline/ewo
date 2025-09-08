@@ -4,7 +4,7 @@ import { LogOut, Settings, ShoppingBag, User } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useAuthCheck } from '../../../hooks/use-auth-check';
-import { useSession } from '../../../lib/authClient';
+import { authClient } from '../../../lib/authClient';
 import {
   useGetUserProfileQuery,
   useUpdateProfileMutation,
@@ -16,7 +16,7 @@ interface ProfileClientProps {
 
 export default function ProfileClient({ initialSession }: ProfileClientProps) {
   // Use the official Better Auth useSession hook
-  const { data: session, isPending: sessionLoading } = useSession();
+  const { data: session, isPending: sessionLoading } = authClient.useSession();
   const { logout } = useAuthCheck();
 
   const [isEditing, setIsEditing] = useState(false);

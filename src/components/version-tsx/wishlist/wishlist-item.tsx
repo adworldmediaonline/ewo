@@ -24,6 +24,7 @@ interface WishlistProduct {
     name: string;
   };
   slug: string;
+  sku?: string;
 }
 
 export default function WishlistItem({
@@ -53,6 +54,7 @@ export default function WishlistItem({
       orderQuantity: 1,
       quantity: 1,
       finalPriceDiscount: prd.finalPriceDiscount || prd.price,
+      sku: prd.sku || prd._id,
     };
     dispatch(add_cart_product(cartProduct));
   };
@@ -64,6 +66,7 @@ export default function WishlistItem({
       orderQuantity: 1,
       quantity: 1,
       finalPriceDiscount: prd.finalPriceDiscount || prd.price,
+      sku: prd.sku || prd._id,
     };
     dispatch(quantityDecrement(cartProduct));
   };

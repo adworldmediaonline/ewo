@@ -17,7 +17,7 @@ import { Minus, Plus } from '@/svg';
 import { CardElement } from '@stripe/react-stripe-js';
 // Removed CSS module import; Tailwind-only styling
 
-export default function CheckoutOrderArea({ checkoutData, isGuest }) {
+export default function CheckoutOrderArea({ checkoutData }) {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
 

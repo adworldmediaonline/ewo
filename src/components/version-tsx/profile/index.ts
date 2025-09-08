@@ -1,4 +1,3 @@
-export { default as AuthDialog } from './auth-dialog';
 export { default as OrderCard } from './order-card';
 export { default as OrderStatusBadge } from './order-status-badge';
 export { default as ProfileActions } from './profile-actions';

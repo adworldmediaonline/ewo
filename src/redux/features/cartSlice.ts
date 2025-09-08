@@ -10,6 +10,7 @@ interface CartProduct {
   _id: string;
   title: string;
   img: string;
+  sku: string;
   price: number | string;
   finalPriceDiscount: number | string;
   orderQuantity: number;
@@ -331,8 +332,6 @@ export const cartSlice = createSlice({
       state.firstTimeDiscount.isEligible = false;
       state.firstTimeDiscount.isApplied = false;
     },
-    // Debug action to check cart state
-    debugCartState: state => {},
   },
 });
 
@@ -351,6 +350,5 @@ export const {
   resetFirstTimeDiscount,
   completeFirstTimeDiscount,
   update_product_option,
-  debugCartState,
 } = cartSlice.actions;
 export default cartSlice.reducer;

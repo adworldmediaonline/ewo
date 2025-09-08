@@ -8,15 +8,9 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ErrorMsg from '../../common/error-msg';
 
-const CheckoutBillingArea = ({
-  register,
-  errors,
-  isGuest = false,
-  setValue,
-  checkoutData,
-}) => {
+const CheckoutBillingArea = ({ register, errors, setValue, checkoutData }) => {
   const { data: session } = authClient.useSession();
-  const { user } = useSelector(state => state.auth);
+  const user = {};
   const { isCheckoutSubmitting } = useSelector(state => state.order);
   const dispatch = useDispatch();
 

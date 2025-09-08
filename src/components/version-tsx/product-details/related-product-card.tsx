@@ -69,6 +69,7 @@ const StarRating = ({
 export interface RelatedProduct {
   _id: string;
   title: string;
+  sku: string;
   slug?: string;
   img?: string;
   imageURLs?: string[];

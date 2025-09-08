@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import useCartInfo from '@/hooks/use-cart-info';
-import useGuestCartNavigation from '@/hooks/useGuestCartNavigation';
+
 import {
   add_cart_product,
   quantityDecrement,
@@ -40,6 +40,27 @@ interface CartItem {
     price: number;
   };
   finalPriceDiscount?: number | string;
+  sku?: string;
+}
+
+interface AppliedCoupon {
+  _id?: string;
+  couponCode: string;
+  discount: number;
+  discountType: string;
+  title?: string;
+}
+
+interface CouponData {
+  couponId: string;
+  couponCode: string;
+  discount: number;
+  discountType: string;
+  title?: string;
+  discountAmount?: number;
+  discountPercentage?: number;
+  minimumAmount?: number;
+  status?: string;
 }
 
 export default function CartDropdown({
@@ -48,17 +69,19 @@ export default function CartDropdown({
   children: React.ReactNode;
 }): React.ReactElement {
   const dispatch = useDispatch();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const { subtotal, total, firstTimeDiscountAmount } = useCartInfo();
-  const { navigateToCart, navigateToCheckout } = useGuestCartNavigation();
 
   // Add state to control dropdown
   const [open, setOpen] = React.useState(false);
 
   // Coupon functionality state
-  const [couponCode, setCouponCode] = React.useState('');
-  const [isApplyingCoupon, setIsApplyingCoupon] = React.useState(false);
-  const [autoFilledCoupon, setAutoFilledCoupon] = React.useState<any>(null);
+  const [couponCode, setCouponCode] = React.useState<string>('');
+  const [isApplyingCoupon, setIsApplyingCoupon] =
+    React.useState<boolean>(false);
+  const [autoFilledCoupon, setAutoFilledCoupon] =
+    React.useState<CouponData | null>(null);
 
   const {
     cart_products,
@@ -92,7 +115,7 @@ export default function CartDropdown({
         return;
       }
 
-      let couponCodeToFill = null;
+      let couponCodeToFill: string | null = null;
 
       // Priority order for coupon sources:
       // 1. URL parameter 'coupon' or 'couponCode' or 'code' (highest priority)
@@ -130,10 +153,10 @@ export default function CartDropdown({
         activeCouponsData?.data?.length > 0
       ) {
         const availableCoupons = activeCouponsData.data.filter(
-          (coupon: any) => {
+          (coupon: CouponData) => {
             // Filter out already applied coupons
             const isAlreadyApplied = applied_coupons.some(
-              (appliedCoupon: any) =>
+              (appliedCoupon: AppliedCoupon) =>
                 appliedCoupon.couponCode?.toLowerCase() ===
                 coupon.couponCode?.toLowerCase()
             );
@@ -152,7 +175,7 @@ export default function CartDropdown({
           // 3. Priority by discount percentage (highest first)
 
           const bestCoupon = availableCoupons.reduce(
-            (best: any, current: any) => {
+            (best: CouponData, current: CouponData) => {
               // Priority 1: Higher discount amount
               const bestDiscount = best.discountAmount || 0;
               const currentDiscount = current.discountAmount || 0;
@@ -183,7 +206,7 @@ export default function CartDropdown({
       // If we found a coupon code and it's not already applied
       if (couponCodeToFill) {
         const isAlreadyApplied = applied_coupons.some(
-          (coupon: any) =>
+          (coupon: AppliedCoupon) =>
             coupon.couponCode?.toLowerCase() === couponCodeToFill?.toLowerCase()
         );
 
@@ -267,7 +290,7 @@ export default function CartDropdown({
               discount: data.data.discount,
               discountType: data.data.discountType,
               title: data.data.title || data.data.couponCode,
-            })
+            } as AppliedCoupon)
           );
           setCouponCode('');
           setAutoFilledCoupon(null);
@@ -305,7 +328,7 @@ export default function CartDropdown({
           // Clear existing coupons and add all validated ones
           dispatch(clear_all_coupons());
 
-          data.data.forEach((coupon: any) => {
+          data.data.forEach((coupon: CouponData) => {
             dispatch(
               add_applied_coupon({
                 _id: coupon.couponId,
@@ -313,7 +336,7 @@ export default function CartDropdown({
                 discount: coupon.discount,
                 discountType: coupon.discountType,
                 title: coupon.title || coupon.couponCode,
-              })
+              } as AppliedCoupon)
             );
           });
 
@@ -338,7 +361,8 @@ export default function CartDropdown({
       add_cart_product({
         ...item,
         finalPriceDiscount: item.finalPriceDiscount || item.price,
-      })
+        sku: item.sku || item._id,
+      } as any)
     );
   }
   function handleDecrement(item: CartItem): void {
@@ -346,12 +370,22 @@ export default function CartDropdown({
       quantityDecrement({
         ...item,
         finalPriceDiscount: item.finalPriceDiscount || item.price,
-      })
+        sku: item.sku || item._id,
+      } as any)
     );
   }
   function handleRemove(item: CartItem): void {
     dispatch(remove_product({ title: item.title, id: item._id }));
   }
+
+  // Navigation functions
+  const navigateToCart = () => {
+    router.push('/cart');
+  };
+
+  const navigateToCheckout = () => {
+    router.push('/checkout');
+  };
 
   // Enhanced navigation functions that close dropdown
   const handleViewAll = () => {
@@ -514,28 +548,32 @@ export default function CartDropdown({
               {/* Applied Coupons */}
               {applied_coupons.length > 0 && (
                 <div className="mb-2 space-y-1">
-                  {applied_coupons.map((coupon: any, index: number) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-2 bg-emerald-50 border border-emerald-200 rounded-md"
-                    >
-                      <span className="text-xs text-emerald-700 font-medium">
-                        {coupon.couponCode}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-emerald-600">
-                          -${coupon.discount || 0}
+                  {applied_coupons.map(
+                    (coupon: AppliedCoupon, index: number) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-2 bg-emerald-50 border border-emerald-200 rounded-md"
+                      >
+                        <span className="text-xs text-emerald-700 font-medium">
+                          {coupon.couponCode}
                         </span>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveCoupon(coupon.couponCode)}
-                          className="text-emerald-500 hover:text-emerald-700 text-xs"
-                        >
-                          ×
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-emerald-600">
+                            -${coupon.discount || 0}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleRemoveCoupon(coupon.couponCode)
+                            }
+                            className="text-emerald-500 hover:text-emerald-700 text-xs"
+                          >
+                            ×
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  )}
                 </div>
               )}
 
