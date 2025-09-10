@@ -8,6 +8,9 @@
     },
     {
       "path": "../ewo-admin-nextjs15"
+    },
+    {
+      "path": "../ewo-admin"
     }
   ],
   "settings": {}
