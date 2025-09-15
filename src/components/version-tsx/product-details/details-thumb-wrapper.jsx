@@ -3,108 +3,59 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
-import dynamic from 'next/dynamic';
-import 'photoswipe/style.css';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import CloudinaryImage from '../../common/CloudinaryImage';
+import { Gallery, Item } from 'react-photoswipe-gallery';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
+import 'photoswipe/dist/photoswipe.css';
 
-// Dynamic import for PhotoSwipe
-const PhotoSwipe = dynamic(() => import('photoswipe'), {
-  ssr: false,
-  loading: () => null,
-});
-
-export default function DetailsThumbWrapper({
+// Component that uses the gallery hook
+const GalleryContent = ({
   activeImg,
   handleImageActive,
   imageURLs = [],
   imgWidth = 580,
   imgHeight = 580,
   status,
-}) {
+}) => {
   const thumbnailsRef = useRef(null);
   const verticalThumbnailsRef = useRef(null);
-  const mainImageRef = useRef(null);
 
-  // Memoize items to prevent infinite re-renders
-  const items = useMemo(
-    () => [
-      {
-        src: activeImg,
-        width: imgWidth,
-        height: imgHeight,
-      },
-      ...(imageURLs?.length > 0
-        ? imageURLs
-            .filter(url => url !== activeImg)
-            .map(url => ({
-              src: url,
-              width: imgWidth,
-              height: imgHeight,
-            }))
-        : []),
-    ],
-    [activeImg, imageURLs, imgWidth, imgHeight]
-  );
+  // Prepare images for react-photoswipe-gallery
+  const allImages = [
+    activeImg,
+    ...(imageURLs?.filter(url => url !== activeImg) || []),
+  ];
 
-  // Find current item index
-  const currentItemIndex = useMemo(
-    () => items.findIndex(item => item.src === activeImg),
-    [items, activeImg]
-  );
-
-  // Helper function to open lightbox
-  const openLightbox = () => {
-    if (typeof window !== 'undefined' && PhotoSwipe) {
-      import('photoswipe')
-        .then(({ default: PhotoSwipeClass }) => {
-          try {
-            // Create a new gallery instance each time
-            const newGallery = new PhotoSwipeClass({
-              dataSource: items,
-              index: currentItemIndex > -1 ? currentItemIndex : 0,
-              showHideAnimationType: 'fade',
-              showAnimationDuration: 300,
-              hideAnimationDuration: 300,
-              allowPanToNext: true,
-              allowMouseDrag: true,
-              allowTouchDrag: true,
-              allowKeyboard: true,
-              allowWheel: true,
-              allowPinch: true,
-              allowDoubleTap: true,
-              maxZoomLevel: 4,
-              minZoomLevel: 0.5,
-              zoomAnimationDuration: 300,
-              easing: 'cubic-bezier(0.4, 0, 0.22, 1)',
-              closeOnVerticalDrag: true,
-              closeOnPullDown: true,
-              closeOnBackdropClick: true,
-              closeOnEscape: true,
-              paddingFn: viewportSize => ({
-                top: 30,
-                bottom: 30,
-                left: 70,
-                right: 70,
-              }),
-            });
-
-            // Initialize and show the gallery
-            newGallery.init();
-
-            // Clean up the gallery after it's closed
-            newGallery.on('close', () => {
-              newGallery.destroy();
-            });
-          } catch (error) {
-            console.error('Error creating PhotoSwipe gallery:', error);
-          }
-        })
-        .catch(error => {
-          console.error('Error loading PhotoSwipe:', error);
-        });
-    }
-  };
+  // Add CSS to ensure PhotoSwipe arrows are visible
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      .pswp__button--arrow--prev,
+      .pswp__button--arrow--next {
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+      }
+      .pswp__button--arrow--prev {
+        left: 20px !important;
+      }
+      .pswp__button--arrow--next {
+        right: 20px !important;
+      }
+      .pswp__img {
+        max-width: 90vw !important;
+        max-height: 90vh !important;
+        object-fit: contain !important;
+      }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      if (document.head.contains(style)) {
+        document.head.removeChild(style);
+      }
+    };
+  }, []);
 
   // Handle thumbnail scroll
   const scrollThumbnails = direction => {
@@ -206,39 +157,51 @@ export default function DetailsThumbWrapper({
           <Card className="overflow-hidden">
             <CardContent className="p-0">
               <div className="relative group">
-                <div
-                  ref={mainImageRef}
-                  className="cursor-zoom-in transition-all duration-200 group-hover:scale-[1.02] group-hover:shadow-lg relative"
-                  onClick={() => {
-                    openLightbox();
-                  }}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      openLightbox();
-                    }
-                  }}
-                  aria-label="Click to open image lightbox"
+                {/* Main image display - clickable to open gallery */}
+                <Item
+                  original={activeImg}
+                  thumbnail={activeImg}
+                  width={imgWidth}
+                  height={imgHeight}
+                  alt="Product main image"
                 >
-                  <CloudinaryImage
-                    src={activeImg}
-                    alt="Product main image"
-                    width={imgWidth}
-                    height={imgHeight}
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px"
-                    className="w-full h-auto aspect-square object-contain"
-                    priority={true}
-                    crop="pad"
-                    gravity="center"
-                  />
+                  {({ ref, open }) => (
+                    <div
+                      ref={ref}
+                      className="cursor-zoom-in transition-all duration-200 group-hover:scale-[1.02] group-hover:shadow-lg relative"
+                      onClick={open}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          open(e);
+                        }
+                      }}
+                      aria-label="Click to open image lightbox"
+                    >
+                      {/* Image container - no forced aspect ratio */}
+                      <div className="w-full bg-gray-50 flex items-center justify-center p-4">
+                        <CloudinaryImage
+                          src={activeImg}
+                          alt="Product main image"
+                          width={imgWidth}
+                          height={imgHeight}
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px"
+                          className="max-w-full max-h-[500px] w-auto h-auto object-contain"
+                          priority={true}
+                          crop="pad"
+                          gravity="center"
+                        />
+                      </div>
 
-                  {/* Subtle zoom indicator */}
-                  <div className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <Search className="w-4 h-4 text-foreground" />
-                  </div>
-                </div>
+                      {/* Subtle zoom indicator */}
+                      <div className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <Search className="w-4 h-4 text-foreground" />
+                      </div>
+                    </div>
+                  )}
+                </Item>
 
                 {/* Out of stock badge */}
                 {status === 'out-of-stock' && (
@@ -324,6 +287,61 @@ export default function DetailsThumbWrapper({
           )}
         </div>
       )}
+
+      {/* Additional gallery items for remaining images */}
+      {imageURLs
+        .filter(url => url !== activeImg)
+        .map((url, i) => (
+          <Item
+            key={`gallery-${i + 1}`}
+            original={url}
+            thumbnail={url}
+            width={imgWidth}
+            height={imgHeight}
+            alt={`Product image ${i + 2}`}
+          >
+            {({ ref, open }) => (
+              <div
+                ref={ref}
+                onClick={open}
+                style={{
+                  display: 'none',
+                }}
+              />
+            )}
+          </Item>
+        ))}
     </div>
+  );
+};
+
+export default function DetailsThumbWrapper({
+  activeImg,
+  handleImageActive,
+  imageURLs = [],
+  imgWidth = 580,
+  imgHeight = 580,
+  status,
+}) {
+  return (
+    <Gallery
+      options={{
+        arrowPrev: true,
+        arrowNext: true,
+        zoom: true,
+        close: true,
+        counter: true,
+        bgOpacity: 0.9,
+      }}
+    >
+      <GalleryContent
+        activeImg={activeImg}
+        handleImageActive={handleImageActive}
+        imageURLs={imageURLs}
+        imgWidth={imgWidth}
+        imgHeight={imgHeight}
+        status={status}
+      />
+    </Gallery>
   );
 }
