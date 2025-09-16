@@ -21,6 +21,7 @@ import { CategoryItem } from '@/lib/server-data';
 import { add_cart_product } from '@/redux/features/cartSlice';
 import { useGetPaginatedProductsQuery } from '@/redux/features/productApi';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
+import { notifyError, notifySuccess } from '@/utils/toast';
 import { Filter, Search } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -60,9 +61,7 @@ export default function ShopContentWrapper({
   const dispatch = useDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { cart_products: _cart_products } = useSelector(
-    (state: any) => state.cart
-  );
+  const { cart_products } = useSelector((state: any) => state.cart);
   const { wishlist: _wishlist } = useSelector((state: any) => state.wishlist);
 
   // Initialize filters from URL parameters
@@ -352,7 +351,44 @@ export default function ShopContentWrapper({
   }, [pagination?.hasNextPage, isLoadingMore]);
 
   const handleAddToCart = useCallback(
-    (product: Product) => {
+    (product: Product, selectedOption?: any) => {
+      // Check if product has options but none are selected
+      if (product.options && product.options.length > 0 && !selectedOption) {
+        notifyError(
+          'Please select an option before adding the product to your cart.'
+        );
+        return;
+      }
+
+      // Check if product already exists in cart
+      const existingProduct = cart_products.find(
+        (item: any) => item._id === product._id
+      );
+
+      // If product exists, check if option has changed
+      const optionChanged =
+        existingProduct &&
+        JSON.stringify(existingProduct.selectedOption) !==
+          JSON.stringify(selectedOption);
+
+      // Get current quantity from existing product
+      const currentQty = existingProduct ? existingProduct.orderQuantity : 0;
+
+      // Determine final quantity based on whether option changed
+      const finalQuantity = optionChanged ? currentQty : currentQty + 1;
+
+      // If product has quantity limitation and requested quantity exceeds available
+      if (product.quantity && finalQuantity > product.quantity) {
+        notifyError(
+          `Sorry, only ${product.quantity} items available. ${
+            existingProduct
+              ? `You already have ${currentQty} in your cart.`
+              : ''
+          }`
+        );
+        return;
+      }
+
       const cartProduct = {
         _id: product._id,
         title: product.title,
@@ -361,14 +397,29 @@ export default function ShopContentWrapper({
         orderQuantity: 1,
         quantity: product.quantity,
         slug: product.slug,
-        shipping: product.shipping || { price: 0 }, // Use product's actual shipping
+        shipping: product.shipping || { price: 0 },
         finalPriceDiscount: product.finalPriceDiscount || product.price || 0,
         sku: product.sku,
+        options: selectedOption,
+        // If an option is selected, update the final price to include the option price
+        finalPrice: selectedOption
+          ? (
+              Number(product.finalPriceDiscount || product.price) +
+              Number(selectedOption.price)
+            ).toFixed(2)
+          : undefined,
       };
 
       dispatch(add_cart_product(cartProduct));
+
+      // Show success message
+      if (optionChanged) {
+        notifySuccess(`Option updated to "${selectedOption?.title}"`);
+      } else {
+        notifySuccess(`${product.title} added to cart`);
+      }
     },
-    [dispatch]
+    [dispatch, cart_products]
   );
 
   const handleAddToWishlist = useCallback(
@@ -386,6 +437,7 @@ export default function ShopContentWrapper({
       };
 
       dispatch(add_to_wishlist(wishlistProduct));
+      notifySuccess(`${product.title} added to wishlist`);
     },
     [dispatch]
   );
@@ -687,8 +739,8 @@ export default function ShopContentWrapper({
                     <ProductCard
                       key={`${product._id}-${currentPage}-${index}`}
                       product={product}
-                      onAddToCart={() => handleAddToCart(product)}
-                      onAddToWishlist={() => handleAddToWishlist(product)}
+                      onAddToCart={handleAddToCart}
+                      onAddToWishlist={handleAddToWishlist}
                     />
                   ))}
 

@@ -3,11 +3,19 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Heart, ShoppingCart, Star } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
 import { useSelector } from 'react-redux';
+import { notifyError } from '@/utils/toast';
 
 // Star rating component
 const StarRating = ({
@@ -89,11 +97,15 @@ export interface Product {
   reviews?: Array<{
     rating: number;
   }>;
+  options?: Array<{
+    title: string;
+    price: number;
+  }>;
 }
 
 interface ProductCardProps {
   product: Product;
-  onAddToCart?: (product: Product) => void;
+  onAddToCart?: (product: Product, selectedOption?: any) => void;
   onAddToWishlist?: (product: Product) => void;
 }
 
@@ -104,6 +116,7 @@ export default function ProductCard({
 }: ProductCardProps): React.ReactElement {
   const [isImageLoading, setIsImageLoading] = React.useState(true);
   const [isHovered, setIsHovered] = React.useState(false);
+  const [selectedOption, setSelectedOption] = React.useState<any>(null);
 
   // Get cart and wishlist state
   const { cart_products } = useSelector((state: any) => state.cart);
@@ -123,16 +136,48 @@ export default function ProductCard({
         product.reviews.length
       : 0;
 
+  // Calculate final price with selected option
+  const calculateFinalPrice = () => {
+    const basePrice = product.finalPriceDiscount || product.price;
+    const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+    return (Number(basePrice) + optionPrice).toFixed(2);
+  };
+
+  // Calculate marked up price with selected option
+  const calculateMarkedUpPrice = () => {
+    const basePrice = product.updatedPrice || product.price;
+    const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+    return (Number(basePrice) + optionPrice).toFixed(2);
+  };
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    onAddToCart?.(product);
+
+    // Check if product has options but none are selected
+    if (product.options && product.options.length > 0 && !selectedOption) {
+      notifyError(
+        'Please select an option before adding the product to your cart.'
+      );
+      return;
+    }
+
+    onAddToCart?.(product, selectedOption);
   };
 
   const handleAddToWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     onAddToWishlist?.(product);
+  };
+
+  const handleOptionChange = (value: string) => {
+    if (value === '') {
+      setSelectedOption(null);
+    } else {
+      const optionIndex = parseInt(value);
+      setSelectedOption(product.options?.[optionIndex] || null);
+    }
   };
 
   return (
@@ -267,16 +312,42 @@ export default function ProductCard({
             )}
         </div>
 
+        {/* Options Selection */}
+        {product.options && product.options.length > 0 && (
+          <div className="mb-3">
+            <Select
+              onValueChange={handleOptionChange}
+              value={
+                selectedOption
+                  ? product.options.indexOf(selectedOption).toString()
+                  : ''
+              }
+            >
+              <SelectTrigger className="w-full h-8 text-xs">
+                <SelectValue placeholder="Select option..." />
+              </SelectTrigger>
+              <SelectContent>
+                {product.options.map((option, index) => (
+                  <SelectItem key={index} value={index.toString()}>
+                    {option.title}
+                    {option.price && Number(option.price) !== 0
+                      ? ` (+$${Number(option.price).toFixed(2)})`
+                      : ''}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
         {/* Price and Button - Fixed at Bottom */}
         <div className="mt-auto pt-3">
           {/* Price */}
           <div className="flex items-center gap-2 mb-2.5">
             <span className="text-sm text-primary line-through">
-              ${Number(product.updatedPrice).toFixed(2)}
+              ${calculateMarkedUpPrice()}
             </span>
-            <span className="text-lg font-bold">
-              ${Number(product.finalPriceDiscount).toFixed(2)}
-            </span>
+            <span className="text-lg font-bold">${calculateFinalPrice()}</span>
           </div>
 
           {/* Add to Cart Button */}
