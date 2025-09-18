@@ -22,6 +22,12 @@ import { add_cart_product } from '@/redux/features/cartSlice';
 import { useGetPaginatedProductsQuery } from '@/redux/features/productApi';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { notifyError, notifySuccess } from '@/utils/toast';
+import {
+  trackAddToCart,
+  trackSearch,
+  captureEvent,
+  captureException,
+} from '@/lib/posthog-client';
 import { Filter, Search } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -352,71 +358,129 @@ export default function ShopContentWrapper({
 
   const handleAddToCart = useCallback(
     (product: Product, selectedOption?: any) => {
-      // Check if product has options but none are selected
-      if (product.options && product.options.length > 0 && !selectedOption) {
-        notifyError(
-          'Please select an option before adding the product to your cart.'
+      try {
+        // Check if product has options but none are selected
+        if (product.options && product.options.length > 0 && !selectedOption) {
+          const errorMessage =
+            'Please select an option before adding the product to your cart.';
+          notifyError(errorMessage);
+
+          // Track the validation error
+          captureException(new Error('Add to cart validation failed'), {
+            product_id: product._id,
+            product_name: product.title,
+            error_type: 'option_not_selected',
+            has_options: true,
+            options_count: product.options.length,
+          });
+          return;
+        }
+
+        // Check if product already exists in cart
+        const existingProduct = cart_products.find(
+          (item: any) => item._id === product._id
         );
-        return;
-      }
 
-      // Check if product already exists in cart
-      const existingProduct = cart_products.find(
-        (item: any) => item._id === product._id
-      );
+        // If product exists, check if option has changed
+        const optionChanged =
+          existingProduct &&
+          JSON.stringify(existingProduct.selectedOption) !==
+            JSON.stringify(selectedOption);
 
-      // If product exists, check if option has changed
-      const optionChanged =
-        existingProduct &&
-        JSON.stringify(existingProduct.selectedOption) !==
-          JSON.stringify(selectedOption);
+        // Get current quantity from existing product
+        const currentQty = existingProduct ? existingProduct.orderQuantity : 0;
 
-      // Get current quantity from existing product
-      const currentQty = existingProduct ? existingProduct.orderQuantity : 0;
+        // Determine final quantity based on whether option changed
+        const finalQuantity = optionChanged ? currentQty : currentQty + 1;
 
-      // Determine final quantity based on whether option changed
-      const finalQuantity = optionChanged ? currentQty : currentQty + 1;
-
-      // If product has quantity limitation and requested quantity exceeds available
-      if (product.quantity && finalQuantity > product.quantity) {
-        notifyError(
-          `Sorry, only ${product.quantity} items available. ${
+        // If product has quantity limitation and requested quantity exceeds available
+        if (product.quantity && finalQuantity > product.quantity) {
+          const errorMessage = `Sorry, only ${
+            product.quantity
+          } items available. ${
             existingProduct
               ? `You already have ${currentQty} in your cart.`
               : ''
-          }`
-        );
-        return;
-      }
+          }`;
+          notifyError(errorMessage);
 
-      const cartProduct = {
-        _id: product._id,
-        title: product.title,
-        img: product.imageURLs?.[0] || product.img || '',
-        price: product.finalPriceDiscount || product.price || 0,
-        orderQuantity: 1,
-        quantity: product.quantity,
-        slug: product.slug,
-        shipping: product.shipping || { price: 0 },
-        finalPriceDiscount: product.finalPriceDiscount || product.price || 0,
-        sku: product.sku,
-        options: selectedOption,
-        // If an option is selected, update the final price to include the option price
-        finalPrice: selectedOption
-          ? (
-              Number(product.finalPriceDiscount || product.price) +
-              Number(selectedOption.price)
-            ).toFixed(2)
-          : undefined,
-      };
+          // Track inventory error
+          captureException(new Error('Add to cart inventory limit exceeded'), {
+            product_id: product._id,
+            product_name: product.title,
+            error_type: 'inventory_limit',
+            available_quantity: product.quantity,
+            requested_quantity: finalQuantity,
+            existing_quantity: currentQty,
+          });
+          return;
+        }
 
-      dispatch(add_cart_product(cartProduct));
+        const finalPrice = selectedOption
+          ? Number(product.finalPriceDiscount || product.price) +
+            Number(selectedOption.price)
+          : Number(product.finalPriceDiscount || product.price);
 
-      // Show success message
-      if (optionChanged) {
-        notifySuccess(`Option updated to "${selectedOption?.title}"`);
-      } else {
-        notifySuccess(`${product.title} added to cart`);
+        const cartProduct = {
+          _id: product._id,
+          title: product.title,
+          img: product.imageURLs?.[0] || product.img || '',
+          price: product.finalPriceDiscount || product.price || 0,
+          orderQuantity: 1,
+          quantity: product.quantity,
+          slug: product.slug,
+          shipping: product.shipping || { price: 0 },
+          finalPriceDiscount: product.finalPriceDiscount || product.price || 0,
+          sku: product.sku,
+          selectedOption,
+          // If an option is selected, update the final price to include the option price
+          finalPrice: selectedOption
+            ? (
+                Number(product.finalPriceDiscount || product.price) +
+                Number(selectedOption.price)
+              ).toFixed(2)
+            : undefined,
+        };
+
+        dispatch(add_cart_product(cartProduct));
+
+        // Track successful add to cart
+        trackAddToCart({
+          product_id: product._id,
+          product_name: product.title,
+          product_category: product.category.name,
+          product_price: finalPrice,
+          product_sku: product.sku,
+          quantity: 1,
+          product_variant: selectedOption?.title,
+          cart_total: finalPrice,
+        });
+
+        // Show success message
+        if (optionChanged) {
+          notifySuccess(`Option updated to "${selectedOption?.title}"`);
+
+          // Track option change
+          captureEvent('product_option_selected', {
+            product_id: product._id,
+            product_name: product.title,
+            old_option: existingProduct?.selectedOption?.title,
+            new_option: selectedOption?.title,
+            action_type: 'option_changed',
+          });
+        } else {
+          notifySuccess(`${product.title} added to cart`);
+        }
+      } catch (error) {
+        // Catch any unexpected errors
+        captureException(error, {
+          action: 'handleAddToCart',
+          product_id: product._id,
+          product_name: product.title,
+          selected_option: selectedOption,
+        });
+
+        notifyError('Something went wrong while adding to cart');
       }
     },
     [dispatch, cart_products]
@@ -424,20 +488,41 @@ export default function ShopContentWrapper({
 
   const handleAddToWishlist = useCallback(
     (product: Product) => {
-      const wishlistProduct = {
-        _id: product._id,
-        title: product.title,
-        img: product.imageURLs?.[0] || product.img || '',
-        price: product.price,
-        category: product.category,
-        slug: product.slug,
-        sku: product.sku,
-        finalPriceDiscount: product.finalPriceDiscount,
-        updatedPrice: product.updatedPrice,
-      };
+      try {
+        const wishlistProduct = {
+          _id: product._id,
+          title: product.title,
+          img: product.imageURLs?.[0] || product.img || '',
+          price: product.price,
+          category: product.category,
+          slug: product.slug,
+          sku: product.sku,
+          finalPriceDiscount: product.finalPriceDiscount,
+          updatedPrice: product.updatedPrice,
+        };
 
-      dispatch(add_to_wishlist(wishlistProduct));
-      notifySuccess(`${product.title} added to wishlist`);
+        dispatch(add_to_wishlist(wishlistProduct));
+
+        // Track add to wishlist
+        captureEvent('product_added_to_wishlist', {
+          product_id: product._id,
+          product_name: product.title,
+          product_category: product.category.name,
+          product_price: product.finalPriceDiscount || product.price,
+          product_sku: product.sku,
+        });
+
+        notifySuccess(`${product.title} added to wishlist`);
+      } catch (error) {
+        // Catch any unexpected errors
+        captureException(error, {
+          action: 'handleAddToWishlist',
+          product_id: product._id,
+          product_name: product.title,
+        });
+
+        notifyError('Something went wrong while adding to wishlist');
+      }
     },
     [dispatch]
   );

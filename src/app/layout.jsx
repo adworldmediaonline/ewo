@@ -11,6 +11,7 @@ import Footer from '../components/version-tsx/footer';
 import HeaderWrapper from '../components/version-tsx/header-wrapper';
 import ScrollToTop from '../components/version-tsx/scroll-to-top';
 import './globals.css';
+import { PostHogProvider } from './provider';
 
 export const metadata = {
   title: 'East West Off Road | Premium Automotive & Off-Road Gear USA',
@@ -76,18 +77,19 @@ export default function RootLayout({ children }) {
       >
         <ScrollToTop />
         {/* {quattrocento.variable} ${quattrocento.className} */}
-        <Providers>
-          <Wrapper>
-            <div className="flex flex-col min-h-screen">
-              <HeaderWrapper />
-              <main className="flex-grow">
-                <NuqsAdapter>{children}</NuqsAdapter>
-              </main>
-              <Footer />
-            </div>
-          </Wrapper>
-        </Providers>
-
+        <PostHogProvider>
+          <Providers>
+            <Wrapper>
+              <div className="flex flex-col min-h-screen">
+                <HeaderWrapper />
+                <main className="flex-grow">
+                  <NuqsAdapter>{children}</NuqsAdapter>
+                </main>
+                <Footer />
+              </div>
+            </Wrapper>
+          </Providers>
+        </PostHogProvider>
         <Toaster richColors />
 
         {/* Tawk.to Script - Simple approach compatible with server components */}

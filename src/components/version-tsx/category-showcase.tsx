@@ -7,6 +7,7 @@ import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import posthog from 'posthog-js';
 
 interface CategoryItem {
   _id: string;
@@ -50,6 +51,7 @@ const CategoryCard = ({ item }: CategoryCardProps) => {
   return (
     <div className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card text-left shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring h-full">
       {/* Main category link - covers the image and title area */}
+      <div></div>
       <Link
         // scroll={true}
         href={`/shop?category=${toSlug(item.parent)}`}
