@@ -16,6 +16,7 @@ import Link from 'next/link';
 import * as React from 'react';
 import { useSelector } from 'react-redux';
 import { notifyError } from '@/utils/toast';
+import { trackProductView, captureException } from '@/lib/posthog-client';
 
 // Star rating component
 const StarRating = ({
@@ -118,6 +119,26 @@ export default function ProductCard({
   const [isHovered, setIsHovered] = React.useState(false);
   const [selectedOption, setSelectedOption] = React.useState<any>(null);
 
+  // Track product view when component mounts
+  React.useEffect(() => {
+    trackProductView({
+      product_id: product._id,
+      product_name: product.title,
+      product_category: product.category.name,
+      product_price: product.finalPriceDiscount || product.price,
+      product_sku: product.sku,
+      product_variant: selectedOption?.title,
+    });
+  }, [
+    product._id,
+    product.title,
+    product.category.name,
+    product.finalPriceDiscount,
+    product.price,
+    product.sku,
+    selectedOption?.title,
+  ]);
+
   // Get cart and wishlist state
   const { cart_products } = useSelector((state: any) => state.cart);
   const { wishlist } = useSelector((state: any) => state.wishlist);
@@ -154,15 +175,38 @@ export default function ProductCard({
     e.preventDefault();
     e.stopPropagation();
 
-    // Check if product has options but none are selected
-    if (product.options && product.options.length > 0 && !selectedOption) {
-      notifyError(
-        'Please select an option before adding the product to your cart.'
-      );
-      return;
-    }
+    try {
+      // Check if product has options but none are selected
+      if (product.options && product.options.length > 0 && !selectedOption) {
+        const errorMessage =
+          'Please select an option before adding the product to your cart.';
+        notifyError(errorMessage);
 
-    onAddToCart?.(product, selectedOption);
+        // Track the validation error
+        captureException(
+          new Error('Product card add to cart validation failed'),
+          {
+            product_id: product._id,
+            product_name: product.title,
+            error_type: 'option_not_selected',
+            has_options: true,
+            options_count: product.options.length,
+          }
+        );
+        return;
+      }
+
+      onAddToCart?.(product, selectedOption);
+    } catch (error) {
+      captureException(error, {
+        action: 'productCardAddToCart',
+        product_id: product._id,
+        product_name: product.title,
+        selected_option: selectedOption,
+      });
+
+      notifyError('Something went wrong while adding to cart');
+    }
   };
 
   const handleAddToWishlist = (e: React.MouseEvent) => {

@@ -26,6 +26,7 @@ import {
 import { add_to_compare } from '@/redux/features/compareSlice';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { notifyError, notifySuccess } from '@/utils/toast';
+import { trackProductView, trackAddToCart, captureEvent, captureException } from '@/lib/posthog-client';
 import {
   BarChart3,
   CheckCircle,
@@ -141,6 +142,20 @@ export default function DetailsWrapper({
       setRatingVal(0);
     }
   }, [reviews]);
+
+  // Track product view when component mounts
+  useEffect(() => {
+    if (productItem) {
+      trackProductView({
+        product_id: productItem._id,
+        product_name: title,
+        product_category: category?.name || 'Unknown',
+        product_price: finalPriceDiscount || price,
+        product_sku: sku,
+        product_variant: selectedOption?.title,
+      });
+    }
+  }, [productItem, title, category, finalPriceDiscount, price, sku, selectedOption]);
 
   // Calculate final price using pre-calculated database values
   const calculateFinalPrice = () => {
