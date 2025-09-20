@@ -384,10 +384,10 @@ export default function ContactPage() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                    {/* <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
                       <Phone className="w-6 h-6 text-primary" />
-                    </div>
-                    <div className="space-y-1">
+                    </div> */}
+                    {/* <div className="space-y-1">
                       <h4 className="font-semibold text-foreground">Phone</h4>
                       <a
                         href="tel:1-866-396-7623"
@@ -397,7 +397,7 @@ export default function ContactPage() {
                         <br />
                         (396-7623)
                       </a>
-                    </div>
+                    </div> */}
                   </div>
 
                   <div className="flex items-start gap-4">
