@@ -199,8 +199,9 @@ export default function OrderArea({ orderId }: { orderId: string }) {
     window.location.href = '/shop';
   };
 
-  const handleCancel = () => {
+  const handleBackToHome = () => {
     setShowCustomAlert(false);
+    window.location.href = '/';
   };
 
   if (isLoading) {
@@ -311,30 +312,24 @@ export default function OrderArea({ orderId }: { orderId: string }) {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
           <div className="bg-white rounded-lg shadow-2xl max-w-md w-full mx-4">
             <div className="p-6 text-center">
-              <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
+              <div className="w-16 h-16 mx-auto mb-6 bg-blue-100 rounded-full flex items-center justify-center">
                 <ShoppingCart className="w-8 h-8 text-blue-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Go Back to Shopping
-              </h3>
-              <p className="text-gray-600 mb-6">
-                This page cannot be refreshed. Choose an option below.
-              </p>
               <div className="flex gap-3">
                 <Button
-                  onClick={handleCancel}
+                  onClick={handleBackToHome}
                   variant="outline"
                   size="lg"
                   className="flex-1"
                 >
-                  Cancel
+                  Back to Home
                 </Button>
                 <Button
                   onClick={handleGoBackToShopping}
                   size="lg"
                   className="flex-1"
                 >
-                  Go Back to Shopping
+                  Back to Shopping
                 </Button>
               </div>
             </div>
