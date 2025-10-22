@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 // Loading State Component
 const OrderLoadingState = () => (
@@ -98,20 +99,12 @@ const OrderErrorState = () => (
             Error Loading Order
           </h2>
           <p className="text-muted-foreground mb-8 leading-relaxed">
-            We encountered an issue while loading your order details. Please try
-            again or contact support if the problem persists.
+            We encountered an issue while loading your order details. Please
+            contact support if the problem persists.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
-              onClick={() => window.location.reload()}
-              className="flex items-center gap-2"
-            >
-              <Loader2 className="w-4 h-4" />
-              Try Again
-            </Button>
-            <Button
               asChild
-              variant="outline"
               className="flex items-center gap-2"
             >
               <Link href="/contact">
@@ -168,6 +161,47 @@ const OrderEmptyState = () => (
 
 export default function OrderArea({ orderId }: { orderId: string }) {
   const { data: order, isError, isLoading } = useGetUserOrderByIdQuery(orderId);
+  const [showCustomAlert, setShowCustomAlert] = useState(false);
+
+  // Prevent page refresh to avoid duplicate analytics events
+  useEffect(() => {
+    // Prevent keyboard shortcuts (F5, Ctrl+R, Cmd+R) - show custom alert
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.key === 'F5' ||
+        (e.ctrlKey && e.key === 'r') ||
+        (e.metaKey && e.key === 'r')
+      ) {
+        e.preventDefault();
+        setShowCustomAlert(true);
+      }
+    };
+
+    // Prevent context menu (right-click refresh option)
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+    };
+
+    // Disable browser refresh completely - no beforeunload event
+    // This prevents the browser's native "Reload site?" dialog
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('contextmenu', handleContextMenu);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('contextmenu', handleContextMenu);
+    };
+  }, []);
+
+  const handleGoBackToShopping = () => {
+    setShowCustomAlert(false);
+    window.location.href = '/shop';
+  };
+
+  const handleCancel = () => {
+    setShowCustomAlert(false);
+  };
 
   if (isLoading) {
     return <OrderLoadingState />;
@@ -272,6 +306,42 @@ export default function OrderArea({ orderId }: { orderId: string }) {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Custom Alert Modal */}
+      {showCustomAlert && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-md w-full mx-4">
+            <div className="p-6 text-center">
+              <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
+                <ShoppingCart className="w-8 h-8 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Go Back to Shopping
+              </h3>
+              <p className="text-gray-600 mb-6">
+                This page cannot be refreshed. Choose an option below.
+              </p>
+              <div className="flex gap-3">
+                <Button
+                  onClick={handleCancel}
+                  variant="outline"
+                  size="lg"
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleGoBackToShopping}
+                  size="lg"
+                  className="flex-1"
+                >
+                  Go Back to Shopping
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         {/* Breadcrumb Navigation */}
         <div className="mb-8">
@@ -657,6 +727,19 @@ export default function OrderArea({ orderId }: { orderId: string }) {
           </div>
         </div>
       </div>
+
+      {/* Floating "Go Back to Shopping" Button */}
+      <Button
+        asChild
+        size="lg"
+        className="fixed bottom-6 right-6 z-50 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105"
+        aria-label="Go back to shopping"
+      >
+        <Link href="/shop" className="flex items-center gap-2">
+          <ShoppingCart className="w-5 h-5" />
+          Go Back to Shopping
+        </Link>
+      </Button>
     </div>
   );
 }
