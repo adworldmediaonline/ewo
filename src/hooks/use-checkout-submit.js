@@ -100,6 +100,7 @@ const useCheckoutSubmit = () => {
     register,
     handleSubmit,
     setValue,
+    control,
     formState: { errors },
   } = useForm({
     mode: 'onSubmit',
@@ -951,6 +952,7 @@ const useCheckoutSubmit = () => {
     submitHandler,
     stripe,
     handleSubmit,
+    control,
     clientSecret,
     setClientSecret,
     cartTotal,
