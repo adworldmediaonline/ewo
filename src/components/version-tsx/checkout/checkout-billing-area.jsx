@@ -6,9 +6,10 @@ import { reset_address_discount } from '@/redux/features/order/orderSlice';
 import { City, Country, State } from 'country-state-city';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Controller } from 'react-hook-form';
 import ErrorMsg from '../../common/error-msg';
 
-const CheckoutBillingArea = ({ register, errors, setValue, checkoutData }) => {
+const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData }) => {
   const { data: session } = authClient.useSession();
   const user = {};
   const { isCheckoutSubmitting } = useSelector(state => state.order);
@@ -102,8 +103,11 @@ const CheckoutBillingArea = ({ register, errors, setValue, checkoutData }) => {
     dispatch(reset_address_discount());
 
     const country = countries.find(c => c.isoCode === countryCode);
+
+    // Update state immediately
     setSelectedCountry(country);
 
+    // Update form values immediately
     setValue('country', countryCode);
     setValue('state', '');
     setValue('city', '');
@@ -257,25 +261,29 @@ const CheckoutBillingArea = ({ register, errors, setValue, checkoutData }) => {
               <label className="block text-sm font-medium text-foreground mb-2">
                 Country <span className="text-destructive">*</span>
               </label>
-              <select
-                {...register('country', {
-                  required: `Country is required!`,
-                  onChange: e => {
-                    handleCountryChange(e);
-                  },
-                })}
+              <Controller
                 name="country"
-                id="country"
-                className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                defaultValue={formValues.country}
-              >
-                <option value="">Select Country</option>
-                {countries.map(country => (
-                  <option key={country.isoCode} value={country.isoCode}>
-                    {country.name}
-                  </option>
-                ))}
-              </select>
+                control={control}
+                rules={{ required: 'Country is required!' }}
+                render={({ field }) => (
+                  <select
+                    {...field}
+                    className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                    value={selectedCountry?.isoCode || 'US'}
+                    onChange={(e) => {
+                      field.onChange(e); // Update react-hook-form
+                      handleCountryChange(e); // Update our state
+                    }}
+                  >
+                    <option value="">Select Country</option>
+                    {countries.map(country => (
+                      <option key={country.isoCode} value={country.isoCode}>
+                        {country.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              />
               <ErrorMsg msg={errors?.country?.message} />
             </div>
 
@@ -286,28 +294,32 @@ const CheckoutBillingArea = ({ register, errors, setValue, checkoutData }) => {
                 <label className="block text-sm font-medium text-foreground mb-2">
                   State <span className="text-destructive">*</span>
                 </label>
-                <select
-                  {...register('state', {
-                    required: `State is required!`,
-                    onChange: e => {
-                      handleStateChange(e);
-                    },
-                  })}
+                <Controller
                   name="state"
-                  id="state"
-                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
-                  value={selectedState?.isoCode || ''}
-                  disabled={!selectedCountry}
-                >
-                  <option value="">
-                    {selectedCountry ? 'Select State' : 'Select country first'}
-                  </option>
-                  {states.map(state => (
-                    <option key={state.isoCode} value={state.isoCode}>
-                      {state.name}
-                    </option>
-                  ))}
-                </select>
+                  control={control}
+                  rules={{ required: 'State is required!' }}
+                  render={({ field }) => (
+                    <select
+                      {...field}
+                      className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
+                      value={selectedState?.isoCode || ''}
+                      disabled={!selectedCountry}
+                      onChange={(e) => {
+                        field.onChange(e); // Update react-hook-form
+                        handleStateChange(e); // Update our state
+                      }}
+                    >
+                      <option value="">
+                        {selectedCountry ? 'Select State' : 'Select country first'}
+                      </option>
+                      {states.map(state => (
+                        <option key={state.isoCode} value={state.isoCode}>
+                          {state.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                />
                 <ErrorMsg msg={errors?.state?.message} />
               </div>
 
@@ -315,28 +327,32 @@ const CheckoutBillingArea = ({ register, errors, setValue, checkoutData }) => {
                 <label className="block text-sm font-medium text-foreground mb-2">
                   City <span className="text-destructive">*</span>
                 </label>
-                <select
-                  {...register('city', {
-                    required: `City is required!`,
-                    onChange: e => {
-                      handleCityChange(e);
-                    },
-                  })}
+                <Controller
                   name="city"
-                  id="city"
-                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
-                  value={selectedCity}
-                  disabled={!selectedState}
-                >
-                  <option value="">
-                    {selectedState ? 'Select City' : 'Select state first'}
-                  </option>
-                  {cities.map(city => (
-                    <option key={city.name} value={city.name}>
-                      {city.name}
-                    </option>
-                  ))}
-                </select>
+                  control={control}
+                  rules={{ required: 'City is required!' }}
+                  render={({ field }) => (
+                    <select
+                      {...field}
+                      className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
+                      value={selectedCity}
+                      disabled={!selectedState}
+                      onChange={(e) => {
+                        field.onChange(e); // Update react-hook-form
+                        handleCityChange(e); // Update our state
+                      }}
+                    >
+                      <option value="">
+                        {selectedState ? 'Select City' : 'Select state first'}
+                      </option>
+                      {cities.map(city => (
+                        <option key={city.name} value={city.name}>
+                          {city.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                />
                 <ErrorMsg msg={errors?.city?.message} />
               </div>
 

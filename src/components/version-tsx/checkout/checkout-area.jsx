@@ -25,6 +25,7 @@ export default function CheckoutArea() {
     register,
     errors,
     setValue,
+    control,
     handleCouponCode,
     couponRef,
     couponApplyMsg,
@@ -105,6 +106,7 @@ export default function CheckoutArea() {
                       register={register}
                       errors={errors}
                       setValue={setValue}
+                      control={control}
                       checkoutData={checkoutData}
                     />
                   </div>
