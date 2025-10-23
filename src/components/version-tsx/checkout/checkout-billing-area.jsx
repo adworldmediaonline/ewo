@@ -58,36 +58,29 @@ const CheckoutBillingArea = ({ register, errors, setValue, checkoutData }) => {
     if (defaultCountry) setValue('country', defaultCountry.isoCode);
   }, [user, setValue, defaultCountry]);
 
+  // 1. Initial load - load US states on mount
   useEffect(() => {
-    if (selectedCountry) {
-      const countryStates = State.getStatesOfCountry(selectedCountry.isoCode);
+    if (defaultCountry) {
+      const countryStates = State.getStatesOfCountry(defaultCountry.isoCode);
       setStates(countryStates);
-
-      setFormValues(prev => ({
-        ...prev,
-        country: selectedCountry.isoCode,
-      }));
+      setValue('country', defaultCountry.isoCode);
     }
-  }, []);
+  }, [defaultCountry, setValue]);
 
+  // 2. Country change - load new states and reset dependents
   useEffect(() => {
     if (selectedCountry) {
       const countryStates = State.getStatesOfCountry(selectedCountry.isoCode);
       setStates(countryStates);
 
-      if (selectedState) {
-        setSelectedState(null);
-        setSelectedCity('');
-        setFormValues(prev => ({
-          ...prev,
-          state: '',
-          city: '',
-        }));
-      }
+      // Reset state and city when country changes
+      setSelectedState(null);
+      setSelectedCity('');
       setCities([]);
     }
-  }, [selectedCountry, selectedState]);
+  }, [selectedCountry]);
 
+  // 3. State change - load cities
   useEffect(() => {
     if (selectedCountry && selectedState) {
       const stateCities = City.getCitiesOfState(
@@ -95,6 +88,8 @@ const CheckoutBillingArea = ({ register, errors, setValue, checkoutData }) => {
         selectedState.isoCode
       );
       setCities(stateCities);
+    } else {
+      setCities([]);
     }
   }, [selectedCountry, selectedState]);
 
@@ -112,6 +107,11 @@ const CheckoutBillingArea = ({ register, errors, setValue, checkoutData }) => {
     setValue('country', countryCode);
     setValue('state', '');
     setValue('city', '');
+
+    // Reset state and city immediately
+    setSelectedState(null);
+    setSelectedCity('');
+    setCities([]);
 
     setFormValues(prev => ({
       ...prev,
@@ -134,6 +134,9 @@ const CheckoutBillingArea = ({ register, errors, setValue, checkoutData }) => {
 
     setValue('state', stateCode);
     setValue('city', '');
+
+    // Reset city immediately
+    setSelectedCity('');
 
     setFormValues(prev => ({
       ...prev,
@@ -276,47 +279,9 @@ const CheckoutBillingArea = ({ register, errors, setValue, checkoutData }) => {
               <ErrorMsg msg={errors?.country?.message} />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Street address <span className="text-destructive">*</span>
-              </label>
-              <input
-                {...register('address', {
-                  required: `Address is required!`,
-                  onChange: e => {
-                    handleAddressChange(e);
-                  },
-                })}
-                name="address"
-                id="address"
-                type="text"
-                placeholder="House number and street name"
-                className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              />
-              <ErrorMsg msg={errors?.address?.message} />
-            </div>
+
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  City <span className="text-destructive">*</span>
-                </label>
-                <input
-                  {...register('city', {
-                    required: `City is required!`,
-                    onChange: e => {
-                      handleCityChange(e);
-                    },
-                  })}
-                  name="city"
-                  id="city"
-                  type="text"
-                  placeholder="Enter city"
-                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                />
-                <ErrorMsg msg={errors?.city?.message} />
-              </div>
-
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
                   State <span className="text-destructive">*</span>
@@ -330,11 +295,13 @@ const CheckoutBillingArea = ({ register, errors, setValue, checkoutData }) => {
                   })}
                   name="state"
                   id="state"
-                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                  defaultValue={formValues.state}
+                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
+                  value={selectedState?.isoCode || ''}
                   disabled={!selectedCountry}
                 >
-                  <option value="">Enter state</option>
+                  <option value="">
+                    {selectedCountry ? 'Select State' : 'Select country first'}
+                  </option>
                   {states.map(state => (
                     <option key={state.isoCode} value={state.isoCode}>
                       {state.name}
@@ -342,6 +309,35 @@ const CheckoutBillingArea = ({ register, errors, setValue, checkoutData }) => {
                   ))}
                 </select>
                 <ErrorMsg msg={errors?.state?.message} />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  City <span className="text-destructive">*</span>
+                </label>
+                <select
+                  {...register('city', {
+                    required: `City is required!`,
+                    onChange: e => {
+                      handleCityChange(e);
+                    },
+                  })}
+                  name="city"
+                  id="city"
+                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
+                  value={selectedCity}
+                  disabled={!selectedState}
+                >
+                  <option value="">
+                    {selectedState ? 'Select City' : 'Select state first'}
+                  </option>
+                  {cities.map(city => (
+                    <option key={city.name} value={city.name}>
+                      {city.name}
+                    </option>
+                  ))}
+                </select>
+                <ErrorMsg msg={errors?.city?.message} />
               </div>
 
               <div>
@@ -363,6 +359,26 @@ const CheckoutBillingArea = ({ register, errors, setValue, checkoutData }) => {
                 />
                 <ErrorMsg msg={errors?.zipCode?.message} />
               </div>
+            </div>
+
+  <div>
+              <label className="block text-sm font-medium text-foreground mb-2">
+                Street address <span className="text-destructive">*</span>
+              </label>
+              <input
+                {...register('address', {
+                  required: `Address is required!`,
+                  onChange: e => {
+                    handleAddressChange(e);
+                  },
+                })}
+                name="address"
+                id="address"
+                type="text"
+                placeholder="House number and street name"
+                className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+              <ErrorMsg msg={errors?.address?.message} />
             </div>
 
             <div>

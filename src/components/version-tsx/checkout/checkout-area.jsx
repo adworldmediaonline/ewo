@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 // internal
 // import { AuthDialog } from '@/components/version-tsx/profile';
 import useCheckoutSubmit from '@/hooks/use-checkout-submit';
-import ThankYouModal from '../../common/thank-you-modal';
+import PaymentSuccessOverlay from '../../common/payment-success-overlay';
 
 import { authClient } from '@/lib/authClient';
 import CheckoutBillingArea from './checkout-billing-area';
@@ -28,11 +28,7 @@ export default function CheckoutArea() {
     handleCouponCode,
     couponRef,
     couponApplyMsg,
-    // Thank You Modal props
-    showThankYouModal,
-    orderDataForModal,
-    handleThankYouModalClose,
-    handleThankYouModalContinue,
+    paymentSuccessful,
   } = checkoutData;
   const { cart_products } = useSelector(state => state.cart);
 
@@ -132,13 +128,8 @@ export default function CheckoutArea() {
         defaultTab="signin"
       /> */}
 
-      {/* Thank You Modal */}
-      <ThankYouModal
-        isOpen={showThankYouModal}
-        onClose={handleThankYouModalClose}
-        orderData={orderDataForModal}
-        onContinue={handleThankYouModalContinue}
-      />
+      {/* Payment Success Overlay - Shows immediately, then auto-redirects */}
+      <PaymentSuccessOverlay isVisible={paymentSuccessful} />
     </>
   );
 }
