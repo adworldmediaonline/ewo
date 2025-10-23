@@ -75,6 +75,8 @@ const useCheckoutSubmit = () => {
   const [discountProductType, setDiscountProductType] = useState('');
   // isCheckoutSubmit
   const [isCheckoutSubmit, setIsCheckoutSubmit] = useState(false);
+  // paymentSuccessful - shows immediate success feedback
+  const [paymentSuccessful, setPaymentSuccessful] = useState(false);
   // cardError
   const [cardError, setCardError] = useState('');
   // clientSecret
@@ -825,6 +827,9 @@ const useCheckoutSubmit = () => {
 
           // Step 4: Payment confirmed by Stripe
           if (paymentIntent.status === 'succeeded') {
+            // ✅ IMMEDIATELY show success feedback
+            setPaymentSuccessful(true);
+
             // Clean up first
             localStorage.removeItem('cart_products');
             localStorage.removeItem('couponInfo');
@@ -838,7 +843,7 @@ const useCheckoutSubmit = () => {
             setIsCheckoutSubmit(false);
             setProcessingPayment(false);
 
-            // Save order and show Thank You modal
+            // Save order and redirect to order page
             saveOrder({
               ...orderInfo,
               paymentInfo: paymentIntent,
@@ -846,21 +851,21 @@ const useCheckoutSubmit = () => {
               paidAt: new Date(),
             })
               .then(res => {
-                // Extract MongoDB ObjectId for the redirect (backend expects _id, not invoice)
+                // Extract MongoDB ObjectId for the redirect
                 const orderId =
                   res.data?.order?._id ||
                   res.order?._id ||
                   res.data?.order?.invoice ||
                   res.order?.invoice;
 
-                // Set order data and show Thank You modal
-                setOrderDataForModal({
-                  orderId: orderId,
-                  customOrderId: res.data?.order?.orderId,
-                });
-                setShowThankYouModal(true);
+                // Keep success overlay visible for 1.5 seconds, then redirect
+                setTimeout(() => {
+                  setPaymentSuccessful(false);
+                  router.push(`/order/${orderId}`);
+                }, 1500);
               })
               .catch(err => {
+                setPaymentSuccessful(false);
                 const productSummary =
                   cart_products.length > 1
                     ? `${cart_products[0].title} and ${
@@ -955,11 +960,8 @@ const useCheckoutSubmit = () => {
     showCard,
     setShowCard,
     processingPayment,
-    // Thank You Modal props
-    showThankYouModal,
-    orderDataForModal,
-    handleThankYouModalClose,
-    handleThankYouModalContinue,
+    // Payment Success Overlay
+    paymentSuccessful,
     applied_coupons,
     total_coupon_discount,
     coupon_error,
