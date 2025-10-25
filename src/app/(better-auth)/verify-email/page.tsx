@@ -48,7 +48,7 @@ function VerifyEmailForm() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+
     await authClient.emailOtp.verifyEmail(
       {
         email: email || '', // required
@@ -173,7 +173,7 @@ function VerifyEmailForm() {
               className="font-medium text-primary hover:text-primary/80 underline underline-offset-4 transition-colors"
               onClick={() => {
                 // You could add resend functionality here
-                console.log('Resend code requested');
+
               }}
             >
               Resend code

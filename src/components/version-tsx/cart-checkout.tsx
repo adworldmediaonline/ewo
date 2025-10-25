@@ -587,10 +587,22 @@ export default function CartCheckout() {
             </div>
           )}
 
-          <div className="flex justify-between pt-3 border-t font-bold text-lg">
+          {/* <div className="flex justify-between pt-3 border-t font-bold text-lg">
             <span>Total</span>
             <span>${Math.max(0, totals.finalTotal).toFixed(2)}</span>
+          </div> */}
+          {/* total */}
+          <div className="border-t border-border pt-3 mt-4">
+            <div className="flex items-center justify-between">
+              <span className="text-lg font-semibold text-foreground">Total</span>
+              <span className="text-lg font-semibold text-foreground">
+                ${Math.max(0, totals.finalTotal).toFixed(2)}
+              </span>
+            </div>
           </div>
+          {/* total code end here */}
+
+
         </div>
       </div>
 

@@ -432,73 +432,73 @@ export default function OrderArea({ orderId }: { orderId: string }) {
           (appliedCoupon &&
             (appliedCoupon.discount > 0 ||
               appliedCoupon.discountAmount > 0))) && (
-          <Alert className="mb-8 border-green-200 bg-green-50">
-            <CheckCircle className="h-5 w-5 text-green-600" />
-            <AlertDescription className="text-green-800">
-              {appliedCoupons.length > 0 ? (
-                appliedCoupons.length === 1 ? (
-                  <div className="text-center">
-                    <h3 className="font-semibold mb-2">
-                      Coupon Applied Successfully!
-                    </h3>
-                    <p className="text-sm">
-                      <strong>{appliedCoupons[0].couponCode}</strong> -{' '}
-                      {appliedCoupons[0].title}
-                      <br />
-                      <span className="text-xs">
-                        You saved $
-                        {(
-                          appliedCoupons[0].discount ||
-                          appliedCoupons[0].discountAmount ||
-                          0
-                        ).toFixed(2)}{' '}
-                        on this order!
-                      </span>
-                    </p>
-                  </div>
-                ) : (
-                  <div className="text-center">
-                    <h3 className="font-semibold mb-2">
-                      {appliedCoupons.length} Coupons Applied Successfully!
-                    </h3>
-                    <div className="text-sm">
-                      {appliedCoupons.map((coupon: any, index: number) => (
-                        <div key={index} className="mb-1">
-                          <strong>{coupon.couponCode}</strong> - {coupon.title}
+            <Alert className="mb-8 border-green-200 bg-green-50">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+              <AlertDescription className="text-green-800">
+                {appliedCoupons.length > 0 ? (
+                  appliedCoupons.length === 1 ? (
+                    <div className="text-center">
+                      <h3 className="font-semibold mb-2">
+                        Coupon Applied Successfully!
+                      </h3>
+                      <p className="text-sm">
+                        <strong>{appliedCoupons[0].couponCode}</strong> -{' '}
+                        {appliedCoupons[0].title}
+                        <br />
+                        <span className="text-xs">
+                          You saved $
+                          {(
+                            appliedCoupons[0].discount ||
+                            appliedCoupons[0].discountAmount ||
+                            0
+                          ).toFixed(2)}{' '}
+                          on this order!
+                        </span>
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="text-center">
+                      <h3 className="font-semibold mb-2">
+                        {appliedCoupons.length} Coupons Applied Successfully!
+                      </h3>
+                      <div className="text-sm">
+                        {appliedCoupons.map((coupon: any, index: number) => (
+                          <div key={index} className="mb-1">
+                            <strong>{coupon.couponCode}</strong> - {coupon.title}
+                          </div>
+                        ))}
+                        <div className="font-bold mt-2">
+                          Total savings: ${couponDiscounts.toFixed(2)}!
                         </div>
-                      ))}
-                      <div className="font-bold mt-2">
-                        Total savings: ${couponDiscounts.toFixed(2)}!
                       </div>
                     </div>
-                  </div>
-                )
-              ) : (
-                appliedCoupon && (
-                  <div className="text-center">
-                    <h3 className="font-semibold mb-2">
-                      Coupon Applied Successfully!
-                    </h3>
-                    <p className="text-sm">
-                      <strong>{appliedCoupon.couponCode}</strong> -{' '}
-                      {appliedCoupon.title}
-                      <br />
-                      <span className="text-xs">
-                        You saved $
-                        {(
-                          appliedCoupon.discount ||
-                          appliedCoupon.discountAmount ||
-                          0
-                        ).toFixed(2)}{' '}
-                        on this order!
-                      </span>
-                    </p>
-                  </div>
-                )
-              )}
-            </AlertDescription>
-          </Alert>
-        )}
+                  )
+                ) : (
+                  appliedCoupon && (
+                    <div className="text-center">
+                      <h3 className="font-semibold mb-2">
+                        Coupon Applied Successfully!
+                      </h3>
+                      <p className="text-sm">
+                        <strong>{appliedCoupon.couponCode}</strong> -{' '}
+                        {appliedCoupon.title}
+                        <br />
+                        <span className="text-xs">
+                          You saved $
+                          {(
+                            appliedCoupon.discount ||
+                            appliedCoupon.discountAmount ||
+                            0
+                          ).toFixed(2)}{' '}
+                          on this order!
+                        </span>
+                      </p>
+                    </div>
+                  )
+                )}
+              </AlertDescription>
+            </Alert>
+          )}
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
@@ -574,7 +574,7 @@ export default function OrderArea({ orderId }: { orderId: string }) {
               <Separator />
 
               {/* Total calculation: Subtotal + Shipping - All Discounts */}
-              <div className="flex justify-between items-center text-lg font-bold">
+              {/* <div className="flex justify-between items-center text-lg font-bold">
                 <span>Total</span>
                 <span className="text-primary">
                   $
@@ -586,7 +586,25 @@ export default function OrderArea({ orderId }: { orderId: string }) {
                     otherDiscounts
                   ).toFixed(2)}
                 </span>
+              </div> */}
+
+              {/* new total ui */}
+              <div className="border-t border-border pt-3 mt-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-lg font-semibold text-foreground">Total</span>
+                  <span className="text-lg font-semibold text-foreground">
+                    $
+                    {(
+                      subtotal +
+                      parseFloat(shippingCost) -
+                      firstTimeDiscountAmount -
+                      couponDiscounts -
+                      otherDiscounts
+                    ).toFixed(2)}
+                  </span>
+                </div>
               </div>
+              {/* new total ui code end here */}
             </CardContent>
           </Card>
 
