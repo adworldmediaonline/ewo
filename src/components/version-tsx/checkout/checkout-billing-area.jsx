@@ -42,6 +42,7 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
   const [selectedCity, setSelectedCity] = useState('');
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
+  const [showManualCityInput, setShowManualCityInput] = useState(false);
 
   const [formValues, setFormValues] = useState({
     country: 'US',
@@ -116,6 +117,7 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
     setSelectedState(null);
     setSelectedCity('');
     setCities([]);
+    setShowManualCityInput(false);
 
     setFormValues(prev => ({
       ...prev,
@@ -141,6 +143,7 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
 
     // Reset city immediately
     setSelectedCity('');
+    setShowManualCityInput(false);
 
     setFormValues(prev => ({
       ...prev,
@@ -153,6 +156,14 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
     if (isCheckoutSubmitting) return;
 
     const cityName = e.target.value;
+
+    // Handle manual entry trigger
+    if (cityName === '__manual__') {
+      setShowManualCityInput(true);
+      setValue('city', '');
+      setSelectedCity('');
+      return;
+    }
 
     dispatch(reset_address_discount());
 
@@ -331,27 +342,79 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
                   name="city"
                   control={control}
                   rules={{ required: 'City is required!' }}
-                  render={({ field }) => (
-                    <select
-                      {...field}
-                      className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
-                      value={selectedCity}
-                      disabled={!selectedState}
-                      onChange={(e) => {
-                        field.onChange(e); // Update react-hook-form
-                        handleCityChange(e); // Update our state
-                      }}
-                    >
-                      <option value="">
-                        {selectedState ? 'Select City' : 'Select state first'}
-                      </option>
-                      {cities.map(city => (
-                        <option key={city.name} value={city.name}>
-                          {city.name}
+                  render={({ field }) => {
+                    // Case 1: No cities available - auto show input
+                    if (cities.length === 0 && selectedState) {
+                      return (
+                        <div className="space-y-2">
+                          <div className="text-sm text-muted-foreground bg-muted/50 p-2 rounded-md">
+                            No cities found for this state. Please enter your city manually.
+                          </div>
+                          <input
+                            {...field}
+                            type="text"
+                            placeholder="Enter city name"
+                            className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                            onChange={(e) => {
+                              field.onChange(e);
+                              handleCityChange(e);
+                            }}
+                          />
+                        </div>
+                      );
+                    }
+
+                    // Case 2: Cities available but user wants manual entry
+                    if (showManualCityInput && cities.length > 0) {
+                      return (
+                        <div className="space-y-2">
+                          <button
+                            type="button"
+                            onClick={() => setShowManualCityInput(false)}
+                            className="text-sm text-primary hover:text-primary/80 underline"
+                          >
+                            ← Back to city list
+                          </button>
+                          <input
+                            {...field}
+                            type="text"
+                            placeholder="Enter city name"
+                            className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                            onChange={(e) => {
+                              field.onChange(e);
+                              handleCityChange(e);
+                            }}
+                          />
+                        </div>
+                      );
+                    }
+
+                    // Case 3: Cities available - show dropdown with manual option
+                    return (
+                      <select
+                        {...field}
+                        className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
+                        value={selectedCity}
+                        disabled={!selectedState}
+                        onChange={(e) => {
+                          field.onChange(e); // Update react-hook-form
+                          handleCityChange(e); // Update our state
+                        }}
+                      >
+                        <option value="">
+                          {selectedState ? 'Select City' : 'Select state first'}
                         </option>
-                      ))}
-                    </select>
-                  )}
+                        {cities.map(city => (
+                          <option key={city.name} value={city.name}>
+                            {city.name}
+                          </option>
+                        ))}
+                        {cities.length > 0 && (
+                          <option value="__manual__">City not listed? Enter manually</option>
+                        )}
+                      </select>
+                    );
+                  }}
                 />
                 <ErrorMsg msg={errors?.city?.message} />
               </div>
@@ -377,7 +440,7 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
               </div>
             </div>
 
-  <div>
+            <div>
               <label className="block text-sm font-medium text-foreground mb-2">
                 Street address <span className="text-destructive">*</span>
               </label>
