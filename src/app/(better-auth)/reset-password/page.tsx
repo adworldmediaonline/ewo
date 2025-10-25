@@ -55,7 +55,7 @@ function ResetPasswordForm() {
     },
   });
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+
     await authClient.emailOtp.resetPassword(
       {
         email: email || '', // required
