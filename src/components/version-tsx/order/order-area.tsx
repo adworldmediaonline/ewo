@@ -22,8 +22,11 @@ import {
   Calendar,
   CheckCircle,
   Clock,
+  Copy,
   CreditCard,
+  DollarSign,
   Loader2,
+  Mail,
   MapPin,
   Package,
   Receipt,
@@ -162,6 +165,7 @@ const OrderEmptyState = () => (
 export default function OrderArea({ orderId }: { orderId: string }) {
   const { data: order, isError, isLoading } = useGetUserOrderByIdQuery(orderId);
   const [showCustomAlert, setShowCustomAlert] = useState(false);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   // Prevent page refresh to avoid duplicate analytics events
   useEffect(() => {
@@ -204,6 +208,16 @@ export default function OrderArea({ orderId }: { orderId: string }) {
     window.location.href = '/';
   };
 
+  const handleCopyToClipboard = async (text: string, fieldName: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedField(fieldName);
+      setTimeout(() => setCopiedField(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
+  };
+
   if (isLoading) {
     return <OrderLoadingState />;
   }
@@ -234,6 +248,7 @@ export default function OrderArea({ orderId }: { orderId: string }) {
     firstTimeDiscount,
     appliedCoupons = [], // Enhanced: Multiple coupons support
     appliedCoupon, // Legacy: Single coupon support
+    paymentIntent, // Payment intent data for Transaction ID and Currency
   } = order.order;
 
   const orderDate = dayjs(createdAt).format('MMMM D, YYYY');
@@ -501,7 +516,7 @@ export default function OrderArea({ orderId }: { orderId: string }) {
           )}
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 mb-8">
           {/* Order Summary */}
           <Card>
             <CardHeader>
@@ -667,6 +682,92 @@ export default function OrderArea({ orderId }: { orderId: string }) {
               </div>
             </CardContent>
           </Card>
+
+          {/* Payment Details - Only show for Card payments */}
+          {paymentMethod === 'Card' && paymentIntent?.id && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CreditCard className="w-5 h-5 text-primary" />
+                  Payment Details
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                      <CreditCard className="w-4 h-4 text-primary" />
+                      Transaction Information
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-muted-foreground">Transaction ID</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 flex-shrink-0"
+                            onClick={() => handleCopyToClipboard(paymentIntent.id, 'transactionId')}
+                            aria-label="Copy Transaction ID"
+                          >
+                            {copiedField === 'transactionId' ? (
+                              <CheckCircle className="w-4 h-4 text-green-600" />
+                            ) : (
+                              <Copy className="w-4 h-4" />
+                            )}
+                          </Button>
+                        </div>
+                        <div className="bg-muted/50 p-2 rounded-md">
+                          <span className="font-medium font-mono text-xs break-all">
+                            {paymentIntent.id}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">Currency</span>
+                        <div className="flex items-center gap-2">
+                          <DollarSign className="w-4 h-4 text-primary" />
+                          <span className="font-medium uppercase">
+                            {paymentIntent.currency}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <div>
+                    <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-primary" />
+                      Contact Information
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">Email</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{email || contact}</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                            onClick={() => handleCopyToClipboard(email || contact, 'email')}
+                            aria-label="Copy Email"
+                          >
+                            {copiedField === 'email' ? (
+                              <CheckCircle className="w-4 h-4 text-green-600" />
+                            ) : (
+                              <Copy className="w-4 h-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Order Items */}
