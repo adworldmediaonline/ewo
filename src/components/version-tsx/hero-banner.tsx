@@ -35,8 +35,8 @@ export default function HeroBanner({
             src={desktopPublicId}
             fill
             sizes="100vw"
-            // priority={priority}
-            preload={true}
+            priority={priority}
+            // preload={true}
             quality={100}
             className="object-cover"
           />
@@ -56,7 +56,7 @@ export default function HeroBanner({
             fill
             sizes="100vw"
             // priority={priority}
-            preload={true}
+            // preload={true}
             quality={85}
             className="object-cover"
           />
