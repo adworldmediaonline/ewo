@@ -14,8 +14,10 @@ interface HeroBannerProps {
 }
 
 export default function HeroBanner({
-  desktopPublicId = 'hero-banner-desktop_dja8ci',
-  mobilePublicId = 'hero-banner-mobile_uprqgb',
+  // desktopPublicId = 'hero-banner-desktop_dja8ci',
+  desktopPublicId = 'EWO_Car_Banner_lz703g',
+  // mobilePublicId = 'hero-banner-mobile_uprqgb',
+  mobilePublicId = 'EWO_Car_Banner_mobile_420x300_px_hfrxlv',
   desktopTitle = 'EAST WEST OFF ROAD',
   mobileTitle = 'EAST WEST OFF ROAD',
   href = '/shop',
@@ -26,14 +28,16 @@ export default function HeroBanner({
       {/* Desktop / Large screens */}
       <div className="relative hidden md:block w-full">
         {/* Aspect ratio ~1920/800 */}
-        <div className="relative w-full aspect-[1920/680]">
+        {/* <div className="relative w-full aspect-[1920/680]"> */}
+        <div className="relative w-full aspect-[1920/780]">
           <CldImage
             alt={desktopTitle}
             src={desktopPublicId}
             fill
             sizes="100vw"
             priority={priority}
-            quality={90}
+            // preload={true}
+            quality={100}
             className="object-cover"
           />
           {/* left gradient for text legibility */}
@@ -44,13 +48,15 @@ export default function HeroBanner({
       {/* Mobile / Small screens */}
       <div className="relative block md:hidden w-full">
         {/* Aspect ratio ~420/170 */}
-        <div className="relative w-full aspect-[420/170]">
+        {/* <div className="relative w-full aspect-[420/170]"> */}
+        <div className="relative w-full aspect-[420/300]">
           <CldImage
             alt={mobileTitle}
             src={mobilePublicId}
             fill
             sizes="100vw"
-            priority={priority}
+            // priority={priority}
+            // preload={true}
             quality={85}
             className="object-cover"
           />
