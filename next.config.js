@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Enable Cache Components for explicit opt-in caching
+  // This changes the paradigm: routes are dynamic by default, use "use cache" to opt-in to caching
+  experimental: {
+    cacheComponents: true,
+  },
   images: {
     remotePatterns: [
       {

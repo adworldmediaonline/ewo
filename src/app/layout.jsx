@@ -7,6 +7,7 @@ import { Lato } from 'next/font/google';
 import Image from 'next/image';
 import Script from 'next/script';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
+import { Suspense } from 'react';
 import Footer from '../components/version-tsx/footer';
 import HeaderWrapper from '../components/version-tsx/header-wrapper';
 import ScrollToTop from '../components/version-tsx/scroll-to-top';
@@ -74,17 +75,27 @@ export default function RootLayout({ children }) {
         className={`${lato.variable} ${lato.className} $antialiased flex min-h-screen flex-col`}
         suppressHydrationWarning
       >
-        <ScrollToTop />
+        {/* Wrap ScrollToTop in Suspense - uses usePathname() */}
+        <Suspense fallback={null}>
+          <ScrollToTop />
+        </Suspense>
         {/* {quattrocento.variable} ${quattrocento.className} */}
 
         <Providers>
           <Wrapper>
             <div className="flex flex-col min-h-screen">
-              <HeaderWrapper />
+              {/* Wrap HeaderWrapper in Suspense - uses usePathname() and useRouter() */}
+              <Suspense fallback={<div className="h-20" />}>
+                <HeaderWrapper />
+              </Suspense>
               <main className="flex-grow">
                 <NuqsAdapter>{children}</NuqsAdapter>
               </main>
-              <Footer />
+              {/* Wrap Footer in Suspense for Cache Components compatibility */}
+              {/* Footer uses connection() to get current year, making it dynamic */}
+              <Suspense fallback={<div className="h-64" />}>
+                <Footer />
+              </Suspense>
             </div>
           </Wrapper>
         </Providers>

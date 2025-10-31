@@ -1,9 +1,16 @@
-'use client';
+// MIGRATED to Server Component: Removed 'use client' directive
+// This allows new Date().getFullYear() to run on the server, avoiding Cache Components prerender errors
+// The footer has no client-side interactivity, so server component is appropriate
+// Uses connection() to mark as dynamic (required for new Date() with Cache Components)
 import logo from '@assets/img/logo/logo.png';
 import Image from 'next/image';
 import Link from 'next/link';
+import { connection } from 'next/server';
 
-export default function Footer() {
+export default async function Footer() {
+  // Mark as dynamic to allow new Date() call
+  // This ensures the current year is always accurate at request time
+  await connection();
   return (
     <footer
       aria-labelledby="footer-heading"
