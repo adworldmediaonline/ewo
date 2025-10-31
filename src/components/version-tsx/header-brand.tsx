@@ -1,9 +1,9 @@
-'use client';
+
 
 import logo from '@assets/img/logo/logo.png';
 import Image from 'next/image';
 import Link from 'next/link';
-import * as React from 'react';
+import { ReactElement } from 'react';
 
 export interface HeaderBrandProps {
   href?: string;
@@ -13,7 +13,7 @@ export interface HeaderBrandProps {
 export function HeaderBrand({
   href = '/',
   ariaLabel = 'Go to homepage',
-}: HeaderBrandProps): React.ReactElement {
+}: HeaderBrandProps): ReactElement {
   return (
     <Link
       href={href}

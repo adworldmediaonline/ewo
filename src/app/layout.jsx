@@ -81,13 +81,13 @@ export default function RootLayout({ children }) {
         <Providers>
           <Wrapper>
             <div className="flex flex-col min-h-screen">
-              {/* HeaderWrapper is cached but still needs Suspense boundary for Cache Components */}
-              <Suspense fallback={<div className="h-20" />}>
-                <HeaderWrapper />
-              </Suspense>
+              {/* HeaderWrapper is cached - no Suspense needed, prerenders at build time */}
+              <HeaderWrapper />
               <main className="grow">
                 <NuqsAdapter>{children}</NuqsAdapter>
               </main>
+              {/* Wrap Footer in Suspense for Cache Components compatibility */}
+              {/* Footer uses connection() to get current year, making it dynamic */}
               <Suspense fallback={<div className="h-64" />}>
                 <Footer />
               </Suspense>
