@@ -272,16 +272,24 @@ export const cartSlice = createSlice({
       // No toast notification for option updates - will be handled when new item is added
     },
     get_cart_products: state => {
+      // IMPORTANT: Preserve showCartConfirmation state BEFORE loading products
+      // This ensures the modal can show when items are added to cart
+      const shouldShowModal = state.showCartConfirmation;
+      const savedLastProduct = state.lastAddedProduct;
+
       state.cart_products = (getLocalStorage('cart_products') ||
         []) as CartProduct[];
       // Always keep cartMiniOpen as false on page load for better UX
       state.cartMiniOpen = false;
       // Clear any lingering celebration state on page load
       state.firstTimeDiscount.showCelebration = false;
-      // Only clear cart confirmation modal state if it's not currently showing
-      // This preserves the modal state when items are added to cart
-      // The modal will be cleared by hideCartConfirmation action or on user interaction
-      if (!state.showCartConfirmation) {
+
+      // Restore showCartConfirmation state if it was set before loading
+      // This prevents the modal from being hidden when cart products are loaded
+      if (shouldShowModal) {
+        state.showCartConfirmation = true;
+        state.lastAddedProduct = savedLastProduct;
+      } else {
         state.lastAddedProduct = null;
       }
 

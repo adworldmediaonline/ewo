@@ -58,9 +58,9 @@ export default function ShopMenuMegaContent({
                           />
                         </div>
                       ) : (
-                        <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted/60" />
+                        <div className="absolute inset-0 bg-linear-to-br from-muted to-muted/60" />
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                      <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
                       <div className="absolute left-0 bottom-0 p-4 sm:p-5">
                         <h3 className="text-white text-lg sm:text-xl font-semibold tracking-tight">
                           {cat.parent}

@@ -1,16 +1,23 @@
-'use client';
+
 import parentCategoryModified from '@/lib/parentCategory';
-import { useGetProductQuery } from '@/redux/features/productApi';
 
 import ProductBreadcrumb from './product-breadcrumb';
 import ProductDetailsContent from './product-details-content';
-import ProductError from './product-error';
-import ProductSkeleton from './product-skeleton';
+// import ProductSkeleton from './product-skeleton';
+import { getProductSingle } from '@/server/products';
 
-const ProductDetailsArea = ({ id }) => {
-  const { data: product, isLoading, isError, refetch } = useGetProductQuery(id);
+export default async function ProductDetailsArea({ params }: { params: Promise<{ id: string }> }) {
+  const id = (await params).id;
+  // Pass id directly to cached component
+  return <ProductDetailsAreaContent id={id} />;
+}
 
-  const formatCategoryName = name => {
+// Cached component - will be prerendered at build time
+async function ProductDetailsAreaContent({ id }: { id: string }) {
+  "use cache";
+  const product = await getProductSingle(id);
+
+  const formatCategoryName = (name: string) => {
     return name
       .replace(/-/g, ' ')
       .split(' ')
@@ -18,22 +25,12 @@ const ProductDetailsArea = ({ id }) => {
       .join(' ');
   };
 
-  const formatProductTitle = title => {
+  const formatProductTitle = (title: string) => {
     return title
       .split(' ')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ');
   };
-
-  // Loading state
-  if (isLoading) {
-    return <ProductSkeleton />;
-  }
-
-  // Error state
-  if (isError) {
-    return <ProductError onRetry={refetch} />;
-  }
 
   // Product content
   if (product) {
@@ -53,8 +50,5 @@ const ProductDetailsArea = ({ id }) => {
     );
   }
 
-  // Fallback - should not reach here
-  return <ProductError onRetry={refetch} />;
-};
-
-export default ProductDetailsArea;
+  return null;
+}

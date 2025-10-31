@@ -70,29 +70,24 @@ export default function RootLayout({ children }) {
           />
         </noscript>
       </head>
-      <GoogleTagManager gtmId="GTM-MB34NG65" />
       <body
         className={`${lato.variable} ${lato.className} $antialiased flex min-h-screen flex-col`}
         suppressHydrationWarning
       >
-        {/* Wrap ScrollToTop in Suspense - uses usePathname() */}
         <Suspense fallback={null}>
           <ScrollToTop />
         </Suspense>
-        {/* {quattrocento.variable} ${quattrocento.className} */}
 
         <Providers>
           <Wrapper>
             <div className="flex flex-col min-h-screen">
-              {/* Wrap HeaderWrapper in Suspense - uses usePathname() and useRouter() */}
+              {/* HeaderWrapper is cached but still needs Suspense boundary for Cache Components */}
               <Suspense fallback={<div className="h-20" />}>
                 <HeaderWrapper />
               </Suspense>
-              <main className="flex-grow">
+              <main className="grow">
                 <NuqsAdapter>{children}</NuqsAdapter>
               </main>
-              {/* Wrap Footer in Suspense for Cache Components compatibility */}
-              {/* Footer uses connection() to get current year, making it dynamic */}
               <Suspense fallback={<div className="h-64" />}>
                 <Footer />
               </Suspense>
@@ -101,8 +96,6 @@ export default function RootLayout({ children }) {
         </Providers>
 
         <Toaster richColors />
-
-        {/* Tawk.to Script - Simple approach compatible with server components */}
 
         <Script
           id="tawk-to-script"
@@ -135,6 +128,7 @@ export default function RootLayout({ children }) {
               `,
           }}
         />
+        <GoogleTagManager gtmId="GTM-MB34NG65" />
       </body>
     </html>
   );

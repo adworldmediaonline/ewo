@@ -74,12 +74,12 @@ export const productApi = apiSlice.injectEndpoints({
       providesTags: (result, _error, _arg) =>
         result
           ? [
-              ...result.data.map(({ _id }) => ({
-                type: 'Products' as const,
-                id: _id,
-              })),
-              { type: 'Products', id: 'LIST' },
-            ]
+            ...result.data.map(({ _id }) => ({
+              type: 'Products' as const,
+              id: _id,
+            })),
+            { type: 'Products', id: 'LIST' },
+          ]
           : [{ type: 'Products', id: 'LIST' }],
     }),
     getAllProducts: builder.query({

@@ -1,5 +1,5 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 
 // import ProductModal from '@/components/common/product-modal';
@@ -19,12 +19,18 @@ interface WrapperProps {
 const Wrapper = ({ children }: WrapperProps) => {
   // const { productItem } = useSelector((state: any) => state.productModal);
   const dispatch = useDispatch();
+  const hasInitialized = useRef(false);
 
   useEffect(() => {
-    dispatch(get_cart_products());
-    dispatch(get_wishlist_products());
-    dispatch(get_compare_products());
-    dispatch(initialOrderQuantity());
+    // Only load cart products once on initial mount
+    // This prevents resetting the cart confirmation modal state when items are added
+    if (!hasInitialized.current) {
+      dispatch(get_cart_products());
+      dispatch(get_wishlist_products());
+      dispatch(get_compare_products());
+      dispatch(initialOrderQuantity());
+      hasInitialized.current = true;
+    }
   }, [dispatch]);
 
   return (
