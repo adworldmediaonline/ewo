@@ -278,9 +278,12 @@ export const cartSlice = createSlice({
       state.cartMiniOpen = false;
       // Clear any lingering celebration state on page load
       state.firstTimeDiscount.showCelebration = false;
-      // Clear cart confirmation modal state on page load
-      state.showCartConfirmation = false;
-      state.lastAddedProduct = null;
+      // Only clear cart confirmation modal state if it's not currently showing
+      // This preserves the modal state when items are added to cart
+      // The modal will be cleared by hideCartConfirmation action or on user interaction
+      if (!state.showCartConfirmation) {
+        state.lastAddedProduct = null;
+      }
 
       // Restore shipping cost from localStorage first
       const storedShippingCost = getLocalStorage('shipping_cost');
