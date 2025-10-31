@@ -14,6 +14,7 @@ export default async function OrderPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  "use cache";
   const id = (await params).id;
   return (
     <Wrapper>

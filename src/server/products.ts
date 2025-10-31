@@ -3,7 +3,7 @@ import { API_ENDPOINT } from "./api-endpoint";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const getProductsShow = cache(async () => {
-
+  "use cache";
   try {
     const response = await fetch(`${API_BASE_URL}${API_ENDPOINT.PRODUCTS_SHOW}`);
     if (!response.ok) {

@@ -3,8 +3,6 @@ import Wrapper from '@/components/wrapper';
 import { getProductSingle } from '@/server/products';
 import { Metadata } from 'next';
 
-
-
 export const generateMetadata = async (props: {
   params: Promise<{ id: string }>;
 }): Promise<Metadata> => {
@@ -50,6 +48,7 @@ export const generateMetadata = async (props: {
 export default async function ProductDetailsPage(props: {
   params: Promise<{ id: string }>;
 }) {
+  "use cache";
 
   return (
     <Wrapper>
