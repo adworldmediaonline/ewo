@@ -8,6 +8,7 @@ const nextConfig = {
     turbopackFileSystemCacheForDev: true,
   },
   images: {
+    qualities: [75, 85, 90, 95, 100],
     remotePatterns: [
       {
         protocol: 'https',

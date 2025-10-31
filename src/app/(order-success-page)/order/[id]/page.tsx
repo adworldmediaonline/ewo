@@ -1,5 +1,4 @@
 import OrderArea from '@/components/version-tsx/order/order-area';
-import Wrapper from '@/components/wrapper';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -16,9 +15,6 @@ export default async function OrderPage({
 }) {
   "use cache";
   const id = (await params).id;
-  return (
-    <Wrapper>
-      <OrderArea orderId={id} />
-    </Wrapper>
-  );
+  // Wrapper is already in layout.jsx, so we don't need it here
+  return <OrderArea orderId={id} />;
 }

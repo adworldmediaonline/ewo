@@ -1,5 +1,4 @@
 import ProductDetailsArea from '@/components/version-tsx/product-details/product-details-area';
-import Wrapper from '@/components/wrapper';
 import { getProductSingle } from '@/server/products';
 import { Metadata } from 'next';
 
@@ -50,9 +49,6 @@ export default async function ProductDetailsPage(props: {
 }) {
   "use cache";
 
-  return (
-    <Wrapper>
-      <ProductDetailsArea params={props.params} />
-    </Wrapper>
-  );
+  // Wrapper is already in layout.jsx, so we don't need it here
+  return <ProductDetailsArea params={props.params} />;
 }

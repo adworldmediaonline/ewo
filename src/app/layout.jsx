@@ -74,17 +74,20 @@ export default function RootLayout({ children }) {
         suppressHydrationWarning
       >
         <Providers>
-          <Wrapper>
-            <div className="flex flex-col min-h-screen">
-              {/* HeaderWrapper is cached - no Suspense needed, prerenders at build time */}
-              <HeaderWrapper />
-              <main className="grow">
-                <NuqsAdapter>{children}</NuqsAdapter>
-              </main>
-              {/* Footer is now static - no Suspense needed */}
-              <Footer />
-            </div>
-          </Wrapper>
+          {/* Wrapper uses Redux hooks (useDispatch) - wrap in Suspense to allow cached pages to prerender */}
+          <Suspense fallback={null}>
+            <Wrapper>
+              <div className="flex flex-col min-h-screen">
+                {/* HeaderWrapper is cached - no Suspense needed, prerenders at build time */}
+                <HeaderWrapper />
+                <main className="grow">
+                  <NuqsAdapter>{children}</NuqsAdapter>
+                </main>
+                {/* Footer is now static - no Suspense needed */}
+                <Footer />
+              </div>
+            </Wrapper>
+          </Suspense>
         </Providers>
 
         <Toaster richColors />
