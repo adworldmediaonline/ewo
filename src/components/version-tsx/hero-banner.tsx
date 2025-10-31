@@ -21,7 +21,7 @@ export default function HeroBanner({
   desktopTitle = 'EAST WEST OFF ROAD',
   mobileTitle = 'EAST WEST OFF ROAD',
   href = '/shop',
-  // priority = true,
+  priority = true, // Enable priority for LCP optimization
 }: HeroBannerProps) {
   return (
     <section aria-label="Hero banner" className="relative w-full">
@@ -35,9 +35,10 @@ export default function HeroBanner({
             src={desktopPublicId}
             fill
             sizes="100vw"
-            // priority={priority}
+            preload={priority}
             quality={100}
             className="object-cover"
+            fetchPriority="high"
           />
           {/* left gradient for text legibility */}
           <div className="pointer-events-none absolute inset-y-0 left-0 w-[45%] lg:w-[36%] xl:w-[32%] bg-linear-to-r from-black/70 to-transparent" />
@@ -54,10 +55,10 @@ export default function HeroBanner({
             src={mobilePublicId}
             fill
             sizes="100vw"
-            // priority={priority}
-            // preload={true}
+            preload={priority}
             quality={85}
             className="object-cover"
+            fetchPriority="high"
           />
           <div className="pointer-events-none absolute inset-y-0 left-0 w-3/4 sm:w-1/2 bg-linear-to-r from-black/70 to-transparent" />
         </div>
