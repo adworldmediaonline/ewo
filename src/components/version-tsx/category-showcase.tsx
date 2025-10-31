@@ -43,6 +43,7 @@ export default function CategoryShowcase() {
 }
 
 async function GetCategoriesShowItems() {
+  "use cache";
   const categories = await getCategoriesShow();
 
   return (

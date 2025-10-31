@@ -12,8 +12,9 @@ import { getCategoriesShow } from '@/server/categories';
 
 export default async function HeaderV2() {
   "use cache";
-  // Header structure doesn't depend on categories - render immediately
-  // DesktopNavWithCategories is a separate cached component
+  // Fetch categories - cached data
+  const categories = await getCategoriesShow();
+
   return (
     <>
       <header className="sticky top-0 z-50 w-full bg-header text-header-foreground border-b border-border">
@@ -28,8 +29,9 @@ export default async function HeaderV2() {
             </div>
 
             {/* Desktop navigation inline on the same row */}
-            {/* Separate cached component - categories cached, DesktopNav streams in */}
-            {/* DesktopNav uses usePathname() which needs Suspense even though categories are cached */}
+            {/* DesktopNav uses usePathname() which accesses request-time data
+                Even with interleaving pattern, hooks accessing runtime data need Suspense
+                Categories are cached, so Suspense fallback rarely shows */}
             <div className="hidden md:block shrink-0">
               <Suspense
                 fallback={
@@ -39,7 +41,7 @@ export default async function HeaderV2() {
                   </nav>
                 }
               >
-                <DesktopNavWithCategories />
+                <DesktopNav categories={categories || []} />
               </Suspense>
             </div>
 
@@ -73,13 +75,4 @@ export default async function HeaderV2() {
       </header>
     </>
   );
-}
-
-// Separate cached component for DesktopNav with categories
-// This allows HeaderV2 to prerender immediately without blocking on categories
-async function DesktopNavWithCategories() {
-  "use cache";
-  const categories = await getCategoriesShow();
-  // DesktopNav is a client component - can be passed directly to cached component
-  return <DesktopNav categories={categories || []} />;
 }

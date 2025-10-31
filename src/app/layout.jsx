@@ -10,7 +10,6 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { Suspense } from 'react';
 import Footer from '../components/version-tsx/footer';
 import HeaderWrapper from '../components/version-tsx/header-wrapper';
-import ScrollToTop from '../components/version-tsx/scroll-to-top';
 import './globals.css';
 
 export const metadata = {
@@ -74,10 +73,6 @@ export default function RootLayout({ children }) {
         className={`${lato.variable} ${lato.className} $antialiased flex min-h-screen flex-col`}
         suppressHydrationWarning
       >
-        <Suspense fallback={null}>
-          <ScrollToTop />
-        </Suspense>
-
         <Providers>
           <Wrapper>
             <div className="flex flex-col min-h-screen">
@@ -86,11 +81,8 @@ export default function RootLayout({ children }) {
               <main className="grow">
                 <NuqsAdapter>{children}</NuqsAdapter>
               </main>
-              {/* Wrap Footer in Suspense for Cache Components compatibility */}
-              {/* Footer uses connection() to get current year, making it dynamic */}
-              <Suspense fallback={<div className="h-64" />}>
-                <Footer />
-              </Suspense>
+              {/* Footer is now static - no Suspense needed */}
+              <Footer />
             </div>
           </Wrapper>
         </Providers>
