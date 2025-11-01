@@ -22,14 +22,27 @@ const Wrapper = ({ children }: WrapperProps) => {
   const hasInitialized = useRef(false);
 
   useEffect(() => {
-    // Only load cart products once on initial mount
-    // This prevents resetting the cart confirmation modal state when items are added
-    if (!hasInitialized.current) {
-      dispatch(get_cart_products());
-      dispatch(get_wishlist_products());
-      dispatch(get_compare_products());
-      dispatch(initialOrderQuantity());
-      hasInitialized.current = true;
+    // Defer Redux initialization to reduce Total Blocking Time
+    // Use requestIdleCallback to load after initial paint, or fallback to setTimeout
+    const initializeRedux = () => {
+      if (!hasInitialized.current) {
+        dispatch(get_cart_products());
+        dispatch(get_wishlist_products());
+        dispatch(get_compare_products());
+        dispatch(initialOrderQuantity());
+        hasInitialized.current = true;
+      }
+    };
+
+    // Use requestIdleCallback if available (runs when browser is idle)
+    // Fallback to setTimeout for browsers that don't support it
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      const id = requestIdleCallback(initializeRedux, { timeout: 2000 });
+      return () => cancelIdleCallback(id);
+    } else {
+      // Fallback: defer to after first paint (100ms delay)
+      const timeoutId = setTimeout(initializeRedux, 100);
+      return () => clearTimeout(timeoutId);
     }
   }, [dispatch]);
 
