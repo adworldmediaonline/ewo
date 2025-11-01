@@ -1,12 +1,10 @@
-'use client';
-
 import { Button } from '@/components/ui/button';
-import { CldImage } from 'next-cloudinary';
+import Image from 'next/image';
 import Link from 'next/link';
+import ewoDesktop from '../../../public/assets/banners/ewo-desktop.webp';
+import ewoMobile from '../../../public/assets/banners/ewo-mobile.webp';
 
 interface HeroBannerProps {
-  desktopPublicId?: string; // 1920x800
-  mobilePublicId?: string; // 420x170
   desktopTitle?: string;
   mobileTitle?: string;
   href?: string;
@@ -14,10 +12,6 @@ interface HeroBannerProps {
 }
 
 export default function HeroBanner({
-  // desktopPublicId = 'hero-banner-desktop_dja8ci',
-  desktopPublicId = 'EWO_Car_Banner_lz703g',
-  // mobilePublicId = 'hero-banner-mobile_uprqgb',
-  mobilePublicId = 'EWO_Car_Banner_mobile_420x300_px_hfrxlv',
   desktopTitle = 'EAST WEST OFF ROAD',
   mobileTitle = 'EAST WEST OFF ROAD',
   href = '/shop',
@@ -27,12 +21,10 @@ export default function HeroBanner({
     <section aria-label="Hero banner" className="relative w-full">
       {/* Desktop / Large screens */}
       <div className="relative hidden md:block w-full">
-        {/* Aspect ratio ~1920/800 */}
-        {/* <div className="relative w-full aspect-[1920/680]"> */}
         <div className="relative w-full aspect-1920/780">
-          <CldImage
+          <Image
             alt={desktopTitle}
-            src={desktopPublicId}
+            src={ewoDesktop}
             fill
             sizes="100vw"
             preload={priority}
@@ -47,12 +39,10 @@ export default function HeroBanner({
 
       {/* Mobile / Small screens */}
       <div className="relative block md:hidden w-full">
-        {/* Aspect ratio ~420/170 */}
-        {/* <div className="relative w-full aspect-[420/170]"> */}
         <div className="relative w-full aspect-420/300">
-          <CldImage
+          <Image
             alt={mobileTitle}
-            src={mobilePublicId}
+            src={ewoMobile}
             fill
             sizes="100vw"
             preload={priority}
