@@ -36,7 +36,7 @@ export default function HeroBanner({
             fill
             sizes="100vw"
             preload={priority}
-            quality={100}
+            quality={90}
             className="object-cover"
             fetchPriority="high"
           />

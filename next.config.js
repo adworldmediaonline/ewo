@@ -4,10 +4,24 @@ const nextConfig = {
   // This changes the paradigm: routes are dynamic by default, use "use cache" to opt-in to caching
   cacheComponents: true,
   reactCompiler: true,
+
+  // Compiler optimizations
+  compiler: {
+    // Remove console.log in production builds
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'], // Keep error and warn logs
+    } : false,
+  },
+
   experimental: {
     turbopackFileSystemCacheForDev: true,
+    // Optimize package imports for better tree-shaking
+    optimizePackageImports: ['react', 'react-dom', 'lodash', 'lucide-react'],
   },
+
   images: {
+    // Prioritize modern image formats for better compression
+    formats: ['image/avif', 'image/webp'],
     qualities: [75, 85, 90, 95, 100],
     remotePatterns: [
       {
@@ -32,6 +46,9 @@ const nextConfig = {
       },
     ],
   },
+
+  // Enable SWC minification (faster than Terser)
+  swcMinify: true,
 };
 
 module.exports = nextConfig;
