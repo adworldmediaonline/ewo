@@ -2,6 +2,7 @@
 
 import Script from 'next/script';
 import { useEffect } from 'react';
+import { getProductGTIN } from '@/utils/gtin-mapping';
 
 // Extend Window interface for Google APIs
 declare global {
@@ -29,7 +30,7 @@ interface GoogleCustomerReviewsProps {
   email: string;
   deliveryCountry: string;
   estimatedDeliveryDate?: Date | string;
-  products?: Array<{ gtin?: string }>;
+  products?: Array<{ gtin?: string; sku?: string }>;
 }
 
 const GoogleCustomerReviews = ({
@@ -92,10 +93,14 @@ const GoogleCustomerReviews = ({
             return 'US';
           };
 
-          // Build products array with GTINs if available
+          // Build products array with GTINs from actual order data
           const productsArray = products
-            .filter((product) => product.gtin)
-            .map((product) => ({ gtin: product.gtin! }));
+            .map((product) => {
+              // Try to get GTIN from product data or SKU mapping
+              const gtin = getProductGTIN(product.sku, product.gtin);
+              return gtin ? { gtin } : null;
+            })
+            .filter((item): item is { gtin: string } => item !== null);
 
           if (window.gapi && window.gapi.surveyoptin) {
             window.gapi.surveyoptin.render({
