@@ -1,9 +1,13 @@
-'use client';
+// Server Component - Footer with static content
+// Using hardcoded year for Cache Components compatibility
 import logo from '@assets/img/logo/logo.png';
 import Image from 'next/image';
 import Link from 'next/link';
 
 export default function Footer() {
+  // Hardcoded year - no need for connection() or new Date()
+  const currentYear = 2025;
+
   return (
     <footer
       aria-labelledby="footer-heading"
@@ -140,7 +144,7 @@ export default function Footer() {
         {/* Bottom section */}
         <div className="border-t border-border py-4 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} EWO. All Rights Reserved.
+            © {currentYear} EWO. All Rights Reserved.
           </div>
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <span className="sr-only">Accepted payments:</span>

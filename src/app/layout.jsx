@@ -7,9 +7,9 @@ import { Lato } from 'next/font/google';
 import Image from 'next/image';
 import Script from 'next/script';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
+import { Suspense } from 'react';
 import Footer from '../components/version-tsx/footer';
 import HeaderWrapper from '../components/version-tsx/header-wrapper';
-import ScrollToTop from '../components/version-tsx/scroll-to-top';
 import './globals.css';
 
 export const metadata = {
@@ -69,29 +69,28 @@ export default function RootLayout({ children }) {
           />
         </noscript>
       </head>
-      <GoogleTagManager gtmId="GTM-MB34NG65" />
       <body
         className={`${lato.variable} ${lato.className} $antialiased flex min-h-screen flex-col`}
         suppressHydrationWarning
       >
-        <ScrollToTop />
-        {/* {quattrocento.variable} ${quattrocento.className} */}
-
         <Providers>
-          <Wrapper>
-            <div className="flex flex-col min-h-screen">
-              <HeaderWrapper />
-              <main className="flex-grow">
-                <NuqsAdapter>{children}</NuqsAdapter>
-              </main>
-              <Footer />
-            </div>
-          </Wrapper>
+          {/* Wrapper uses Redux hooks (useDispatch) - wrap in Suspense to allow cached pages to prerender */}
+          <Suspense fallback={null}>
+            <Wrapper>
+              <div className="flex flex-col min-h-screen">
+                {/* HeaderWrapper is cached - no Suspense needed, prerenders at build time */}
+                <HeaderWrapper />
+                <main className="grow">
+                  <NuqsAdapter>{children}</NuqsAdapter>
+                </main>
+                {/* Footer is now static - no Suspense needed */}
+                <Footer />
+              </div>
+            </Wrapper>
+          </Suspense>
         </Providers>
 
         <Toaster richColors />
-
-        {/* Tawk.to Script - Simple approach compatible with server components */}
 
         <Script
           id="tawk-to-script"
@@ -124,6 +123,8 @@ export default function RootLayout({ children }) {
               `,
           }}
         />
+
+        <GoogleTagManager gtmId="GTM-MB34NG65" />
       </body>
     </html>
   );

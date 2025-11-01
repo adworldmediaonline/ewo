@@ -1,20 +1,18 @@
 'use client';
 
 import { Search as SearchIcon } from 'lucide-react';
-import * as React from 'react';
 import SearchForm from './search-form';
-
+import { useRef, ReactElement } from 'react';
 export interface HeaderSearchProps {
-  inputRef?: React.RefObject<HTMLInputElement | null>;
   placeholder?: string;
   className?: string;
 }
 
 export function HeaderSearch({
-  inputRef,
   placeholder = 'Search Product',
   className,
-}: HeaderSearchProps): React.ReactElement {
+}: HeaderSearchProps): ReactElement {
+  const inputRef = useRef<HTMLInputElement>(null);
   return (
     <div className={`relative ${className ?? ''}`}>
       <SearchIcon

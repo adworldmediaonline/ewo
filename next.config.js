@@ -1,6 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Enable Cache Components for explicit opt-in caching
+  // This changes the paradigm: routes are dynamic by default, use "use cache" to opt-in to caching
+  cacheComponents: true,
+  reactCompiler: true,
+  experimental: {
+    turbopackFileSystemCacheForDev: true,
+  },
   images: {
+    qualities: [75, 85, 90, 95, 100],
     remotePatterns: [
       {
         protocol: 'https',

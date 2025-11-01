@@ -1,40 +1,19 @@
-'use client';
-
-import { usePathname, useRouter } from 'next/navigation';
-import * as React from 'react';
 
 import { PRIMARY_LINKS } from '@/appdata/navigation';
-import { toSlug } from '@/lib/server-data';
+import { Suspense } from 'react';
+
 import DesktopNav from './desktop-nav';
 import HeaderActions from './header-actions';
 import HeaderBrand from './header-brand';
 import HeaderMenuButton from './header-menu-button';
 import HeaderSearch from './header-search';
-import { CategoryItem as MenuCategoryItem } from './shop-menu-content';
+import { getCategoriesShow } from '@/server/categories';
 
-interface HeaderV2Props {
-  categories?: MenuCategoryItem[];
-}
 
-export default function HeaderV2({
-  categories,
-}: HeaderV2Props): React.ReactElement {
-  const pathname = usePathname();
-  const router = useRouter();
-
-  const mobileSearchRef = React.useRef<HTMLInputElement>(null);
-  const desktopSearchRef = React.useRef<HTMLInputElement>(null);
-
-  function handleCategoryRoute(title: string): void {
-    const slug = toSlug(title);
-    router.push(`/shop?category=${slug}`);
-  }
-
-  function handleChildCategoryRoute(parent: string, child: string): void {
-    const parentSlug = toSlug(parent);
-    const childSlug = toSlug(child);
-    router.push(`/shop?category=${parentSlug}&subcategory=${childSlug}`);
-  }
+export default async function HeaderV2() {
+  "use cache";
+  // Fetch categories - cached data
+  const categories = await getCategoriesShow();
 
   return (
     <>
@@ -50,30 +29,47 @@ export default function HeaderV2({
             </div>
 
             {/* Desktop navigation inline on the same row */}
+            {/* DesktopNav uses usePathname() which accesses request-time data
+                Even with interleaving pattern, hooks accessing runtime data need Suspense
+                Categories are cached, so Suspense fallback rarely shows */}
             <div className="hidden md:block shrink-0">
-              <DesktopNav
-                pathname={pathname}
-                categories={categories || []}
-                onSelectCategory={handleCategoryRoute}
-                onSelectSubcategory={handleChildCategoryRoute}
-              />
+              <Suspense
+                fallback={
+                  <nav aria-label="Primary" className="hidden md:flex items-center gap-2">
+                    <div className="h-6 w-16 animate-pulse rounded bg-muted"></div>
+                    <div className="h-6 w-16 animate-pulse rounded bg-muted"></div>
+                  </nav>
+                }
+              >
+                <DesktopNav categories={categories || []} />
+              </Suspense>
             </div>
 
             {/* Centered search grows to fill remaining space on desktop */}
             <div className="hidden md:block flex-1 px-2">
               <HeaderSearch
-                inputRef={desktopSearchRef}
                 className="w-full max-w-3xl mx-auto"
               />
             </div>
 
             <div className="shrink-0">
-              <HeaderActions />
+              {/* HeaderActions is a client component with hooks - wrap in Suspense */}
+              <Suspense
+                fallback={
+                  <div className="flex items-center gap-2 md:gap-4">
+                    <div className="h-10 w-10 md:h-11 md:w-11 animate-pulse rounded-full bg-muted"></div>
+                    <div className="h-10 w-10 md:h-11 md:w-11 animate-pulse rounded-full bg-muted"></div>
+                    <div className="h-10 w-10 md:h-11 md:w-11 animate-pulse rounded-full bg-muted"></div>
+                  </div>
+                }
+              >
+                <HeaderActions />
+              </Suspense>
             </div>
           </div>
           {/* Mobile search below the row */}
           <div className="md:hidden pb-3">
-            <HeaderSearch inputRef={mobileSearchRef} className="w-full" />
+            <HeaderSearch className="w-full" />
           </div>
         </div>
       </header>

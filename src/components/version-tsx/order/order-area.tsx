@@ -16,6 +16,7 @@ import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useGetUserOrderByIdQuery } from '@/redux/features/order/orderApi';
 import dayjs from 'dayjs';
+import GoogleCustomerReviews from './google-customer-reviews';
 import {
   AlertTriangle,
   ArrowRight,
@@ -249,6 +250,7 @@ export default function OrderArea({ orderId }: { orderId: string }) {
     appliedCoupons = [], // Enhanced: Multiple coupons support
     appliedCoupon, // Legacy: Single coupon support
     paymentIntent, // Payment intent data for Transaction ID and Currency
+    shippingDetails, // Shipping details with estimatedDelivery
   } = order.order;
 
   const orderDate = dayjs(createdAt).format('MMMM D, YYYY');
@@ -324,7 +326,7 @@ export default function OrderArea({ orderId }: { orderId: string }) {
     <div className="min-h-screen bg-background">
       {/* Custom Alert Modal */}
       {showCustomAlert && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-100 p-4">
           <div className="bg-white rounded-lg shadow-2xl max-w-md w-full mx-4">
             <div className="p-6 text-center">
               <div className="w-16 h-16 mx-auto mb-6 bg-blue-100 rounded-full flex items-center justify-center">
@@ -854,6 +856,18 @@ export default function OrderArea({ orderId }: { orderId: string }) {
           Go Back to Shopping
         </Link>
       </Button>
+
+      {/* Google Customer Reviews Opt-in */}
+      {email && orderUniqueId && (
+        <GoogleCustomerReviews
+          merchantId={5595301125}
+          orderId={orderUniqueId}
+          email={email}
+          deliveryCountry={country || 'US'}
+          estimatedDeliveryDate={shippingDetails?.estimatedDelivery}
+          products={cart || []}
+        />
+      )}
     </div>
   );
 }

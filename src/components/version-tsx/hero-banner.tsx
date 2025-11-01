@@ -21,7 +21,7 @@ export default function HeroBanner({
   desktopTitle = 'EAST WEST OFF ROAD',
   mobileTitle = 'EAST WEST OFF ROAD',
   href = '/shop',
-  priority = true,
+  priority = true, // Enable priority for LCP optimization
 }: HeroBannerProps) {
   return (
     <section aria-label="Hero banner" className="relative w-full">
@@ -29,19 +29,19 @@ export default function HeroBanner({
       <div className="relative hidden md:block w-full">
         {/* Aspect ratio ~1920/800 */}
         {/* <div className="relative w-full aspect-[1920/680]"> */}
-        <div className="relative w-full aspect-[1920/780]">
+        <div className="relative w-full aspect-1920/780">
           <CldImage
             alt={desktopTitle}
             src={desktopPublicId}
             fill
             sizes="100vw"
-            priority={priority}
-            // preload={true}
+            preload={priority}
             quality={100}
             className="object-cover"
+            fetchPriority="high"
           />
           {/* left gradient for text legibility */}
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-[45%] lg:w-[36%] xl:w-[32%] bg-gradient-to-r from-black/70 to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-[45%] lg:w-[36%] xl:w-[32%] bg-linear-to-r from-black/70 to-transparent" />
         </div>
       </div>
 
@@ -49,18 +49,18 @@ export default function HeroBanner({
       <div className="relative block md:hidden w-full">
         {/* Aspect ratio ~420/170 */}
         {/* <div className="relative w-full aspect-[420/170]"> */}
-        <div className="relative w-full aspect-[420/300]">
+        <div className="relative w-full aspect-420/300">
           <CldImage
             alt={mobileTitle}
             src={mobilePublicId}
             fill
             sizes="100vw"
-            // priority={priority}
-            // preload={true}
+            preload={priority}
             quality={85}
             className="object-cover"
+            fetchPriority="high"
           />
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-3/4 sm:w-1/2 bg-gradient-to-r from-black/70 to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-3/4 sm:w-1/2 bg-linear-to-r from-black/70 to-transparent" />
         </div>
       </div>
 
