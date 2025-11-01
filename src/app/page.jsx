@@ -5,7 +5,6 @@ import HeroBanner from '@/components/version-tsx/hero-banner';
 
 
 export default async function HomePage() {
-  "use cache";
   return (
     <>
       <HeroBanner />
