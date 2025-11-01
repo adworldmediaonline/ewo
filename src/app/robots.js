@@ -2,8 +2,12 @@ export default function robots() {
   return {
     rules: [
       {
-        userAgent: 'OAI-SearchBot',
-        allow: '/',
+        userAgent: 'Googlebot',
+        disallow: [],
+      },
+      {
+        userAgent: 'Googlebot-image',
+        disallow: [],
       },
       {
         userAgent: '*',

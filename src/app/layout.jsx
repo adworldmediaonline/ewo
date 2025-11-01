@@ -123,6 +123,7 @@ export default function RootLayout({ children }) {
               `,
           }}
         />
+
         <GoogleTagManager gtmId="GTM-MB34NG65" />
       </body>
     </html>
