@@ -15,7 +15,7 @@ export const getActiveBanners = cache(async () => {
     if (!data?.data) {
       throw new Error('No banner found');
     }
-    //
+
     return data?.data || [];
   } catch (error) {
     console.error('Error fetching banner:', error);
