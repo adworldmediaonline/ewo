@@ -1,16 +1,13 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import DetailsThumbWrapper from './details-thumb-wrapper';
 import DetailsWrapper from './details-wrapper';
 import RelatedProducts from './related-products';
+import ProductVideoPlayer from './product-video-player';
 
 export default function ProductDetailsContent({ productItem }) {
   const { _id, img, imageURLs, videoId, status } = productItem || {};
   const [activeImg, setActiveImg] = useState(imageURLs?.[0] || img);
-
-  useEffect(() => {
-    setActiveImg(imageURLs?.[0] || img);
-  }, [img, imageURLs]);
 
   // handle image active
   const handleImageActive = img => {
@@ -46,8 +43,18 @@ export default function ProductDetailsContent({ productItem }) {
         </div>
       </div>
 
+      {/* Product Video Section - Compact spacing */}
+      {videoId && (
+        <div className="mb-12">
+          <ProductVideoPlayer
+            videoId={videoId}
+            productTitle={productItem?.title}
+          />
+        </div>
+      )}
+
       {/* Related Products */}
-      <div className="mt-16">
+      <div className={videoId ? "mt-0" : "mt-16"}>
         <RelatedProducts id={_id} />
       </div>
     </>
