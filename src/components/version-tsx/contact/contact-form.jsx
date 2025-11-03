@@ -214,9 +214,8 @@ export default function ContactPage() {
                           name="name"
                           value={formData.name}
                           onChange={handleChange}
-                          className={`${
-                            errors.name ? 'border-destructive' : ''
-                          }`}
+                          className={`${errors.name ? 'border-destructive' : ''
+                            }`}
                           placeholder="Your full name"
                           maxLength={100}
                         />
@@ -238,9 +237,8 @@ export default function ContactPage() {
                           name="email"
                           value={formData.email}
                           onChange={handleChange}
-                          className={`${
-                            errors.email ? 'border-destructive' : ''
-                          }`}
+                          className={`${errors.email ? 'border-destructive' : ''
+                            }`}
                           placeholder="your.email@example.com"
                         />
                         {errors.email && (
@@ -266,9 +264,8 @@ export default function ContactPage() {
                           name="phone"
                           value={formData.phone}
                           onChange={handleChange}
-                          className={`${
-                            errors.phone ? 'border-destructive' : ''
-                          }`}
+                          className={`${errors.phone ? 'border-destructive' : ''
+                            }`}
                           placeholder="(555) 123-4567"
                         />
                         {errors.phone && (
@@ -292,9 +289,8 @@ export default function ContactPage() {
                           name="subject"
                           value={formData.subject}
                           onChange={handleChange}
-                          className={`${
-                            errors.subject ? 'border-destructive' : ''
-                          }`}
+                          className={`${errors.subject ? 'border-destructive' : ''
+                            }`}
                           placeholder="How can we help you?"
                           maxLength={200}
                         />
@@ -316,9 +312,8 @@ export default function ContactPage() {
                         name="message"
                         value={formData.message}
                         onChange={handleChange}
-                        className={`min-h-[120px] resize-none ${
-                          errors.message ? 'border-destructive' : ''
-                        }`}
+                        className={`min-h-[120px] resize-none ${errors.message ? 'border-destructive' : ''
+                          }`}
                         placeholder="Please describe your inquiry in detail..."
                         rows={6}
                         maxLength={2000}
@@ -384,10 +379,10 @@ export default function ContactPage() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="flex items-start gap-4">
-                    {/* <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
                       <Phone className="w-6 h-6 text-primary" />
-                    </div> */}
-                    {/* <div className="space-y-1">
+                    </div>
+                    <div className="space-y-1">
                       <h4 className="font-semibold text-foreground">Phone</h4>
                       <a
                         href="tel:1-866-396-7623"
@@ -397,7 +392,7 @@ export default function ContactPage() {
                         <br />
                         (396-7623)
                       </a>
-                    </div> */}
+                    </div>
                   </div>
 
                   <div className="flex items-start gap-4">

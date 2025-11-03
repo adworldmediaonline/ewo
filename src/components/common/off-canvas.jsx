@@ -31,9 +31,8 @@ const OffCanvas = ({
   return (
     <>
       <div
-        className={`offcanvas__area offcanvas__radius ${
-          isOffCanvasOpen ? 'offcanvas-opened' : ''
-        }`}
+        className={`offcanvas__area offcanvas__radius ${isOffCanvasOpen ? 'offcanvas-opened' : ''
+          }`}
       >
         <div className="offcanvas__wrapper">
           <div className="offcanvas__close">
@@ -62,9 +61,8 @@ const OffCanvas = ({
               </button>
               <div className="tp-category-mobile-menu">
                 <nav
-                  className={`tp-category-menu-content ${
-                    isCategoryActive ? 'active' : ''
-                  }`}
+                  className={`tp-category-menu-content ${isCategoryActive ? 'active' : ''
+                    }`}
                 >
                   <MobileCategory
                     categoryType={categoryType}
@@ -106,9 +104,8 @@ const OffCanvas = ({
                   Currency : USD
                 </span>
                 <ul
-                  className={`offcanvas__currency-list tp-currency-list ${
-                    isCurrencyActive ? 'tp-currency-list-open' : ''
-                  }`}
+                  className={`offcanvas__currency-list tp-currency-list ${isCurrencyActive ? 'tp-currency-list-open' : ''
+                    }`}
                 >
                   <li>USD</li>
                   <li>ERU</li>
@@ -130,9 +127,8 @@ const OffCanvas = ({
                       English
                     </span>
                     <ul
-                      className={`offcanvas__lang-list tp-lang-list ${
-                        isLanguageActive ? 'tp-lang-list-open' : ''
-                      }`}
+                      className={`offcanvas__lang-list tp-lang-list ${isLanguageActive ? 'tp-lang-list-open' : ''
+                        }`}
                     >
                       <li>Spanish</li>
                       <li>Portugese</li>

@@ -166,17 +166,17 @@ export default function ThankYouPage() {
                     Need immediate assistance?
                   </h2>
                   <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                    {/* <Button
+                    <Button
                       asChild
                       variant="outline"
                       size="default"
                       className="flex items-center gap-2 hover:bg-primary hover:text-primary-foreground transition-all duration-200"
-                    > */}
-                    {/* <a href="tel:1-866-396-7623">
+                    >
+                      <a href="tel:1-866-396-7623">
                         <Phone className="w-4 h-4" />
                         Call 1-866-EWO-ROAD
-                      </a> */}
-                    {/* </Button> */}
+                      </a>
+                    </Button>
                     <Button
                       asChild
                       variant="outline"

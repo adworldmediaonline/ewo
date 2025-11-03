@@ -35,11 +35,11 @@ const ContactArea = () => {
                       <p data-info="mail">
                         <a href="mailto:contact@ewo.com">contact@ewo.com</a>
                       </p>
-                      {/* <p data-info="phone">
+                      <p data-info="phone">
                         <a href="tel:1-866-396-7623">
                           1-866-EWO-ROAD (396-7623)
                         </a>
-                      </p> */}
+                      </p>
                     </div>
                   </div>
                   {/* <div className="tp-contact-info-item">

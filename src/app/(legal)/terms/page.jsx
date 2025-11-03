@@ -341,7 +341,7 @@ export default function TermsPage() {
                         info@eastwestoffroad.com
                       </a>
                     </div>
-                    {/* <div className="flex items-center justify-center gap-2">
+                    <div className="flex items-center justify-center gap-2">
                       <Phone className="w-4 h-4 text-primary" />
                       <a
                         href="tel:1-866-396-7623"
@@ -349,7 +349,7 @@ export default function TermsPage() {
                       >
                         1-866-EWO-ROAD
                       </a>
-                    </div> */}
+                    </div>
                     <div className="flex items-center justify-center gap-2">
                       <MapPin className="w-4 h-4 text-primary" />
                       <span className="text-muted-foreground">
