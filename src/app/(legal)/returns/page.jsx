@@ -222,7 +222,7 @@ export default function ReturnsPage() {
                     </a>
                   </div>
                 </div>
-                {/* <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3">
                   <Phone className="w-5 h-5 text-primary" />
                   <div>
                     <span className="text-sm font-medium text-foreground">
@@ -236,7 +236,7 @@ export default function ReturnsPage() {
                       1-866-EWO-ROAD (396-7623)
                     </a>
                   </div>
-                </div> */}
+                </div>
               </div>
               <div className="space-y-2">
                 <p className="text-muted-foreground leading-relaxed">
@@ -362,7 +362,7 @@ export default function ReturnsPage() {
                         info@eastwestoffroad.com
                       </a>
                     </div>
-                    {/* <div className="flex items-center justify-center gap-2">
+                    <div className="flex items-center justify-center gap-2">
                       <Phone className="w-4 h-4 text-primary" />
                       <a
                         href="tel:1-866-396-7623"
@@ -370,7 +370,7 @@ export default function ReturnsPage() {
                       >
                         1-866-EWO-ROAD
                       </a>
-                    </div> */}
+                    </div>
                     <div className="flex items-center justify-center gap-2">
                       <MapPin className="w-4 h-4 text-primary" />
                       <span className="text-muted-foreground">
