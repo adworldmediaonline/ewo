@@ -20,6 +20,7 @@ export default function robots() {
           '/about',
           '/terms',
           '/returns',
+          '/shipping',
           '/history',
           '/search',
         ],
