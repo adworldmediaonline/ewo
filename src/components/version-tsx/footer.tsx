@@ -105,6 +105,14 @@ export default function Footer() {
               </li>
               <li>
                 <Link
+                  href="/shipping"
+                  className="text-muted-foreground hover:text-primary-foreground"
+                >
+                  Shipping Policy
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/history"
                   className="text-muted-foreground hover:text-primary-foreground"
                 >
