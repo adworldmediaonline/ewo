@@ -1,9 +1,8 @@
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
-import ewoDesktop from '../../../public/assets/banners/ewo-desktop.webp';
-import ewoMobile from '../../../public/assets/banners/ewo-mobile.webp';
-import { getActiveBanners } from '@/server/banner';
+import ewoDesktop from '../../../public/assets/banners/ewo-desktop.png';
+import ewoMobile from '../../../public/assets/banners/ewo-mobile.png';
 
 interface HeroBannerProps {
   desktopTitle?: string;
