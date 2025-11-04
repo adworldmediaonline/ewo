@@ -34,9 +34,8 @@ const StarRating = ({
     stars.push(
       <Star
         key={`full-${i}`}
-        className={`${
-          size === 'sm' ? 'h-3 w-3' : 'h-4 w-4'
-        } fill-yellow-400 text-yellow-400`}
+        className={`${size === 'sm' ? 'h-3 w-3' : 'h-4 w-4'
+          } fill-yellow-400 text-yellow-400`}
       />
     );
   }
@@ -50,9 +49,8 @@ const StarRating = ({
         />
         <div className="absolute inset-0 overflow-hidden">
           <Star
-            className={`${
-              size === 'sm' ? 'h-3 w-3' : 'h-4 w-4'
-            } fill-yellow-400 text-yellow-400`}
+            className={`${size === 'sm' ? 'h-3 w-3' : 'h-4 w-4'
+              } fill-yellow-400 text-yellow-400`}
             style={{ clipPath: 'inset(0 50% 0 0)' }}
           />
         </div>
@@ -133,7 +131,7 @@ export default function ProductCard({
   const averageRating =
     product.reviews && product.reviews.length > 0
       ? product.reviews.reduce((sum, review) => sum + review.rating, 0) /
-        product.reviews.length
+      product.reviews.length
       : 0;
 
   // Calculate final price with selected option
@@ -200,7 +198,7 @@ export default function ProductCard({
                   {Math.round(
                     ((product.price - product.finalPriceDiscount!) /
                       product.price) *
-                      100
+                    100
                   )}
                   %
                 </Badge>
@@ -224,9 +222,8 @@ export default function ProductCard({
                   alt={product.title}
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className={`object-contain transition-transform duration-300 ${
-                    isHovered ? 'scale-105' : 'scale-100'
-                  }`}
+                  className={`object-contain transition-transform duration-300 ${isHovered ? 'scale-105' : 'scale-100'
+                    }`}
                   onLoad={() => setIsImageLoading(false)}
                   priority={false}
                 />
@@ -243,44 +240,39 @@ export default function ProductCard({
 
               {/* Quick Action Buttons */}
               <div
-                className={`absolute inset-0 bg-black/20 opacity-0 transition-opacity duration-300 ${
-                  isHovered ? 'opacity-100' : ''
-                }`}
+                className={`absolute inset-0 bg-black/20 opacity-0 transition-opacity duration-300 ${isHovered ? 'opacity-100' : ''
+                  }`}
               >
                 <div className="absolute right-2 top-2 flex flex-col gap-2">
                   <Button
                     size="icon"
                     variant="outline"
                     rounded="full"
-                    className={`h-8 w-8 ${
-                      isAddedToWishlist
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-white/90 hover:bg-white'
-                    }`}
+                    className={`h-8 w-8 ${isAddedToWishlist
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-white/90 hover:bg-white'
+                      }`}
                     onClick={handleAddToWishlist}
                   >
                     <Heart
-                      className={`h-4 w-4 ${
-                        isAddedToWishlist ? 'fill-current' : ''
-                      }`}
+                      className={`h-4 w-4 ${isAddedToWishlist ? 'fill-current' : ''
+                        }`}
                     />
                   </Button>
                   <Button
                     size="icon"
                     variant="outline"
                     rounded="full"
-                    className={`h-8 w-8 ${
-                      isAddedToCart
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-white/90 hover:bg-white'
-                    }`}
+                    className={`h-8 w-8 ${isAddedToCart
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-white/90 hover:bg-white'
+                      }`}
                     onClick={handleAddToCart}
                     disabled={product.status === 'out-of-stock'}
                   >
                     <ShoppingCart
-                      className={`h-4 w-4 ${
-                        isAddedToCart ? 'fill-current' : ''
-                      }`}
+                      className={`h-4 w-4 ${isAddedToCart ? 'fill-current' : ''
+                        }`}
                     />
                   </Button>
                 </div>
