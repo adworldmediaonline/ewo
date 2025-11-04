@@ -4,7 +4,6 @@ import { Toaster } from '@/components/ui/sonner';
 import Wrapper from '@/components/wrapper';
 import { GoogleTagManager } from '@next/third-parties/google';
 import { Lato } from 'next/font/google';
-import Image from 'next/image';
 import Script from 'next/script';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { Suspense } from 'react';
@@ -42,16 +41,16 @@ const lato = Lato({
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <head>
-        {/* Resource Hints for Performance */}
+    <html lang="en" suppressHydrationWarning>
+      {/* <head>
+
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
         <link rel="dns-prefetch" href="https://embed.tawk.to" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://connect.facebook.net" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
 
-        {/* Meta Pixel Noscript (must be in head for proper tracking) */}
+
         <noscript>
           <Image
             height={1}
@@ -61,22 +60,19 @@ export default function RootLayout({ children }) {
             alt=""
           />
         </noscript>
-      </head>
+      </head> */}
       <body
-        className={`${lato.variable} ${lato.className} $antialiased flex min-h-screen flex-col`}
+        className={`${lato.variable} ${lato.className} antialiased flex min-h-screen flex-col`}
         suppressHydrationWarning
       >
         <Providers>
-          {/* Wrapper uses Redux hooks (useDispatch) - wrap in Suspense to allow cached pages to prerender */}
           <Suspense fallback={null}>
             <Wrapper>
               <div className="flex flex-col min-h-screen">
-                {/* HeaderWrapper is cached - no Suspense needed, prerenders at build time */}
                 <HeaderWrapper />
                 <main className="grow">
                   <NuqsAdapter>{children}</NuqsAdapter>
                 </main>
-                {/* Footer is now static - no Suspense needed */}
                 <Footer />
               </div>
             </Wrapper>
@@ -85,7 +81,6 @@ export default function RootLayout({ children }) {
 
         <Toaster richColors />
 
-        {/* Meta Pixel Code - Load after page becomes interactive */}
         <Script
           id="meta-pixel"
           strategy="afterInteractive"
@@ -105,7 +100,6 @@ export default function RootLayout({ children }) {
           }}
         />
 
-        {/* Tawk.to Chat Widget - Load lazily (chat doesn't need to load immediately) */}
         <Script
           id="tawk-to-script"
           strategy="lazyOnload"
