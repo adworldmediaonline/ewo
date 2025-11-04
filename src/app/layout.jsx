@@ -42,25 +42,16 @@ const lato = Lato({
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      {/* <head>
+      <head>
+        {/* Preconnect to image CDNs for faster LCP */}
+        <link rel="preconnect" href="https://res.cloudinary.com" />
+        <link rel="preconnect" href="https://i.ibb.co" />
 
+        {/* DNS prefetch for third-party scripts */}
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
         <link rel="dns-prefetch" href="https://embed.tawk.to" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
-        <link rel="preconnect" href="https://connect.facebook.net" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
-
-
-        <noscript>
-          <Image
-            height={1}
-            width={1}
-            style={{ display: 'none' }}
-            src="https://www.facebook.com/tr?id=595879356450357&ev=PageView&noscript=1"
-            alt=""
-          />
-        </noscript>
-      </head> */}
+      </head>
       <body
         className={`${lato.variable} ${lato.className} antialiased flex min-h-screen flex-col`}
         suppressHydrationWarning
