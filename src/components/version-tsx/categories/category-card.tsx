@@ -17,8 +17,9 @@ export interface CategoryItem {
 }
 interface CategoryCardProps {
   item: CategoryItem;
+  index?: number;
 }
-export const CategoryCard = ({ item }: CategoryCardProps) => {
+export const CategoryCard = ({ item, index = 0 }: CategoryCardProps) => {
   const router = useRouter();
   const hasImage = Boolean(item.img);
   const childLabels = Array.isArray(item.children)
@@ -57,7 +58,8 @@ export const CategoryCard = ({ item }: CategoryCardProps) => {
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
                 className="object-contain"
-                priority={false}
+                loading={index < 4 ? 'eager' : 'lazy'}
+                fetchPriority={index < 2 ? 'high' : undefined}
               />
             </div>
           ) : (
