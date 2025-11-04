@@ -369,7 +369,7 @@ export default function ShopContentWrapper({
       const optionChanged =
         existingProduct &&
         JSON.stringify(existingProduct.selectedOption) !==
-          JSON.stringify(selectedOption);
+        JSON.stringify(selectedOption);
 
       // Get current quantity from existing product
       const currentQty = existingProduct ? existingProduct.orderQuantity : 0;
@@ -380,10 +380,9 @@ export default function ShopContentWrapper({
       // If product has quantity limitation and requested quantity exceeds available
       if (product.quantity && finalQuantity > product.quantity) {
         notifyError(
-          `Sorry, only ${product.quantity} items available. ${
-            existingProduct
-              ? `You already have ${currentQty} in your cart.`
-              : ''
+          `Sorry, only ${product.quantity} items available. ${existingProduct
+            ? `You already have ${currentQty} in your cart.`
+            : ''
           }`
         );
         return;
@@ -404,9 +403,9 @@ export default function ShopContentWrapper({
         // If an option is selected, update the final price to include the option price
         finalPrice: selectedOption
           ? (
-              Number(product.finalPriceDiscount || product.price) +
-              Number(selectedOption.price)
-            ).toFixed(2)
+            Number(product.finalPriceDiscount || product.price) +
+            Number(selectedOption.price)
+          ).toFixed(2)
           : undefined,
       };
 
@@ -547,9 +546,8 @@ export default function ShopContentWrapper({
                       <Label className="text-sm font-medium">Sort By</Label>
                       <Select
                         onValueChange={handleMobileSortChange}
-                        value={`${getDisplayFilters().sortBy}-${
-                          getDisplayFilters().sortOrder
-                        }`}
+                        value={`${getDisplayFilters().sortBy}-${getDisplayFilters().sortOrder
+                          }`}
                       >
                         <SelectTrigger className="w-full h-9">
                           <SelectValue placeholder="Select sort option" />
@@ -675,7 +673,7 @@ export default function ShopContentWrapper({
                                   ? 'category'
                                   : '',
                                 pendingFilters!.sortBy !== filters.sortBy ||
-                                pendingFilters!.sortOrder !== filters.sortOrder
+                                  pendingFilters!.sortOrder !== filters.sortOrder
                                   ? 'sort'
                                   : '',
                               ].filter(Boolean).length
@@ -741,6 +739,7 @@ export default function ShopContentWrapper({
                       product={product}
                       onAddToCart={handleAddToCart}
                       onAddToWishlist={handleAddToWishlist}
+                      index={index}
                     />
                   ))}
 
