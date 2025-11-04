@@ -737,7 +737,6 @@ export default function ShopContentWrapper({
                     <ProductCard
                       key={`${product._id}-${currentPage}-${index}`}
                       product={product}
-                      index={index}
                       onAddToCart={handleAddToCart}
                       onAddToWishlist={handleAddToWishlist}
                     />

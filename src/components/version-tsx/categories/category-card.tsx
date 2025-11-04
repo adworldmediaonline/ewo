@@ -59,7 +59,7 @@ export const CategoryCard = ({ item, index = 0 }: CategoryCardProps) => {
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
                 className="object-contain"
                 loading={index < 4 ? 'eager' : 'lazy'}
-                fetchPriority={index < 4 ? 'high' : undefined}
+                fetchPriority={index < 2 ? 'high' : undefined}
               />
             </div>
           ) : (

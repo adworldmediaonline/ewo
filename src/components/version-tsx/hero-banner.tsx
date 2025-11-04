@@ -19,11 +19,13 @@ export default async function HeroBanner() {
             alt={banner.heading || 'Hero banner'}
             fill
             preload={true}
-            loading="eager"
-            fetchPriority="high"
-            quality={75}
+            // loading="eager"
+            quality={85}
             sizes="100vw"
             className="hidden md:block object-cover"
+            style={{
+              objectPosition: 'center',
+            }}
           />
 
           {/* Mobile Banner - Optimized for LCP */}
@@ -32,11 +34,13 @@ export default async function HeroBanner() {
             alt={banner.heading || 'Hero banner'}
             fill
             preload={true}
-            loading="eager"
-            fetchPriority="high"
-            quality={75}
+            // loading="eager"
+            quality={85}
             sizes="100vw"
             className="block md:hidden object-cover"
+            style={{
+              objectPosition: 'center',
+            }}
           />
 
           {/* Overlay Gradient - Optimized for performance */}

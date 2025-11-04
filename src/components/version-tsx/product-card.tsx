@@ -105,14 +105,12 @@ interface ProductCardProps {
   product: Product;
   onAddToCart?: (product: Product, selectedOption?: any) => void;
   onAddToWishlist?: (product: Product) => void;
-  index?: number; // Add index prop for optimized loading
 }
 
 export default function ProductCard({
   product,
   onAddToCart,
   onAddToWishlist,
-  index = 999, // Default high value for lazy loading
 }: ProductCardProps): React.ReactElement {
   const [isImageLoading, setIsImageLoading] = React.useState(true);
   const [isHovered, setIsHovered] = React.useState(false);
@@ -227,8 +225,7 @@ export default function ProductCard({
                   className={`object-contain transition-transform duration-300 ${isHovered ? 'scale-105' : 'scale-100'
                     }`}
                   onLoad={() => setIsImageLoading(false)}
-                  loading={index < 8 ? 'eager' : 'lazy'}
-                  fetchPriority={index < 2 ? 'high' : undefined}
+                  priority={false}
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-muted">
