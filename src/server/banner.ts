@@ -7,7 +7,20 @@ export const getActiveBanners = cache(async () => {
   "use cache";
   cacheLife('days')
   try {
-    const response = await fetch(`${API_BASE_URL}${API_ENDPOINT.BANNER}`);
+    // Add timeout to prevent long delays
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+
+    const response = await fetch(`${API_BASE_URL}${API_ENDPOINT.BANNER}`, {
+      signal: controller.signal,
+      next: { revalidate: 86400 }, // Cache for 24 hours
+      headers: {
+        'Cache-Control': 'max-age=86400',
+      },
+    });
+
+    clearTimeout(timeoutId);
+
     if (!response.ok) {
       throw new Error('Failed to fetch banner');
     }
