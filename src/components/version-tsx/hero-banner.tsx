@@ -4,69 +4,77 @@ import Link from 'next/link';
 import { getActiveBanners } from '@/server/banner';
 import { ArrowRight } from 'lucide-react';
 
-interface HeroBannerProps {
-  desktopTitle?: string;
-  mobileTitle?: string;
-  href?: string;
-  priority?: boolean;
-}
-
 export default async function HeroBanner() {
   const banners = await getActiveBanners();
 
-
   const banner = banners.length > 0 ? banners[0] : null;
 
-
   return (
-
     <>
       {banner && (
         <section className="relative w-full h-[450px] md:h-[550px] lg:h-[600px] overflow-hidden">
-          {/* Next.js Image Component - Optimized with best practices */}
+          {/* Desktop Banner - Optimized for LCP */}
           <Image
-            src={banner?.desktopImg}
-            alt="Modern shopping experience - Discover your favorite products"
+            src={banner.desktopImg}
+            alt={banner.heading || 'Hero banner'}
             fill
-            priority
-            quality={90}
+            preload={true}
+            loading="eager"
+            quality={85}
             sizes="100vw"
-            className="object-cover"
+            className="hidden md:block object-cover"
             style={{
-              objectPosition: "center",
+              objectPosition: 'center',
             }}
           />
 
-          {/* Overlay Gradient - Responsive opacity */}
-          <div className="absolute inset-0 bg-linear-to-r from-black/80 via-black/60 to-black/40 md:from-black/70 md:via-black/50 md:to-black/30" />
+          {/* Mobile Banner - Optimized for LCP */}
+          <Image
+            src={banner.mobileImg}
+            alt={banner.heading || 'Hero banner'}
+            fill
+            preload={true}
+            loading="eager"
+            quality={85}
+            sizes="100vw"
+            className="block md:hidden object-cover"
+            style={{
+              objectPosition: 'center',
+            }}
+          />
+
+          {/* Overlay Gradient - Optimized for performance */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
 
           {/* Content Overlay */}
           <div className="relative z-10 h-full flex items-center">
             <div className="container mx-auto px-6 lg:px-8">
-              <div className="max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-1000">
+              <div className="max-w-2xl">
                 {/* Title */}
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-2 md:mb-3 leading-tight">
-                  {banner?.heading}
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-2 md:mb-3 leading-tight drop-shadow-lg">
+                  {banner.heading}
                 </h1>
 
                 {/* Subtitle */}
-                <h2 className="text-xl md:text-2xl lg:text-3xl font-semibold text-white/90 mb-4 md:mb-6">
-                  {banner?.description}
+                <h2 className="text-xl md:text-2xl lg:text-3xl font-semibold text-white/90 mb-4 md:mb-6 drop-shadow-md">
+                  {banner.description}
                 </h2>
 
                 {/* Description */}
-                <p className="text-lg md:text-xl lg:text-2xl text-white/90 mb-6 md:mb-8 leading-relaxed font-medium">
-                  {banner?.smallSubDescription}
-                </p>
+                {banner.smallSubDescription && (
+                  <p className="text-lg md:text-xl lg:text-2xl text-white/90 mb-6 md:mb-8 leading-relaxed font-medium drop-shadow-md">
+                    {banner.smallSubDescription}
+                  </p>
+                )}
 
                 {/* CTA Button */}
                 <Button
                   asChild
                   size="lg"
-                  className="bg-primary text-white hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-200 shadow-xl text-base md:text-lg  h-auto group py-2.5"
+                  className="bg-primary text-white hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all duration-200 shadow-xl text-base md:text-lg h-auto group py-2.5"
                 >
-                  <Link href={banner?.cta?.link || '/shop'} className="inline-flex items-center gap-2">
-                    {banner?.cta?.text}
+                  <Link href={banner.cta?.link || '/shop'} className="inline-flex items-center gap-2">
+                    {banner.cta.text}
                     <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </Button>
@@ -74,8 +82,8 @@ export default async function HeroBanner() {
             </div>
           </div>
 
-          {/* Decorative Bottom Gradient */}
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-black/20 to-transparent pointer-events-none" />
+          {/* Decorative Bottom Gradient - Subtle enhancement */}
+          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/15 to-transparent pointer-events-none" />
         </section>
       )}
       {!banner && (
