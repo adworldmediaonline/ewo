@@ -48,8 +48,8 @@ async function GetCategoriesShowItems() {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
-      {categories.map((item: CategoryItem) => (
-        <CategoryCard key={item._id} item={item} />
+      {categories.map((item: CategoryItem, index: number) => (
+        <CategoryCard key={item._id} item={item} index={index} />
       ))}
     </div>
   );
