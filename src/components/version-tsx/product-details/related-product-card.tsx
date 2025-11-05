@@ -3,11 +3,12 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Heart, ShoppingCart, Star } from 'lucide-react';
+import { Heart, ShoppingCart, Star, Ticket } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
 import { useSelector } from 'react-redux';
+import { useProductCoupon } from '@/hooks/useProductCoupon';
 
 // Star rating component
 const StarRating = ({
@@ -107,6 +108,9 @@ export default function RelatedProductCard({
   const { cart_products } = useSelector((state: any) => state.cart);
   const { wishlist } = useSelector((state: any) => state.wishlist);
 
+  // Get coupon information for this product
+  const { hasCoupon, couponPercentage } = useProductCoupon(product._id);
+
   const isAddedToCart = cart_products.some(
     (prd: any) => prd._id === product._id
   );
@@ -142,24 +146,37 @@ export default function RelatedProductCard({
       <Link href={`/product/${product.slug || product._id}`} className="block">
         <CardContent className="p-0">
           <div className="relative aspect-square overflow-hidden p-1">
-            {/* Discount Badge */}
-            {product.finalPriceDiscount &&
-              product.finalPriceDiscount < product.price && (
+            {/* Left Side Badges - Stacked vertically */}
+            <div className="absolute left-2 top-2 z-10 flex flex-col gap-2">
+              {/* Discount Badge */}
+              {product.finalPriceDiscount &&
+                product.finalPriceDiscount < product.price && (
+                  <Badge
+                    variant="destructive"
+                    className="shadow-md"
+                  >
+                    -
+                    {Math.round(
+                      ((product.price - product.finalPriceDiscount!) /
+                        product.price) *
+                      100
+                    )}
+                    %
+                  </Badge>
+                )}
+
+              {/* Coupon Badge */}
+              {hasCoupon && couponPercentage && (
                 <Badge
-                  variant="destructive"
-                  className="absolute left-2 top-2 z-10"
+                  className="bg-gradient-to-r from-emerald-500 to-green-500 text-white border-0 shadow-lg flex items-center gap-1 px-2 py-1"
                 >
-                  -
-                  {Math.round(
-                    ((product.price - product.finalPriceDiscount!) /
-                      product.price) *
-                    100
-                  )}
-                  %
+                  <Ticket className="h-3 w-3" />
+                  <span className="font-bold">{couponPercentage}% OFF</span>
                 </Badge>
               )}
+            </div>
 
-            {/* Status Badge */}
+            {/* Status Badge - Top Right */}
             {product.status === 'out-of-stock' && (
               <Badge
                 variant="secondary"
