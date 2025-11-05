@@ -369,8 +369,8 @@ export default function CartMiniSidebar() {
                 ✕
               </button>
             </div>
-            {/* First-time discount banner */}
-            {firstTimeDiscount.isApplied && (
+            {/* First-time discount banner - Only show when NO coupons are applied */}
+            {firstTimeDiscount.isApplied && applied_coupons.length === 0 && (
               <div className="">
                 <div className="">
                   <span className="">🎉</span>
@@ -506,20 +506,63 @@ export default function CartMiniSidebar() {
 
           {/* Essential Checkout Section - Always Visible */}
           <div className="">
-            {/* Applied Coupons Section - Simple Display */}
+            {/* Applied Coupons Section - Beautiful Banner */}
             {applied_coupons.length > 0 && (
               <div className="mb-3">
-                <div className="space-y-1">
-                  {applied_coupons.map((coupon, index) => (
-                    <div key={coupon.couponCode || index} className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-md">
-                      <span className="text-xs text-green-800 dark:text-green-200 font-semibold">
-                        {coupon.couponCode}
-                      </span>
-                      <span className="text-xs text-green-700 dark:text-green-300 font-medium">
-                        Applied
-                      </span>
-                    </div>
-                  ))}
+                <div className="space-y-2">
+                  {applied_coupons.map((coupon, index) => {
+                    // Calculate discount percentage if available
+                    const cartSubtotal = cart_products.reduce((total, item) => {
+                      return total + (Number(item.price || 0) * Number(item.orderQuantity || 1));
+                    }, 0);
+                    const discountPercent = coupon.discountType === 'percentage' && coupon.discountPercentage
+                      ? coupon.discountPercentage
+                      : coupon.discount && cartSubtotal > 0
+                      ? ((coupon.discount / cartSubtotal) * 100).toFixed(1)
+                      : null;
+
+                    return (
+                      <div
+                        key={coupon.couponCode || index}
+                        className="relative overflow-hidden bg-gradient-to-r from-emerald-500 to-green-500 rounded-lg p-2.5 shadow-md"
+                      >
+                        {/* Decorative corner */}
+                        <div className="absolute top-0 right-0 w-12 h-12 bg-white/10 rounded-bl-full" />
+
+                        <div className="relative flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="bg-white/20 backdrop-blur-sm rounded-full p-1">
+                              <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            </div>
+                            <div>
+                              <p className="text-xs font-bold text-white uppercase tracking-wide">
+                                {coupon.couponCode}
+                              </p>
+                              <p className="text-[9px] text-white/90 font-medium">
+                                Applied
+                              </p>
+                            </div>
+                          </div>
+                          {discountPercent && (
+                            <div className="bg-white rounded-full px-2 py-0.5">
+                              <span className="text-xs font-extrabold text-emerald-600">
+                                {discountPercent}% OFF
+                              </span>
+                            </div>
+                          )}
+                          {!discountPercent && (
+                            <div className="bg-white rounded-full px-2 py-0.5">
+                              <span className="text-xs font-extrabold text-emerald-600">
+                                -${coupon.discount?.toFixed(2)}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -567,8 +610,8 @@ export default function CartMiniSidebar() {
                 </div>
               )}
 
-              {/* First-time discount */}
-              {firstTimeDiscount.isApplied && (
+              {/* First-time discount - Only show when NO coupons are applied */}
+              {firstTimeDiscount.isApplied && applied_coupons.length === 0 && (
                 <div className=" ">
                   <span>
                     First-time discount (-{firstTimeDiscount.percentage}%):

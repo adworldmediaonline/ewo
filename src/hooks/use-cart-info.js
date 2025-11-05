@@ -11,6 +11,7 @@ const useCartInfo = () => {
   const { cart_products, totalShippingCost, firstTimeDiscount } = useSelector(
     state => state.cart
   );
+  const { applied_coupons } = useSelector(state => state.coupon);
 
   useEffect(() => {
     const cart = cart_products.reduce(
@@ -33,8 +34,11 @@ const useCartInfo = () => {
     setQuantity(cart.quantity);
 
     // Calculate first-time discount amount
+    // IMPORTANT: First-time discount is NOT applied when coupons are active
     let discountAmount = 0;
-    if (firstTimeDiscount.isApplied && cart.total > 0) {
+    const hasCouponsApplied = applied_coupons && applied_coupons.length > 0;
+    
+    if (firstTimeDiscount.isApplied && cart.total > 0 && !hasCouponsApplied) {
       discountAmount = (cart.total * firstTimeDiscount.percentage) / 100;
     }
     setFirstTimeDiscountAmount(discountAmount);
@@ -43,7 +47,7 @@ const useCartInfo = () => {
     const finalTotal = cart.total - discountAmount;
     setTotal(finalTotal);
     setTotalWithShipping(finalTotal + totalShippingCost);
-  }, [cart_products, totalShippingCost, firstTimeDiscount]);
+  }, [cart_products, totalShippingCost, firstTimeDiscount, applied_coupons]);
 
   return {
     quantity,

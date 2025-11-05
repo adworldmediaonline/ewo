@@ -48,6 +48,7 @@ interface AppliedCoupon {
   couponCode: string;
   discount: number;
   discountType: string;
+  discountPercentage?: number;
   title?: string;
 }
 
@@ -525,24 +526,61 @@ export default function CartDropdown({
               ))}
             </div>
 
-            {/* Coupon Section - Applied Coupons Only */}
+            {/* Coupon Section - Beautiful Applied Coupons Banner */}
             {applied_coupons.length > 0 && (
               <div className="px-3 py-2 border-t border-border/60">
-                <div className="space-y-1">
+                <div className="space-y-2">
                   {applied_coupons.map(
-                    (coupon: AppliedCoupon, index: number) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-md"
-                      >
-                        <span className="text-xs text-green-800 dark:text-green-200 font-semibold">
-                          {coupon.couponCode}
-                        </span>
-                        <span className="text-xs text-green-700 dark:text-green-300 font-medium">
-                          Applied
-                        </span>
-                      </div>
-                    )
+                    (coupon: AppliedCoupon, index: number) => {
+                      // Calculate discount percentage if available
+                      const discountPercent = coupon.discountType === 'percentage' && coupon.discountPercentage
+                        ? coupon.discountPercentage
+                        : coupon.discount && subtotal > 0
+                        ? ((coupon.discount / subtotal) * 100).toFixed(1)
+                        : null;
+
+                      return (
+                        <div
+                          key={index}
+                          className="relative overflow-hidden bg-gradient-to-r from-emerald-500 to-green-500 rounded-lg p-3 shadow-md"
+                        >
+                          {/* Decorative corner */}
+                          <div className="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-bl-full" />
+
+                          <div className="relative flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div className="bg-white/20 backdrop-blur-sm rounded-full p-1.5">
+                                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                              </div>
+                              <div>
+                                <p className="text-xs font-bold text-white uppercase tracking-wide">
+                                  {coupon.couponCode}
+                                </p>
+                                <p className="text-[10px] text-white/90 font-medium">
+                                  Applied Successfully
+                                </p>
+                              </div>
+                            </div>
+                            {discountPercent && (
+                              <div className="bg-white rounded-full px-2.5 py-1">
+                                <span className="text-xs font-extrabold text-emerald-600">
+                                  {discountPercent}% OFF
+                                </span>
+                              </div>
+                            )}
+                            {!discountPercent && (
+                              <div className="bg-white rounded-full px-2.5 py-1">
+                                <span className="text-xs font-extrabold text-emerald-600">
+                                  -${coupon.discount?.toFixed(2)}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    }
                   )}
                 </div>
               </div>
@@ -559,7 +597,8 @@ export default function CartDropdown({
                   ).toFixed(2)}
                 </span>
               </div>
-              {firstTimeDiscount?.isApplied && (
+              {/* Only show first-time discount when NO coupons are applied */}
+              {firstTimeDiscount?.isApplied && applied_coupons.length === 0 && (
                 <div className="flex items-center justify-between text-emerald-700">
                   <span>
                     First-time discount (-{firstTimeDiscount?.percentage}%)

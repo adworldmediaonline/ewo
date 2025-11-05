@@ -248,6 +248,7 @@ export const autoApplyCoupon = async ({
           couponCode: couponData.couponCode || firstAvailableCoupon.couponCode,
           discount: couponData.discount || 0,
           discountType: couponData.discountType || firstAvailableCoupon.discountType,
+          discountPercentage: couponData.discountPercentage || firstAvailableCoupon.discountPercentage,
           title: couponData.title || firstAvailableCoupon.title || couponData.couponCode,
         })
       );
@@ -265,6 +266,7 @@ export const autoApplyCoupon = async ({
             couponCode: couponData.couponCode,
             discount: couponData.discount || 0,
             discountType: couponData.discountType,
+            discountPercentage: couponData.discountPercentage,
             title: couponData.title || couponData.couponCode,
           })
         );

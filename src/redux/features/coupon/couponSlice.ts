@@ -10,6 +10,7 @@ interface Coupon {
   endTime: string;
   discount?: number;
   applicableProducts: any[];
+  title?: string;
 }
 
 interface CouponState {
