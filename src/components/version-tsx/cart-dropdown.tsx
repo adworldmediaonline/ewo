@@ -525,78 +525,28 @@ export default function CartDropdown({
               ))}
             </div>
 
-            {/* Coupon Section */}
-            <div className="px-3 py-2 border-t border-border/60">
-              {/* Auto-filled coupon message */}
-              {autoFilledCoupon && (
-                <div className="mb-2 p-2 bg-gradient-to-r from-emerald-50 to-blue-50 border border-emerald-200 rounded-md">
-                  <div className="flex items-center gap-2">
-                    <span className="text-emerald-600 text-xs">🎯</span>
-                    <span className="text-xs text-emerald-700 font-medium">
-                      Best Coupon Found! Click Apply to save{' '}
-                      {autoFilledCoupon.discountPercentage
-                        ? `${autoFilledCoupon.discountPercentage}%`
-                        : autoFilledCoupon.discountAmount
-                        ? `$${autoFilledCoupon.discountAmount}`
-                        : 'money'}{' '}
-                      on your order
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {/* Applied Coupons */}
-              {applied_coupons.length > 0 && (
-                <div className="mb-2 space-y-1">
+            {/* Coupon Section - Applied Coupons Only */}
+            {applied_coupons.length > 0 && (
+              <div className="px-3 py-2 border-t border-border/60">
+                <div className="space-y-1">
                   {applied_coupons.map(
                     (coupon: AppliedCoupon, index: number) => (
                       <div
                         key={index}
-                        className="flex items-center justify-between p-2 bg-emerald-50 border border-emerald-200 rounded-md"
+                        className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-md"
                       >
-                        <span className="text-xs text-emerald-700 font-medium">
+                        <span className="text-xs text-green-800 dark:text-green-200 font-semibold">
                           {coupon.couponCode}
                         </span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-emerald-600">
-                            -${coupon.discount || 0}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleRemoveCoupon(coupon.couponCode)
-                            }
-                            className="text-emerald-500 hover:text-emerald-700 text-xs"
-                          >
-                            ×
-                          </button>
-                        </div>
+                        <span className="text-xs text-green-700 dark:text-green-300 font-medium">
+                          Applied
+                        </span>
                       </div>
                     )
                   )}
                 </div>
-              )}
-
-              {/* Coupon Input */}
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={couponCode}
-                  onChange={e => setCouponCode(e.target.value)}
-                  placeholder="Enter coupon code"
-                  className="flex-1 px-2 py-1 text-xs border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
-                  onKeyPress={e => e.key === 'Enter' && handleApplyCoupon()}
-                />
-                <Button
-                  onClick={handleApplyCoupon}
-                  disabled={!couponCode.trim() || isApplyingCoupon}
-                  size="sm"
-                  className="px-3 py-1 text-xs h-auto"
-                >
-                  {isApplyingCoupon ? 'Applying...' : 'Apply'}
-                </Button>
               </div>
-            </div>
+            )}
 
             {/* Summary (no separators) */}
             <div className="px-3 py-3 space-y-2 text-sm">

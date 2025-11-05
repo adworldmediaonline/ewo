@@ -383,143 +383,23 @@ export default function CartCheckout() {
       </div>
 
       <div className="space-y-6">
-        {/* Coupon Application Section */}
-        <div className="border-b pb-4">
-          <h4 className="font-medium text-foreground mb-3">🎟️ Apply Coupon</h4>
-
-          <div className="mt-3">
-            <form onSubmit={handleCouponSubmit} className="space-y-3">
-              <div className="flex gap-2">
-                <input
-                  ref={couponInputRef}
-                  type="text"
-                  placeholder="Enter coupon code"
-                  className="flex-1 border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                  disabled={isApplyingCoupon}
-                />
-                <button
-                  type="submit"
-                  disabled={isApplyingCoupon}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background px-4 py-2"
-                >
-                  {isApplyingCoupon ? 'Applying...' : 'Apply'}
-                </button>
-              </div>
-            </form>
-
-            {/* Auto-fill helper messages for cart */}
-            {couponsLoading && (
-              <div className="text-sm text-muted-foreground mt-2 flex items-center gap-1">
-                <svg
-                  className="w-4 h-4 text-primary animate-spin"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm6 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1h-1z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                Looking for the best coupon for you...
-              </div>
-            )}
-
-            {!couponsLoading &&
-              couponInputRef.current?.value &&
-              applied_coupons.length === 0 &&
-              autoFilledCoupon &&
-              autoFilledCoupon.discountPercentage && (
-                <div className="mt-3 p-3 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                        <svg
-                          className="w-4 h-4 text-white"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V4z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-green-800">
-                          Best Coupon Found!
-                        </p>
-                        <p className="text-xs text-green-600">
-                          Click Apply to save{' '}
-                          {autoFilledCoupon.discountPercentage}% on your order
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-green-500 text-white">
-                        {autoFilledCoupon.discountPercentage}% OFF
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-            {couponsError && (
-              <div className="text-sm text-destructive mt-2 flex items-center gap-1">
-                <svg
-                  className="w-4 h-4"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                Unable to load coupons. Please enter manually.
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Applied Coupons Section */}
-        {Array.isArray(applied_coupons) && applied_coupons.length > 0 && (
+        {/* Coupon Application Section - Applied Coupons Display */}
+        {applied_coupons.length > 0 && (
           <div className="border-b pb-4">
-            <div className="flex justify-between items-center mb-3">
-              <h4 className="font-medium">
-                Applied Coupons ({applied_coupons.length})
-              </h4>
-              <button
-                onClick={handleClearAllCoupons}
-                className="text-destructive hover:text-destructive/80 text-sm"
-                type="button"
-              >
-                Clear All
-              </button>
-            </div>
+            <h4 className="font-medium text-foreground mb-3">🎟️ Coupon Discounts</h4>
+            
             <div className="space-y-2">
               {applied_coupons.map((coupon: any, index: number) => (
                 <div
-                  key={coupon._id || coupon.couponCode || index}
-                  className="flex justify-between items-center bg-muted rounded-md p-2"
+                  key={index}
+                  className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-md"
                 >
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-sm">
-                      {coupon.couponCode}
-                    </span>
-                    <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
-                      -${coupon.discount ? coupon.discount.toFixed(2) : '0.00'}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => handleRemoveCoupon(coupon._id)}
-                    className="text-muted-foreground hover:text-destructive"
-                    type="button"
-                  >
-                    ×
-                  </button>
+                  <span className="text-sm text-green-800 dark:text-green-200 font-semibold">
+                    {coupon.couponCode}
+                  </span>
+                  <span className="text-sm text-green-700 dark:text-green-300 font-medium">
+                    Applied
+                  </span>
                 </div>
               ))}
             </div>

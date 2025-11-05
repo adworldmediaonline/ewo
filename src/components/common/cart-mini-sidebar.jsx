@@ -506,89 +506,18 @@ export default function CartMiniSidebar() {
 
           {/* Essential Checkout Section - Always Visible */}
           <div className="">
-            {/* Apply Coupon Toggle */}
-            {cart_products.length > 0 && (
-              <>
-                <button
-                  type="button"
-                  onClick={toggleCouponForm}
-                  className=""
-                  aria-expanded={couponFormVisible}
-                  aria-controls="coupon-form"
-                >
-                  <span>
-                    {couponFormVisible ? 'Hide Coupon Form' : 'Apply Coupon'}
-                  </span>
-                  <span className="">▼</span>
-                </button>
-
-                {/* Collapsible Coupon Form */}
-                <div id="coupon-form" className="">
-                  <div className="">
-                    {/* Apply Coupon Section */}
-                    <div className="">
-                      <div className="">
-                        <input
-                          ref={couponRef}
-                          type="text"
-                          placeholder="Enter coupon code"
-                          className=""
-                          disabled={coupon_loading}
-                        />
-                        <button
-                          type="button"
-                          onClick={handleCouponSubmit}
-                          className=""
-                          disabled={coupon_loading}
-                        >
-                          {coupon_loading ? 'Applying...' : 'Apply'}
-                        </button>
-                      </div>
-
-                      {/* Coupon messages */}
-                      {couponApplyMsg && (
-                        <div className="">{couponApplyMsg}</div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-
-            {/* Applied Coupons Section - Always visible when coupons exist */}
+            {/* Applied Coupons Section - Simple Display */}
             {applied_coupons.length > 0 && (
-              <div className="">
-                <div className="">
-                  <h4 className="">
-                    Applied Coupons ({applied_coupons.length})
-                  </h4>
-                  {applied_coupons.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={handleClearAllCoupons}
-                      className=""
-                    >
-                      Remove All
-                    </button>
-                  )}
-                </div>
-
-                <div className="">
+              <div className="mb-3">
+                <div className="space-y-1">
                   {applied_coupons.map((coupon, index) => (
-                    <div key={coupon.couponCode || index} className="">
-                      <div className="">
-                        <span className="">{coupon.couponCode}</span>
-                        <span className="">
-                          -${Number(coupon.discount || 0).toFixed(2)}
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveCoupon(coupon.couponCode)}
-                        className=""
-                      >
-                        ✕
-                      </button>
+                    <div key={coupon.couponCode || index} className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-md">
+                      <span className="text-xs text-green-800 dark:text-green-200 font-semibold">
+                        {coupon.couponCode}
+                      </span>
+                      <span className="text-xs text-green-700 dark:text-green-300 font-medium">
+                        Applied
+                      </span>
                     </div>
                   ))}
                 </div>
