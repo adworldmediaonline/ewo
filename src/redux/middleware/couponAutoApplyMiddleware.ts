@@ -3,7 +3,7 @@
  * Listens for cart actions and automatically applies coupons
  */
 
-import { Middleware } from '@reduxjs/toolkit';
+import { Middleware, AnyAction } from '@reduxjs/toolkit';
 import { autoApplyCoupon, revalidateAppliedCoupons } from '@/utils/coupon-auto-apply';
 
 // Debounce helper to prevent multiple simultaneous auto-apply attempts
@@ -11,6 +11,9 @@ let autoApplyTimeout: NodeJS.Timeout | null = null;
 const DEBOUNCE_DELAY = 500; // ms
 
 export const couponAutoApplyMiddleware: Middleware = store => next => action => {
+  // Type assertion for action
+  const typedAction = action as AnyAction;
+
   // Execute the action first
   const result = next(action);
 
@@ -20,7 +23,7 @@ export const couponAutoApplyMiddleware: Middleware = store => next => action => 
     'cart/increment_quantity',
     'cart/decrement_quantity',
     'cart/remove_product',
-  ].includes(action.type);
+  ].includes(typedAction.type);
 
   if (shouldAutoApply) {
     // Clear any pending auto-apply
@@ -41,12 +44,12 @@ export const couponAutoApplyMiddleware: Middleware = store => next => action => 
         : 0;
 
       // Skip if cart is empty (for remove_product action)
-      if (action.type === 'cart/remove_product' && cart_products.length === 0) {
+      if (typedAction.type === 'cart/remove_product' && cart_products.length === 0) {
         return;
       }
 
       // Use revalidate for quantity changes and removals, auto-apply for additions
-      if (action.type === 'cart/add_cart_product') {
+      if (typedAction.type === 'cart/add_cart_product') {
         await autoApplyCoupon({
           cartProducts: cart_products,
           appliedCoupons: applied_coupons,
@@ -69,7 +72,7 @@ export const couponAutoApplyMiddleware: Middleware = store => next => action => 
   }
 
   // Clear coupons when cart is cleared
-  if (action.type === 'cart/clearCart') {
+  if (typedAction.type === 'cart/clearCart') {
     const state = store.getState();
     if (state.coupon.applied_coupons.length > 0) {
       // Import dynamically to avoid circular dependency
