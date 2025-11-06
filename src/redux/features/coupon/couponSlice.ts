@@ -10,6 +10,7 @@ interface Coupon {
   endTime: string;
   discount?: number;
   applicableProducts: any[];
+  title?: string;
 }
 
 interface CouponState {
@@ -19,6 +20,8 @@ interface CouponState {
   coupon_error: any;
   coupon_loading: boolean;
   last_applied_coupon: Coupon | null;
+  isAutoApplying: boolean;
+  lastAutoApplyTimestamp: number | null;
 }
 
 const initialState: CouponState = {
@@ -28,6 +31,8 @@ const initialState: CouponState = {
   coupon_error: null,
   coupon_loading: false,
   last_applied_coupon: null,
+  isAutoApplying: false,
+  lastAutoApplyTimestamp: null,
 };
 
 export const couponSlice = createSlice({
@@ -124,6 +129,25 @@ export const couponSlice = createSlice({
       state.coupon_error = null;
       state.coupon_loading = false;
       state.last_applied_coupon = null;
+      state.isAutoApplying = false;
+      state.lastAutoApplyTimestamp = null;
+      localStorage.removeItem('appliedCoupons');
+    },
+
+    setAutoApplying: (state, { payload }) => {
+      state.isAutoApplying = payload;
+      if (payload) {
+        state.lastAutoApplyTimestamp = Date.now();
+      }
+    },
+
+    clearAutoApplyCoupons: state => {
+      // Same as clear_all_coupons but specifically for auto-apply scenarios
+      state.applied_coupons = [];
+      state.total_coupon_discount = 0;
+      state.coupon_error = null;
+      state.isAutoApplying = false;
+      state.lastAutoApplyTimestamp = null;
       localStorage.removeItem('appliedCoupons');
     },
 
@@ -229,6 +253,8 @@ export const {
   set_coupon_loading,
   clear_all_coupons,
   load_applied_coupons,
+  setAutoApplying,
+  clearAutoApplyCoupons,
   // Legacy compatibility exports
   set_applied_coupon,
   clear_coupon,
