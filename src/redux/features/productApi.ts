@@ -39,38 +39,7 @@ export const productApi = apiSlice.injectEndpoints({
         });
         return `/api/product/paginated?${params.toString()}`;
       },
-      serializeQueryArgs: ({ queryArgs }) => {
-        // Create a stable cache key that excludes the page number
-        const { page: _page, ...rest } = queryArgs;
-        return JSON.stringify(rest);
-      },
-      merge: (currentCache, newItems, { arg }) => {
-        // If this is the first page, return new items
-        if (arg.page === 1) {
-          return newItems;
-        }
-
-        // For subsequent pages, merge with existing data
-        if (currentCache && currentCache.data) {
-          return {
-            data: [...currentCache.data, ...newItems.data],
-            pagination: newItems.pagination,
-          };
-        }
-
-        return newItems;
-      },
-      forceRefetch: ({ currentArg, previousArg }) => {
-        // Force refetch when filters change (not just page)
-        if (!previousArg || !currentArg) return true;
-        const { page: _currentPage, ...currentFilters } = currentArg;
-        const { page: _previousPage, ...previousFilters } = previousArg;
-        return (
-          JSON.stringify(currentFilters) !== JSON.stringify(previousFilters)
-        );
-      },
-      // Add a key to ensure re-fetching when page changes
-      keepUnusedDataFor: 0,
+      keepUnusedDataFor: 5,
       providesTags: (result, _error, _arg) =>
         result
           ? [
