@@ -106,7 +106,6 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between gap-2 sm:gap-4">
               <ShopToolbar
-                key={`toolbar-${filters.search}`}
                 initialSearch={filters.search}
                 onSearchCommit={value => {
                   void setSearch(value);

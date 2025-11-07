@@ -37,13 +37,21 @@ const ShopToolbar = ({
 }: ShopToolbarProps) => {
   const [searchValue, setSearchValue] = useState(initialSearch);
 
+  // Sync local search value with external changes (e.g., clear filters)
+  useEffect(() => {
+    setSearchValue(initialSearch);
+  }, [initialSearch]);
+
+  // Debounce search commits
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      onSearchCommit(searchValue.trim());
+      if (searchValue.trim() !== initialSearch) {
+        onSearchCommit(searchValue.trim());
+      }
     }, 350);
 
     return () => clearTimeout(timeoutId);
-  }, [searchValue, onSearchCommit]);
+  }, [searchValue, initialSearch, onSearchCommit]);
 
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
