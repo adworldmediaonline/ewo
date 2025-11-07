@@ -26,10 +26,13 @@ export const useShopQueryState = () => {
       search: parseAsString.withDefault(DEFAULT_FILTERS.search),
       category: parseAsString.withDefault(DEFAULT_FILTERS.category),
       subcategory: parseAsString.withDefault(DEFAULT_FILTERS.subcategory),
-      sortBy: parseAsStringEnum([...SHOP_SORT_FIELDS]).withDefault(
-        DEFAULT_FILTERS.sortBy
-      ),
-      sortOrder: parseAsStringEnum([...SHOP_SORT_ORDERS]).withDefault(
+      sortBy: parseAsStringEnum([
+        'skuArrangementOrderNo',
+        'createdAt',
+        'price',
+        'title',
+      ] as const).withDefault(DEFAULT_FILTERS.sortBy as 'skuArrangementOrderNo'),
+      sortOrder: parseAsStringEnum(['asc', 'desc'] as const).withDefault(
         DEFAULT_FILTERS.sortOrder
       ),
     },
@@ -38,55 +41,43 @@ export const useShopQueryState = () => {
     }
   );
 
-  const setFilters = useCallback(
-    async (updates: Partial<ShopFiltersState>) => {
-      const payload = Object.entries(updates).reduce<
-        Partial<Record<keyof ShopFiltersState, QuerySetterValue>>
-      >((acc, [key, value]) => {
-        acc[key as keyof ShopFiltersState] = toQueryValue(
-          typeof value === 'string' ? value : value?.toString()
-        );
-        return acc;
-      }, {});
-
-      await setQueryState(payload);
+  const setSearch = useCallback(
+    async (value: string) => {
+      await setQueryState({ search: toQueryValue(value) });
     },
     [setQueryState]
   );
 
-  const setSearch = useCallback(
-    (value: string) => {
-      return setFilters({ search: value });
-    },
-    [setFilters]
-  );
-
   const setSort = useCallback(
-    (sortBy: string, sortOrder: ShopFiltersState['sortOrder']) => {
-      return setFilters({ sortBy, sortOrder });
+    async (sortBy: string, sortOrder: ShopFiltersState['sortOrder']) => {
+      await setQueryState({
+        sortBy: toQueryValue(sortBy) as any,
+        sortOrder: toQueryValue(sortOrder) as any,
+      });
     },
-    [setFilters]
+    [setQueryState]
   );
 
   const toggleCategory = useCallback(
-    (category: string) => {
+    async (category: string) => {
       const nextCategory = category === filters.category ? '' : category;
 
-      return setFilters({
-        category: nextCategory,
-        subcategory: '',
+      await setQueryState({
+        category: toQueryValue(nextCategory),
+        subcategory: null,
       });
     },
-    [filters.category, setFilters]
+    [filters.category, setQueryState]
   );
 
   const toggleSubcategory = useCallback(
-    (subcategory: string) => {
-      const nextSubcategory = subcategory === filters.subcategory ? '' : subcategory;
+    async (subcategory: string) => {
+      const nextSubcategory =
+        subcategory === filters.subcategory ? '' : subcategory;
 
-      return setFilters({ subcategory: nextSubcategory });
+      await setQueryState({ subcategory: toQueryValue(nextSubcategory) });
     },
-    [filters.subcategory, setFilters]
+    [filters.subcategory, setQueryState]
   );
 
   const resetFilters = useCallback(async () => {
@@ -116,7 +107,6 @@ export const useShopQueryState = () => {
 
   return {
     filters,
-    setFilters,
     setSearch,
     setSort,
     toggleCategory,
