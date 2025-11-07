@@ -46,18 +46,18 @@ const ShopToolbar = ({
   }, [searchValue, onSearchCommit]);
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex flex-col gap-2 sm:flex-1 sm:flex-row">
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 sm:flex-1 sm:flex-row sm:items-center">
         <Input
           value={searchValue}
           onChange={event => setSearchValue(event.target.value)}
           placeholder="Search products..."
-          className="h-11 w-full sm:max-w-xs"
+          className="h-10 w-full sm:max-w-sm"
           aria-label="Search products"
         />
 
         <Select value={sortKey} onValueChange={onSortChange}>
-          <SelectTrigger className="h-11 sm:w-56">
+          <SelectTrigger className="h-10 w-full sm:w-52">
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
           <SelectContent>
@@ -70,20 +70,23 @@ const ShopToolbar = ({
         </Select>
       </div>
 
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center justify-between gap-3 sm:justify-end">
         {typeof totalProducts === 'number' ? (
-          <Badge variant="outline" className="hidden sm:inline-flex">
-            {totalProducts} products
+          <Badge
+            variant="outline"
+            className="h-10 inline-flex items-center px-4 text-sm font-medium"
+          >
+            {totalProducts} {totalProducts === 1 ? 'product' : 'products'}
           </Badge>
         ) : null}
 
         {hasActiveFilters ? (
           <Button
             type="button"
-            variant="ghost"
-            size="sm"
+            variant="outline"
+            size="default"
             onClick={onClearFilters}
-            className="h-9 px-3 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+            className="h-10 px-4 text-sm font-medium text-muted-foreground hover:text-destructive hover:border-destructive hover:bg-destructive/5"
           >
             Clear ({activeFiltersCount})
           </Button>
