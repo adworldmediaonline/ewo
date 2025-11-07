@@ -32,6 +32,7 @@ export const useShopProducts = (filters: ShopFiltersState) => {
 
   const isMountedRef = useRef(true);
   const pendingResetRef = useRef(false);
+  const currentFetchRef = useRef<{ filters: string; page: number } | null>(null);
 
   const [fetchProducts] = useLazyGetPaginatedProductsQuery();
 
@@ -58,6 +59,7 @@ export const useShopProducts = (filters: ShopFiltersState) => {
 
   useEffect(() => {
     pendingResetRef.current = true;
+    currentFetchRef.current = null;
     const timeoutId = setTimeout(() => {
       setPage(1);
       setResult({ data: [], pagination: null });
@@ -80,6 +82,18 @@ export const useShopProducts = (filters: ShopFiltersState) => {
         pendingResetRef.current = false;
       }
 
+      // Prevent duplicate fetches for the same filter/page combination
+      const fetchKey = { filters: filtersKey, page };
+      if (
+        currentFetchRef.current &&
+        currentFetchRef.current.filters === fetchKey.filters &&
+        currentFetchRef.current.page === fetchKey.page
+      ) {
+        return;
+      }
+
+      currentFetchRef.current = fetchKey;
+
       setStatus(isInitialPage ? 'loading' : 'loading-more');
       setErrorMessage(null);
 
@@ -92,10 +106,23 @@ export const useShopProducts = (filters: ShopFiltersState) => {
           return;
         }
 
-        setResult(prev => ({
-          data: isInitialPage ? result.data : [...prev.data, ...result.data],
-          pagination: result.pagination,
-        }));
+        setResult(prev => {
+          if (isInitialPage) {
+            return {
+              data: result.data,
+              pagination: result.pagination,
+            };
+          }
+
+          // Deduplicate products by _id to prevent duplicates
+          const existingIds = new Set(prev.data.map(p => p._id));
+          const newProducts = result.data.filter(p => !existingIds.has(p._id));
+
+          return {
+            data: [...prev.data, ...newProducts],
+            pagination: result.pagination,
+          };
+        });
 
         setStatus('success');
       } catch (error) {
@@ -120,7 +147,7 @@ export const useShopProducts = (filters: ShopFiltersState) => {
     return () => {
       ignore = true;
     };
-  }, [fetchProducts, filtersSnapshot, page, reloadKey]);
+  }, [fetchProducts, filtersSnapshot, page, reloadKey, filtersKey]);
 
   const fetchNext = useCallback(() => {
     if (status === 'loading' || status === 'loading-more') {
