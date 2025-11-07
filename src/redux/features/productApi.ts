@@ -109,6 +109,7 @@ export const productApi = apiSlice.injectEndpoints({
 
 export const {
   useGetPaginatedProductsQuery,
+  useLazyGetPaginatedProductsQuery,
   useGetAllProductsQuery,
   useGetOfferProductsQuery,
   useGetTopRatedProductsQuery,

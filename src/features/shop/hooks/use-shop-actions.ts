@@ -1,0 +1,108 @@
+'use client';
+
+import { useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { add_cart_product } from '@/redux/features/cartSlice';
+import { add_to_wishlist } from '@/redux/features/wishlist-slice';
+import { notifyError, notifySuccess } from '@/utils/toast';
+
+import type { ShopProduct } from '../shop-types';
+
+interface SelectedOption {
+  title: string;
+  price: number;
+}
+
+export const useShopActions = () => {
+  const dispatch = useDispatch();
+  const { cart_products } = useSelector((state: any) => state.cart);
+
+  const handleAddToCart = useCallback(
+    (product: ShopProduct, selectedOption?: SelectedOption) => {
+      if (product.options && product.options.length > 0 && !selectedOption) {
+        notifyError(
+          'Please select an option before adding the product to your cart.'
+        );
+        return;
+      }
+
+      const existingProduct = cart_products.find(
+        (item: any) => item._id === product._id
+      );
+
+      const optionChanged =
+        existingProduct &&
+        JSON.stringify(existingProduct.selectedOption) !==
+        JSON.stringify(selectedOption);
+
+      const currentQty = existingProduct ? existingProduct.orderQuantity : 0;
+      const finalQuantity = optionChanged ? currentQty : currentQty + 1;
+
+      if (product.quantity && finalQuantity > product.quantity) {
+        notifyError(
+          `Sorry, only ${product.quantity} items available. ${existingProduct
+            ? `You already have ${currentQty} in your cart.`
+            : ''}`
+        );
+        return;
+      }
+
+      const cartProduct = {
+        _id: product._id,
+        title: product.title,
+        img: product.imageURLs?.[0] || product.img || '',
+        price: product.finalPriceDiscount || product.price || 0,
+        orderQuantity: 1,
+        quantity: product.quantity,
+        slug: product.slug,
+        shipping: product.shipping || { price: 0 },
+        finalPriceDiscount: product.finalPriceDiscount || product.price || 0,
+        sku: product.sku,
+        options: selectedOption,
+        finalPrice: selectedOption
+          ? (
+            Number(product.finalPriceDiscount || product.price) +
+            Number(selectedOption.price)
+          ).toFixed(2)
+          : undefined,
+      };
+
+      dispatch(add_cart_product(cartProduct));
+
+      if (optionChanged) {
+        notifySuccess(`Option updated to "${selectedOption?.title}"`);
+        return;
+      }
+
+      notifySuccess(`${product.title} added to cart`);
+    },
+    [cart_products, dispatch]
+  );
+
+  const handleAddToWishlist = useCallback(
+    (product: ShopProduct) => {
+      const wishlistProduct = {
+        _id: product._id,
+        title: product.title,
+        img: product.imageURLs?.[0] || product.img || '',
+        price: product.price,
+        category: product.category,
+        slug: product.slug,
+        sku: product.sku,
+        finalPriceDiscount: product.finalPriceDiscount,
+        updatedPrice: product.updatedPrice,
+      };
+
+      dispatch(add_to_wishlist(wishlistProduct));
+      notifySuccess(`${product.title} added to wishlist`);
+    },
+    [dispatch]
+  );
+
+  return {
+    handleAddToCart,
+    handleAddToWishlist,
+  } as const;
+};
+
