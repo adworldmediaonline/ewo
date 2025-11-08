@@ -3,8 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-// internal
-// import { AuthDialog } from '@/components/version-tsx/profile';
+import { AuthDialog } from '@/components/auth/auth-dialog';
 import useCheckoutSubmit from '@/hooks/use-checkout-submit';
 import PaymentSuccessOverlay from '../../common/payment-success-overlay';
 
@@ -16,7 +15,7 @@ export default function CheckoutArea() {
   const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
 
-  const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
   const checkoutData = useCheckoutSubmit();
   const {
@@ -32,15 +31,6 @@ export default function CheckoutArea() {
     paymentSuccessful,
   } = checkoutData;
   const { cart_products } = useSelector(state => state.cart);
-
-  // Handle auth dialog
-  // const handleShowAuthDialog = () => {
-  //   setShowAuthDialog(true);
-  // };
-
-  // const handleCloseAuthDialog = () => {
-  //   setShowAuthDialog(false);
-  // };
 
   return (
     <>
@@ -84,20 +74,13 @@ export default function CheckoutArea() {
                               Checking out as Guest
                             </span>
                           </div>
-                          {/* <button
+                          <button
                             type="button"
-                            onClick={handleShowAuthDialog}
-                            className="text-primary hover:text-primary/90 underline"
+                            onClick={() => setAuthDialogOpen(true)}
+                            className="text-primary hover:text-primary/90 underline font-medium transition-colors"
                           >
                             Sign In Instead
-                          </button> */}
-
-                          <Link
-                            href="/sign-in"
-                            className="text-primary hover:text-primary/90 underline"
-                          >
-                            Sign In Instead
-                          </Link>
+                          </button>
                         </div>
                       </div>
                     )}
@@ -123,12 +106,7 @@ export default function CheckoutArea() {
       </section>
 
       {/* Auth Dialog */}
-      {/* <AuthDialog
-        isOpen={showAuthDialog}
-        onClose={handleCloseAuthDialog}
-        redirectPath="/checkout"
-        defaultTab="signin"
-      /> */}
+      <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} defaultTab="signin" />
 
       {/* Payment Success Overlay - Shows immediately, then auto-redirects */}
       <PaymentSuccessOverlay isVisible={paymentSuccessful} />
