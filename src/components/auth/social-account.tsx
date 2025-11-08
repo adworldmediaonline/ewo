@@ -1,17 +1,14 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { authClient } from '@/lib/authClient';
-
-// import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
 export default function SocialAccount() {
-  // const pathname = usePathname();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const signInWithGoogle = async () => {
-    const cb = `${window.location.origin}/profile`;
+    const cb = window.location.href;
     await authClient.signIn.social(
       {
         provider: 'google',
@@ -25,7 +22,6 @@ export default function SocialAccount() {
         onSuccess: () => {
           setIsLoading(false);
           setError(null);
-          // router.push('/dashboard');
         },
         onError: ctx => {
           setError(ctx.error.message);
@@ -36,7 +32,7 @@ export default function SocialAccount() {
   };
 
   // const signInWithApple = async () => {
-  //   const cb = `${window.location.origin}/profile`;
+  //   const cb = window.location.href;
   //   await authClient.signIn.social(
   //     {
   //       provider: 'apple',
@@ -50,7 +46,6 @@ export default function SocialAccount() {
   //       onSuccess: () => {
   //         setIsLoading(false);
   //         setError(null);
-  //         router.push(cb);
   //       },
   //       onError: ctx => {
   //         setError(ctx.error.message);
