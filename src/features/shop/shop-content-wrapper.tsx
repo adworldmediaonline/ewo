@@ -95,8 +95,8 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
   const showErrorState = status === 'error';
 
   return (
-    <div className="min-h-screen bg-background py-6">
-      <div className="mx-auto flex w-full max-w-7xl gap-6 px-4">
+    <div className="min-h-screen bg-background py-2 lg:py-6">
+      <div className="mx-auto flex w-full max-w-7xl gap-2 lg:gap-4 px-0 md:px-4">
         <ShopSidebar
           categories={categories}
           activeCategory={filters.category}
@@ -109,8 +109,20 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
         />
 
         <section className="flex-1 space-y-6">
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between gap-2 sm:gap-4">
+          {/* Mobile: Single row with Filters + Toolbar */}
+          <div className="flex items-start gap-2 lg:hidden">
+            <ShopMobileFilters
+              categories={categories}
+              activeCategory={filters.category}
+              activeSubcategory={filters.subcategory}
+              onToggleCategory={toggleCategory}
+              onToggleSubcategory={toggleSubcategory}
+              onReset={handleClearFilters}
+              activeFiltersCount={activeFiltersCount}
+              hasActiveFilters={hasActiveFilters}
+            />
+
+            <div className="flex-1 min-w-0">
               <ShopToolbar
                 initialSearch={filters.search}
                 onSearchCommit={value => {
@@ -123,20 +135,23 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
                 onClearFilters={handleClearFilters}
                 totalProducts={totalProducts}
               />
-
-              <div className="lg:hidden">
-                <ShopMobileFilters
-                  categories={categories}
-                  activeCategory={filters.category}
-                  activeSubcategory={filters.subcategory}
-                  onToggleCategory={toggleCategory}
-                  onToggleSubcategory={toggleSubcategory}
-                  onReset={handleClearFilters}
-                  activeFiltersCount={activeFiltersCount}
-                  hasActiveFilters={hasActiveFilters}
-                />
-              </div>
             </div>
+          </div>
+
+          {/* Desktop: Toolbar only (sidebar has filters) */}
+          <div className="hidden lg:block">
+            <ShopToolbar
+              initialSearch={filters.search}
+              onSearchCommit={value => {
+                void setSearch(value);
+              }}
+              sortKey={sortKey}
+              onSortChange={handleSortChange}
+              hasActiveFilters={hasActiveFilters}
+              activeFiltersCount={activeFiltersCount}
+              onClearFilters={handleClearFilters}
+              totalProducts={totalProducts}
+            />
           </div>
 
           {showErrorState ? (
