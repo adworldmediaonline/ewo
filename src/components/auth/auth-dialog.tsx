@@ -55,7 +55,7 @@ const signUpSchema = z.object({
 });
 
 const verifyEmailSchema = z.object({
-  otp: z.string().min(6, 'Please enter the 6-digit code'),
+  otp: z.string().length(6, 'Please enter the complete 6-digit code'),
 });
 
 const forgotPasswordSchema = z.object({
@@ -65,7 +65,7 @@ const forgotPasswordSchema = z.object({
 });
 
 const resetPasswordSchema = z.object({
-  otp: z.string().min(6, 'Please enter the 6-digit code'),
+  otp: z.string().length(6, 'Please enter the complete 6-digit code'),
   newPassword: z.string().min(8, {
     message: 'Password must be at least 8 characters.',
   }),
