@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 //internal import
-import { completeFirstTimeDiscount } from '@/redux/features/cartSlice';
+import { clearCart, completeFirstTimeDiscount, hideCartConfirmation } from '@/redux/features/cartSlice';
 import { useValidateCouponMutation } from '@/redux/features/coupon/couponApi';
 import {
   add_applied_coupon,
@@ -39,9 +39,9 @@ const useCheckoutSubmit = () => {
     useValidateCouponMutation();
 
   // addOrder
-  const [saveOrder, {}] = useSaveOrderMutation();
+  const [saveOrder, { }] = useSaveOrderMutation();
   // createPaymentIntent
-  const [createPaymentIntent, {}] = useCreatePaymentIntentMutation();
+  const [createPaymentIntent, { }] = useCreatePaymentIntentMutation();
   // cart_products
   const { cart_products, firstTimeDiscount } = useSelector(state => state.cart);
 
@@ -650,12 +650,20 @@ const useCheckoutSubmit = () => {
           });
           setShowThankYouModal(true);
 
-          // Clean up
+          // Clean up - Remove from localStorage
           localStorage.removeItem('cart_products');
           localStorage.removeItem('couponInfo');
+          localStorage.removeItem('shipping_cost');
+
+          // Clear Redux cart state
+          dispatch(clearCart());
+
+          // Hide cart confirmation modal
+          dispatch(hideCartConfirmation());
 
           // Clear enhanced coupon
           dispatch(clear_coupon());
+          dispatch(clear_all_coupons());
 
           setIsCheckoutSubmit(false);
           setProcessingPayment(false);
@@ -692,9 +700,8 @@ const useCheckoutSubmit = () => {
           // Create a summary of attempted purchase
           const productSummary =
             cart_products.length > 1
-              ? `${cart_products[0].title} and ${
-                  cart_products.length - 1
-                } more items`
+              ? `${cart_products[0].title} and ${cart_products.length - 1
+              } more items`
               : cart_products[0]?.title || 'your items';
 
           // Show a user-friendly message
@@ -811,9 +818,8 @@ const useCheckoutSubmit = () => {
             // Create a summary of attempted purchase
             const productSummary =
               cart_products.length > 1
-                ? `${cart_products[0].title} and ${
-                    cart_products.length - 1
-                  } more items`
+                ? `${cart_products[0].title} and ${cart_products.length - 1
+                } more items`
                 : cart_products[0]?.title || 'your items';
 
             setCardError(errorMessage);
@@ -831,12 +837,20 @@ const useCheckoutSubmit = () => {
             // ✅ IMMEDIATELY show success feedback
             setPaymentSuccessful(true);
 
-            // Clean up first
+            // Clean up first - Remove from localStorage
             localStorage.removeItem('cart_products');
             localStorage.removeItem('couponInfo');
+            localStorage.removeItem('shipping_cost');
+
+            // Clear Redux cart state
+            dispatch(clearCart());
+
+            // Hide cart confirmation modal
+            dispatch(hideCartConfirmation());
 
             // Clear enhanced coupon
             dispatch(clear_coupon());
+            dispatch(clear_all_coupons());
 
             // Mark first-time discount as used after successful payment
             dispatch(completeFirstTimeDiscount());
@@ -869,9 +883,8 @@ const useCheckoutSubmit = () => {
                 setPaymentSuccessful(false);
                 const productSummary =
                   cart_products.length > 1
-                    ? `${cart_products[0].title} and ${
-                        cart_products.length - 1
-                      } other items`
+                    ? `${cart_products[0].title} and ${cart_products.length - 1
+                    } other items`
                     : cart_products[0]?.title || 'your product';
 
                 notifyError(
