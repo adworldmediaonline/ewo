@@ -186,21 +186,21 @@ export default function ProductCard({
 
   return (
     <Card
-      className="group relative overflow-hidden transition-all duration-300 hover:shadow-lg p-0"
+      className="group rounded-md relative overflow-hidden transition-all duration-300 hover:shadow-lg p-0"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <Link href={`/product/${product.slug}`} className="block">
         <CardContent className="p-0">
-          <div className="relative aspect-square overflow-hidden p-1">
+          <div className="relative aspect-square overflow-hidden p-0.5 sm:p-1">
             {/* Left Side Badges - Stacked vertically */}
-            <div className="absolute left-2 top-2 z-10 flex flex-col gap-2">
+            <div className="absolute left-1 top-1 sm:left-2 sm:top-2 z-10 flex flex-col gap-1 sm:gap-2">
               {/* Discount Badge */}
               {product.finalPriceDiscount &&
                 product.finalPriceDiscount < product.price && (
                   <Badge
                     variant="destructive"
-                    className="shadow-md"
+                    className="shadow-md text-[9px] sm:text-xs px-1 py-0 sm:px-2.5 sm:py-0.5"
                   >
                     -
                     {Math.round(
@@ -215,9 +215,9 @@ export default function ProductCard({
               {/* Coupon Badge */}
               {hasCoupon && couponPercentage && (
                 <Badge
-                  className="bg-gradient-to-r from-emerald-500 to-green-500 text-white border-0 shadow-lg flex items-center gap-1 px-2 py-1"
+                  className="bg-gradient-to-r from-emerald-500 to-green-500 text-white border-0 shadow-lg flex items-center gap-0.5 sm:gap-1 px-1 py-0 sm:px-2 sm:py-1 text-[9px] sm:text-xs"
                 >
-                  <Ticket className="h-3 w-3" />
+                  <Ticket className="h-2 w-2 sm:h-3 sm:w-3" />
                   <span className="font-bold">{couponPercentage}% OFF</span>
                 </Badge>
               )}
@@ -227,7 +227,7 @@ export default function ProductCard({
             {product.status === 'out-of-stock' && (
               <Badge
                 variant="secondary"
-                className="absolute right-2 top-2 z-10"
+                className="absolute right-1 top-1 sm:right-2 sm:top-2 z-10 text-[9px] sm:text-xs px-1 py-0 sm:px-2.5 sm:py-0.5"
               >
                 Out of Stock
               </Badge>
@@ -258,9 +258,9 @@ export default function ProductCard({
                 <div className="absolute inset-0 bg-muted animate-pulse" />
               )}
 
-              {/* Quick Action Buttons */}
+              {/* Quick Action Buttons - Hidden on mobile for cleaner 2-column layout */}
               <div
-                className={`absolute inset-0 bg-black/20 opacity-0 transition-opacity duration-300 ${isHovered ? 'opacity-100' : ''
+                className={`absolute inset-0 bg-black/20 opacity-0 transition-opacity duration-300 hidden sm:block ${isHovered ? 'opacity-100' : ''
                   }`}
               >
                 <div className="absolute right-2 top-2 flex flex-col gap-2">
@@ -303,10 +303,10 @@ export default function ProductCard({
       </Link>
 
       {/* Product Info - Fixed Layout */}
-      <div className="flex flex-col h-full px-4 pb-4 pt-1">
+      <div className="flex flex-col h-full px-2 pb-3 pt-1 sm:px-4 sm:pb-4">
         <div className="flex-1">
           <Link href={`/product/${product.slug}`} className="block">
-            <h3 className="mb-1 text-sm font-medium leading-tight hover:text-primary transition-colors cursor-pointer">
+            <h3 className="mb-1 text-xs sm:text-sm font-medium leading-tight hover:text-primary transition-colors cursor-pointer line-clamp-2">
               {product.title}
             </h3>
           </Link>
@@ -326,7 +326,7 @@ export default function ProductCard({
 
         {/* Options Selection */}
         {product.options && product.options.length > 0 && (
-          <div className="mb-3">
+          <div className="mb-2 sm:mb-3">
             <Select
               onValueChange={handleOptionChange}
               value={
@@ -335,12 +335,12 @@ export default function ProductCard({
                   : ''
               }
             >
-              <SelectTrigger className="w-full h-8 text-xs">
+              <SelectTrigger className="w-full h-7 text-[10px] sm:h-8 sm:text-xs">
                 <SelectValue placeholder="Select option..." />
               </SelectTrigger>
               <SelectContent>
                 {product.options.map((option, index) => (
-                  <SelectItem key={index} value={index.toString()}>
+                  <SelectItem key={index} value={index.toString()} className="text-[10px] sm:text-xs">
                     {option.title}
                     {option.price && Number(option.price) !== 0
                       ? ` (+$${Number(option.price).toFixed(2)})`
@@ -353,25 +353,25 @@ export default function ProductCard({
         )}
 
         {/* Price and Button - Fixed at Bottom */}
-        <div className="mt-auto pt-3">
+        <div className="mt-auto pt-2 sm:pt-3">
           {/* Price */}
-          <div className="flex items-center gap-2 mb-2.5">
-            <span className="text-sm text-primary line-through">
+          <div className="flex items-center gap-1.5 sm:gap-2 mb-2">
+            <span className="text-[10px] sm:text-sm text-primary line-through">
               ${calculateMarkedUpPrice()}
             </span>
-            <span className="text-lg font-bold">${calculateFinalPrice()}</span>
+            <span className="text-sm sm:text-lg font-bold">${calculateFinalPrice()}</span>
           </div>
 
           {/* Add to Cart Button */}
           {isAddedToCart ? (
             <Link href="/cart" className="w-full block">
-              <Button className="w-full" variant="outline" rounded="full">
+              <Button className="w-full h-8 text-[10px] sm:h-10 sm:text-sm" variant="outline" rounded="full">
                 View Cart
               </Button>
             </Link>
           ) : (
             <Button
-              className="w-full"
+              className="w-full h-8 text-[10px] sm:h-10 sm:text-sm"
               rounded="full"
               onClick={handleAddToCart}
               disabled={product.status === 'out-of-stock'}

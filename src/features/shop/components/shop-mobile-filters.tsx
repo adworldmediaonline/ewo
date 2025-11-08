@@ -55,24 +55,24 @@ const ShopMobileFilters = ({
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
-          <Filter className="h-4 w-4" />
+        <Button variant="outline" size="sm" className="h-9 gap-1.5 text-xs px-3">
+          <Filter className="h-3.5 w-3.5" />
           Filters
           {activeFiltersCount > 0 ? (
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="secondary" className="text-[10px] h-4 px-1 min-w-4">
               {activeFiltersCount}
             </Badge>
           ) : null}
         </Button>
       </SheetTrigger>
 
-      <SheetContent side="left" className="gap-0 p-0">
-        <SheetHeader className="border-b border-border/80">
+      <SheetContent side="left" className="flex flex-col gap-0 p-0">
+        <SheetHeader className="shrink-0 border-b border-border/80 px-4 py-3">
           <SheetTitle className="text-base font-semibold">Filters</SheetTitle>
         </SheetHeader>
 
-        <ScrollArea className="flex-1 px-4 py-4">
-          <div className="space-y-3">
+        <ScrollArea className="flex-1 overflow-auto">
+          <div className="space-y-3 px-4 py-4">
             {categories.map(category => {
               const categorySlug = toSlug(category.parent);
               const isActiveCategory = categorySlug === activeCategory;
@@ -124,8 +124,8 @@ const ShopMobileFilters = ({
           </div>
         </ScrollArea>
 
-        <SheetFooter className="border-t border-border/80">
-          <Button type="button" onClick={() => setOpen(false)}>
+        <SheetFooter className="shrink-0 border-t border-border/80 px-4 py-3 flex-row gap-2">
+          <Button type="button" onClick={() => setOpen(false)} className="flex-1">
             Apply Filters
           </Button>
           <Button
@@ -133,6 +133,7 @@ const ShopMobileFilters = ({
             variant="ghost"
             onClick={handleReset}
             disabled={!hasActiveFilters}
+            className="flex-1"
           >
             Clear All
           </Button>

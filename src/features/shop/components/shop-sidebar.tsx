@@ -64,8 +64,8 @@ const ShopSidebar = ({
 
         <Separator />
 
-        <ScrollArea className="h-[460px] pr-2">
-          <div className="space-y-2">
+        <ScrollArea className="h-[calc(100vh-200px)] max-h-[600px] pr-2">
+          <div className="space-y-2 pb-4">
             {categories.map(category => {
               const categorySlug = toSlug(category.parent);
               const isActiveCategory = categorySlug === activeCategory;
