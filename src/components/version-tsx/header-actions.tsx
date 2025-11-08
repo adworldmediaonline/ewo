@@ -41,8 +41,14 @@ export function HeaderActions({
   // signout
   const handleSignOut = () => {
     startTransition(async () => {
+      const currentPath = window.location.pathname;
       await authClient.signOut();
-      router.refresh();
+      
+      if (currentPath.startsWith('/profile') || currentPath.startsWith('/settings')) {
+        router.push('/');
+      } else {
+        router.refresh();
+      }
     });
   };
 

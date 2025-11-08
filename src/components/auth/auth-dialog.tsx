@@ -233,30 +233,33 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'signin' }: AuthDi
   };
 
   const handleResetPassword = async (values: z.infer<typeof resetPasswordSchema>) => {
-    await authClient.resetPassword({
-      email: userEmail,
-      otp: values.otp,
-      newPassword: values.newPassword,
-    }, {
-      onRequest: () => {
-        setIsLoading(true);
-        setError(null);
+    await authClient.emailOtp.resetPassword(
+      {
+        email: userEmail,
+        otp: values.otp,
+        password: values.newPassword,
       },
-      onSuccess: () => {
-        setIsLoading(false);
-        resetPasswordForm.reset();
-        setSuccessMessage('Password reset successfully!');
-        setTimeout(() => {
-          setView('auth');
-          setActiveTab('signin');
-          setSuccessMessage('');
-        }, 2000);
-      },
-      onError: ctx => {
-        setIsLoading(false);
-        setError(ctx.error?.message || 'Failed to reset password');
-      },
-    });
+      {
+        onRequest: () => {
+          setIsLoading(true);
+          setError(null);
+        },
+        onSuccess: () => {
+          setIsLoading(false);
+          resetPasswordForm.reset();
+          setSuccessMessage('Password reset successfully!');
+          setTimeout(() => {
+            setView('auth');
+            setActiveTab('signin');
+            setSuccessMessage('');
+          }, 2000);
+        },
+        onError: ctx => {
+          setIsLoading(false);
+          setError(ctx.error?.message || 'Failed to reset password');
+        },
+      }
+    );
   };
 
   const handleBackToAuth = () => {
