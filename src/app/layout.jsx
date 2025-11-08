@@ -1,4 +1,5 @@
 import Providers from '@/components/provider';
+import { Analytics } from '@vercel/analytics/next';
 
 import { Toaster } from '@/components/ui/sonner';
 import Wrapper from '@/components/wrapper';
@@ -124,6 +125,7 @@ export default function RootLayout({ children }) {
         />
 
         <GoogleTagManager gtmId="GTM-MB34NG65" />
+        <Analytics />
       </body>
     </html>
   );
