@@ -39,7 +39,7 @@ export const CategoryCard = ({ item, index = 0 }: CategoryCardProps) => {
   };
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card text-left shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring h-full">
+    <div className="group flex flex-col overflow-hidden rounded-lg sm:rounded-xl border border-border bg-card text-left shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring h-full">
       {/* Main category link - covers the image and title area */}
       <div></div>
       <Link
@@ -49,14 +49,14 @@ export const CategoryCard = ({ item, index = 0 }: CategoryCardProps) => {
         aria-label={`Browse ${item.parent}`}
       >
         {/* Image section */}
-        <div className="relative h-40 sm:h-48 md:h-56 w-full shrink-0">
+        <div className="relative h-32 sm:h-40 md:h-48 lg:h-56 w-full shrink-0">
           {hasImage ? (
-            <div className="h-full w-full p-2">
+            <div className="h-full w-full p-1.5 sm:p-2">
               <Image
                 src={item.img as string}
                 alt={item.parent}
                 fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
                 className="object-contain"
                 loading={index < 4 ? 'eager' : 'lazy'}
                 fetchPriority={index < 4 ? 'high' : undefined}
@@ -68,14 +68,14 @@ export const CategoryCard = ({ item, index = 0 }: CategoryCardProps) => {
         </div>
 
         {/* Unified text section with dark background - covers entire remaining area */}
-        <div className="bg-linear-to-t from-black/80 via-black/60 to-transparent px-4 sm:px-5 py-4 sm:py-5 text-center flex flex-col justify-end flex-1">
-          <h3 className="text-white text-lg sm:text-xl font-semibold tracking-tight mb-3">
+        <div className="bg-linear-to-t from-black/80 via-black/60 to-transparent px-2 sm:px-4 md:px-5 py-2.5 sm:py-4 md:py-5 text-center flex flex-col justify-end flex-1">
+          <h3 className="text-white text-sm sm:text-lg md:text-xl font-semibold tracking-tight mb-2 sm:mb-3 line-clamp-2">
             {item.parent}
           </h3>
 
           {/* Subcategory tags integrated within the same dark background */}
           {childLabels.length > 0 && (
-            <div className="flex flex-wrap gap-2 justify-center">
+            <div className="flex flex-wrap gap-1 sm:gap-2 justify-center">
               {childLabels.map(child => (
                 <span
                   key={child}
@@ -88,7 +88,7 @@ export const CategoryCard = ({ item, index = 0 }: CategoryCardProps) => {
                       handleSubcategoryClick(e as any, item.parent, child);
                     }
                   }}
-                  className="inline-flex cursor-pointer items-center rounded-full bg-white/90 px-2.5 py-0.5 text-xs font-medium text-foreground hover:bg-white"
+                  className="inline-flex cursor-pointer items-center rounded-full bg-white/90 px-2 py-0.5 text-[10px] sm:text-xs font-medium text-foreground hover:bg-white"
                 >
                   {child}
                 </span>
