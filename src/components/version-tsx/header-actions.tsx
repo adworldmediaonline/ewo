@@ -1,6 +1,7 @@
 'use client';
 
 import ClientOnlyWrapper from '@/components/client-only-wrapper';
+import { AuthDialog } from '@/components/auth/auth-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -30,6 +31,7 @@ export function HeaderActions({
   const router = useRouter();
   const { data: session } = authClient.useSession();
   const [isPendingSignOut, startTransition] = React.useTransition();
+  const [authDialogOpen, setAuthDialogOpen] = React.useState(false);
   const _dispatch = useDispatch();
   const { quantity } = useCartInfo();
   const wishlist: unknown[] = useSelector(
@@ -40,7 +42,7 @@ export function HeaderActions({
   const handleSignOut = () => {
     startTransition(async () => {
       await authClient.signOut();
-      router.push('/sign-in'); // redirect to login page
+      router.refresh();
     });
   };
 
@@ -154,12 +156,16 @@ export function HeaderActions({
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <Link
-            href="/sign-in"
-            className="inline-flex h-10 w-10 md:h-11 md:w-11 items-center justify-center rounded-full border border-border bg-background text-foreground hover:bg-accent"
-          >
-            <User className="h-5 w-5 md:h-5 md:w-5" />
-          </Link>
+          <>
+            <button
+              onClick={() => setAuthDialogOpen(true)}
+              aria-label="Sign in"
+              className="inline-flex h-10 w-10 md:h-11 md:w-11 items-center justify-center rounded-full border border-border bg-background text-foreground hover:bg-accent transition-colors"
+            >
+              <User className="h-5 w-5 md:h-5 md:w-5" />
+            </button>
+            <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
+          </>
         )}
       </div>
     </ClientOnlyWrapper>
