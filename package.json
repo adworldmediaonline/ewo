@@ -39,6 +39,7 @@
     "@stripe/react-stripe-js": "^3.0.0",
     "@stripe/stripe-js": "^2.2.0",
     "@tawk.to/tawk-messenger-react": "^2.0.2",
+    "@vercel/analytics": "^1.5.0",
     "@vercel/speed-insights": "^1.1.0",
     "babel-plugin-react-compiler": "^1.0.0",
     "better-auth": "^1.3.7",
