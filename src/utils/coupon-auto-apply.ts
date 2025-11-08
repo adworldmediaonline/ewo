@@ -57,7 +57,7 @@ const calculateCartTotals = (
   firstTimeDiscount = 0
 ) => {
   const subtotal = cartProducts.reduce((total, item) => {
-    const price = Number(item.finalPriceDiscount || item.price || 0);
+    const price = Number(item.finalPriceDiscount || 0);
     const quantity = Number(item.orderQuantity || 1);
     return total + price * quantity;
   }, 0);

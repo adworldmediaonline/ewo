@@ -110,7 +110,7 @@ export default function CartMiniSidebar() {
     try {
       const cartSubtotal = cart_products.reduce((total, item) => {
         const quantity = Number(item?.orderQuantity || 0);
-        const price = Number(item?.price || 0);
+        const price = Number(item?.finalPriceDiscount || 0);
         return total + quantity * price;
       }, 0);
 
@@ -408,11 +408,11 @@ export default function CartMiniSidebar() {
                             $
                             {item.discount > 0
                               ? (
-                                  Number(item.price) -
-                                  (Number(item.price) * Number(item.discount)) /
+                                  Number(item.finalPriceDiscount) -
+                                  (Number(item.finalPriceDiscount) * Number(item.discount)) /
                                     100
                                 ).toFixed(2)
-                              : Number(item.price).toFixed(2)}
+                              : Number(item.finalPriceDiscount || 0).toFixed(2)}
                           </span>
                           <span className="">×</span>
                           <span className="">{item.orderQuantity}</span>
@@ -421,14 +421,14 @@ export default function CartMiniSidebar() {
                             $
                             {item.discount > 0
                               ? (
-                                  (Number(item.price) -
-                                    (Number(item.price) *
+                                  (Number(item.finalPriceDiscount) -
+                                    (Number(item.finalPriceDiscount) *
                                       Number(item.discount)) /
                                       100) *
                                   item.orderQuantity
                                 ).toFixed(2)
                               : (
-                                  Number(item.price) * item.orderQuantity
+                                  Number(item.finalPriceDiscount || 0) * item.orderQuantity
                                 ).toFixed(2)}
                           </span>
                         </div>
@@ -513,7 +513,7 @@ export default function CartMiniSidebar() {
                   {applied_coupons.map((coupon, index) => {
                     // Calculate discount percentage if available
                     const cartSubtotal = cart_products.reduce((total, item) => {
-                      return total + (Number(item.price || 0) * Number(item.orderQuantity || 1));
+                      return total + (Number(item.finalPriceDiscount || 0) * Number(item.orderQuantity || 1));
                     }, 0);
                     const discountPercent = coupon.discountType === 'percentage' && coupon.discountPercentage
                       ? coupon.discountPercentage

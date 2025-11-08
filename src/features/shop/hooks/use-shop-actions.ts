@@ -48,24 +48,23 @@ export const useShopActions = () => {
         return;
       }
 
+      // Calculate base price and total price with option
+      const basePrice = Number(product.finalPriceDiscount || 0);
+      const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+      const totalPrice = basePrice + optionPrice;
+
       const cartProduct = {
         _id: product._id,
         title: product.title,
         img: product.imageURLs?.[0] || product.img || '',
-        price: product.finalPriceDiscount || product.price || 0,
+        finalPriceDiscount: totalPrice, // Include option price (this is the price field we use)
         orderQuantity: 1,
         quantity: product.quantity,
         slug: product.slug,
         shipping: product.shipping || { price: 0 },
-        finalPriceDiscount: product.finalPriceDiscount || product.price || 0,
         sku: product.sku,
-        options: selectedOption,
-        finalPrice: selectedOption
-          ? (
-            Number(product.finalPriceDiscount || product.price) +
-            Number(selectedOption.price)
-          ).toFixed(2)
-          : undefined,
+        selectedOption: selectedOption, // Store selected option details
+        basePrice: basePrice, // Store original base price for reference
       };
 
       dispatch(add_cart_product(cartProduct));

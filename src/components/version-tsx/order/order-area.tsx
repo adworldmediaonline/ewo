@@ -256,7 +256,7 @@ export default function OrderArea({ orderId }: { orderId: string }) {
   const orderDate = dayjs(createdAt).format('MMMM D, YYYY');
   const orderTime = dayjs(createdAt).format('h:mm A');
   const subtotal = cart.reduce(
-    (sum: number, item: any) => sum + item.price * item.orderQuantity,
+    (sum: number, item: any) => sum + Number(item.finalPriceDiscount || 0) * item.orderQuantity,
     0
   );
 
@@ -800,17 +800,22 @@ export default function OrderArea({ orderId }: { orderId: string }) {
                     <h3 className="font-semibold text-foreground truncate">
                       {item.title}
                     </h3>
+                    {item.selectedOption && (
+                      <p className="text-xs text-muted-foreground">
+                        {item.selectedOption.title} (+${Number(item.selectedOption.price).toFixed(2)})
+                      </p>
+                    )}
                     <p className="text-sm text-muted-foreground">
                       Quantity: {item.orderQuantity}
                     </p>
                   </div>
                   <div className="text-right flex-shrink-0">
                     <div className="font-semibold text-foreground">
-                      ${(item.price * item.orderQuantity).toFixed(2)}
+                      ${(Number(item.finalPriceDiscount || 0) * item.orderQuantity).toFixed(2)}
                     </div>
                     {item.orderQuantity > 1 && (
                       <div className="text-xs text-muted-foreground">
-                        ${item.price.toFixed(2)} each
+                        ${Number(item.finalPriceDiscount || 0).toFixed(2)} each
                       </div>
                     )}
                   </div>

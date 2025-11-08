@@ -4,6 +4,7 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 interface SelectedOption {
   title: string;
+  price: number;
 }
 
 interface CartProduct {
@@ -11,14 +12,15 @@ interface CartProduct {
   title: string;
   img: string;
   sku: string;
-  price: number | string;
-  finalPriceDiscount: number | string;
+  price?: number | string; // Deprecated - kept for backward compatibility
+  finalPriceDiscount: number | string; // Current price field (includes option price)
   orderQuantity: number;
   quantity?: number;
   discount?: number | string;
   slug?: string;
   shipping?: { price?: number };
   selectedOption?: SelectedOption;
+  basePrice?: number; // Original base price before option
 }
 
 interface FirstTimeDiscountState {

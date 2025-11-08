@@ -15,7 +15,7 @@ export default function CartItem({ product }: { product: any }) {
     _id,
     img,
     title,
-    price,
+    finalPriceDiscount,
     orderQuantity = 0,
     selectedOption,
   } = product || {};
@@ -69,7 +69,7 @@ export default function CartItem({ product }: { product: any }) {
           )}
 
           <div className="text-sm text-muted-foreground mt-1">
-            ${price.toFixed(2)} each
+            ${Number(finalPriceDiscount || 0).toFixed(2)} each
           </div>
         </div>
 
@@ -103,7 +103,7 @@ export default function CartItem({ product }: { product: any }) {
 
           <div className="flex items-center gap-3">
             <div className="font-medium">
-              ${(price * orderQuantity).toFixed(2)}
+              ${(Number(finalPriceDiscount || 0) * orderQuantity).toFixed(2)}
             </div>
             <button
               onClick={() => handleRemovePrd({ title, id: _id })}
