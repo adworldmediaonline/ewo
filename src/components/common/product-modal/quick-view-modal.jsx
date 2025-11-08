@@ -129,10 +129,16 @@ export default function QuickViewModal() {
       return;
     }
 
+    // Calculate total price with selected option
+    const basePrice = Number(prd.finalPriceDiscount || 0);
+    const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+    const totalPrice = basePrice + optionPrice;
+
     const productToAdd = {
       ...prd,
+      finalPriceDiscount: totalPrice, // Include option price (this is the price field we use)
       selectedOption,
-      finalPrice: selectedOption ? calculateFinalPrice() : undefined,
+      basePrice: basePrice, // Store original base price for reference
     };
 
     dispatch(add_cart_product(productToAdd));

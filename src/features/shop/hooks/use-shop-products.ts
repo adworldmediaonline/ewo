@@ -32,7 +32,7 @@ export const useShopProducts = (filters: ShopFiltersState) => {
 
   const isMountedRef = useRef(true);
   const pendingResetRef = useRef(false);
-  const currentFetchRef = useRef<{ filters: string; page: number } | null>(null);
+  const currentFetchRef = useRef<string | null>(null);
 
   const [fetchProducts] = useLazyGetPaginatedProductsQuery();
 
@@ -60,12 +60,8 @@ export const useShopProducts = (filters: ShopFiltersState) => {
   useEffect(() => {
     pendingResetRef.current = true;
     currentFetchRef.current = null;
-    const timeoutId = setTimeout(() => {
-      setPage(1);
-      setResult({ data: [], pagination: null });
-    }, 0);
-
-    return () => clearTimeout(timeoutId);
+    setPage(1);
+    setResult({ data: [], pagination: null });
   }, [filtersKey]);
 
   useEffect(() => {
@@ -83,12 +79,8 @@ export const useShopProducts = (filters: ShopFiltersState) => {
       }
 
       // Prevent duplicate fetches for the same filter/page combination
-      const fetchKey = { filters: filtersKey, page };
-      if (
-        currentFetchRef.current &&
-        currentFetchRef.current.filters === fetchKey.filters &&
-        currentFetchRef.current.page === fetchKey.page
-      ) {
+      const fetchKey = `${filtersKey}-${page}`;
+      if (currentFetchRef.current === fetchKey) {
         return;
       }
 
@@ -125,12 +117,16 @@ export const useShopProducts = (filters: ShopFiltersState) => {
         });
 
         setStatus('success');
+        // Clear fetch ref after successful load to allow next fetch
+        currentFetchRef.current = null;
       } catch (error) {
         if (ignore || !isMountedRef.current) {
           return;
         }
 
         setStatus('error');
+        // Clear fetch ref on error to allow retry
+        currentFetchRef.current = null;
 
         const message =
           typeof error === 'object' && error && 'data' in error
@@ -150,15 +146,18 @@ export const useShopProducts = (filters: ShopFiltersState) => {
   }, [fetchProducts, filtersSnapshot, page, reloadKey, filtersKey]);
 
   const fetchNext = useCallback(() => {
+    // Prevent multiple calls while already loading
     if (status === 'loading' || status === 'loading-more') {
       return;
     }
 
+    // Check if there are more pages
     if (!pagination?.hasNextPage) {
       return;
     }
 
-    setPage(previous => previous + 1);
+    // Increment page to trigger fetch
+    setPage(prev => prev + 1);
   }, [pagination?.hasNextPage, status]);
 
   const reset = useCallback(() => {

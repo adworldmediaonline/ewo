@@ -59,16 +59,22 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
   const totalProducts = pagination?.totalProducts ?? products.length;
 
   const { ref: loadMoreRef, inView } = useInView({
-    rootMargin: '400px 0px',
+    rootMargin: '200px 0px',
+    threshold: 0,
   });
 
   useEffect(() => {
-    if (!inView || !canFetchMore) {
+    if (!inView || !canFetchMore || isLoadingMore) {
       return;
     }
 
-    fetchNext();
-  }, [inView, canFetchMore, fetchNext]);
+    // Debounce the fetch trigger to prevent rapid-fire calls
+    const timeoutId = setTimeout(() => {
+      fetchNext();
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, [inView, canFetchMore, isLoadingMore, fetchNext]);
 
   const handleSortChange = useCallback(
     (value: string) => {

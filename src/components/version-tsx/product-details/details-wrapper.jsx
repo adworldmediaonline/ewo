@@ -228,20 +228,21 @@ export default function DetailsWrapper({
     }
     //
     // Use pre-calculated prices from database
-    const finalSellingPrice = prd.finalPriceDiscount || prd.price;
-    const markedUpPrice = prd.updatedPrice || prd.price;
-    const originalPrice = Number(prd.price);
+    const finalSellingPrice = Number(prd.finalPriceDiscount || 0);
+    const markedUpPrice = prd.updatedPrice || prd.finalPriceDiscount;
+
+    // Calculate total price with selected option
+    const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+    const totalPriceWithOption = finalSellingPrice + optionPrice;
 
     const productToAdd = {
       ...prd,
-      price: finalSellingPrice,
-      originalPrice: originalPrice,
-      markedUpPrice: markedUpPrice,
+      finalPriceDiscount: totalPriceWithOption, // Include option price (this is the price field we use)
+      updatedPrice: markedUpPrice,
       selectedOption,
+      basePrice: finalSellingPrice, // Store original base price for reference
       // Replace the options array with only the selected option
       options: selectedOption ? [selectedOption] : [],
-      // If an option is selected, update the final price to include the option price
-      finalPrice: selectedOption ? calculateFinalPrice() : undefined,
     };
 
     dispatch(add_cart_product(productToAdd));

@@ -92,9 +92,14 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
                       <p className="text-sm font-medium text-foreground line-clamp-2 leading-tight">
                         {item.title || `Product ${index + 1}`}
                       </p>
+                      {item.selectedOption && (
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {item.selectedOption.title} (+${Number(item.selectedOption.price).toFixed(2)})
+                        </p>
+                      )}
                       <div className="flex flex-wrap gap-2 mt-1 text-xs text-muted-foreground">
                         <span>Qty: {item.orderQuantity || 1}</span>
-                        <span>${(item.price || 0).toFixed(2)}</span>
+                        <span>${Number(item.finalPriceDiscount || 0).toFixed(2)}</span>
                       </div>
                     </div>
                   </div>

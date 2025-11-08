@@ -41,6 +41,10 @@ interface CartItem {
   };
   finalPriceDiscount?: number | string;
   sku?: string;
+  selectedOption?: {
+    title: string;
+    price: number;
+  };
 }
 
 interface AppliedCoupon {
@@ -361,7 +365,7 @@ export default function CartDropdown({
     dispatch(
       add_cart_product({
         ...item,
-        finalPriceDiscount: item.finalPriceDiscount || item.price,
+        finalPriceDiscount: item.finalPriceDiscount,
         sku: item.sku || item._id,
       } as any)
     );
@@ -370,7 +374,7 @@ export default function CartDropdown({
     dispatch(
       quantityDecrement({
         ...item,
-        finalPriceDiscount: item.finalPriceDiscount || item.price,
+        finalPriceDiscount: item.finalPriceDiscount,
         sku: item.sku || item._id,
       } as any)
     );
@@ -405,7 +409,7 @@ export default function CartDropdown({
   };
 
   function renderLinePrice(item: CartItem): string {
-    const base = Number(item.price) || 0;
+    const base = Number(item.finalPriceDiscount || 0);
     const discount = Number(item.discount) || 0;
     const unit = discount > 0 ? base - (base * discount) / 100 : base;
     return (unit * Number(item.orderQuantity || 0)).toFixed(2);
@@ -480,6 +484,11 @@ export default function CartDropdown({
                     >
                       {item.title}
                     </Link>
+                    {item.selectedOption && (
+                      <div className="mt-1 text-xs text-muted-foreground">
+                        {item.selectedOption.title} (+${Number(item.selectedOption.price).toFixed(2)})
+                      </div>
+                    )}
                     <div className="mt-1 flex flex-wrap items-center gap-2">
                       {Number(item.discount || 0) > 0 && (
                         <span className="inline-flex items-center rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-700">

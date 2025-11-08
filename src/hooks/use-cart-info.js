@@ -16,8 +16,8 @@ const useCartInfo = () => {
   useEffect(() => {
     const cart = cart_products.reduce(
       (cartTotal, cartItem) => {
-        const { price, orderQuantity } = cartItem;
-        const itemTotal = price * orderQuantity;
+        const { finalPriceDiscount, orderQuantity } = cartItem;
+        const itemTotal = Number(finalPriceDiscount || 0) * orderQuantity;
         cartTotal.total += itemTotal;
         cartTotal.quantity += orderQuantity;
 

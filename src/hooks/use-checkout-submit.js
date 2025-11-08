@@ -572,7 +572,7 @@ const useCheckoutSubmit = () => {
     // Calculate correct subtotal (before any discounts)
     const rawSubTotal =
       cart_products?.reduce(
-        (acc, item) => acc + item.price * item.orderQuantity,
+        (acc, item) => acc + Number(item.finalPriceDiscount || 0) * item.orderQuantity,
         0
       ) || 0;
 

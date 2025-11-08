@@ -379,11 +379,16 @@ export default function MyOrders({ orderData }) {
                             />
                             <div className="">
                               <h6 className="">{item.title}</h6>
-                              <p className="">${item.price?.toFixed(2)} each</p>
+                              {item.selectedOption && (
+                                <p className="text-xs text-muted-foreground">
+                                  {item.selectedOption.title} (+${Number(item.selectedOption.price).toFixed(2)})
+                                </p>
+                              )}
+                              <p className="">${Number(item.finalPriceDiscount || 0).toFixed(2)} each</p>
                             </div>
                             <div className="">{item.orderQuantity}</div>
                             <div className="">
-                              ${(item.price * item.orderQuantity).toFixed(2)}
+                              ${(Number(item.finalPriceDiscount || 0) * item.orderQuantity).toFixed(2)}
                             </div>
                           </div>
                         ))}
