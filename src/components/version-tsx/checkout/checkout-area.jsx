@@ -113,7 +113,7 @@ export default function CheckoutArea() {
                 </div>
 
                 {/* Order summary - full width on mobile (displayed first), 5/12 width on desktop (sticky) */}
-                <div className="lg:col-span-5 order-1 lg:order-2 lg:sticky lg:top-4 lg:self-start">
+                <div className="lg:col-span-5 order-2 lg:order-2 lg:sticky lg:top-4 lg:self-start">
                   <CheckoutOrderArea checkoutData={checkoutData} />
                 </div>
               </div>
