@@ -273,15 +273,20 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'signin' }: AuthDi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px] p-0 gap-0 overflow-hidden">
+      <DialogContent className="sm:max-w-[480px] p-0 gap-0 overflow-hidden !z-[10000]">
         <DialogHeader className="sr-only">
           <DialogTitle>Authentication</DialogTitle>
           <DialogDescription>Sign in to your account or create a new one</DialogDescription>
         </DialogHeader>
+        <style jsx global>{`
+          [data-radix-dialog-overlay][data-slot="dialog-overlay"] {
+            z-index: 10000 !important;
+          }
+        `}</style>
 
         {view === 'auth' && (
-          <Tabs 
-            value={activeTab} 
+          <Tabs
+            value={activeTab}
             onValueChange={(value) => {
               setActiveTab(value as 'signin' | 'signup');
               setError(null);
@@ -296,8 +301,8 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'signin' }: AuthDi
                 {activeTab === 'signin' ? 'Welcome back' : 'Create account'}
               </h2>
               <p className="text-sm text-muted-foreground mb-4">
-                {activeTab === 'signin' 
-                  ? 'Sign in to access your account and continue shopping' 
+                {activeTab === 'signin'
+                  ? 'Sign in to access your account and continue shopping'
                   : 'Join us today and start your shopping journey'}
               </p>
               <TabsList className="grid w-full grid-cols-2">
