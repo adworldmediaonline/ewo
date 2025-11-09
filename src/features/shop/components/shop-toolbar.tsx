@@ -1,10 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
+import DebouncedSearchInput from '@/components/common/debounced-search-input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -35,34 +33,16 @@ const ShopToolbar = ({
   onClearFilters,
   totalProducts,
 }: ShopToolbarProps) => {
-  const [searchValue, setSearchValue] = useState(initialSearch);
-
-  // Sync local search value with external changes (e.g., clear filters)
-  useEffect(() => {
-    setSearchValue(initialSearch);
-  }, [initialSearch]);
-
-  // Debounce search commits
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (searchValue.trim() !== initialSearch) {
-        onSearchCommit(searchValue.trim());
-      }
-    }, 350);
-
-    return () => clearTimeout(timeoutId);
-  }, [searchValue, initialSearch, onSearchCommit]);
 
   return (
     <div className="flex flex-col gap-2 sm:gap-4">
       {/* Mobile: Everything in single compact row */}
       <div className="flex items-center gap-1.5 sm:hidden">
-        <Input
-          value={searchValue}
-          onChange={event => setSearchValue(event.target.value)}
+        <DebouncedSearchInput
+          initialValue={initialSearch}
+          onSearchChange={onSearchCommit}
           placeholder="Search..."
           className="h-9 flex-1 min-w-0 text-xs"
-          aria-label="Search products"
         />
 
         <Select value={sortKey} onValueChange={onSortChange}>
@@ -102,12 +82,11 @@ const ShopToolbar = ({
       {/* Desktop: Original layout */}
       <div className="hidden sm:flex sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-1 flex-row items-center gap-3">
-          <Input
-            value={searchValue}
-            onChange={event => setSearchValue(event.target.value)}
+          <DebouncedSearchInput
+            initialValue={initialSearch}
+            onSearchChange={onSearchCommit}
             placeholder="Search products..."
             className="h-10 w-full max-w-sm"
-            aria-label="Search products"
           />
 
           <Select value={sortKey} onValueChange={onSortChange}>
