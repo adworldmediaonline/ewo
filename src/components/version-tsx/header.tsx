@@ -6,7 +6,7 @@ import DesktopNav from './desktop-nav';
 import HeaderActions from './header-actions';
 import HeaderBrand from './header-brand';
 import HeaderMenuButton from './header-menu-button';
-import HeaderSearch from './header-search';
+import HeaderSearch from './header-search-new';
 import { getCategoriesShow } from '@/server/categories';
 
 
