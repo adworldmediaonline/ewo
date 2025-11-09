@@ -29,6 +29,7 @@ export default function robots() {
           '/email-verify',
           '/forget-password',
           '/admin/',
+          '/search',
           '/dashboard/',
           '/webhook/',
         ],
