@@ -43,7 +43,7 @@ export function HeaderActions({
     startTransition(async () => {
       const currentPath = window.location.pathname;
       await authClient.signOut();
-      
+
       if (currentPath.startsWith('/profile') || currentPath.startsWith('/settings')) {
         router.push('/');
       } else {
@@ -167,8 +167,8 @@ export function HeaderActions({
               onClick={() => setAuthDialogOpen(true)}
               aria-label="Sign in"
               className="inline-flex h-10 w-10 md:h-11 md:w-11 items-center justify-center rounded-full border border-border bg-background text-foreground hover:bg-accent transition-colors"
-            >
-              <User className="h-5 w-5 md:h-5 md:w-5" />
+          >
+            <User className="h-5 w-5 md:h-5 md:w-5" />
             </button>
             <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
           </>
