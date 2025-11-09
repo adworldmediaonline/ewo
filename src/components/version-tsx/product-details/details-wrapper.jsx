@@ -430,7 +430,7 @@ export default function DetailsWrapper({
       <div className="hidden lg:block">
         <Accordion
           type="multiple"
-          defaultValue={['description']}
+          defaultValue={[]}
           className="w-full"
         >
           <AccordionItem value="description" className="border-border/50">
@@ -580,7 +580,7 @@ export default function DetailsWrapper({
       <div className="lg:hidden">
         <Accordion
           type="multiple"
-          defaultValue={['description']}
+          defaultValue={[]}
           className="w-full"
         >
           <AccordionItem value="description" className="border-border/50">
