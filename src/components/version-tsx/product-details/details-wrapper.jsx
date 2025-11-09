@@ -40,7 +40,7 @@ import {
   Truck,
   XCircle,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ProductDetailsCountdown from './product-details-countdown';
 import ProductQuantity from './product-quantity';
@@ -116,12 +116,16 @@ export default function DetailsWrapper({
     description,
     specifications,
   } = productItem || {};
-  const [ratingVal, setRatingVal] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
   const { data: session } = authClient.useSession();
   const dispatch = useDispatch();
   const { orderQuantity, cart_products } = useSelector(state => state.cart);
+
+  // Calculate average rating (derived state - no memoization needed for simple calculation)
+  const ratingVal = reviews?.length > 0
+    ? reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
+    : 0;
 
   const handleReviewButtonClick = () => {
     if (!session) {
@@ -130,17 +134,6 @@ export default function DetailsWrapper({
     }
     setIsReviewDialogOpen(true);
   };
-
-  useEffect(() => {
-    if (reviews && reviews.length > 0) {
-      const rating =
-        reviews.reduce((acc, review) => acc + review.rating, 0) /
-        reviews.length;
-      setRatingVal(rating);
-    } else {
-      setRatingVal(0);
-    }
-  }, [reviews]);
 
   // Calculate final price using pre-calculated database values
   const calculateFinalPrice = () => {
@@ -189,7 +182,7 @@ export default function DetailsWrapper({
     const optionChanged =
       existingProduct &&
       JSON.stringify(existingProduct.selectedOption) !==
-        JSON.stringify(selectedOption);
+      JSON.stringify(selectedOption);
 
     // Get current quantity from existing product
     const currentQty = existingProduct ? existingProduct.orderQuantity : 0;
@@ -202,8 +195,7 @@ export default function DetailsWrapper({
     // If product has quantity limitation and requested quantity exceeds available
     if (prd.quantity && finalQuantity > prd.quantity) {
       notifyError(
-        `Sorry, only ${prd.quantity} items available. ${
-          existingProduct ? `You already have ${currentQty} in your cart.` : ''
+        `Sorry, only ${prd.quantity} items available. ${existingProduct ? `You already have ${currentQty} in your cart.` : ''
         }`
       );
       return;
@@ -438,7 +430,7 @@ export default function DetailsWrapper({
       <div className="hidden lg:block">
         <Accordion
           type="multiple"
-          defaultValue={['description']}
+          defaultValue={[]}
           className="w-full"
         >
           <AccordionItem value="description" className="border-border/50">
@@ -588,7 +580,7 @@ export default function DetailsWrapper({
       <div className="lg:hidden">
         <Accordion
           type="multiple"
-          defaultValue={['description']}
+          defaultValue={[]}
           className="w-full"
         >
           <AccordionItem value="description" className="border-border/50">

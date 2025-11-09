@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import DetailsThumbWrapper from './details-thumb-wrapper';
 import DetailsWrapper from './details-wrapper';
-import RelatedProducts from './related-products';
+import RelatedProductsSlider from './related-products-slider';
 import ProductVideoPlayer from './product-video-player';
 
 export default function ProductDetailsContent({ productItem }) {
@@ -55,7 +55,7 @@ export default function ProductDetailsContent({ productItem }) {
 
       {/* Related Products */}
       <div className={videoId ? "mt-0" : "mt-16"}>
-        <RelatedProducts id={_id} />
+        <RelatedProductsSlider id={_id} />
       </div>
     </>
   );

@@ -104,26 +104,26 @@ const ShopToolbar = ({
         </div>
 
         <div className="flex items-center justify-end gap-3">
-          {typeof totalProducts === 'number' ? (
-            <Badge
-              variant="outline"
-              className="h-10 inline-flex items-center px-4 text-sm font-medium"
-            >
-              {totalProducts} {totalProducts === 1 ? 'product' : 'products'}
-            </Badge>
-          ) : null}
+        {typeof totalProducts === 'number' ? (
+          <Badge
+            variant="outline"
+            className="h-10 inline-flex items-center px-4 text-sm font-medium"
+          >
+            {totalProducts} {totalProducts === 1 ? 'product' : 'products'}
+          </Badge>
+        ) : null}
 
-          {hasActiveFilters ? (
-            <Button
-              type="button"
-              variant="outline"
-              size="default"
-              onClick={onClearFilters}
-              className="h-10 px-4 text-sm font-medium text-muted-foreground hover:text-destructive hover:border-destructive hover:bg-destructive/5"
-            >
-              Clear ({activeFiltersCount})
-            </Button>
-          ) : null}
+        {hasActiveFilters ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="default"
+            onClick={onClearFilters}
+            className="h-10 px-4 text-sm font-medium text-muted-foreground hover:text-destructive hover:border-destructive hover:bg-destructive/5"
+          >
+            Clear ({activeFiltersCount})
+          </Button>
+        ) : null}
         </div>
       </div>
     </div>

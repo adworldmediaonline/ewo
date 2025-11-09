@@ -139,12 +139,12 @@ export default function RelatedProductCard({
 
   return (
     <Card
-      className="group relative overflow-hidden transition-all duration-300 hover:shadow-lg p-0"
+      className="group relative overflow-hidden transition-all duration-300 hover:shadow-lg p-0 flex flex-col h-full"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <Link href={`/product/${product.slug || product._id}`} className="block">
-        <CardContent className="p-0">
+      <Link href={`/product/${product.slug || product._id}`} className="block flex-1 flex flex-col">
+        <CardContent className="p-0 flex-shrink-0">
           <div className="relative aspect-square overflow-hidden p-1">
             {/* Left Side Badges - Stacked vertically */}
             <div className="absolute left-2 top-2 z-10 flex flex-col gap-2">
@@ -255,7 +255,7 @@ export default function RelatedProductCard({
       </Link>
 
       {/* Product Info - Fixed Layout */}
-      <div className="flex flex-col h-full px-4 pb-4 pt-2">
+      <div className="flex flex-col flex-1 px-4 pb-4 pt-2">
         <div className="flex-1">
           <Link
             href={`/product/${product.slug || product._id}`}
