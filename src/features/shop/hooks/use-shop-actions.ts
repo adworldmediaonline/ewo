@@ -69,12 +69,7 @@ export const useShopActions = () => {
 
       dispatch(add_cart_product(cartProduct));
 
-      if (optionChanged) {
-        notifySuccess(`Option updated to "${selectedOption?.title}"`);
-        return;
-      }
-
-      notifySuccess(`${product.title} added to cart`);
+      // Cart confirmation modal will handle user feedback - no toast needed
     },
     [cart_products, dispatch]
   );

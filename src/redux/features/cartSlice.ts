@@ -255,7 +255,14 @@ export const cartSlice = createSlice({
 
       setLocalStorage('cart_products', state.cart_products);
       setLocalStorage('shipping_cost', state.totalShippingCost);
-      notifyError(`${payload.title} Remove from cart`);
+
+      // Hide cart confirmation modal if cart is now empty
+      if (state.cart_products.length === 0) {
+        state.showCartConfirmation = false;
+        state.lastAddedProduct = null;
+      }
+
+      // No toast notification - keep UI clean
     },
     update_product_option: (
       state,
@@ -312,6 +319,10 @@ export const cartSlice = createSlice({
       state.cart_products = [];
       state.totalShippingCost = 0;
       state.shippingDiscount = 0;
+
+      // Hide cart confirmation modal when cart is cleared
+      state.showCartConfirmation = false;
+      state.lastAddedProduct = null;
 
       // Reset first-time discount state
       updateFirstTimeDiscount(state);

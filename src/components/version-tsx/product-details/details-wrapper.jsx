@@ -247,10 +247,7 @@ export default function DetailsWrapper({
 
     dispatch(add_cart_product(productToAdd));
 
-    // Show appropriate success message
-    if (optionChanged) {
-      notifySuccess(`Option updated to "${selectedOption?.title}"`);
-    }
+    // Cart confirmation modal will handle user feedback - no toast needed
 
     // Reset the order quantity back to 1 for future additions
     if (optionChanged) {
