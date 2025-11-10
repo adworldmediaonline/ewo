@@ -408,10 +408,10 @@ export default function CartMiniSidebar() {
                             $
                             {item.discount > 0
                               ? (
-                                  Number(item.finalPriceDiscount) -
-                                  (Number(item.finalPriceDiscount) * Number(item.discount)) /
-                                    100
-                                ).toFixed(2)
+                                Number(item.finalPriceDiscount) -
+                                (Number(item.finalPriceDiscount) * Number(item.discount)) /
+                                100
+                              ).toFixed(2)
                               : Number(item.finalPriceDiscount || 0).toFixed(2)}
                           </span>
                           <span className="">×</span>
@@ -421,15 +421,15 @@ export default function CartMiniSidebar() {
                             $
                             {item.discount > 0
                               ? (
-                                  (Number(item.finalPriceDiscount) -
-                                    (Number(item.finalPriceDiscount) *
-                                      Number(item.discount)) /
-                                      100) *
-                                  item.orderQuantity
-                                ).toFixed(2)
+                                (Number(item.finalPriceDiscount) -
+                                  (Number(item.finalPriceDiscount) *
+                                    Number(item.discount)) /
+                                  100) *
+                                item.orderQuantity
+                              ).toFixed(2)
                               : (
-                                  Number(item.finalPriceDiscount || 0) * item.orderQuantity
-                                ).toFixed(2)}
+                                Number(item.finalPriceDiscount || 0) * item.orderQuantity
+                              ).toFixed(2)}
                           </span>
                         </div>
 
@@ -518,8 +518,8 @@ export default function CartMiniSidebar() {
                     const discountPercent = coupon.discountType === 'percentage' && coupon.discountPercentage
                       ? coupon.discountPercentage
                       : coupon.discount && cartSubtotal > 0
-                      ? ((coupon.discount / cartSubtotal) * 100).toFixed(1)
-                      : null;
+                        ? ((coupon.discount / cartSubtotal) * 100).toFixed(1)
+                        : null;
 
                     return (
                       <div
