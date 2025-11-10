@@ -619,15 +619,31 @@ export default function CartDropdown({
                 </div>
               )}
               <div className="flex items-center justify-between">
-                <span>Shipping</span>
                 <span>
-                  ${totalShippingCost.toFixed(2)}
-                  {Number(discountPercentage) > 0 && (
-                    <span className="ml-2 text-xs text-muted-foreground">
-                      {discountPercentage}% off
+                  Shipping
+                  {totalShippingCost === 0 && Number(subtotal) >= 500 && (
+                    <span className="ml-1 text-xs text-emerald-600">
+                      (Free on orders $500+)
+                    </span>
+                  )}
+                  {totalShippingCost > 0 && Number(subtotal) < 500 && (
+                    <span className="ml-1 text-xs text-blue-600">
+                      (Free on $500+)
                     </span>
                   )}
                 </span>
+                {totalShippingCost === 0 && Number(subtotal) >= 500 ? (
+                  <span className="text-emerald-600 font-semibold">FREE</span>
+                ) : (
+                  <span>
+                    ${totalShippingCost.toFixed(2)}
+                    {Number(discountPercentage) > 0 && (
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        {discountPercentage}% off
+                      </span>
+                    )}
+                  </span>
+                )}
               </div>
               {Number(total_coupon_discount) > 0 && (
                 <div className="flex items-center justify-between">

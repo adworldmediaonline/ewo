@@ -584,15 +584,31 @@ export default function CheckoutOrderArea({ checkoutData }) {
           </div>
 
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Shipping</span>
-            <span className="font-medium text-foreground">
-              ${(Number(displayShipping) || 0).toFixed(2)}
-              {discountPercentage > 0 && (
-                <span className="ml-2 text-xs bg-green-100 text-green-600 px-1.5 py-0.5 rounded">
-                  {discountPercentage}% off
+            <span className="text-muted-foreground">
+              Shipping
+              {displayShipping === 0 && Number(displaySubtotal) >= 500 && (
+                <span className="ml-1 text-xs text-emerald-600">
+                  (Free on orders $500+)
+                </span>
+              )}
+              {displayShipping > 0 && Number(displaySubtotal) < 500 && (
+                <span className="ml-1 text-xs text-blue-600">
+                  (Free on $500+)
                 </span>
               )}
             </span>
+            {displayShipping === 0 && Number(displaySubtotal) >= 500 ? (
+              <span className="font-bold text-emerald-600">FREE</span>
+            ) : (
+              <span className="font-medium text-foreground">
+                ${(Number(displayShipping) || 0).toFixed(2)}
+                {discountPercentage > 0 && (
+                  <span className="ml-2 text-xs bg-green-100 text-green-600 px-1.5 py-0.5 rounded">
+                    {discountPercentage}% off
+                  </span>
+                )}
+              </span>
+            )}
           </div>
 
           {/* Multiple coupon discounts display */}

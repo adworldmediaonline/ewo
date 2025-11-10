@@ -461,14 +461,28 @@ export default function CartCheckout() {
             <div className="space-y-1">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
-                  Shipping:{' '}
+                  Shipping
+                  {totals.shipping === 0 && totals.subtotal >= 500 && (
+                    <span className="ml-1 text-xs text-emerald-600">
+                      (Free on orders $500+)
+                    </span>
+                  )}
+                  {totals.shipping > 0 && totals.subtotal < 500 && (
+                    <span className="ml-1 text-xs text-blue-600">
+                      (Free on $500+)
+                    </span>
+                  )}
                   {discountPercentage > 0 && (
                     <span className="text-green-600">
-                      ({discountPercentage}% off)
+                      {' '}({discountPercentage}% off)
                     </span>
                   )}
                 </span>
-                <span>${totals.shipping.toFixed(2)}</span>
+                {totals.shipping === 0 && totals.subtotal >= 500 ? (
+                  <span className="text-emerald-600 font-semibold">FREE</span>
+                ) : (
+                  <span>${totals.shipping.toFixed(2)}</span>
+                )}
               </div>
               {/* {discountPercentage > 0 && (
                 <div className="text-xs text-green-600">
