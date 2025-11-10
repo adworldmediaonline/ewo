@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 export default function useCouponRevalidation() {
   const dispatch = useDispatch();
-  const { cart_products } = useSelector(state => state.cart);
+  const { cart_products, totalShippingCost } = useSelector(state => state.cart);
   const { applied_coupons } = useSelector(state => state.coupon);
   const previousCartRef = useRef(null);
   const revalidationTimeoutRef = useRef(null);
@@ -22,23 +22,28 @@ export default function useCouponRevalidation() {
       !Array.isArray(cart_products) ||
       cart_products.length === 0
     ) {
-      return { cartSubtotal: 0 };
+      return { cartSubtotal: 0, cartTotal: 0, shippingCost: 0 };
     }
 
     try {
       const cartSubtotal = cart_products.reduce((total, item) => {
         const quantity = Number(item?.orderQuantity || 0);
-        const price = Number(item?.price || 0);
+        const price = Number(item?.finalPriceDiscount || item?.price || 0);
         return total + quantity * price;
       }, 0);
 
+      const shippingCost = Number(totalShippingCost || 0);
+      const cartTotal = cartSubtotal + shippingCost;
+
       return {
         cartSubtotal: Math.round(cartSubtotal * 100) / 100,
+        cartTotal: Math.round(cartTotal * 100) / 100,
+        shippingCost: Math.round(shippingCost * 100) / 100,
       };
     } catch (error) {
-      return { cartSubtotal: 0 };
+      return { cartSubtotal: 0, cartTotal: 0, shippingCost: 0 };
     }
-  }, [cart_products]);
+  }, [cart_products, totalShippingCost]);
 
   // Re-validate all applied coupons
   const revalidateAllCoupons = useCallback(async () => {
@@ -54,7 +59,7 @@ export default function useCouponRevalidation() {
     dispatch(set_coupon_loading(true));
 
     try {
-      const { cartSubtotal } = calculateTotals();
+      const { cartSubtotal, cartTotal, shippingCost } = calculateTotals();
       const couponCodes = applied_coupons.map(c => c.couponCode);
 
       const response = await fetch(
@@ -67,9 +72,9 @@ export default function useCouponRevalidation() {
           body: JSON.stringify({
             couponCodes: couponCodes,
             cartItems: cart_products,
-            cartTotal: cartSubtotal,
+            cartTotal: cartTotal,
             cartSubtotal: cartSubtotal,
-            shippingCost: 0,
+            shippingCost: shippingCost,
             excludeAppliedCoupons: [], // Don't exclude any since we're revalidating
           }),
         }
