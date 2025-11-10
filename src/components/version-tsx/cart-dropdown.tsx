@@ -421,11 +421,15 @@ export default function CartDropdown({
       : '0';
 
   const finalTotal = React.useMemo(() => {
-    const baseTotal = Number(total || 0);
+    // When coupons are applied, use subtotal (ignore first-time discount)
+    // When NO coupons are applied, use total (includes first-time discount)
+    const baseTotal = applied_coupons.length > 0
+      ? Number(subtotal || 0)
+      : Number(total || 0);
     const shipping = Number(totalShippingCost || 0);
     const coupon = Number(total_coupon_discount || 0);
     return Math.max(0, baseTotal + shipping - coupon);
-  }, [total, totalShippingCost, total_coupon_discount]);
+  }, [subtotal, total, totalShippingCost, total_coupon_discount, applied_coupons.length]);
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -600,10 +604,7 @@ export default function CartDropdown({
               <div className="flex items-center justify-between">
                 <span>Subtotal</span>
                 <span>
-                  $
-                  {Number(
-                    firstTimeDiscount?.isApplied ? subtotal : total || 0
-                  ).toFixed(2)}
+                  ${Number(subtotal || 0).toFixed(2)}
                 </span>
               </div>
               {/* Only show first-time discount when NO coupons are applied */}

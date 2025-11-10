@@ -54,7 +54,7 @@ const calculateCartTotals = (
   cartProducts: CartProduct[],
   totalShippingCost = 0,
   addressDiscount = 0,
-  firstTimeDiscount = 0
+  firstTimeDiscountPercent = 0
 ) => {
   const subtotal = cartProducts.reduce((total, item) => {
     const price = Number(item.finalPriceDiscount || 0);
@@ -62,12 +62,20 @@ const calculateCartTotals = (
     return total + price * quantity;
   }, 0);
 
-  const cartTotal = subtotal + totalShippingCost - addressDiscount - firstTimeDiscount;
+  // Calculate first-time discount amount from percentage
+  const firstTimeDiscountAmount = firstTimeDiscountPercent > 0
+    ? (subtotal * firstTimeDiscountPercent) / 100
+    : 0;
+
+  // For coupon validation, send cart total WITHOUT first-time discount
+  // Coupons and first-time discount should not stack
+  const cartTotal = subtotal + totalShippingCost - addressDiscount;
 
   return {
     subtotal,
     cartTotal,
     shipping: totalShippingCost,
+    firstTimeDiscountAmount,
   };
 };
 
