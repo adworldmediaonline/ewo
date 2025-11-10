@@ -28,7 +28,7 @@ export default async function HeroBanner() {
                 fetchPriority="high"
                 quality={75}
                 sizes="100vw"
-                className="object-cover"
+                className="object-contain"
               />
             </div>
 
@@ -43,7 +43,7 @@ export default async function HeroBanner() {
                 fetchPriority="high"
                 quality={75}
                 sizes="100vw"
-                className="object-cover"
+                className="object-contain"
               />
             </div>
           </Link>
