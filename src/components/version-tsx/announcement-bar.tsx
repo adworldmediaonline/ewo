@@ -71,7 +71,7 @@ export default function AnnouncementBar({ announcements }: AnnouncementBarProps)
       <div className="container mx-auto flex items-center justify-center gap-2 relative">
         {/* Title (Mobile: Hidden, Desktop: Shown) */}
         {currentAnnouncement.title && (
-          <span className="hidden sm:inline font-semibold text-sm">
+          <span className="inline font-semibold text-sm">
             {currentAnnouncement.title}:
           </span>
         )}
