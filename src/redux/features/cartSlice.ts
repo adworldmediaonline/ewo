@@ -105,8 +105,28 @@ const calculateTotalShipping = (
   return parseFloat(discountedTotal.toFixed(2));
 };
 
+// Helper to check if free shipping is eligible (orders >= $500)
+const isFreeShippingEligible = (items: CartProduct[]): boolean => {
+  const subtotal = items.reduce((total: number, item: CartProduct) => {
+    const price = Number(item.finalPriceDiscount || 0);
+    const quantity = Number(item.orderQuantity || 0);
+    return total + price * quantity;
+  }, 0);
+
+  // Free shipping threshold: $500
+  return subtotal >= 500;
+};
+
 // Helper to update shipping costs
 const updateShippingCosts = (state: CartState): void => {
+  // Check if free shipping is eligible
+  if (isFreeShippingEligible(state.cart_products)) {
+    state.totalShippingCost = 0;
+    state.shippingDiscount = 0;
+    return;
+  }
+
+  // Otherwise, calculate normal shipping with discounts
   const discount = calculateShippingDiscount(state.cart_products);
   state.shippingDiscount = discount;
 

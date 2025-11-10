@@ -580,13 +580,29 @@ export default function CartMiniSidebar() {
               </div>
 
               <div className="">
-                <span>Shipping:</span>
                 <span>
-                  ${(Number(totalShippingCost) || 0).toFixed(2)}
-                  {discountPercentage > 0 && (
-                    <span className="">{discountPercentage}% off</span>
+                  Shipping:
+                  {totalShippingCost === 0 && Number(subtotal) >= 500 && (
+                    <span className="ml-1 text-xs text-emerald-600">
+                      (Free on orders $500+)
+                    </span>
+                  )}
+                  {totalShippingCost > 0 && Number(subtotal) < 500 && (
+                    <span className="ml-1 text-xs text-blue-600">
+                      (Free on $500+)
+                    </span>
                   )}
                 </span>
+                {totalShippingCost === 0 && Number(subtotal) >= 500 ? (
+                  <span className="text-emerald-600 font-semibold">FREE</span>
+                ) : (
+                  <span>
+                    ${(Number(totalShippingCost) || 0).toFixed(2)}
+                    {discountPercentage > 0 && (
+                      <span className="">{discountPercentage}% off</span>
+                    )}
+                  </span>
+                )}
               </div>
 
               {/* Multiple coupon discounts display */}
