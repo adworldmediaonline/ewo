@@ -1,4 +1,6 @@
 import ProductDetailsArea from '@/components/version-tsx/product-details/product-details-area';
+import ProductBreadcrumbAsync from '@/components/version-tsx/product-details/product-breadcrumb-async';
+import { BreadcrumbShell } from '@/components/version-tsx/product-details/breadcrumb-shell';
 import { getProductSingle } from '@/server/products';
 import { Metadata } from 'next';
 
@@ -49,6 +51,15 @@ export default async function ProductDetailsPage(props: {
 }) {
   "use cache";
 
-  // Wrapper is already in layout.jsx, so we don't need it here
-  return <ProductDetailsArea params={props.params} />;
+  return (
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+      <BreadcrumbShell>
+        <ProductBreadcrumbAsync params={props.params} />
+      </BreadcrumbShell>
+
+      {/* Product details content - streams in separately */}
+      <ProductDetailsArea params={props.params} />
+    </div>
+  );
 }
