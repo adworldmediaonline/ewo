@@ -1,6 +1,6 @@
 "use cache";
 
-import { cache } from "react";
+// import { cache } from "react";
 import { cacheLife } from "next/cache";
 import { API_ENDPOINT } from "./api-endpoint";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
