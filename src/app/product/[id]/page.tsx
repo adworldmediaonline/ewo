@@ -1,8 +1,12 @@
 import ProductDetailsArea from '@/components/version-tsx/product-details/product-details-area';
 import ProductBreadcrumbAsync from '@/components/version-tsx/product-details/product-breadcrumb-async';
 import { BreadcrumbShell } from '@/components/version-tsx/product-details/breadcrumb-shell';
+import { ProductContentSkeleton } from '@/components/version-tsx/product-details/product-content-skeleton';
 import { getProductSingle } from '@/server/products';
 import { Metadata } from 'next';
+import { Suspense } from 'react';
+import { BreadcrumbItem, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+import { ChevronRight } from 'lucide-react';
 
 export const generateMetadata = async (props: {
   params: Promise<{ id: string }>;
@@ -49,17 +53,44 @@ export const generateMetadata = async (props: {
 export default async function ProductDetailsPage(props: {
   params: Promise<{ id: string }>;
 }) {
-  "use cache";
-
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
+      {/*
+        Static breadcrumb shell renders instantly
+        Dynamic breadcrumb content (category + product) streams in via Suspense
+      */}
       <BreadcrumbShell>
-        <ProductBreadcrumbAsync params={props.params} />
+        <Suspense fallback={<BreadcrumbLoadingSkeleton />}>
+          <ProductBreadcrumbAsync params={props.params} />
+        </Suspense>
       </BreadcrumbShell>
 
-      {/* Product details content - streams in separately */}
-      <ProductDetailsArea params={props.params} />
+      {/*
+        Main product content with Suspense boundary
+        Cached product data streams in, providing fast subsequent loads
+        Related products have their own nested Suspense boundary
+      */}
+      <Suspense fallback={<ProductContentSkeleton />}>
+        <ProductDetailsArea params={props.params} />
+      </Suspense>
     </div>
   );
 }
+
+const BreadcrumbLoadingSkeleton = () => {
+  return (
+    <>
+      <BreadcrumbItem>
+        <div className="h-5 w-24 bg-muted animate-pulse rounded" />
+      </BreadcrumbItem>
+
+      <BreadcrumbSeparator>
+        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+      </BreadcrumbSeparator>
+
+      <BreadcrumbItem>
+        <div className="h-5 w-32 bg-muted animate-pulse rounded" />
+      </BreadcrumbItem>
+    </>
+  );
+};

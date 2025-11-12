@@ -7,7 +7,6 @@ import {
 } from '@/components/ui/breadcrumb';
 import { ChevronRight, Home } from 'lucide-react';
 import Link from 'next/link';
-import { Suspense } from 'react';
 
 /**
  * Static breadcrumb shell that renders immediately
@@ -35,30 +34,12 @@ export const BreadcrumbShell = ({ children }: { children: React.ReactNode }) => 
         </BreadcrumbSeparator>
 
         {/* Dynamic content slot with Suspense fallback */}
-        <Suspense fallback={<BreadcrumbLoadingSkeleton />}>{children}</Suspense>
+        {children}
       </BreadcrumbList>
     </Breadcrumb>
   );
 };
 
-/**
- * Loading skeleton for breadcrumb dynamic content
- */
-const BreadcrumbLoadingSkeleton = () => {
-  return (
-    <>
-      <BreadcrumbItem>
-        <div className="h-5 w-24 bg-muted animate-pulse rounded" />
-      </BreadcrumbItem>
 
-      <BreadcrumbSeparator>
-        <ChevronRight className="w-4 h-4 text-muted-foreground" />
-      </BreadcrumbSeparator>
 
-      <BreadcrumbItem>
-        <div className="h-5 w-32 bg-muted animate-pulse rounded" />
-      </BreadcrumbItem>
-    </>
-  );
-};
 

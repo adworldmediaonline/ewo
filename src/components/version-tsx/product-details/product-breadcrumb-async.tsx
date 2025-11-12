@@ -11,7 +11,6 @@ export default async function ProductBreadcrumbAsync({
 }: {
   params: Promise<{ id: string }>
 }) {
-  "use cache";
 
   const { id } = await params;
   const product = await getProductSingle(id);

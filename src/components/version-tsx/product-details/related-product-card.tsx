@@ -9,6 +9,7 @@ import Link from 'next/link';
 import * as React from 'react';
 import { useSelector } from 'react-redux';
 import { useProductCoupon } from '@/hooks/useProductCoupon';
+import { ProductLinkIndicatorMinimal } from '@/components/ui/product-link-indicator';
 
 // Star rating component
 const StarRating = ({
@@ -143,7 +144,10 @@ export default function RelatedProductCard({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <Link href={`/product/${product.slug || product._id}`} className="block flex-1 flex flex-col">
+      <Link href={`/product/${product.slug || product._id}`} className="block flex-1 flex flex-col" prefetch={true}>
+        {/* useLinkStatus loading indicator - shows during navigation */}
+        <ProductLinkIndicatorMinimal />
+        
         <CardContent className="p-0 flex-shrink-0">
           <div className="relative aspect-square overflow-hidden p-1">
             {/* Left Side Badges - Stacked vertically */}

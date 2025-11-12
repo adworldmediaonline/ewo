@@ -1,9 +1,12 @@
-import { cache } from "react";
+"use cache";
+
+// import { cache } from "react";
+import { cacheLife } from "next/cache";
 import { API_ENDPOINT } from "./api-endpoint";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-export const getProductsShow = cache(async () => {
-  "use cache";
+export async function getProductsShow() {
+  cacheLife("hours");
   try {
     const response = await fetch(`${API_BASE_URL}${API_ENDPOINT.PRODUCTS_SHOW}`);
     if (!response.ok) {
@@ -18,11 +21,11 @@ export const getProductsShow = cache(async () => {
     console.error('Error fetching products:', error);
     return [];
   }
-});
+}
 
 
-export const getProductSingle = cache(async (id: string) => {
-  "use cache";
+export async function getProductSingle(id: string) {
+  cacheLife("hours");
   try {
     const response = await fetch(`${API_BASE_URL}${API_ENDPOINT.PRODUCTS_SINGLE}/${id}`);
     if (!response.ok) {
@@ -35,4 +38,23 @@ export const getProductSingle = cache(async (id: string) => {
     console.error('Error fetching product:', error);
     return null;
   }
-});
+}
+
+export async function getRelatedProducts(id: string) {
+  cacheLife("minutes");
+  try {
+    const response = await fetch(`${API_BASE_URL}${API_ENDPOINT.PRODUCTS_RELATED}/${id}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch related products');
+    }
+    const data = await response.json();
+
+    // Filter out current product and limit to 8
+    const relatedProducts = data?.data?.filter((p: any) => p._id !== id).slice(0, 8) || [];
+
+    return relatedProducts;
+  } catch (error) {
+    console.error('Error fetching related products:', error);
+    return [];
+  }
+}

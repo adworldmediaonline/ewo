@@ -1,17 +1,22 @@
 import ProductDetailsContent from './product-details-content';
+import RelatedProductsServer from './related-products-server';
+import { RelatedProductsSkeleton } from './related-products-skeleton';
 import { getProductSingle } from '@/server/products';
+import { Suspense } from 'react';
 
 /**
  * Product details area - renders the main product content
- * This component streams in after the static breadcrumb shell
+ * Uses native fetch with caching for optimal performance
+ * Caching is handled at the data fetching layer (products.ts)
+ *
+ * Follows composition pattern: client component receives server component as children
+ * This avoids the "donut pattern" anti-pattern and respects client/server boundaries
  */
 export default async function ProductDetailsArea({
   params
 }: {
   params: Promise<{ id: string }>
 }) {
-  "use cache";
-
   const { id } = await params;
   const product = await getProductSingle(id);
 
@@ -23,5 +28,14 @@ export default async function ProductDetailsArea({
     );
   }
 
-  return <ProductDetailsContent productItem={product} />;
+  return (
+    <ProductDetailsContent productItem={product}>
+      {/* Related Products - Server component passed as children slot */}
+      <div className={product.videoId ? "mt-0" : "mt-16"}>
+        <Suspense fallback={<RelatedProductsSkeleton />}>
+          <RelatedProductsServer productId={product._id} />
+        </Suspense>
+      </div>
+    </ProductDetailsContent>
+  );
 }
