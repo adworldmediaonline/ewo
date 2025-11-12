@@ -2,11 +2,10 @@
 import { useState } from 'react';
 import DetailsThumbWrapper from './details-thumb-wrapper';
 import DetailsWrapper from './details-wrapper';
-import RelatedProductsSlider from './related-products-slider';
 import ProductVideoPlayer from './product-video-player';
 
-export default function ProductDetailsContent({ productItem }) {
-  const { _id, img, imageURLs, videoId, status } = productItem || {};
+export default function ProductDetailsContent({ productItem, children }) {
+  const { img, imageURLs, videoId, status } = productItem || {};
   const [activeImg, setActiveImg] = useState(imageURLs?.[0] || img);
 
   // handle image active
@@ -53,10 +52,8 @@ export default function ProductDetailsContent({ productItem }) {
         </div>
       )}
 
-      {/* Related Products */}
-      <div className={videoId ? "mt-0" : "mt-16"}>
-        <RelatedProductsSlider id={_id} />
-      </div>
+      {/* Related Products - Passed as children slot from parent */}
+      {children}
     </>
   );
 }

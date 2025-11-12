@@ -1,0 +1,189 @@
+'use client';
+
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useDispatch } from 'react-redux';
+import { useCallback, useRef } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Autoplay } from 'swiper/modules';
+import type { Swiper as SwiperType } from 'swiper';
+import RelatedProductCard from './related-product-card';
+
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/autoplay';
+
+interface RelatedProductsClientProps {
+  products: any[];
+  currentProductId: string;
+}
+
+/**
+ * Client component for related products interactivity
+ * Handles Swiper slider and user interactions (cart, wishlist)
+ */
+export default function RelatedProductsClient({
+  products,
+  currentProductId,
+}: RelatedProductsClientProps) {
+  const dispatch = useDispatch();
+  const swiperRef = useRef<SwiperType | null>(null);
+
+  // Cart and Wishlist handlers
+  const handleAddToCart = useCallback(
+    (product: any) => {
+      import('@/redux/features/cartSlice').then(({ add_cart_product }) => {
+        dispatch(add_cart_product(product));
+      });
+    },
+    [dispatch]
+  );
+
+  const handleAddToWishlist = useCallback(
+    (product: any) => {
+      import('@/redux/features/wishlist-slice').then(({ add_to_wishlist }) => {
+        dispatch(add_to_wishlist(product));
+      });
+    },
+    [dispatch]
+  );
+
+  const handlePrevSlide = () => {
+    swiperRef.current?.slidePrev();
+  };
+
+  const handleNextSlide = () => {
+    swiperRef.current?.slideNext();
+  };
+
+  return (
+    <div className="space-y-6">
+      <style jsx global>{`
+        .related-products-swiper .swiper-wrapper {
+          align-items: stretch;
+        }
+        .related-products-swiper .swiper-slide {
+          height: auto;
+          display: flex;
+        }
+        .related-products-swiper .swiper-slide > div {
+          width: 100%;
+        }
+      `}</style>
+
+      {/* Header with Navigation */}
+      <div className="flex items-center justify-between">
+        <div className="text-center sm:text-left flex-1">
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
+            Related Products
+          </h2>
+          <p className="text-sm sm:text-base text-muted-foreground">
+            Discover more products you might like
+          </p>
+        </div>
+
+        {/* Navigation Buttons - Desktop Only */}
+        <div className="hidden lg:flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            rounded="full"
+            onClick={handlePrevSlide}
+            className="h-10 w-10 hover:bg-primary hover:text-primary-foreground transition-colors"
+            aria-label="Previous slide"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            rounded="full"
+            onClick={handleNextSlide}
+            className="h-10 w-10 hover:bg-primary hover:text-primary-foreground transition-colors"
+            aria-label="Next slide"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Swiper Slider */}
+      <div className="relative">
+        <Swiper
+          modules={[Navigation, Autoplay]}
+          onSwiper={(swiper) => {
+            swiperRef.current = swiper;
+          }}
+          spaceBetween={16}
+          slidesPerView={2}
+          autoplay={{
+            delay: 5000,
+            disableOnInteraction: true,
+            pauseOnMouseEnter: true,
+          }}
+          loop={products.length > 4}
+          speed={600}
+          grabCursor={true}
+          watchSlidesProgress={true}
+          breakpoints={{
+            0: {
+              slidesPerView: 2,
+              spaceBetween: 12,
+            },
+            640: {
+              slidesPerView: 2,
+              spaceBetween: 16,
+            },
+            768: {
+              slidesPerView: 3,
+              spaceBetween: 20,
+            },
+            1024: {
+              slidesPerView: 4,
+              spaceBetween: 24,
+            },
+          }}
+          className="related-products-swiper pb-2"
+        >
+          {products.map((product: any) => (
+            <SwiperSlide key={product._id} className="h-auto">
+              <div className="h-full">
+                <RelatedProductCard
+                  product={product}
+                  onAddToCart={handleAddToCart}
+                  onAddToWishlist={handleAddToWishlist}
+                />
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+
+        {/* Mobile Navigation Dots */}
+        <div className="flex lg:hidden justify-center gap-2 mt-6">
+          <Button
+            variant="outline"
+            size="icon"
+            rounded="full"
+            onClick={handlePrevSlide}
+            className="h-9 w-9 hover:bg-primary hover:text-primary-foreground transition-colors"
+            aria-label="Previous slide"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            rounded="full"
+            onClick={handleNextSlide}
+            className="h-9 w-9 hover:bg-primary hover:text-primary-foreground transition-colors"
+            aria-label="Next slide"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
