@@ -200,7 +200,7 @@ export default function ProductCard({
             {/* Left Side Badges - Stacked vertically */}
             <div className="absolute left-1 top-1 sm:left-2 sm:top-2 z-10 flex flex-col gap-1 sm:gap-2">
               {/* Discount Badge */}
-              {product.finalPriceDiscount &&
+              {/* {product.finalPriceDiscount &&
                 product.finalPriceDiscount < product.price && (
                   <Badge
                     variant="destructive"
@@ -214,15 +214,15 @@ export default function ProductCard({
                     )}
                     %
                   </Badge>
-                )}
+                )} */}
 
               {/* Coupon Badge */}
               {hasCoupon && couponPercentage && (
                 <Badge
                   className="bg-gradient-to-r from-emerald-500 to-green-500 text-white border-0 shadow-lg flex items-center gap-0.5 sm:gap-1 px-1 py-0 sm:px-2 sm:py-1 text-[9px] sm:text-xs"
                 >
-                  <Ticket className="h-2 w-2 sm:h-3 sm:w-3" />
-                  <span className="font-bold">{couponPercentage}% OFF</span>
+                  {/* <Ticket className="h-2 w-2 sm:h-3 sm:w-3" /> */}
+                  <span className="font-bold">GET {couponPercentage}% OFF AT CHECKOUT!</span>
                 </Badge>
               )}
             </div>
