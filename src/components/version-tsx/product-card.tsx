@@ -219,7 +219,7 @@ export default function ProductCard({
               {/* Coupon Badge */}
               {hasCoupon && couponPercentage && (
                 <Badge
-                  className="bg-gradient-to-r from-emerald-500 to-green-500 text-white border-0 shadow-lg flex items-center gap-0.5 sm:gap-1 px-1 py-0 sm:px-2 sm:py-1 text-[9px] sm:text-xs"
+                  className="bg-linear-to-r from-emerald-500 to-green-500 text-white border-0 shadow-lg flex items-center gap-0.5 sm:gap-1 px-1 py-0  sm:px-2 sm:py-1 text-[8px] sm:text-[11px]"
                 >
                   {/* <Ticket className="h-2 w-2 sm:h-3 sm:w-3" /> */}
                   <span className="font-bold">GET EXTRA {couponPercentage}% OFF AT CHECKOUT</span>
@@ -267,7 +267,7 @@ export default function ProductCard({
                 className={`absolute inset-0 bg-black/20 opacity-0 transition-opacity duration-300 hidden sm:block ${isHovered ? 'opacity-100' : ''
                   }`}
               >
-                <div className="absolute right-2 top-2 flex flex-col gap-2">
+                <div className={`absolute right-2 flex flex-col gap-2 z-10 ${hasCoupon && couponPercentage ? 'top-8' : 'top-2'}`}>
                   <Button
                     size="icon"
                     variant="outline"
