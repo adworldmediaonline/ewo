@@ -222,7 +222,7 @@ export default function ProductCard({
                   className="bg-gradient-to-r from-emerald-500 to-green-500 text-white border-0 shadow-lg flex items-center gap-0.5 sm:gap-1 px-1 py-0 sm:px-2 sm:py-1 text-[9px] sm:text-xs"
                 >
                   {/* <Ticket className="h-2 w-2 sm:h-3 sm:w-3" /> */}
-                  <span className="font-bold">GET {couponPercentage}% OFF AT CHECKOUT!</span>
+                  <span className="font-bold">GET EXTRA {couponPercentage}% OFF AT CHECKOUT</span>
                 </Badge>
               )}
             </div>
