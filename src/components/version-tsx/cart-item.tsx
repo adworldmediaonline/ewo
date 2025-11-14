@@ -1,7 +1,8 @@
 'use client';
-import Image from 'next/image';
+
 import Link from 'next/link';
 import { useDispatch } from 'react-redux';
+import { CldImage } from 'next-cloudinary';
 // internal
 import {
   add_cart_product,
@@ -19,6 +20,10 @@ export default function CartItem({ product }: { product: any }) {
     orderQuantity = 0,
     selectedOption,
   } = product || {};
+  const isCloudinaryImage =
+    typeof img === 'string' &&
+    img.startsWith('https://res.cloudinary.com/') &&
+    img.includes('/upload/');
 
   const dispatch = useDispatch();
 
@@ -39,21 +44,29 @@ export default function CartItem({ product }: { product: any }) {
   return (
     <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
       <div className="flex flex-col sm:flex-row gap-4">
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <Link href={`/product/${_id}`}>
             <div className="bg-gray-100 rounded-md overflow-hidden">
-              <Image
-                src={img}
-                alt={title}
-                width={80}
-                height={80}
-                className="object-cover w-20 h-20"
-              />
+              {img ? (
+                <CldImage
+                  src={img}
+                  alt={title}
+                  width={80}
+                  height={80}
+                  className="object-cover w-20 h-20"
+                  preserveTransformations={isCloudinaryImage}
+                  deliveryType={isCloudinaryImage ? undefined : 'fetch'}
+                />
+              ) : (
+                <div className="flex h-20 w-20 items-center justify-center text-xs text-muted-foreground">
+                  No Image
+                </div>
+              )}
             </div>
           </Link>
         </div>
 
-        <div className="flex-grow">
+        <div className="grow">
           <Link
             href={`/product/${_id}`}
             className="font-medium text-foreground hover:text-primary transition-colors"

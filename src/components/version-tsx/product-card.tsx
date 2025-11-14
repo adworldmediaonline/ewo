@@ -11,13 +11,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Heart, ShoppingCart, Star, Ticket } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
 import { useSelector } from 'react-redux';
 import { notifyError } from '@/utils/toast';
 import { useProductCoupon } from '@/hooks/useProductCoupon';
 import { ProductLinkIndicatorMinimal } from '@/components/ui/product-link-indicator';
+import { CldImage } from 'next-cloudinary';
 
 // Star rating component
 const StarRating = ({
@@ -135,6 +135,12 @@ export default function ProductCard({
   );
 
   const imageUrl = product.imageURLs?.[0] || product.img;
+  const isCloudinaryAsset =
+    typeof imageUrl === 'string' &&
+    imageUrl.startsWith('https://res.cloudinary.com/') &&
+    imageUrl.includes('/upload/');
+  const shouldEagerLoad = index < 8;
+  const shouldUseHighPriority = index < 4;
   const averageRating =
     product.reviews && product.reviews.length > 0
       ? product.reviews.reduce((sum, review) => sum + review.rating, 0) /
@@ -240,16 +246,18 @@ export default function ProductCard({
             {/* Product Image */}
             <div className="relative h-full w-full overflow-hidden">
               {imageUrl ? (
-                <Image
+                <CldImage
                   src={imageUrl}
                   alt={product.title}
                   fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   className={`object-contain transition-transform duration-300 ${isHovered ? 'scale-105' : 'scale-100'
                     }`}
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  loading={shouldEagerLoad ? 'eager' : 'lazy'}
+                  fetchPriority={shouldUseHighPriority ? 'high' : undefined}
+                  preserveTransformations={isCloudinaryAsset}
+                  deliveryType={isCloudinaryAsset ? undefined : 'fetch'}
                   onLoad={() => setIsImageLoading(false)}
-                  loading={index < 8 ? 'eager' : 'lazy'}
-                  fetchPriority={index < 4 ? 'high' : undefined}
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-muted">

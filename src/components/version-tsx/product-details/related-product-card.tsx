@@ -4,12 +4,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Heart, ShoppingCart, Star, Ticket } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
 import { useSelector } from 'react-redux';
 import { useProductCoupon } from '@/hooks/useProductCoupon';
 import { ProductLinkIndicatorMinimal } from '@/components/ui/product-link-indicator';
+import { CldImage } from 'next-cloudinary';
 
 // Star rating component
 const StarRating = ({
@@ -120,6 +120,10 @@ export default function RelatedProductCard({
   );
 
   const imageUrl = product.imageURLs?.[0] || product.img;
+  const isCloudinaryAsset =
+    typeof imageUrl === 'string' &&
+    imageUrl.startsWith('https://res.cloudinary.com/') &&
+    imageUrl.includes('/upload/');
   const averageRating =
     product.reviews && product.reviews.length > 0
       ? product.reviews.reduce((sum, review) => sum + review.rating, 0) /
@@ -144,11 +148,15 @@ export default function RelatedProductCard({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <Link href={`/product/${product.slug || product._id}`} className="block flex-1 flex flex-col" prefetch={true}>
+      <Link
+        href={`/product/${product.slug || product._id}`}
+        className="flex flex-1 flex-col"
+        prefetch={true}
+      >
         {/* useLinkStatus loading indicator - shows during navigation */}
         <ProductLinkIndicatorMinimal />
-        
-        <CardContent className="p-0 flex-shrink-0">
+
+        <CardContent className="p-0 shrink-0">
           <div className="relative aspect-square overflow-hidden p-1">
             {/* Left Side Badges - Stacked vertically */}
             <div className="absolute left-2 top-2 z-10 flex flex-col gap-2">
@@ -171,9 +179,7 @@ export default function RelatedProductCard({
 
               {/* Coupon Badge */}
               {hasCoupon && couponPercentage && (
-                <Badge
-                  className="bg-gradient-to-r from-emerald-500 to-green-500 text-white border-0 shadow-lg flex items-center gap-1 px-2 py-1"
-                >
+                <Badge className="bg-linear-to-r from-emerald-500 to-green-500 text-white border-0 shadow-lg flex items-center gap-1 px-2 py-1">
                   <Ticket className="h-3 w-3" />
                   <span className="font-bold">{couponPercentage}% OFF</span>
                 </Badge>
@@ -193,7 +199,7 @@ export default function RelatedProductCard({
             {/* Product Image */}
             <div className="relative h-full w-full overflow-hidden">
               {imageUrl ? (
-                <Image
+                <CldImage
                   src={imageUrl}
                   alt={product.title}
                   fill
@@ -201,7 +207,8 @@ export default function RelatedProductCard({
                   className={`object-contain transition-transform duration-300 ${isHovered ? 'scale-105' : 'scale-100'
                     }`}
                   onLoad={() => setIsImageLoading(false)}
-                  priority={false}
+                  preserveTransformations={isCloudinaryAsset}
+                  deliveryType={isCloudinaryAsset ? undefined : 'fetch'}
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-muted">
