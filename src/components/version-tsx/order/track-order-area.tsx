@@ -295,24 +295,9 @@ export default function TrackOrderArea({ orderId }: { orderId: string }) {
           </Breadcrumb>
         </div>
 
-        {/* Header Card */}
+        {/* Order Snapshot */}
         <Card className="mb-8">
-          <CardHeader className="text-center">
-            <div className="space-y-4">
-              <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
-                <Truck className="w-8 h-8 text-primary" />
-              </div>
-              <div>
-                <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">
-                  Track Your Order
-                </h1>
-                <p className="text-lg text-muted-foreground">
-                  Monitor your order status and shipping information
-                </p>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center space-y-2">
                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
@@ -624,19 +609,6 @@ export default function TrackOrderArea({ orderId }: { orderId: string }) {
                 </div>
               </div>
 
-              <Separator />
-
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">
-                  Need more details about your order?
-                </p>
-                <Button asChild variant="outline" className="w-full">
-                  <Link href={`/order/${orderId}`}>
-                    View Full Order Details
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Link>
-                </Button>
-              </div>
             </CardContent>
           </Card>
         </div>
