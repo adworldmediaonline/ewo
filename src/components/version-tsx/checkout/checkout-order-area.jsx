@@ -1,5 +1,5 @@
 'use client';
-import Image from 'next/image';
+
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,7 +15,13 @@ import { useGetAllActiveCouponsQuery } from '@/redux/features/coupon/couponApi';
 import { load_applied_coupons } from '@/redux/features/coupon/couponSlice';
 import { Minus, Plus } from '@/svg';
 import { CardElement } from '@stripe/react-stripe-js';
+import { CldImage } from 'next-cloudinary';
 // Removed CSS module import; Tailwind-only styling
+
+const isCloudinaryUrl = url =>
+  typeof url === 'string' &&
+  url.startsWith('https://res.cloudinary.com/') &&
+  url.includes('/upload/');
 
 export default function CheckoutOrderArea({ checkoutData }) {
   const dispatch = useDispatch();
@@ -432,73 +438,88 @@ export default function CheckoutOrderArea({ checkoutData }) {
       {/* Scrollable area for order items */}
       <ScrollArea className="h-[45px] md:h-[50px] pr-2">
         <div className="space-y-2 mb-4">
-          {cart_products.map(item => (
-            <div
-              key={item._id}
-              className="flex items-center justify-between py-2 border-b border-border last:border-0 gap-2"
-            >
-              {/* Left side: Image + Product Info */}
-              <div className="flex items-center space-x-2 flex-1 min-w-0 max-w-[60%]">
-                <div className="w-8 h-8 rounded overflow-hidden flex-shrink-0">
-                  <Image
-                    src={item.img || '/placeholder-product.png'}
-                    alt={item.title}
-                    width={32}
-                    height={32}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="flex-1 min-w-0 overflow-hidden">
-                  <h4 className="font-medium text-foreground text-xs leading-tight truncate">
-                    {item.title.length > 25
-                      ? `${item.title.substring(0, 25)}...`
-                      : item.title}
-                  </h4>
-                  {item.selectedOption && (
-                    <p className="text-xs text-muted-foreground truncate">
-                      {item.selectedOption.title} (+$
-                      {Number(item.selectedOption.price).toFixed(2)})
-                    </p>
-                  )}
-                </div>
-              </div>
+          {cart_products.map(item => {
+            const imageUrl = item.img || '';
+            const isCloudImage = isCloudinaryUrl(imageUrl);
 
-              {/* Right side: Quantity Controls + Price */}
-              <div className="flex items-center space-x-3 flex-shrink-0">
-                {/* Compact quantity controls */}
-                <div className="flex items-center border border-border rounded">
-                  <button
-                    type="button"
-                    onClick={() => handleDecrement(item)}
-                    className="w-5 h-5 flex items-center justify-center text-foreground hover:bg-muted transition-colors disabled:opacity-50"
-                    disabled={
-                      isCheckoutSubmit ||
-                      processingPayment ||
-                      item.orderQuantity <= 1
-                    }
-                  >
-                    <Minus width={8} height={8} />
-                  </button>
-                  <span className="w-6 h-5 flex items-center justify-center text-xs font-medium">
-                    {item.orderQuantity}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => handleAddProduct(item)}
-                    className="w-5 h-5 flex items-center justify-center text-foreground hover:bg-muted transition-colors disabled:opacity-50"
-                    disabled={isCheckoutSubmit || processingPayment}
-                  >
-                    <Plus width={8} height={8} />
-                  </button>
+            return (
+              <div
+                key={item._id}
+                className="flex items-center justify-between py-2 border-b border-border last:border-0 gap-2"
+              >
+                {/* Left side: Image + Product Info */}
+                <div className="flex items-center space-x-2 flex-1 min-w-0 max-w-[60%]">
+                  <div className="relative w-8 h-8 rounded overflow-hidden shrink-0 bg-muted">
+                    {imageUrl ? (
+                      <CldImage
+                        src={imageUrl}
+                        alt={item.title}
+                        fill
+                        sizes="32px"
+                        className="object-cover"
+                        preserveTransformations={isCloudImage}
+                        deliveryType={isCloudImage ? undefined : 'fetch'}
+                        loading="lazy"
+                        fetchPriority="low"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">
+                        No Image
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0 overflow-hidden">
+                    <h4 className="font-medium text-foreground text-xs leading-tight truncate">
+                      {item.title.length > 25
+                        ? `${item.title.substring(0, 25)}...`
+                        : item.title}
+                    </h4>
+                    {item.selectedOption && (
+                      <p className="text-xs text-muted-foreground truncate">
+                        {item.selectedOption.title} (+$
+                        {Number(item.selectedOption.price).toFixed(2)})
+                      </p>
+                    )}
+                  </div>
                 </div>
 
-                {/* Price */}
-                <div className="text-foreground font-medium text-sm min-w-[5rem] w-[5rem] text-right whitespace-nowrap">
-                  ${(item.price * item.orderQuantity).toFixed(2)}
+                {/* Right side: Quantity Controls + Price */}
+                <div className="flex items-center space-x-3 shrink-0">
+                  {/* Compact quantity controls */}
+                  <div className="flex items-center border border-border rounded">
+                    <button
+                      type="button"
+                      onClick={() => handleDecrement(item)}
+                      className="w-5 h-5 flex items-center justify-center text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+                      disabled={
+                        isCheckoutSubmit ||
+                        processingPayment ||
+                        item.orderQuantity <= 1
+                      }
+                    >
+                      <Minus width={8} height={8} />
+                    </button>
+                    <span className="w-6 h-5 flex items-center justify-center text-xs font-medium">
+                      {item.orderQuantity}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleAddProduct(item)}
+                      className="w-5 h-5 flex items-center justify-center text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+                      disabled={isCheckoutSubmit || processingPayment}
+                    >
+                      <Plus width={8} height={8} />
+                    </button>
+                  </div>
+
+                  {/* Price */}
+                  <div className="text-foreground font-medium text-sm min-w-[5rem] w-[5rem] text-right whitespace-nowrap">
+                    ${(item.price * item.orderQuantity).toFixed(2)}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </ScrollArea>
 
@@ -524,13 +545,13 @@ export default function CheckoutOrderArea({ checkoutData }) {
                 const discountPercent = coupon.discountType === 'percentage' && coupon.discountPercentage
                   ? coupon.discountPercentage
                   : coupon.discount && displaySubtotal > 0
-                  ? ((coupon.discount / displaySubtotal) * 100).toFixed(1)
-                  : null;
+                    ? ((coupon.discount / displaySubtotal) * 100).toFixed(1)
+                    : null;
 
                 return (
                   <div
                     key={coupon.couponCode || index}
-                    className="relative overflow-hidden bg-gradient-to-br from-emerald-500 via-green-500 to-emerald-600 rounded-xl p-4 shadow-lg"
+                    className="relative overflow-hidden bg-linear-to-br from-emerald-500 via-green-500 to-emerald-600 rounded-xl p-4 shadow-lg"
                   >
                     {/* Decorative elements */}
                     <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-bl-full" />

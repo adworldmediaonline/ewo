@@ -2,7 +2,7 @@
 import { useRouter } from 'next/navigation';
 import { toSlug } from '@/lib/server-data';
 import Link from 'next/link';
-import Image from 'next/image';
+import { CldImage } from 'next-cloudinary';
 
 export interface CategoryItem {
   _id: string;
@@ -22,6 +22,10 @@ interface CategoryCardProps {
 export const CategoryCard = ({ item, index = 0 }: CategoryCardProps) => {
   const router = useRouter();
   const hasImage = Boolean(item.img);
+  const isCloudinaryAsset =
+    typeof item.img === 'string' &&
+    item.img.startsWith('https://res.cloudinary.com/') &&
+    item.img.includes('/upload/');
   const childLabels = Array.isArray(item.children)
     ? item.children.slice(0, 3)
     : [];
@@ -52,7 +56,7 @@ export const CategoryCard = ({ item, index = 0 }: CategoryCardProps) => {
         <div className="relative h-32 sm:h-40 md:h-48 lg:h-56 w-full shrink-0">
           {hasImage ? (
             <div className="h-full w-full p-1.5 sm:p-2">
-              <Image
+              <CldImage
                 src={item.img as string}
                 alt={item.parent}
                 fill
@@ -60,6 +64,8 @@ export const CategoryCard = ({ item, index = 0 }: CategoryCardProps) => {
                 className="object-contain"
                 loading={index < 4 ? 'eager' : 'lazy'}
                 fetchPriority={index < 4 ? 'high' : undefined}
+                preserveTransformations={isCloudinaryAsset}
+                deliveryType={isCloudinaryAsset ? undefined : 'fetch'}
               />
             </div>
           ) : (

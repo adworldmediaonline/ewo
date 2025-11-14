@@ -1,8 +1,8 @@
 'use client';
 
 import { NavigationMenuLink } from '@/components/ui/navigation-menu';
-import Image from 'next/image';
 import * as React from 'react';
+import { CldImage } from 'next-cloudinary';
 
 export interface MegaCategoryItem {
   _id: string;
@@ -33,10 +33,15 @@ export default function ShopMenuMegaContent({
     >
       <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
         {categories.map(cat => {
-          const hasImage = Boolean(cat.img);
+          const imageUrl = cat.img;
+          const hasImage = Boolean(imageUrl);
           const childLabels = Array.isArray(cat.children)
             ? cat.children.slice(0, 3)
             : [];
+          const isCloudinaryAsset =
+            typeof imageUrl === 'string' &&
+            imageUrl.startsWith('https://res.cloudinary.com/') &&
+            imageUrl.includes('/upload/');
 
           return (
             <div key={cat._id} className="group">
@@ -48,13 +53,14 @@ export default function ShopMenuMegaContent({
                       <div className="absolute inset-0 bg-background" />
                       {hasImage ? (
                         <div className="absolute inset-0 p-2">
-                          <Image
-                            src={cat.img as string}
+                          <CldImage
+                            src={imageUrl as string}
                             alt={cat.parent}
                             fill
                             sizes="(max-width: 640px) 45vw, (max-width: 1024px) 22vw, 200px"
                             className="object-contain transition-transform duration-300 group-hover:scale-105"
-                            priority={false}
+                            preserveTransformations={isCloudinaryAsset}
+                            deliveryType={isCloudinaryAsset ? undefined : 'fetch'}
                           />
                         </div>
                       ) : (

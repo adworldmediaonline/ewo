@@ -1,11 +1,11 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { CldImage } from 'next-cloudinary';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -67,6 +67,11 @@ interface CouponData {
   minimumAmount?: number;
   status?: string;
 }
+
+const isCloudinaryUrl = (url?: string) =>
+  typeof url === 'string' &&
+  url.startsWith('https://res.cloudinary.com/') &&
+  url.includes('/upload/');
 
 export default function CartDropdown({
   children,
@@ -436,7 +441,7 @@ export default function CartDropdown({
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="w-[min(92vw,26rem)] rounded-xl border border-border bg-popover p-0 shadow-xl z-[2147483647]"
+        className="w-[min(92vw,26rem)] rounded-xl border border-border bg-popover p-0 shadow-xl z-2147483647"
       >
         {items.length === 0 ? (
           <div className="grid place-items-center py-16 text-sm text-muted-foreground">
@@ -461,82 +466,97 @@ export default function CartDropdown({
 
             {/* Items */}
             <div className="max-h-80 overflow-auto p-3 pr-1 grid gap-3">
-              {items.map((item, idx) => (
-                <div
-                  key={`${item._id}-${idx}`}
-                  className="grid grid-cols-[56px_1fr_auto] items-start gap-3 rounded-lg border border-border/60 bg-background p-2"
-                >
-                  <Link
-                    href={`/product/${item.slug || item._id}`}
-                    className="relative h-14 w-14 overflow-hidden rounded-md bg-muted"
-                    aria-label={item.title}
-                    onClick={() => setOpen(false)}
+              {items.map((item, idx) => {
+                const imageUrl = item.img;
+                const isCloudinaryImage = isCloudinaryUrl(imageUrl);
+
+                return (
+                  <div
+                    key={`${item._id}-${idx}`}
+                    className="grid grid-cols-[56px_1fr_auto] items-start gap-3 rounded-lg border border-border/60 bg-background p-2"
                   >
-                    <Image
-                      src={item.img}
-                      alt={item.title}
-                      fill
-                      sizes="56px"
-                      className="object-cover"
-                    />
-                  </Link>
-                  <div className="min-w-0">
                     <Link
                       href={`/product/${item.slug || item._id}`}
-                      className="line-clamp-2 text-sm font-medium"
+                      className="relative h-14 w-14 overflow-hidden rounded-md bg-muted"
+                      aria-label={item.title}
                       onClick={() => setOpen(false)}
                     >
-                      {item.title}
-                    </Link>
-                    {item.selectedOption && (
-                      <div className="mt-1 text-xs text-muted-foreground">
-                        {item.selectedOption.title} (+${Number(item.selectedOption.price).toFixed(2)})
-                      </div>
-                    )}
-                    <div className="mt-1 flex flex-wrap items-center gap-2">
-                      {Number(item.discount || 0) > 0 && (
-                        <span className="inline-flex items-center rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-700">
-                          Disc {Number(item.discount)}%
-                        </span>
+                      {imageUrl ? (
+                        <CldImage
+                          src={imageUrl}
+                          alt={item.title}
+                          fill
+                          sizes="56px"
+                          className="object-cover"
+                          preserveTransformations={isCloudinaryImage}
+                          deliveryType={isCloudinaryImage ? undefined : 'fetch'}
+                          loading="lazy"
+                          fetchPriority="low"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">
+                          No Image
+                        </div>
                       )}
+                    </Link>
+                    <div className="min-w-0">
+                      <Link
+                        href={`/product/${item.slug || item._id}`}
+                        className="line-clamp-2 text-sm font-medium"
+                        onClick={() => setOpen(false)}
+                      >
+                        {item.title}
+                      </Link>
+                      {item.selectedOption && (
+                        <div className="mt-1 text-xs text-muted-foreground">
+                          {item.selectedOption.title} (+${Number(item.selectedOption.price).toFixed(2)})
+                        </div>
+                      )}
+                      <div className="mt-1 flex flex-wrap items-center gap-2">
+                        {Number(item.discount || 0) > 0 && (
+                          <span className="inline-flex items-center rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-700">
+                            Disc {Number(item.discount)}%
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-1 inline-flex items-center gap-2 text-xs text-muted-foreground">
+                        <button
+                          type="button"
+                          className="inline-flex h-6 w-6 items-center justify-center rounded-md border hover:bg-accent"
+                          onClick={() => handleDecrement(item)}
+                          disabled={item.orderQuantity <= 1}
+                          aria-label="Decrease quantity"
+                        >
+                          -
+                        </button>
+                        <span className="w-6 text-center">
+                          {item.orderQuantity}
+                        </span>
+                        <button
+                          type="button"
+                          className="inline-flex h-6 w-6 items-center justify-center rounded-md border hover:bg-accent"
+                          onClick={() => handleIncrement(item)}
+                          aria-label="Increase quantity"
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
-                    <div className="mt-1 inline-flex items-center gap-2 text-xs text-muted-foreground">
+                    <div className="flex flex-col items-end">
                       <button
                         type="button"
-                        className="inline-flex h-6 w-6 items-center justify-center rounded-md border hover:bg-accent"
-                        onClick={() => handleDecrement(item)}
-                        disabled={item.orderQuantity <= 1}
-                        aria-label="Decrease quantity"
+                        className="inline-flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground hover:text-destructive"
+                        onClick={() => handleRemove(item)}
                       >
-                        -
+                        <XIcon className="h-4 w-4" aria-hidden />
                       </button>
-                      <span className="w-6 text-center">
-                        {item.orderQuantity}
-                      </span>
-                      <button
-                        type="button"
-                        className="inline-flex h-6 w-6 items-center justify-center rounded-md border hover:bg-accent"
-                        onClick={() => handleIncrement(item)}
-                        aria-label="Increase quantity"
-                      >
-                        +
-                      </button>
+                      <div className="text-sm font-semibold">
+                        ${renderLinePrice(item)}
+                      </div>
                     </div>
                   </div>
-                  <div className="flex flex-col items-end">
-                    <button
-                      type="button"
-                      className="inline-flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground hover:text-destructive"
-                      onClick={() => handleRemove(item)}
-                    >
-                      <XIcon className="h-4 w-4" aria-hidden />
-                    </button>
-                    <div className="text-sm font-semibold">
-                      ${renderLinePrice(item)}
-                    </div>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Coupon Section - Beautiful Applied Coupons Banner */}
@@ -555,7 +575,7 @@ export default function CartDropdown({
                       return (
                         <div
                           key={index}
-                          className="relative overflow-hidden bg-gradient-to-r from-emerald-500 to-green-500 rounded-lg p-3 shadow-md"
+                          className="relative overflow-hidden bg-linear-to-r from-emerald-500 to-green-500 rounded-lg p-3 shadow-md"
                         >
                           {/* Decorative corner */}
                           <div className="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-bl-full" />
