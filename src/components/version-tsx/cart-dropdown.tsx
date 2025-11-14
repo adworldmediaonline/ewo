@@ -549,8 +549,8 @@ export default function CartDropdown({
                       const discountPercent = coupon.discountType === 'percentage' && coupon.discountPercentage
                         ? coupon.discountPercentage
                         : coupon.discount && subtotal > 0
-                        ? ((coupon.discount / subtotal) * 100).toFixed(1)
-                        : null;
+                          ? ((coupon.discount / subtotal) * 100).toFixed(1)
+                          : null;
 
                       return (
                         <div
