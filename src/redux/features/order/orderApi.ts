@@ -26,7 +26,7 @@ export const authApi = apiSlice.injectEndpoints({
               );
             }
           }
-        } catch (err) {}
+        } catch (err) { }
       },
     }),
     // checkAddressDiscount

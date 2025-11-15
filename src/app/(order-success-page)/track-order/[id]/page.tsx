@@ -13,7 +13,6 @@ export default async function TrackOrderPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  "use cache";
   const id = (await params).id;
   return <TrackOrderArea orderId={id} />;
 }
