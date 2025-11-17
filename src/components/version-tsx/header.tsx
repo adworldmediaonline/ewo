@@ -61,13 +61,11 @@ export default async function HeaderV2() {
                 <HeaderSearch
                   className="w-full max-w-3xl mx-auto"
                 />
-                {/* Contact Info - Compact, on right side of search */}
-                <HeaderContactInfo />
               </div>
 
               {/* Mobile: Contact Info and Header Actions */}
               <div className="flex md:hidden items-center gap-1.5 shrink-0">
-                <HeaderContactInfo />
+
                 <Suspense
                   fallback={
                     <div className="flex items-center gap-1.5">
@@ -79,10 +77,11 @@ export default async function HeaderV2() {
                 >
                   <HeaderActions />
                 </Suspense>
+                <HeaderContactInfo />
               </div>
 
-              {/* Desktop: Header Actions */}
-              <div className="hidden md:block shrink-0">
+              {/* Desktop: Header Actions and Contact Info */}
+              <div className="hidden md:flex items-center gap-2 shrink-0">
                 {/* HeaderActions is a client component with hooks - wrap in Suspense */}
                 <Suspense
                   fallback={
@@ -95,6 +94,8 @@ export default async function HeaderV2() {
                 >
                   <HeaderActions />
                 </Suspense>
+                {/* Contact Info - Compact, on right side of header actions */}
+                <HeaderContactInfo />
               </div>
             </div>
             {/* Mobile search below the row */}
