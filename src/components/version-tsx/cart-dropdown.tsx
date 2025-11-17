@@ -22,10 +22,7 @@ import {
 } from '@/redux/features/cartSlice';
 import { useGetAllActiveCouponsQuery } from '@/redux/features/coupon/couponApi';
 import {
-  add_applied_coupon,
-  clear_all_coupons,
   load_applied_coupons,
-  remove_applied_coupon,
 } from '@/redux/features/coupon/couponSlice';
 import { X as XIcon } from 'lucide-react';
 
@@ -257,129 +254,6 @@ export default function CartDropdown({
     couponCode,
   ]);
 
-  // Calculate totals for coupon validation
-  const calculateTotals = () => {
-    const subtotal = Number(total || 0);
-    const shipping = Number(totalShippingCost || 0);
-    const firstTimeDiscount = Number(firstTimeDiscountAmount || 0);
-    const addressDiscount = 0; // Not available in dropdown context
-    const currentCouponDiscount = Number(total_coupon_discount || 0);
-
-    return {
-      subtotal,
-      shipping,
-      firstTimeDiscount,
-      addressDiscount,
-      currentCouponDiscount,
-    };
-  };
-
-  // Handle coupon application
-  const handleApplyCoupon = async () => {
-    if (!couponCode.trim() || isApplyingCoupon) return;
-
-    setIsApplyingCoupon(true);
-
-    try {
-      const totals = calculateTotals();
-
-      if (applied_coupons.length === 0) {
-        // First coupon - use validation endpoint
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/coupon/validate`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              couponCode: couponCode.trim(),
-              cartItems: cart_products,
-              cartTotal:
-                totals.subtotal +
-                totals.shipping -
-                totals.addressDiscount -
-                totals.firstTimeDiscount,
-              cartSubtotal: totals.subtotal,
-              shippingCost: totals.shipping,
-            }),
-          }
-        );
-
-        const data = await response.json();
-
-        if (response.ok && data.success) {
-          dispatch(
-            add_applied_coupon({
-              _id: data.data.couponId,
-              couponCode: data.data.couponCode,
-              discount: data.data.discount,
-              discountType: data.data.discountType,
-              title: data.data.title || data.data.couponCode,
-            } as AppliedCoupon)
-          );
-          setCouponCode('');
-          setAutoFilledCoupon(null);
-        } else {
-        }
-      } else {
-        // Multiple coupons - use multiple validation endpoint
-        const allCouponCodes = [
-          ...applied_coupons.map((c: any) => c.couponCode),
-          couponCode.trim(),
-        ];
-
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/coupon/validate-multiple`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              couponCodes: allCouponCodes,
-              cartItems: cart_products,
-              cartTotal:
-                totals.subtotal +
-                totals.shipping -
-                totals.addressDiscount -
-                totals.firstTimeDiscount,
-              cartSubtotal: totals.subtotal,
-              shippingCost: totals.shipping,
-            }),
-          }
-        );
-
-        const data = await response.json();
-
-        if (response.ok && data.success) {
-          // Clear existing coupons and add all validated ones
-          dispatch(clear_all_coupons());
-
-          data.data.forEach((coupon: CouponData) => {
-            dispatch(
-              add_applied_coupon({
-                _id: coupon.couponId,
-                couponCode: coupon.couponCode,
-                discount: coupon.discount,
-                discountType: coupon.discountType,
-                title: coupon.title || coupon.couponCode,
-              } as AppliedCoupon)
-            );
-          });
-
-          setCouponCode('');
-          setAutoFilledCoupon(null);
-        } else {
-        }
-      }
-    } catch (error) {
-    } finally {
-      setIsApplyingCoupon(false);
-    }
-  };
-
-  // Handle coupon removal
-  const handleRemoveCoupon = (couponCodeToRemove: string) => {
-    dispatch(remove_applied_coupon(couponCodeToRemove));
-  };
-
   function handleIncrement(item: CartItem): void {
     dispatch(
       add_cart_product({
@@ -389,6 +263,7 @@ export default function CartDropdown({
       } as any)
     );
   }
+
   function handleDecrement(item: CartItem): void {
     dispatch(
       quantityDecrement({
@@ -398,34 +273,11 @@ export default function CartDropdown({
       } as any)
     );
   }
+
   function handleRemove(item: CartItem): void {
     dispatch(remove_product({ title: item.title, id: item._id }));
   }
 
-  // Navigation functions
-  const navigateToCart = () => {
-    router.push('/cart');
-  };
-
-  const navigateToCheckout = () => {
-    router.push('/checkout');
-  };
-
-  // Enhanced navigation functions that close dropdown
-  const handleViewAll = () => {
-    setOpen(false);
-    navigateToCart();
-  };
-
-  const handleViewCart = () => {
-    setOpen(false);
-    navigateToCart();
-  };
-
-  const handleCheckout = () => {
-    setOpen(false);
-    navigateToCheckout();
-  };
 
   function renderLinePrice(item: CartItem): string {
     const base = Number(item.finalPriceDiscount || 0);
@@ -722,8 +574,14 @@ export default function CartDropdown({
                     ${finalTotal.toFixed(2)}
                   </div>
                 </div>
-                <Button onClick={handleCheckout} className="flex-1">
-                  Proceed to Buy
+
+                <Button asChild className="flex-1">
+                  <Link
+                    href="/checkout"
+                    onClick={() => setOpen(false)}
+                  >
+                    Proceed to Buy
+                  </Link>
                 </Button>
               </div>
             </div>
