@@ -64,22 +64,22 @@ export function HeaderActions({
   return (
     <ClientOnlyWrapper
       fallback={
-        <div className="flex items-center gap-2 md:gap-4">
-          <div className="h-10 w-10 md:h-11 md:w-11 animate-pulse rounded-full bg-muted"></div>
-          <div className="h-10 w-10 md:h-11 md:w-11 animate-pulse rounded-full bg-muted"></div>
-          <div className="h-10 w-10 md:h-11 md:w-11 animate-pulse rounded-full bg-muted"></div>
+        <div className="flex items-center gap-1.5 md:gap-2">
+          <div className="h-8 w-8 md:h-9 md:w-9 animate-pulse rounded-full bg-muted"></div>
+          <div className="h-8 w-8 md:h-9 md:w-9 animate-pulse rounded-full bg-muted"></div>
+          <div className="h-8 w-8 md:h-9 md:w-9 animate-pulse rounded-full bg-muted"></div>
         </div>
       }
     >
-      <div className="flex items-center gap-2 md:gap-4">
+      <div className="flex items-center gap-1.5 md:gap-2">
         <Link
           href="/wishlist"
           aria-label="Wishlist"
-          className="relative inline-flex h-10 w-10 md:h-11 md:w-11 items-center justify-center rounded-full border border-border bg-background text-foreground hover:bg-accent"
+          className="relative inline-flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-full border border-border bg-background text-foreground hover:bg-accent"
         >
-          <Heart className="h-5 w-5 md:h-5 md:w-5" />
+          <Heart className="h-4 w-4 md:h-4 md:w-4" />
           {showBadges && wishlist.length > 0 && (
-            <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+            <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-primary px-0.5 text-[9px] font-semibold text-primary-foreground">
               {wishlist.length}
             </span>
           )}
@@ -88,12 +88,12 @@ export function HeaderActions({
         <CartDropdown>
           <button
             aria-label="Cart"
-            className="relative inline-flex h-10 w-10 md:h-11 md:w-11 items-center justify-center rounded-full border border-border bg-background text-foreground hover:bg-accent"
+            className="relative inline-flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-full border border-border bg-background text-foreground hover:bg-accent"
             type="button"
           >
-            <ShoppingCart className="h-5 w-5 md:h-5 md:w-5" />
+            <ShoppingCart className="h-4 w-4 md:h-4 md:w-4" />
             {showBadges && quantity > 0 && (
-              <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+              <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-primary px-0.5 text-[9px] font-semibold text-primary-foreground">
                 {quantity}
               </span>
             )}
@@ -111,9 +111,9 @@ export function HeaderActions({
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="relative h-10 w-10 rounded-full"
+                className="relative h-8 w-8 md:h-9 md:w-9 rounded-full"
               >
-                <Avatar className="h-10 w-10">
+                <Avatar className="h-8 w-8 md:h-9 md:w-9">
                   <AvatarImage
                     src={session.user.image || ''}
                     alt={session.user.name || session.user.email}
@@ -166,9 +166,9 @@ export function HeaderActions({
             <button
               onClick={() => setAuthDialogOpen(true)}
               aria-label="Sign in"
-              className="inline-flex h-10 w-10 md:h-11 md:w-11 items-center justify-center rounded-full border border-border bg-background text-foreground hover:bg-accent transition-colors"
+              className="inline-flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-full border border-border bg-background text-foreground hover:bg-accent transition-colors"
           >
-            <User className="h-5 w-5 md:h-5 md:w-5" />
+            <User className="h-4 w-4 md:h-4 md:w-4" />
             </button>
             <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
           </>
