@@ -39,9 +39,12 @@ import {
   Tag,
   Truck,
   XCircle,
+  Zap,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import ProductDetailsCountdown from './product-details-countdown';
 import ProductQuantity from './product-quantity';
 import ReviewForm from './review-form';
@@ -99,6 +102,8 @@ export default function DetailsWrapper({
   productItem,
   handleImageActive,
   activeImg,
+  onAddToCartRef,
+  onProceedToBuyRef,
 }) {
   const {
     sku,
@@ -120,6 +125,7 @@ export default function DetailsWrapper({
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
   const { data: session } = authClient.useSession();
   const dispatch = useDispatch();
+  const router = useRouter();
   const { orderQuantity, cart_products } = useSelector(state => state.cart);
 
   // Calculate average rating (derived state - no memoization needed for simple calculation)
@@ -257,6 +263,82 @@ export default function DetailsWrapper({
     dispatch(add_to_compare(prd));
   };
 
+  // handle proceed to buy - adds to cart and navigates to checkout
+  const handleProceedToBuy = prd => {
+    // First add to cart using the same logic as handleAddProduct
+    if (options && options.length > 0 && !selectedOption) {
+      notifyError(
+        'Please select an option before proceeding to checkout.'
+      );
+      return;
+    }
+
+    const existingProduct = cart_products.find(item => item._id === prd._id);
+    const optionChanged =
+      existingProduct &&
+      JSON.stringify(existingProduct.selectedOption) !==
+      JSON.stringify(selectedOption);
+
+    const currentQty = existingProduct ? existingProduct.orderQuantity : 0;
+    const finalQuantity = optionChanged
+      ? currentQty
+      : currentQty + orderQuantity;
+
+    if (prd.quantity && finalQuantity > prd.quantity) {
+      notifyError(
+        `Sorry, only ${prd.quantity} items available. ${existingProduct ? `You already have ${currentQty} in your cart.` : ''
+        }`
+      );
+      return;
+    }
+
+    if (optionChanged) {
+      dispatch(
+        update_product_option({
+          id: existingProduct._id,
+          title: existingProduct.title,
+        })
+      );
+      dispatch(initialOrderQuantity());
+      for (let i = 1; i < currentQty; i++) {
+        dispatch(increment());
+      }
+    }
+
+    const finalSellingPrice = Number(prd.finalPriceDiscount || 0);
+    const markedUpPrice = prd.updatedPrice || prd.finalPriceDiscount;
+    const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+    const totalPriceWithOption = finalSellingPrice + optionPrice;
+
+    const productToAdd = {
+      ...prd,
+      finalPriceDiscount: totalPriceWithOption,
+      updatedPrice: markedUpPrice,
+      selectedOption,
+      basePrice: finalSellingPrice,
+      options: selectedOption ? [selectedOption] : [],
+    };
+
+    dispatch(add_cart_product(productToAdd));
+
+    if (optionChanged) {
+      dispatch(initialOrderQuantity());
+    }
+
+    // Navigate to checkout
+    router.push('/checkout');
+  };
+
+  // Expose handlers via refs if provided
+  useEffect(() => {
+    if (onAddToCartRef) {
+      onAddToCartRef.current = handleAddProduct;
+    }
+    if (onProceedToBuyRef) {
+      onProceedToBuyRef.current = handleProceedToBuy;
+    }
+  }, [onAddToCartRef, onProceedToBuyRef, handleAddProduct, handleProceedToBuy]);
+
   return (
     <div className="space-y-8">
       {/* Product Title */}
@@ -358,8 +440,8 @@ export default function DetailsWrapper({
         </div>
       )}
 
-      {/* Add to Cart Section */}
-      <div className="space-y-4">
+      {/* Add to Cart Section - Hidden on mobile, shown on desktop */}
+      <div className="hidden md:block space-y-4">
         <div className="flex items-center gap-4">
           <ProductQuantity productItem={productItem} />
           <Button
@@ -671,6 +753,9 @@ export default function DetailsWrapper({
           </AccordionItem>
         </Accordion>
       </div>
+
+      {/* Spacer to prevent content from being hidden behind fixed bar on mobile */}
+      <div className="h-20 md:h-0" />
     </div>
   );
 }

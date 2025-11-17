@@ -37,7 +37,8 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState, useRef } from 'react';
 
 // Loading State Component
 const OrderLoadingState = () => (
@@ -164,9 +165,62 @@ const OrderEmptyState = () => (
 );
 
 export default function OrderArea({ orderId }: { orderId: string }) {
+  const router = useRouter();
   const { data: order, isError, isLoading } = useGetUserOrderByIdQuery(orderId);
   const [showCustomAlert, setShowCustomAlert] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [redirectCountdown, setRedirectCountdown] = useState<number | null>(null);
+  const countdownStartedRef = useRef(false);
+  const redirectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Check if page was already accessed and prevent re-access
+  useEffect(() => {
+    const storageKey = `order-success-${orderId}`;
+    const wasAccessed = sessionStorage.getItem(storageKey);
+
+    if (wasAccessed) {
+      // Page was already accessed, redirect immediately to track-order
+      router.replace(`/track-order/${orderId}`);
+      return;
+    }
+  }, [orderId, router]);
+
+  // Redirect countdown after 8 seconds - only start after order loads
+  useEffect(() => {
+    // Only start countdown if order is loaded successfully and countdown hasn't started
+    if (!order || isError || isLoading || countdownStartedRef.current) return;
+
+    // Mark that countdown has started
+    countdownStartedRef.current = true;
+    setRedirectCountdown(8);
+
+    // Start countdown display
+    let currentCount = 8;
+    const countdownInterval = setInterval(() => {
+      currentCount -= 1;
+      setRedirectCountdown(currentCount);
+
+      if (currentCount <= 0) {
+        clearInterval(countdownInterval);
+      }
+    }, 1000);
+
+    // Set redirect timeout for 8 seconds
+    redirectTimeoutRef.current = setTimeout(() => {
+      // Mark page as accessed before redirecting
+      const storageKey = `order-success-${orderId}`;
+      sessionStorage.setItem(storageKey, 'true');
+      // Redirect to track-order page
+      router.replace(`/track-order/${orderId}`);
+    }, 8000);
+
+    return () => {
+      clearInterval(countdownInterval);
+      if (redirectTimeoutRef.current) {
+        clearTimeout(redirectTimeoutRef.current);
+      }
+    };
+  }, [order, isError, isLoading, orderId, router]);
 
   // Prevent page refresh to avoid duplicate analytics events
   useEffect(() => {
@@ -392,6 +446,16 @@ export default function OrderArea({ orderId }: { orderId: string }) {
                   Thank you for your purchase! Your order has been successfully
                   placed.
                 </p>
+                {redirectCountdown !== null && redirectCountdown >= 0 && (
+                  <div className="mt-4 p-4 bg-primary/10 border border-primary/20 rounded-lg">
+                    <div className="flex items-center justify-center gap-3">
+                      <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                      <p className="text-base font-medium text-foreground">
+                        Redirecting to track your order in {redirectCountdown} second{redirectCountdown !== 1 ? 's' : ''}...
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </CardHeader>
