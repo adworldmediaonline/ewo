@@ -1,8 +1,9 @@
+
 import { Button } from '@/components/ui/button';
-import Image from 'next/image';
 import Link from 'next/link';
 import { getActiveBanners } from '@/server/banner';
 import { ArrowRight } from 'lucide-react';
+import { BannerImage } from './banner-image';
 
 export default async function HeroBanner() {
   const banners = await getActiveBanners();
@@ -18,32 +19,22 @@ export default async function HeroBanner() {
         <section className="relative w-full overflow-hidden">
           <Link href={banner.cta?.link || '/shop'} className="block w-full">
             {/* Desktop Banner - 1920x800 aspect ratio */}
-            <div className="hidden md:block relative w-full aspect-[1920/800]">
-              <Image
+            <div className="hidden md:block relative w-full aspect-1920/800">
+              <BannerImage
                 src={banner.desktopImg}
                 alt={banner.heading || 'Hero banner'}
-                fill
-                preload={true}
-                loading="eager"
-                fetchPriority="high"
-                quality={75}
-                sizes="100vw"
                 className="object-contain"
+                objectFit="contain"
               />
             </div>
 
             {/* Mobile Banner - 480x511 aspect ratio */}
-            <div className="block md:hidden relative w-full aspect-[480/511]">
-              <Image
+            <div className="block md:hidden relative w-full aspect-480/511">
+              <BannerImage
                 src={banner.mobileImg}
                 alt={banner.heading || 'Hero banner'}
-                fill
-                preload={true}
-                loading="eager"
-                fetchPriority="high"
-                quality={75}
-                sizes="100vw"
                 className="object-contain"
+                objectFit="contain"
               />
             </div>
           </Link>
@@ -55,37 +46,27 @@ export default async function HeroBanner() {
     return (
       <section className="relative w-full overflow-hidden">
         {/* Desktop Banner - 1920x800 aspect ratio */}
-        <div className="hidden md:block relative w-full aspect-[1920/800]">
-          <Image
+        <div className="hidden md:block relative w-full aspect-1920/800">
+          <BannerImage
             src={banner.desktopImg}
             alt={banner.heading || 'Hero banner'}
-            fill
-            preload={true}
-            loading="eager"
-            fetchPriority="high"
-            quality={75}
-            sizes="100vw"
             className="object-cover"
+            objectFit="cover"
           />
         </div>
 
         {/* Mobile Banner - 480x511 aspect ratio */}
-        <div className="block md:hidden relative w-full aspect-[480/511]">
-          <Image
+        <div className="block md:hidden relative w-full aspect-480/511">
+          <BannerImage
             src={banner.mobileImg}
             alt={banner.heading || 'Hero banner'}
-            fill
-            preload={true}
-            loading="eager"
-            fetchPriority="high"
-            quality={75}
-            sizes="100vw"
             className="object-cover"
+            objectFit="cover"
           />
         </div>
 
         {/* Overlay Gradient - Optimized for performance */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-r from-black/70 via-black/50 to-transparent" />
 
         {/* Content Overlay */}
         <div className="relative z-10 h-full flex items-center">
@@ -124,7 +105,7 @@ export default async function HeroBanner() {
         </div>
 
         {/* Decorative Bottom Gradient - Subtle enhancement */}
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/15 to-transparent pointer-events-none" />
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-linear-to-t from-black/15 to-transparent pointer-events-none" />
       </section>
     );
   };
