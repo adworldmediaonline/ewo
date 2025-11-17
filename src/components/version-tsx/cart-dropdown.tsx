@@ -433,67 +433,67 @@ export default function CartDropdown({
                   );
                 })}
               </div>
-
-              {/* Coupon Section - Beautiful Applied Coupons Banner */}
-              {applied_coupons.length > 0 && (
-                <div className="px-4 py-2 border-t border-border/60">
-                  <div className="space-y-2">
-                    {applied_coupons.map(
-                      (coupon: AppliedCoupon, index: number) => {
-                        // Calculate discount percentage if available
-                        const discountPercent = coupon.discountType === 'percentage' && coupon.discountPercentage
-                          ? coupon.discountPercentage
-                          : coupon.discount && subtotal > 0
-                            ? ((coupon.discount / subtotal) * 100).toFixed(1)
-                            : null;
-
-                        return (
-                          <div
-                            key={index}
-                            className="relative overflow-hidden bg-linear-to-r from-emerald-500 to-green-500 rounded-lg p-3 shadow-md"
-                          >
-                            {/* Decorative corner */}
-                            <div className="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-bl-full" />
-
-                            <div className="relative flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <div className="bg-white/20 backdrop-blur-sm rounded-full p-1.5">
-                                  <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                  </svg>
-                                </div>
-                                <div>
-                                  <p className="text-xs font-bold text-white uppercase tracking-wide">
-                                    {coupon.couponCode}
-                                  </p>
-                                  <p className="text-[10px] text-white/90 font-medium">
-                                    Applied Successfully
-                                  </p>
-                                </div>
-                              </div>
-                              {discountPercent && (
-                                <div className="bg-white rounded-full px-2.5 py-1">
-                                  <span className="text-xs font-extrabold text-emerald-600">
-                                    {discountPercent}% OFF
-                                  </span>
-                                </div>
-                              )}
-                              {!discountPercent && (
-                                <div className="bg-white rounded-full px-2.5 py-1">
-                                  <span className="text-xs font-extrabold text-emerald-600">
-                                    -${coupon.discount?.toFixed(2)}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      }
-                    )}
-                  </div>
-                </div>
-              )}
             </div>
+
+            {/* Fixed Coupon Section - Always Visible */}
+            {applied_coupons.length > 0 && (
+              <div className="px-4 py-2 border-t border-border/60 bg-popover shrink-0">
+                <div className="space-y-2">
+                  {applied_coupons.map(
+                    (coupon: AppliedCoupon, index: number) => {
+                      // Calculate discount percentage if available
+                      const discountPercent = coupon.discountType === 'percentage' && coupon.discountPercentage
+                        ? coupon.discountPercentage
+                        : coupon.discount && subtotal > 0
+                          ? ((coupon.discount / subtotal) * 100).toFixed(1)
+                          : null;
+
+                      return (
+                        <div
+                          key={index}
+                          className="relative overflow-hidden bg-linear-to-r from-emerald-500 to-green-500 rounded-lg p-3 shadow-md"
+                        >
+                          {/* Decorative corner */}
+                          <div className="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-bl-full" />
+
+                          <div className="relative flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div className="bg-white/20 backdrop-blur-sm rounded-full p-1.5">
+                                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                              </div>
+                              <div>
+                                <p className="text-xs font-bold text-white uppercase tracking-wide">
+                                  {coupon.couponCode}
+                                </p>
+                                <p className="text-[10px] text-white/90 font-medium">
+                                  Applied Successfully
+                                </p>
+                              </div>
+                            </div>
+                            {discountPercent && (
+                              <div className="bg-white rounded-full px-2.5 py-1">
+                                <span className="text-xs font-extrabold text-emerald-600">
+                                  {discountPercent}% OFF
+                                </span>
+                              </div>
+                            )}
+                            {!discountPercent && (
+                              <div className="bg-white rounded-full px-2.5 py-1">
+                                <span className="text-xs font-extrabold text-emerald-600">
+                                  -${coupon.discount?.toFixed(2)}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    }
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Fixed Summary Section at Bottom */}
             <div className="px-4 py-3 space-y-2 text-sm bg-popover border-t border-border/60 shrink-0">
@@ -577,7 +577,7 @@ export default function CartDropdown({
                   </div>
                 </div>
 
-                <Button asChild className="flex-1">
+                <Button size="lg" asChild className="flex-1">
                   <Link
                     href="/checkout"
                     onClick={() => setOpen(false)}
