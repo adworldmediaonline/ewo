@@ -50,7 +50,7 @@ export default function RootLayout({ children }) {
 
         {/* DNS prefetch for third-party scripts */}
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
-        <link rel="dns-prefetch" href="https://embed.tawk.to" />
+
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
       </head>
       <body
@@ -92,37 +92,7 @@ export default function RootLayout({ children }) {
           }}
         />
 
-        {/* <Script
-          id="tawk-to-script"
-          strategy="lazyOnload"
-          dangerouslySetInnerHTML={{
-            __html: `
-                (function() {
-                  if (typeof window === 'undefined') return;
-                  if (window.Tawk_API) return;
 
-                  try {
-                    window.Tawk_API = window.Tawk_API || {};
-                    window.Tawk_LoadStart = new Date();
-
-                    var script = document.createElement('script');
-                    script.async = true;
-                    script.src = 'https://embed.tawk.to/68901758770617192577a56d/1j1pdmd5n';
-                    script.charset = 'UTF-8';
-                    script.setAttribute('crossorigin', '*');
-
-                    script.onerror = function() {
-                      console.warn('Failed to load Tawk.to script');
-                    };
-
-                    document.head.appendChild(script);
-                  } catch (error) {
-                    console.warn('Error initializing Tawk.to:', error);
-                  }
-                })();
-              `,
-          }}
-        /> */}
 
         <GoogleTagManager gtmId="GTM-MB34NG65" />
         <Analytics />
