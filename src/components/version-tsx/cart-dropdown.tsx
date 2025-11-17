@@ -321,9 +321,9 @@ export default function CartDropdown({
             Your cart is empty
           </div>
         ) : (
-          <div>
+          <div className="flex flex-col max-h-[80vh]">
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-border/60">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border/60 shrink-0">
               <div className="text-sm font-semibold">
                 Shopping Cart ({items.length})
               </div>
@@ -338,104 +338,106 @@ export default function CartDropdown({
               </Button>
             </div>
 
-            {/* Items */}
-            <div className="max-h-80 overflow-auto px-4 py-3 grid gap-3">
-              {items.map((item, idx) => {
-                const imageUrl = item.img;
-                const isCloudinaryImage = isCloudinaryUrl(imageUrl);
+            {/* Scrollable Items Section */}
+            <div className="flex-1 overflow-y-auto min-h-0">
+              <div className="px-4 py-3 grid gap-3">
+                {items.map((item, idx) => {
+                  const imageUrl = item.img;
+                  const isCloudinaryImage = isCloudinaryUrl(imageUrl);
 
-                return (
-                  <div
-                    key={`${item._id}-${idx}`}
-                    className="grid grid-cols-[56px_1fr_auto] items-start gap-3 rounded-lg border border-border/60 bg-background p-2"
-                  >
-                    <Link
-                      href={`/product/${item.slug || item._id}`}
-                      className="relative h-14 w-14 overflow-hidden rounded-md bg-muted"
-                      aria-label={item.title}
-                      onClick={() => setOpen(false)}
+                  return (
+                    <div
+                      key={`${item._id}-${idx}`}
+                      className="grid grid-cols-[56px_1fr_auto] items-start gap-3 rounded-lg border border-border/60 bg-background p-2"
                     >
-                      {imageUrl ? (
-                        <CldImage
-                          src={imageUrl}
-                          alt={item.title}
-                          fill
-                          sizes="56px"
-                          className="object-cover"
-                          preserveTransformations={isCloudinaryImage}
-                          deliveryType={isCloudinaryImage ? undefined : 'fetch'}
-                          loading="lazy"
-                          fetchPriority="low"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">
-                          No Image
-                        </div>
-                      )}
-                    </Link>
-                    <div className="min-w-0">
                       <Link
                         href={`/product/${item.slug || item._id}`}
-                        className="line-clamp-2 text-sm font-medium"
+                        className="relative h-14 w-14 overflow-hidden rounded-md bg-muted"
+                        aria-label={item.title}
                         onClick={() => setOpen(false)}
                       >
-                        {item.title}
-                      </Link>
-                      {item.selectedOption && (
-                        <div className="mt-1 text-xs text-muted-foreground">
-                          {item.selectedOption.title} (+${Number(item.selectedOption.price).toFixed(2)})
-                        </div>
-                      )}
-                      <div className="mt-1 flex flex-wrap items-center gap-2">
-                        {Number(item.discount || 0) > 0 && (
-                          <span className="inline-flex items-center rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-700">
-                            Disc {Number(item.discount)}%
-                          </span>
+                        {imageUrl ? (
+                          <CldImage
+                            src={imageUrl}
+                            alt={item.title}
+                            fill
+                            sizes="56px"
+                            className="object-cover"
+                            preserveTransformations={isCloudinaryImage}
+                            deliveryType={isCloudinaryImage ? undefined : 'fetch'}
+                            loading="lazy"
+                            fetchPriority="low"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">
+                            No Image
+                          </div>
                         )}
+                      </Link>
+                      <div className="min-w-0">
+                        <Link
+                          href={`/product/${item.slug || item._id}`}
+                          className="line-clamp-2 text-sm font-medium"
+                          onClick={() => setOpen(false)}
+                        >
+                          {item.title}
+                        </Link>
+                        {item.selectedOption && (
+                          <div className="mt-1 text-xs text-muted-foreground">
+                            {item.selectedOption.title} (+${Number(item.selectedOption.price).toFixed(2)})
+                          </div>
+                        )}
+                        <div className="mt-1 flex flex-wrap items-center gap-2">
+                          {Number(item.discount || 0) > 0 && (
+                            <span className="inline-flex items-center rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-700">
+                              Disc {Number(item.discount)}%
+                            </span>
+                          )}
+                        </div>
+                        <div className="mt-1 inline-flex items-center gap-2 text-xs text-muted-foreground">
+                          <button
+                            type="button"
+                            className="inline-flex h-6 w-6 items-center justify-center rounded-md border hover:bg-accent"
+                            onClick={() => handleDecrement(item)}
+                            disabled={item.orderQuantity <= 1}
+                            aria-label="Decrease quantity"
+                          >
+                            -
+                          </button>
+                          <span className="w-6 text-center">
+                            {item.orderQuantity}
+                          </span>
+                          <button
+                            type="button"
+                            className="inline-flex h-6 w-6 items-center justify-center rounded-md border hover:bg-accent"
+                            onClick={() => handleIncrement(item)}
+                            aria-label="Increase quantity"
+                          >
+                            +
+                          </button>
+                        </div>
                       </div>
-                      <div className="mt-1 inline-flex items-center gap-2 text-xs text-muted-foreground">
+                      <div className="flex flex-col items-end">
                         <button
                           type="button"
-                          className="inline-flex h-6 w-6 items-center justify-center rounded-md border hover:bg-accent"
-                          onClick={() => handleDecrement(item)}
-                          disabled={item.orderQuantity <= 1}
-                          aria-label="Decrease quantity"
+                          className="inline-flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground hover:text-destructive"
+                          onClick={() => handleRemove(item)}
                         >
-                          -
+                          <XIcon className="h-4 w-4" aria-hidden />
                         </button>
-                        <span className="w-6 text-center">
-                          {item.orderQuantity}
-                        </span>
-                        <button
-                          type="button"
-                          className="inline-flex h-6 w-6 items-center justify-center rounded-md border hover:bg-accent"
-                          onClick={() => handleIncrement(item)}
-                          aria-label="Increase quantity"
-                        >
-                          +
-                        </button>
+                        <div className="text-sm font-semibold">
+                          ${renderLinePrice(item)}
+                        </div>
                       </div>
                     </div>
-                    <div className="flex flex-col items-end">
-                      <button
-                        type="button"
-                        className="inline-flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground hover:text-destructive"
-                        onClick={() => handleRemove(item)}
-                      >
-                        <XIcon className="h-4 w-4" aria-hidden />
-                      </button>
-                      <div className="text-sm font-semibold">
-                        ${renderLinePrice(item)}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
 
-            {/* Coupon Section - Beautiful Applied Coupons Banner */}
+            {/* Fixed Coupon Section - Always Visible */}
             {applied_coupons.length > 0 && (
-              <div className="px-4 py-2 border-t border-border/60">
+              <div className="px-4 py-2 border-t border-border/60 bg-popover shrink-0">
                 <div className="space-y-2">
                   {applied_coupons.map(
                     (coupon: AppliedCoupon, index: number) => {
@@ -493,8 +495,8 @@ export default function CartDropdown({
               </div>
             )}
 
-            {/* Summary */}
-            <div className="px-4 py-3 space-y-2 text-sm">
+            {/* Fixed Summary Section at Bottom */}
+            <div className="px-4 py-3 space-y-2 text-sm bg-popover border-t border-border/60 shrink-0">
               <div className="text-sm font-semibold mb-2">Order Summary</div>
               <div className="flex items-center justify-between">
                 <span>Subtotal</span>
@@ -575,7 +577,7 @@ export default function CartDropdown({
                   </div>
                 </div>
 
-                <Button asChild className="flex-1">
+                <Button size="lg" asChild className="flex-1">
                   <Link
                     href="/checkout"
                     onClick={() => setOpen(false)}

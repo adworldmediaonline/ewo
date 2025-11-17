@@ -1,12 +1,15 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import DetailsThumbWrapper from './details-thumb-wrapper';
 import DetailsWrapper from './details-wrapper';
 import ProductVideoPlayer from './product-video-player';
+import ProductDetailsFixedBar from './product-details-fixed-bar';
 
 export default function ProductDetailsContent({ productItem, children }) {
   const { img, imageURLs, videoId, status } = productItem || {};
   const [activeImg, setActiveImg] = useState(imageURLs?.[0] || img);
+  const addToCartRef = useRef(null);
+  const proceedToBuyRef = useRef(null);
 
   // handle image active
   const handleImageActive = img => {
@@ -38,6 +41,8 @@ export default function ProductDetailsContent({ productItem, children }) {
             productItem={productItem}
             handleImageActive={handleImageActive}
             activeImg={activeImg}
+            onAddToCartRef={addToCartRef}
+            onProceedToBuyRef={proceedToBuyRef}
           />
         </div>
       </div>
@@ -54,6 +59,13 @@ export default function ProductDetailsContent({ productItem, children }) {
 
       {/* Related Products - Passed as children slot from parent */}
       {children}
+
+      {/* Fixed Bottom Bar for Mobile */}
+      <ProductDetailsFixedBar
+        productItem={productItem}
+        onAddToCart={(prd) => addToCartRef.current?.(prd)}
+        onProceedToBuy={(prd) => proceedToBuyRef.current?.(prd)}
+      />
     </>
   );
 }

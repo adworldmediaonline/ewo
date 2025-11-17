@@ -13,7 +13,6 @@ export default async function OrderPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  "use cache";
   const id = (await params).id;
   // Wrapper is already in layout.jsx, so we don't need it here
   return <OrderArea orderId={id} />;
