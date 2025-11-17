@@ -8,6 +8,7 @@ import HeaderBrand from './header-brand';
 import HeaderMenuButton from './header-menu-button';
 import HeaderSearch from './header-search-new';
 import AnnouncementBar from './announcement-bar';
+import HeaderContactInfo from './header-contact-info';
 import { getCategoriesShow } from '@/server/categories';
 import { getActiveAnnouncements } from '@/server/announcements';
 
@@ -56,20 +57,39 @@ export default async function HeaderV2() {
               </div>
 
               {/* Centered search grows to fill remaining space on desktop */}
-              <div className="hidden md:block flex-1 px-2">
+              <div className="hidden md:flex flex-1 px-2 items-center gap-3">
                 <HeaderSearch
                   className="w-full max-w-3xl mx-auto"
                 />
+                {/* Contact Info - Compact, on right side of search */}
+                <HeaderContactInfo />
               </div>
 
-              <div className="shrink-0">
+              {/* Mobile: Contact Info and Header Actions */}
+              <div className="flex md:hidden items-center gap-1.5 shrink-0">
+                <HeaderContactInfo />
+                <Suspense
+                  fallback={
+                    <div className="flex items-center gap-1.5">
+                      <div className="h-8 w-8 animate-pulse rounded-full bg-muted"></div>
+                      <div className="h-8 w-8 animate-pulse rounded-full bg-muted"></div>
+                      <div className="h-8 w-8 animate-pulse rounded-full bg-muted"></div>
+                    </div>
+                  }
+                >
+                  <HeaderActions />
+                </Suspense>
+              </div>
+
+              {/* Desktop: Header Actions */}
+              <div className="hidden md:block shrink-0">
                 {/* HeaderActions is a client component with hooks - wrap in Suspense */}
                 <Suspense
                   fallback={
-                    <div className="flex items-center gap-2 md:gap-4">
-                      <div className="h-10 w-10 md:h-11 md:w-11 animate-pulse rounded-full bg-muted"></div>
-                      <div className="h-10 w-10 md:h-11 md:w-11 animate-pulse rounded-full bg-muted"></div>
-                      <div className="h-10 w-10 md:h-11 md:w-11 animate-pulse rounded-full bg-muted"></div>
+                    <div className="flex items-center gap-1.5 md:gap-2">
+                      <div className="h-8 w-8 md:h-9 md:w-9 animate-pulse rounded-full bg-muted"></div>
+                      <div className="h-8 w-8 md:h-9 md:w-9 animate-pulse rounded-full bg-muted"></div>
+                      <div className="h-8 w-8 md:h-9 md:w-9 animate-pulse rounded-full bg-muted"></div>
                     </div>
                   }
                 >
