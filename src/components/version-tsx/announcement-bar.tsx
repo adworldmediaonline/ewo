@@ -71,13 +71,13 @@ export default function AnnouncementBar({ announcements }: AnnouncementBarProps)
       <div className="container mx-auto flex items-center justify-center gap-2 relative">
         {/* Title (Mobile: Hidden, Desktop: Shown) */}
         {currentAnnouncement.title && (
-          <span className="hidden sm:inline font-semibold text-sm">
+          <span className="inline font-semibold text-[10px] sm:text-sm">
             {currentAnnouncement.title}:
           </span>
         )}
 
         {/* Message */}
-        <p className="text-xs sm:text-sm font-medium">
+        <p className="text-[10px] sm:text-sm font-medium">
           {currentAnnouncement.message}
         </p>
 
@@ -85,7 +85,7 @@ export default function AnnouncementBar({ announcements }: AnnouncementBarProps)
         {currentAnnouncement.link && (
           <Link
             href={currentAnnouncement.link}
-            className="inline-flex items-center gap-1 text-xs sm:text-sm font-semibold underline hover:no-underline transition-all"
+            className="inline-flex items-center gap-1 text-[10px] sm:text-sm font-semibold underline hover:no-underline transition-all"
           >
             {currentAnnouncement.linkText || 'Learn More'}
             <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
