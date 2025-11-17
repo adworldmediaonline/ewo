@@ -92,7 +92,7 @@ export default function RootLayout({ children }) {
           }}
         />
 
-        <Script
+        {/* <Script
           id="tawk-to-script"
           strategy="lazyOnload"
           dangerouslySetInnerHTML={{
@@ -122,7 +122,7 @@ export default function RootLayout({ children }) {
                 })();
               `,
           }}
-        />
+        /> */}
 
         <GoogleTagManager gtmId="GTM-MB34NG65" />
         {/* <Analytics /> */}

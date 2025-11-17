@@ -2,12 +2,14 @@
 import useCartInfo from '@/hooks/use-cart-info';
 import { authClient } from '@/lib/authClient';
 import { reset_address_discount } from '@/redux/features/order/orderSlice';
+import { cn } from '@/lib/utils';
 
 import { City, Country, State } from 'country-state-city';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Controller } from 'react-hook-form';
 import ErrorMsg from '../../common/error-msg';
+import { SearchableSelect } from '@/components/ui/searchable-select';
 
 const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData }) => {
   const { data: session } = authClient.useSession();
@@ -276,24 +278,33 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
                 name="country"
                 control={control}
                 rules={{ required: 'Country is required!' }}
-                render={({ field }) => (
-                  <select
-                    {...field}
-                    className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                    value={selectedCountry?.isoCode || 'US'}
-                    onChange={(e) => {
-                      field.onChange(e); // Update react-hook-form
-                      handleCountryChange(e); // Update our state
-                    }}
-                  >
-                    <option value="">Select Country</option>
-                    {countries.map(country => (
-                      <option key={country.isoCode} value={country.isoCode}>
-                        {country.name}
-                      </option>
-                    ))}
-                  </select>
-                )}
+                render={({ field }) => {
+                  const countryOptions = countries.map(country => ({
+                    value: country.isoCode,
+                    label: country.name,
+                  }));
+
+                  return (
+                    <>
+                      <SearchableSelect
+                        options={countryOptions}
+                        value={field.value || selectedCountry?.isoCode || 'US'}
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          // Simulate event for handleCountryChange
+                          const syntheticEvent = {
+                            target: { value },
+                          };
+                          handleCountryChange(syntheticEvent);
+                        }}
+                        placeholder="Select Country"
+                        searchPlaceholder="Search countries..."
+                        emptyMessage="No country found."
+                        error={!!errors?.country}
+                      />
+                    </>
+                  );
+                }}
               />
               <ErrorMsg msg={errors?.country?.message} />
             </div>
@@ -309,27 +320,34 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
                   name="state"
                   control={control}
                   rules={{ required: 'State is required!' }}
-                  render={({ field }) => (
-                    <select
-                      {...field}
-                      className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
-                      value={selectedState?.isoCode || ''}
-                      disabled={!selectedCountry}
-                      onChange={(e) => {
-                        field.onChange(e); // Update react-hook-form
-                        handleStateChange(e); // Update our state
-                      }}
-                    >
-                      <option value="">
-                        {selectedCountry ? 'Select State' : 'Select country first'}
-                      </option>
-                      {states.map(state => (
-                        <option key={state.isoCode} value={state.isoCode}>
-                          {state.name}
-                        </option>
-                      ))}
-                    </select>
-                  )}
+                  render={({ field }) => {
+                    const stateOptions = states.map(state => ({
+                      value: state.isoCode,
+                      label: state.name,
+                    }));
+
+                    return (
+                      <>
+                        <SearchableSelect
+                          options={stateOptions}
+                          value={field.value || selectedState?.isoCode || ''}
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            // Simulate event for handleStateChange
+                            const syntheticEvent = {
+                              target: { value },
+                            };
+                            handleStateChange(syntheticEvent);
+                          }}
+                          placeholder={selectedCountry ? 'Select State' : 'Select country first'}
+                          searchPlaceholder="Search states..."
+                          emptyMessage="No state found."
+                          disabled={!selectedCountry}
+                          error={!!errors?.state}
+                        />
+                      </>
+                    );
+                  }}
                 />
                 <ErrorMsg msg={errors?.state?.message} />
               </div>
@@ -354,7 +372,10 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
                             {...field}
                             type="text"
                             placeholder="Enter city name"
-                            className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                            className={cn(
+                              'w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring',
+                              errors?.city && 'border-destructive'
+                            )}
                             onChange={(e) => {
                               field.onChange(e);
                               handleCityChange(e);
@@ -379,7 +400,10 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
                             {...field}
                             type="text"
                             placeholder="Enter city name"
-                            className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                            className={cn(
+                              'w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring',
+                              errors?.city && 'border-destructive'
+                            )}
                             onChange={(e) => {
                               field.onChange(e);
                               handleCityChange(e);
@@ -389,30 +413,46 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
                       );
                     }
 
-                    // Case 3: Cities available - show dropdown with manual option
+                    // Case 3: Cities available - show searchable combobox with manual option
+                    const cityOptions = cities.map(city => ({
+                      value: city.name,
+                      label: city.name,
+                    }));
+
+                    // Add manual entry option if cities are available
+                    if (cityOptions.length > 0) {
+                      cityOptions.push({
+                        value: '__manual__',
+                        label: 'City not listed? Enter manually',
+                      });
+                    }
+
                     return (
-                      <select
-                        {...field}
-                        className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
-                        value={selectedCity}
-                        disabled={!selectedState}
-                        onChange={(e) => {
-                          field.onChange(e); // Update react-hook-form
-                          handleCityChange(e); // Update our state
-                        }}
-                      >
-                        <option value="">
-                          {selectedState ? 'Select City' : 'Select state first'}
-                        </option>
-                        {cities.map(city => (
-                          <option key={city.name} value={city.name}>
-                            {city.name}
-                          </option>
-                        ))}
-                        {cities.length > 0 && (
-                          <option value="__manual__">City not listed? Enter manually</option>
-                        )}
-                      </select>
+                      <>
+                        <SearchableSelect
+                          options={cityOptions}
+                          value={field.value || selectedCity || ''}
+                          onValueChange={(value) => {
+                            if (value === '__manual__') {
+                              setShowManualCityInput(true);
+                              field.onChange('');
+                              setSelectedCity('');
+                            } else {
+                              field.onChange(value);
+                              // Simulate event for handleCityChange
+                              const syntheticEvent = {
+                                target: { value },
+                              };
+                              handleCityChange(syntheticEvent);
+                            }
+                          }}
+                          placeholder={selectedState ? 'Select City' : 'Select state first'}
+                          searchPlaceholder="Search cities..."
+                          emptyMessage="No city found."
+                          disabled={!selectedState}
+                          error={!!errors?.city}
+                        />
+                      </>
                     );
                   }}
                 />
