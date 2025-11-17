@@ -12,6 +12,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 import useCartInfo from '@/hooks/use-cart-info';
 
 import {
@@ -85,6 +86,19 @@ export default function CartDropdown({
 
   // Add state to control dropdown
   const [open, setOpen] = React.useState(false);
+
+  // Detect mobile screen size for responsive alignment
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768); // md breakpoint
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Coupon functionality state
   const [couponCode, setCouponCode] = React.useState<string>('');
@@ -441,7 +455,14 @@ export default function CartDropdown({
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="w-[min(92vw,26rem)] rounded-xl border border-border bg-popover p-0 shadow-xl z-2147483647"
+        alignOffset={0}
+        sideOffset={4}
+        collisionPadding={isMobile ? { right: 16, left: 16 } : 0}
+        side="bottom"
+        className={cn(
+          "rounded-xl border border-border bg-popover p-0 shadow-xl z-2147483647",
+          isMobile ? "w-[calc(100vw-2rem)] max-w-[26rem]" : "w-[26rem]"
+        )}
       >
         {items.length === 0 ? (
           <div className="grid place-items-center py-16 text-sm text-muted-foreground">
@@ -450,22 +471,23 @@ export default function CartDropdown({
         ) : (
           <div>
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border/60">
               <div className="text-sm font-semibold">
-                My Cart ({items.length})
+                Shopping Cart ({items.length})
               </div>
               <Button
                 variant="ghost"
-                size="sm"
-                className="h-7 px-2 text-xs"
-                onClick={handleViewAll}
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                onClick={() => setOpen(false)}
+                aria-label="Close cart"
               >
-                View all
+                <XIcon className="h-4 w-4" />
               </Button>
             </div>
 
             {/* Items */}
-            <div className="max-h-80 overflow-auto p-3 pr-1 grid gap-3">
+            <div className="max-h-80 overflow-auto px-4 py-3 grid gap-3">
               {items.map((item, idx) => {
                 const imageUrl = item.img;
                 const isCloudinaryImage = isCloudinaryUrl(imageUrl);
@@ -561,7 +583,7 @@ export default function CartDropdown({
 
             {/* Coupon Section - Beautiful Applied Coupons Banner */}
             {applied_coupons.length > 0 && (
-              <div className="px-3 py-2 border-t border-border/60">
+              <div className="px-4 py-2 border-t border-border/60">
                 <div className="space-y-2">
                   {applied_coupons.map(
                     (coupon: AppliedCoupon, index: number) => {
@@ -619,8 +641,9 @@ export default function CartDropdown({
               </div>
             )}
 
-            {/* Summary (no separators) */}
-            <div className="px-3 py-3 space-y-2 text-sm">
+            {/* Summary */}
+            <div className="px-4 py-3 space-y-2 text-sm">
+              <div className="text-sm font-semibold mb-2">Order Summary</div>
               <div className="flex items-center justify-between">
                 <span>Subtotal</span>
                 <span>
@@ -679,20 +702,28 @@ export default function CartDropdown({
                   <span>- ${Number(total_coupon_discount).toFixed(2)}</span>
                 </div>
               )}
-              <div className="flex items-center justify-between text-base font-bold">
+              {/* Total row - commented out, showing below instead */}
+              {/* <div className="flex items-center justify-between text-base font-bold">
                 <span>Total</span>
                 <span>${finalTotal.toFixed(2)}</span>
-              </div>
-              <div className="grid grid-cols-2 gap-2 pt-2">
-                <Button
+              </div> */}
+              <div className="flex items-center gap-2 pt-4 border-t border-border/60 mt-3">
+                {/* View Cart button - commented out, replaced with total display */}
+                {/* <Button
                   variant="outline"
                   onClick={handleViewCart}
                   className="w-full"
                 >
                   View Cart
-                </Button>
-                <Button onClick={handleCheckout} className="w-full">
-                  Checkout
+                </Button> */}
+                <div className="flex-1">
+                  <div className="text-xs text-muted-foreground mb-1">Total Payable</div>
+                  <div className="text-lg font-bold">
+                    ${finalTotal.toFixed(2)}
+                  </div>
+                </div>
+                <Button onClick={handleCheckout} className="flex-1">
+                  Proceed to Buy
                 </Button>
               </div>
             </div>
