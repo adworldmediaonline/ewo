@@ -5,6 +5,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,6 +20,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { authClient } from '@/lib/authClient';
 import { replaceTextCharacters } from '@/lib/replaceTextCharacters';
 import {
@@ -57,7 +63,7 @@ const ProductRating = ({ rating, reviewCount }) => {
   const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
       <div className="flex items-center gap-1">
         {/* Full stars */}
         {Array.from({ length: fullStars }).map((_, i) => (
@@ -123,6 +129,7 @@ export default function DetailsWrapper({
   } = productItem || {};
   const [selectedOption, setSelectedOption] = useState(null);
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
+  const [isReviewsPopoverOpen, setIsReviewsPopoverOpen] = useState(false);
   const { data: session } = authClient.useSession();
   const dispatch = useDispatch();
   const router = useRouter();
@@ -350,7 +357,103 @@ export default function DetailsWrapper({
 
       {/* Rating and Status */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-        <ProductRating rating={ratingVal} reviewCount={reviews?.length || 0} />
+        <Popover open={isReviewsPopoverOpen} onOpenChange={setIsReviewsPopoverOpen}>
+          <PopoverTrigger asChild>
+            <button
+              className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-md p-1 -m-1"
+              aria-label={`View ${reviews?.length || 0} review${reviews?.length !== 1 ? 's' : ''}`}
+            >
+              <ProductRating
+                rating={ratingVal}
+                reviewCount={reviews?.length || 0}
+              />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent
+            className="w-[90vw] sm:w-[420px] p-0"
+            align="start"
+            side="bottom"
+            sideOffset={8}
+          >
+            <div className="flex flex-col" style={{ maxHeight: '400px' }}>
+              {/* Header */}
+              <div className="p-3 border-b shrink-0">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4 text-primary shrink-0" />
+                    <h3 className="font-semibold text-foreground text-sm">
+                      Customer Reviews
+                    </h3>
+                    {reviews && reviews.length > 0 && (
+                      <span className="bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full shrink-0">
+                        {reviews.length}
+                      </span>
+                    )}
+                  </div>
+                  {reviews && reviews.length > 0 && (
+                    <span className="text-xs text-muted-foreground shrink-0">
+                      Avg: {ratingVal.toFixed(1)}/5
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Reviews List - Scrollable */}
+              <div className="flex-1 min-h-0 overflow-hidden">
+                <ScrollArea className="h-full" style={{ height: '280px' }}>
+                  <div className="p-3 space-y-3">
+                    {reviews && reviews.length > 0 ? (
+                      reviews.map((review, index) => (
+                        <ReviewItem key={review._id || index} review={review} />
+                      ))
+                    ) : (
+                      <div className="text-center py-6">
+                        <MessageSquare className="w-10 h-10 mx-auto text-muted-foreground mb-3" />
+                        <p className="text-sm font-medium text-foreground mb-1">
+                          No reviews yet
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Be the first to review this product!
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </ScrollArea>
+              </div>
+
+              {/* Footer with Add Review Button */}
+              <div className="p-3 border-t shrink-0">
+                <Dialog
+                  open={isReviewDialogOpen}
+                  onOpenChange={setIsReviewDialogOpen}
+                >
+                  <DialogTrigger asChild>
+                    <Button
+                      onClick={handleReviewButtonClick}
+                      className="w-full flex items-center justify-center gap-2 h-9 text-sm"
+                      variant="outline"
+                    >
+                      <Plus className="w-3 h-3" />
+                      Add Review
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Write a Review</DialogTitle>
+                    </DialogHeader>
+                    <ReviewForm
+                      productId={productItem?._id}
+                      onSuccess={() => {
+                        setIsReviewDialogOpen(false);
+                        setIsReviewsPopoverOpen(false);
+                      }}
+                    />
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
 
         <div className="flex items-center gap-2">
           {status === 'in-stock' ? (

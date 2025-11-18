@@ -45,7 +45,7 @@ const ReviewRating = ({ rating }) => {
 };
 
 const ReviewItem = ({ review }) => {
-  const { rating, comment, name, email, createdAt, title, guestName } = review || {};
+  const { rating, comment, name, email, createdAt, title, guestName, guestEmail } = review || {};
 
   // Generate initials from name or email
   const getInitials = () => {
