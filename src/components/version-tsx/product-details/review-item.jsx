@@ -45,20 +45,20 @@ const ReviewRating = ({ rating }) => {
 };
 
 const ReviewItem = ({ review }) => {
-  const { rating, comment, name, email, createdAt, title } = review || {};
+  const { rating, comment, name, email, createdAt, title, guestName } = review || {};
 
   // Generate initials from name or email
   const getInitials = () => {
-    if (name) {
-      return name
+    if (name || guestName) {
+      return (name || guestName)
         .split(' ')
         .map(n => n[0])
         .join('')
         .toUpperCase()
         .slice(0, 2);
     }
-    if (email) {
-      return email.split('@')[0].slice(0, 2).toUpperCase();
+    if (email || guestEmail) {
+      return (email || guestEmail).split('@')[0].slice(0, 2).toUpperCase();
     }
     return 'U';
   };
@@ -96,7 +96,7 @@ const ReviewItem = ({ review }) => {
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
               <Avatar className="w-10 h-10">
-                <AvatarImage src="" alt={name || email} />
+                <AvatarImage src="" alt={name || email || guestName} />
                 <AvatarFallback className="bg-primary/10 text-primary font-medium">
                   {getInitials()}
                 </AvatarFallback>
@@ -105,7 +105,7 @@ const ReviewItem = ({ review }) => {
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <h4 className="font-medium text-foreground">
-                    {name || email?.split('@')[0] || 'Anonymous'}
+                    {name || email?.split('@')[0] || guestName || 'Anonymous'}
                   </h4>
                   {title && (
                     <Badge variant="secondary" className="text-xs">
