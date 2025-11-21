@@ -5,7 +5,7 @@ import { cacheLife } from 'next/cache';
 
 export const getActiveBanners = cache(async () => {
   "use cache";
-  cacheLife('days')
+  cacheLife('default')
   try {
     const response = await fetch(`${API_BASE_URL}${API_ENDPOINT.BANNER}`);
     if (!response.ok) {
