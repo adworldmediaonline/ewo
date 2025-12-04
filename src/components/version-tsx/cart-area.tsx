@@ -83,7 +83,6 @@ export default function CartArea() {
   const { cart_products } = useSelector(
     (state: RootState) => state.cart as CartState
   );
-  const { firstTimeDiscountAmount: _firstTimeDiscountAmount } = useCartInfo();
   const dispatch = useDispatch();
   const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
 

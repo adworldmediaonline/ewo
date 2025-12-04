@@ -199,9 +199,9 @@ export default function CartCheckout() {
     const currentCouponDiscount = total_coupon_discount || 0;
 
     // Calculate final total BEFORE shipping for free shipping eligibility
+    // Note: addressDiscount is applied to final total, not subtotal, so it doesn't affect free shipping eligibility
     const finalTotalBeforeShipping =
       currentSubtotal -
-      currentAddressDiscount -
       currentCouponDiscount;
 
     return {

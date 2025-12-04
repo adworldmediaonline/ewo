@@ -64,12 +64,6 @@ const initialState: CartState = {
   lastAddedProduct: null,
 };
 
-// Helper function to check if user is first-time customer
-const checkFirstTimeCustomer = (): boolean => {
-  // Use direct localStorage access to avoid the getLocalStorage function's default behavior
-  const hasReceivedDiscount = localStorage.getItem('first_time_discount_used');
-  return !hasReceivedDiscount; // Returns true if null/undefined (first time)
-};
 
 // Helper function to mark discount as used (should only be called on order completion)
 // const markDiscountAsUsed = (): void => {
@@ -175,23 +169,12 @@ const updateShippingCosts = (state: CartState): void => {
   );
 };
 
-// Helper to update first-time discount eligibility
-const updateFirstTimeDiscount = (state: CartState): void => {
-  const isFirstTime = checkFirstTimeCustomer();
-  const hasProducts = state.cart_products.length > 0;
-
-  state.firstTimeDiscount.isEligible = isFirstTime;
-  state.firstTimeDiscount.isApplied = isFirstTime && hasProducts;
-};
 
 export const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
     add_cart_product: (state, { payload }: PayloadAction<CartProduct>) => {
-      // Check if this is the first product being added to cart
-      // const isFirstProduct = state.cart_products.length === 0;
-      // const isFirstTimeCustomer = checkFirstTimeCustomer();
 
       // Create unique identifier that includes selected option if present
       const productId = payload.selectedOption
@@ -267,9 +250,8 @@ export const cartSlice = createSlice({
         });
       }
 
-      // Update shipping costs and first-time discount
+      // Update shipping costs
       updateShippingCosts(state);
-      updateFirstTimeDiscount(state);
 
       setLocalStorage('cart_products', state.cart_products);
       setLocalStorage('shipping_cost', state.totalShippingCost);
@@ -293,9 +275,8 @@ export const cartSlice = createSlice({
         return { ...item } as CartProduct;
       });
 
-      // Update shipping costs and first-time discount
+      // Update shipping costs
       updateShippingCosts(state);
-      updateFirstTimeDiscount(state);
 
       setLocalStorage('cart_products', state.cart_products);
       setLocalStorage('shipping_cost', state.totalShippingCost);
@@ -308,9 +289,8 @@ export const cartSlice = createSlice({
         (item: CartProduct) => item._id !== payload.id
       );
 
-      // Update shipping costs and first-time discount
+      // Update shipping costs
       updateShippingCosts(state);
-      updateFirstTimeDiscount(state);
 
       setLocalStorage('cart_products', state.cart_products);
       setLocalStorage('shipping_cost', state.totalShippingCost);
@@ -331,9 +311,8 @@ export const cartSlice = createSlice({
         (item: CartProduct) => item._id !== payload.id
       );
 
-      // Update shipping costs and first-time discount
+      // Update shipping costs
       updateShippingCosts(state);
-      updateFirstTimeDiscount(state);
 
       setLocalStorage('cart_products', state.cart_products);
       setLocalStorage('shipping_cost', state.totalShippingCost);
@@ -367,9 +346,8 @@ export const cartSlice = createSlice({
         state.totalShippingCost = Number(storedShippingCost);
       }
 
-      // Update shipping costs and first-time discount when getting cart products
+      // Update shipping costs when getting cart products
       updateShippingCosts(state);
-      updateFirstTimeDiscount(state);
     },
     initialOrderQuantity: state => {
       state.orderQuantity = 1;
@@ -383,8 +361,6 @@ export const cartSlice = createSlice({
       state.showCartConfirmation = false;
       state.lastAddedProduct = null;
 
-      // Reset first-time discount state
-      updateFirstTimeDiscount(state);
 
       setLocalStorage('cart_products', state.cart_products);
       setLocalStorage('shipping_cost', state.totalShippingCost);
