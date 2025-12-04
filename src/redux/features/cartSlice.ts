@@ -64,12 +64,6 @@ const initialState: CartState = {
   lastAddedProduct: null,
 };
 
-// Helper function to check if user is first-time customer
-const checkFirstTimeCustomer = (): boolean => {
-  // Use direct localStorage access to avoid the getLocalStorage function's default behavior
-  const hasReceivedDiscount = localStorage.getItem('first_time_discount_used');
-  return !hasReceivedDiscount; // Returns true if null/undefined (first time)
-};
 
 // Helper function to mark discount as used (should only be called on order completion)
 // const markDiscountAsUsed = (): void => {
@@ -105,22 +99,61 @@ const calculateTotalShipping = (
   return parseFloat(discountedTotal.toFixed(2));
 };
 
+// Helper to get coupon discount from localStorage
+const getCouponDiscountFromStorage = (): number => {
+  try {
+    const appliedCoupons = localStorage.getItem('appliedCoupons');
+    if (appliedCoupons) {
+      const coupons = JSON.parse(appliedCoupons);
+      if (Array.isArray(coupons)) {
+        return coupons.reduce(
+          (total: number, coupon: any) => total + (coupon.discount || 0),
+          0
+        );
+      }
+    }
+  } catch (error) {
+    // Ignore errors
+  }
+  return 0;
+};
+
+// Helper to get first-time discount amount
+const getFirstTimeDiscountAmount = (state: CartState): number => {
+  if (!state.firstTimeDiscount.isApplied) {
+    return 0;
+  }
+  const subtotal = state.cart_products.reduce((total: number, item: CartProduct) => {
+    const price = Number(item.finalPriceDiscount || 0);
+    const quantity = Number(item.orderQuantity || 0);
+    return total + price * quantity;
+  }, 0);
+  return (subtotal * state.firstTimeDiscount.percentage) / 100;
+};
+
 // Helper to check if free shipping is eligible (orders >= $500)
-const isFreeShippingEligible = (items: CartProduct[]): boolean => {
-  const subtotal = items.reduce((total: number, item: CartProduct) => {
+// Checks final total AFTER discounts (subtotal - coupon discount)
+const isFreeShippingEligible = (state: CartState): boolean => {
+  const subtotal = state.cart_products.reduce((total: number, item: CartProduct) => {
     const price = Number(item.finalPriceDiscount || 0);
     const quantity = Number(item.orderQuantity || 0);
     return total + price * quantity;
   }, 0);
 
-  // Free shipping threshold: $500
-  return subtotal >= 500;
+  // Get coupon discount from localStorage
+  const couponDiscount = getCouponDiscountFromStorage();
+
+  // Calculate final total BEFORE shipping (after coupon discount)
+  const finalTotalBeforeShipping = subtotal - couponDiscount;
+
+  // Free shipping threshold: $500 (based on final total, not subtotal)
+  return finalTotalBeforeShipping >= 500;
 };
 
 // Helper to update shipping costs
 const updateShippingCosts = (state: CartState): void => {
-  // Check if free shipping is eligible
-  if (isFreeShippingEligible(state.cart_products)) {
+  // Check if free shipping is eligible based on final total (after discounts)
+  if (isFreeShippingEligible(state)) {
     state.totalShippingCost = 0;
     state.shippingDiscount = 0;
     return;
@@ -136,23 +169,12 @@ const updateShippingCosts = (state: CartState): void => {
   );
 };
 
-// Helper to update first-time discount eligibility
-const updateFirstTimeDiscount = (state: CartState): void => {
-  const isFirstTime = checkFirstTimeCustomer();
-  const hasProducts = state.cart_products.length > 0;
-
-  state.firstTimeDiscount.isEligible = isFirstTime;
-  state.firstTimeDiscount.isApplied = isFirstTime && hasProducts;
-};
 
 export const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
     add_cart_product: (state, { payload }: PayloadAction<CartProduct>) => {
-      // Check if this is the first product being added to cart
-      // const isFirstProduct = state.cart_products.length === 0;
-      // const isFirstTimeCustomer = checkFirstTimeCustomer();
 
       // Create unique identifier that includes selected option if present
       const productId = payload.selectedOption
@@ -228,9 +250,8 @@ export const cartSlice = createSlice({
         });
       }
 
-      // Update shipping costs and first-time discount
+      // Update shipping costs
       updateShippingCosts(state);
-      updateFirstTimeDiscount(state);
 
       setLocalStorage('cart_products', state.cart_products);
       setLocalStorage('shipping_cost', state.totalShippingCost);
@@ -254,9 +275,8 @@ export const cartSlice = createSlice({
         return { ...item } as CartProduct;
       });
 
-      // Update shipping costs and first-time discount
+      // Update shipping costs
       updateShippingCosts(state);
-      updateFirstTimeDiscount(state);
 
       setLocalStorage('cart_products', state.cart_products);
       setLocalStorage('shipping_cost', state.totalShippingCost);
@@ -269,9 +289,8 @@ export const cartSlice = createSlice({
         (item: CartProduct) => item._id !== payload.id
       );
 
-      // Update shipping costs and first-time discount
+      // Update shipping costs
       updateShippingCosts(state);
-      updateFirstTimeDiscount(state);
 
       setLocalStorage('cart_products', state.cart_products);
       setLocalStorage('shipping_cost', state.totalShippingCost);
@@ -292,9 +311,8 @@ export const cartSlice = createSlice({
         (item: CartProduct) => item._id !== payload.id
       );
 
-      // Update shipping costs and first-time discount
+      // Update shipping costs
       updateShippingCosts(state);
-      updateFirstTimeDiscount(state);
 
       setLocalStorage('cart_products', state.cart_products);
       setLocalStorage('shipping_cost', state.totalShippingCost);
@@ -328,9 +346,8 @@ export const cartSlice = createSlice({
         state.totalShippingCost = Number(storedShippingCost);
       }
 
-      // Update shipping costs and first-time discount when getting cart products
+      // Update shipping costs when getting cart products
       updateShippingCosts(state);
-      updateFirstTimeDiscount(state);
     },
     initialOrderQuantity: state => {
       state.orderQuantity = 1;
@@ -344,8 +361,6 @@ export const cartSlice = createSlice({
       state.showCartConfirmation = false;
       state.lastAddedProduct = null;
 
-      // Reset first-time discount state
-      updateFirstTimeDiscount(state);
 
       setLocalStorage('cart_products', state.cart_products);
       setLocalStorage('shipping_cost', state.totalShippingCost);
@@ -376,6 +391,24 @@ export const cartSlice = createSlice({
       state.firstTimeDiscount.isEligible = false;
       state.firstTimeDiscount.isApplied = false;
     },
+    // Action to recalculate shipping costs (can be called when discounts change)
+    recalculateShipping: state => {
+      updateShippingCosts(state);
+    },
+  },
+  extraReducers: builder => {
+    // Recalculate shipping when coupons are added, removed, or cleared
+    builder
+      .addMatcher(
+        (action) =>
+          action.type === 'coupon/add_applied_coupon' ||
+          action.type === 'coupon/remove_applied_coupon' ||
+          action.type === 'coupon/set_applied_coupons' ||
+          action.type === 'coupon/clear_all_coupons',
+        (state) => {
+          updateShippingCosts(state);
+        }
+      );
   },
 });
 
