@@ -37,6 +37,198 @@
   animation: shimmer 1.5s infinite;
 }
 
+/* Pulse glow animation for coupon text - Smooth and polished */
+@keyframes pulse-glow {
+  0% {
+    text-shadow:
+      0 0 5px #ff3131,
+      0 0 10px #ff3131,
+      0 0 15px #ff3131,
+      0 0 20px #ff3131,
+      0 0 25px rgba(255, 49, 49, 0.5);
+  }
+  25% {
+    text-shadow:
+      0 0 10px #ff3131,
+      0 0 20px #ff3131,
+      0 0 30px #ff3131,
+      0 0 40px #ff3131,
+      0 0 50px rgba(255, 49, 49, 0.8);
+  }
+  50% {
+    text-shadow:
+      0 0 15px #ff3131,
+      0 0 30px #ff3131,
+      0 0 45px #ff3131,
+      0 0 60px #ff3131,
+      0 0 75px rgba(255, 49, 49, 1);
+  }
+  75% {
+    text-shadow:
+      0 0 10px #ff3131,
+      0 0 20px #ff3131,
+      0 0 30px #ff3131,
+      0 0 40px #ff3131,
+      0 0 50px rgba(255, 49, 49, 0.8);
+  }
+  100% {
+    text-shadow:
+      0 0 5px #ff3131,
+      0 0 10px #ff3131,
+      0 0 15px #ff3131,
+      0 0 20px #ff3131,
+      0 0 25px rgba(255, 49, 49, 0.5);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Yellow pulse glow animation */
+@keyframes pulse-glow-yellow {
+  0% {
+    text-shadow:
+      0 0 5px #ffde59,
+      0 0 10px #ffde59,
+      0 0 15px #ffde59,
+      0 0 20px #ffde59,
+      0 0 25px rgba(255, 222, 89, 0.5);
+  }
+  25% {
+    text-shadow:
+      0 0 10px #ffde59,
+      0 0 20px #ffde59,
+      0 0 30px #ffde59,
+      0 0 40px #ffde59,
+      0 0 50px rgba(255, 222, 89, 0.8);
+  }
+  50% {
+    text-shadow:
+      0 0 15px #ffde59,
+      0 0 30px #ffde59,
+      0 0 45px #ffde59,
+      0 0 60px #ffde59,
+      0 0 75px rgba(255, 222, 89, 1);
+  }
+  75% {
+    text-shadow:
+      0 0 10px #ffde59,
+      0 0 20px #ffde59,
+      0 0 30px #ffde59,
+      0 0 40px #ffde59,
+      0 0 50px rgba(255, 222, 89, 0.8);
+  }
+  100% {
+    text-shadow:
+      0 0 5px #ffde59,
+      0 0 10px #ffde59,
+      0 0 15px #ffde59,
+      0 0 20px #ffde59,
+      0 0 25px rgba(255, 222, 89, 0.5);
+  }
+}
+
+.animate-pulse-glow-yellow {
+  animation: pulse-glow-yellow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Gradient pulse glow animation for shipping text */
+@keyframes pulse-glow-gradient {
+  0% {
+    text-shadow:
+      -5px 0 5px #01edc9,
+      -10px 0 10px #01edc9,
+      -15px 0 15px rgba(1, 237, 201, 0.6),
+      5px 0 5px #01a6f7,
+      10px 0 10px #01a6f7,
+      15px 0 15px rgba(1, 166, 247, 0.6);
+  }
+  25% {
+    text-shadow:
+      -8px 0 8px #01edc9,
+      -15px 0 15px #01edc9,
+      -20px 0 20px rgba(1, 237, 201, 0.8),
+      8px 0 8px #01a6f7,
+      15px 0 15px #01a6f7,
+      20px 0 20px rgba(1, 166, 247, 0.8);
+  }
+  50% {
+    text-shadow:
+      -10px 0 10px #01edc9,
+      -20px 0 20px #01edc9,
+      -25px 0 25px rgba(1, 237, 201, 1),
+      10px 0 10px #01a6f7,
+      20px 0 20px #01a6f7,
+      25px 0 25px rgba(1, 166, 247, 1);
+  }
+  75% {
+    text-shadow:
+      -8px 0 8px #01edc9,
+      -15px 0 15px #01edc9,
+      -20px 0 20px rgba(1, 237, 201, 0.8),
+      8px 0 8px #01a6f7,
+      15px 0 15px #01a6f7,
+      20px 0 20px rgba(1, 166, 247, 0.8);
+  }
+  100% {
+    text-shadow:
+      -5px 0 5px #01edc9,
+      -10px 0 10px #01edc9,
+      -15px 0 15px rgba(1, 237, 201, 0.6),
+      5px 0 5px #01a6f7,
+      10px 0 10px #01a6f7,
+      15px 0 15px rgba(1, 166, 247, 0.6);
+  }
+}
+
+.animate-pulse-glow-gradient {
+  animation: pulse-glow-gradient 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Gradient pulse glow animation for button - Subtle */
+@keyframes pulse-glow-button {
+  0% {
+    box-shadow:
+      -3px 0 5px rgba(1, 237, 201, 0.3),
+      -6px 0 10px rgba(1, 237, 201, 0.2),
+      3px 0 5px rgba(1, 166, 247, 0.3),
+      6px 0 10px rgba(1, 166, 247, 0.2);
+  }
+  25% {
+    box-shadow:
+      -4px 0 8px rgba(1, 237, 201, 0.4),
+      -8px 0 15px rgba(1, 237, 201, 0.3),
+      4px 0 8px rgba(1, 166, 247, 0.4),
+      8px 0 15px rgba(1, 166, 247, 0.3);
+  }
+  50% {
+    box-shadow:
+      -5px 0 10px rgba(1, 237, 201, 0.5),
+      -10px 0 20px rgba(1, 237, 201, 0.4),
+      5px 0 10px rgba(1, 166, 247, 0.5),
+      10px 0 20px rgba(1, 166, 247, 0.4);
+  }
+  75% {
+    box-shadow:
+      -4px 0 8px rgba(1, 237, 201, 0.4),
+      -8px 0 15px rgba(1, 237, 201, 0.3),
+      4px 0 8px rgba(1, 166, 247, 0.4),
+      8px 0 15px rgba(1, 166, 247, 0.3);
+  }
+  100% {
+    box-shadow:
+      -3px 0 5px rgba(1, 237, 201, 0.3),
+      -6px 0 10px rgba(1, 237, 201, 0.2),
+      3px 0 5px rgba(1, 166, 247, 0.3),
+      6px 0 10px rgba(1, 166, 247, 0.2);
+  }
+}
+
+.animate-pulse-glow-button {
+  animation: pulse-glow-button 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 :root {
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
