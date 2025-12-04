@@ -13,7 +13,7 @@ export default async function HeroBanner() {
     if (!banner) return null;
 
     // If includeCaption is false, render as simple clickable image
-    if (banner.includeCaption === false) {
+    if (banner.includeCaption === false || banner.includeCaption === true) {
       return (
         <section className="relative w-full overflow-hidden">
           <Link href={banner.cta?.link || '/shop'} className="block w-full">
