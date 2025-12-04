@@ -79,7 +79,7 @@ export default function CartDropdown({
   const dispatch = useDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { subtotal, total, firstTimeDiscountAmount } = useCartInfo();
+  const { subtotal, total } = useCartInfo();
 
   // Add state to control dropdown
   const [open, setOpen] = React.useState(false);
@@ -108,7 +108,6 @@ export default function CartDropdown({
     cart_products,
     totalShippingCost,
     shippingDiscount,
-    firstTimeDiscount,
   } = useSelector((s: any) => s.cart);
   const { applied_coupons = [], total_coupon_discount = 0 } = useSelector(
     (s: any) => s.coupon ?? {}
@@ -301,6 +300,13 @@ export default function CartDropdown({
     const coupon = Number(total_coupon_discount || 0);
     return Math.max(0, baseTotal + shipping - coupon);
   }, [subtotal, total, totalShippingCost, total_coupon_discount, applied_coupons.length]);
+
+  // Calculate final total BEFORE shipping for free shipping eligibility check
+  const finalTotalBeforeShipping = React.useMemo(() => {
+    const baseSubtotal = Number(subtotal || 0);
+    const couponDiscount = Number(total_coupon_discount || 0);
+    return Math.max(0, baseSubtotal - couponDiscount);
+  }, [subtotal, total_coupon_discount]);
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -504,32 +510,21 @@ export default function CartDropdown({
                   ${Number(subtotal || 0).toFixed(2)}
                 </span>
               </div>
-              {/* Only show first-time discount when NO coupons are applied */}
-              {firstTimeDiscount?.isApplied && applied_coupons.length === 0 && (
-                <div className="flex items-center justify-between text-emerald-700">
-                  <span>
-                    First-time discount (-{firstTimeDiscount?.percentage}%)
-                  </span>
-                  <span>
-                    -${Number(firstTimeDiscountAmount || 0).toFixed(2)}
-                  </span>
-                </div>
-              )}
               <div className="flex items-center justify-between">
                 <span>
                   Shipping
-                  {totalShippingCost === 0 && Number(subtotal) >= 500 && (
+                  {totalShippingCost === 0 && finalTotalBeforeShipping >= 500 && (
                     <span className="ml-1 text-xs text-emerald-600">
                       (Free on orders $500+)
                     </span>
                   )}
-                  {totalShippingCost > 0 && Number(subtotal) < 500 && (
+                  {totalShippingCost > 0 && finalTotalBeforeShipping < 500 && (
                     <span className="ml-1 text-xs text-blue-600">
                       (Free on $500+)
                     </span>
                   )}
                 </span>
-                {totalShippingCost === 0 && Number(subtotal) >= 500 ? (
+                {totalShippingCost === 0 && finalTotalBeforeShipping >= 500 ? (
                   <span className="text-emerald-600 font-semibold">FREE</span>
                 ) : (
                   <span>

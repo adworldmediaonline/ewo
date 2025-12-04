@@ -39,7 +39,6 @@ export default function CheckoutOrderArea({ checkoutData }) {
   const [savedOrderSummary, setSavedOrderSummary] = useState({
     subtotal: 0,
     shipping: 0,
-    firstTimeDiscountAmount: 0,
     totalCouponDiscount: 0,
     appliedCoupons: [],
     finalTotal: 0,
@@ -71,11 +70,9 @@ export default function CheckoutOrderArea({ checkoutData }) {
     cart_products,
     totalShippingCost,
     shippingDiscount,
-    firstTimeDiscount,
   } = useSelector(state => state.cart);
 
-  const { total, totalWithShipping, subtotal, firstTimeDiscountAmount } =
-    useCartInfo();
+  const { total, totalWithShipping, subtotal } = useCartInfo();
 
   const { isCheckoutSubmitting } = useSelector(state => state.order);
 
@@ -294,9 +291,8 @@ export default function CheckoutOrderArea({ checkoutData }) {
         ) || 0;
 
       const shipping = Number(totalShippingCost) || 0;
-      const firstTimeDiscountAmt = Number(firstTimeDiscountAmount) || 0;
 
-      const manualTotal = cartTotal + shipping - firstTimeDiscountAmt;
+      const manualTotal = cartTotal + shipping;
 
       let finalTotal = manualTotal;
 
@@ -345,7 +341,6 @@ export default function CheckoutOrderArea({ checkoutData }) {
       setSavedOrderSummary({
         subtotal: subtotal,
         shipping: totalShippingCost,
-        firstTimeDiscountAmount: firstTimeDiscountAmount,
         totalCouponDiscount: total_coupon_discount,
         appliedCoupons: applied_coupons,
         finalTotal: calculateFinalTotal(),
@@ -354,7 +349,6 @@ export default function CheckoutOrderArea({ checkoutData }) {
   }, [
     subtotal,
     totalShippingCost,
-    firstTimeDiscountAmount,
     total_coupon_discount,
     applied_coupons,
     isCheckoutSubmit,
@@ -380,9 +374,6 @@ export default function CheckoutOrderArea({ checkoutData }) {
   const displayShipping = isProcessing
     ? savedOrderSummary.shipping
     : totalShippingCost;
-  const displayFirstTimeDiscount = isProcessing
-    ? savedOrderSummary.firstTimeDiscountAmount
-    : firstTimeDiscountAmount;
   const displayTotalCouponDiscount = isProcessing
     ? savedOrderSummary.totalCouponDiscount
     : total_coupon_discount;
@@ -392,6 +383,11 @@ export default function CheckoutOrderArea({ checkoutData }) {
   const displayFinalTotal = isProcessing
     ? savedOrderSummary.finalTotal
     : calculateFinalTotal();
+
+  // Calculate final total BEFORE shipping for free shipping eligibility check
+  const displayFinalTotalBeforeShipping = isProcessing
+    ? savedOrderSummary.subtotal - (savedOrderSummary.totalCouponDiscount || 0)
+    : Number(subtotal) - Number(total_coupon_discount || 0);
 
   // Update shipping cost in checkout data when it changes
   useEffect(() => {
@@ -607,18 +603,18 @@ export default function CheckoutOrderArea({ checkoutData }) {
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">
               Shipping
-              {displayShipping === 0 && Number(displaySubtotal) >= 500 && (
+              {displayShipping === 0 && displayFinalTotalBeforeShipping >= 500 && (
                 <span className="ml-1 text-xs text-emerald-600">
                   (Free on orders $500+)
                 </span>
               )}
-              {displayShipping > 0 && Number(displaySubtotal) < 500 && (
+              {displayShipping > 0 && displayFinalTotalBeforeShipping < 500 && (
                 <span className="ml-1 text-xs text-blue-600">
                   (Free on $500+)
                 </span>
               )}
             </span>
-            {displayShipping === 0 && Number(displaySubtotal) >= 500 ? (
+            {displayShipping === 0 && displayFinalTotalBeforeShipping >= 500 ? (
               <span className="font-bold text-emerald-600">FREE</span>
             ) : (
               <span className="font-medium text-foreground">
@@ -659,17 +655,6 @@ export default function CheckoutOrderArea({ checkoutData }) {
             </div>
           )}
 
-          {/* First-time discount - Only show when NO coupons are applied */}
-          {firstTimeDiscount.isApplied && displayAppliedCoupons.length === 0 && (
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">
-                First-time discount (-{firstTimeDiscount.percentage}%):
-              </span>
-              <span className="font-medium text-foreground">
-                -${Number(displayFirstTimeDiscount || 0).toFixed(2)}
-              </span>
-            </div>
-          )}
         </div>
 
         {/* Total */}

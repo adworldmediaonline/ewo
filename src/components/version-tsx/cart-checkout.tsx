@@ -15,8 +15,7 @@ import {
 import { notifyError, notifySuccess } from '@/utils/toast';
 
 export default function CartCheckout() {
-  const { subtotal, firstTimeDiscountAmount, firstTimeDiscount } =
-    useCartInfo();
+  const { subtotal } = useCartInfo();
 
   const dispatch = useDispatch();
   const couponInputRef = useRef<HTMLInputElement>(null);
@@ -197,22 +196,24 @@ export default function CartCheckout() {
     const currentSubtotal = subtotal;
     const currentShipping = totalShippingCost;
     const currentAddressDiscount = address_discount || 0;
-    const currentFirstTimeDiscount = firstTimeDiscount.isApplied
-      ? firstTimeDiscountAmount
-      : 0;
     const currentCouponDiscount = total_coupon_discount || 0;
+
+    // Calculate final total BEFORE shipping for free shipping eligibility
+    const finalTotalBeforeShipping =
+      currentSubtotal -
+      currentAddressDiscount -
+      currentCouponDiscount;
 
     return {
       subtotal: currentSubtotal,
       shipping: currentShipping,
       addressDiscount: currentAddressDiscount,
-      firstTimeDiscount: currentFirstTimeDiscount,
       couponDiscount: currentCouponDiscount,
+      finalTotalBeforeShipping,
       finalTotal:
         currentSubtotal +
         currentShipping -
         currentAddressDiscount -
-        currentFirstTimeDiscount -
         currentCouponDiscount,
     };
   };
@@ -245,8 +246,7 @@ export default function CartCheckout() {
               cartTotal:
                 totals.subtotal +
                 totals.shipping -
-                totals.addressDiscount -
-                totals.firstTimeDiscount,
+                totals.addressDiscount,
               cartSubtotal: totals.subtotal,
               shippingCost: totals.shipping,
             }),
@@ -304,8 +304,7 @@ export default function CartCheckout() {
               cartTotal:
                 totals.subtotal +
                 totals.shipping -
-                totals.addressDiscount -
-                totals.firstTimeDiscount,
+                totals.addressDiscount,
               cartSubtotal: totals.subtotal,
               shippingCost: totals.shipping,
               excludeAppliedCoupons: excludeAppliedCoupons,
@@ -462,12 +461,12 @@ export default function CartCheckout() {
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
                   Shipping
-                  {totals.shipping === 0 && totals.subtotal >= 500 && (
+                  {totals.shipping === 0 && totals.finalTotalBeforeShipping >= 500 && (
                     <span className="ml-1 text-xs text-emerald-600">
                       (Free on orders $500+)
                     </span>
                   )}
-                  {totals.shipping > 0 && totals.subtotal < 500 && (
+                  {totals.shipping > 0 && totals.finalTotalBeforeShipping < 500 && (
                     <span className="ml-1 text-xs text-blue-600">
                       (Free on $500+)
                     </span>
@@ -478,7 +477,7 @@ export default function CartCheckout() {
                     </span>
                   )}
                 </span>
-                {totals.shipping === 0 && totals.subtotal >= 500 ? (
+                {totals.shipping === 0 && totals.finalTotalBeforeShipping >= 500 ? (
                   <span className="text-emerald-600 font-semibold">FREE</span>
                 ) : (
                   <span>${totals.shipping.toFixed(2)}</span>
@@ -502,17 +501,6 @@ export default function CartCheckout() {
             </div>
           )}
 
-          {/* First-time discount section - Only show when NO coupons are applied */}
-          {totals.firstTimeDiscount > 0 && applied_coupons.length === 0 && (
-            <div className="flex justify-between">
-              <span className="text-green-600">
-                First Time order discount (-{firstTimeDiscount.percentage}%)
-              </span>
-              <span className="text-success">
-                -${totals.firstTimeDiscount.toFixed(2)}
-              </span>
-            </div>
-          )}
 
           {/* Coupon Discounts */}
           {totals.couponDiscount > 0 && (
