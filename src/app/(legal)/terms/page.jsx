@@ -350,12 +350,12 @@ export default function TermsPage() {
                         1-866-EWO-ROAD
                       </a>
                     </div>
-                    <div className="flex items-center justify-center gap-2">
+                    {/* <div className="flex items-center justify-center gap-2">
                       <MapPin className="w-4 h-4 text-primary" />
                       <span className="text-muted-foreground">
                         PO Box 2644 Everett WA 98213
                       </span>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>
