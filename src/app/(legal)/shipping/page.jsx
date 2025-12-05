@@ -361,7 +361,7 @@ export default function ShippingPage() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 text-muted-foreground">
+                {/* <div className="flex items-start gap-3 text-muted-foreground">
                   <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm font-medium text-foreground mb-1">
@@ -373,7 +373,7 @@ export default function ShippingPage() {
                       PO Box 2644, Everett, WA 98213, USA
                     </p>
                   </div>
-                </div>
+                </div> */}
 
                 <div className="flex items-start gap-3 text-muted-foreground">
                   <Clock className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
