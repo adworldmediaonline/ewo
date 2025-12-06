@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { City, Country, State } from 'country-state-city';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Controller } from 'react-hook-form';
+import { Controller, useWatch } from 'react-hook-form';
 import ErrorMsg from '../../common/error-msg';
 import { SearchableSelect } from '@/components/ui/searchable-select';
 
@@ -16,6 +16,9 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
   const user = {};
   const { isCheckoutSubmitting } = useSelector(state => state.order);
   const dispatch = useDispatch();
+
+  // Watch state field value to enable city field when state is entered manually
+  const stateValue = useWatch({ control, name: 'state' });
 
   const {
     stripe,
@@ -44,6 +47,7 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
   const [selectedCity, setSelectedCity] = useState('');
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
+  const [showManualStateInput, setShowManualStateInput] = useState(false);
   const [showManualCityInput, setShowManualCityInput] = useState(false);
 
   const [formValues, setFormValues] = useState({
@@ -81,6 +85,8 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
       setSelectedState(null);
       setSelectedCity('');
       setCities([]);
+      setShowManualStateInput(false);
+      setShowManualCityInput(false);
     }
   }, [selectedCountry]);
 
@@ -321,10 +327,55 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
                   control={control}
                   rules={{ required: 'State is required!' }}
                   render={({ field }) => {
+                    // Show manual input if user selected manual entry
+                    if (showManualStateInput) {
+                      return (
+                        <div className="space-y-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowManualStateInput(false);
+                              setValue('state', '');
+                              setSelectedState(null);
+                            }}
+                            className="text-sm text-primary hover:text-primary/80 underline"
+                          >
+                            ← Back to state list
+                          </button>
+                          <input
+                            {...field}
+                            type="text"
+                            placeholder="Enter state name"
+                            className={cn(
+                              'w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring',
+                              errors?.state && 'border-destructive'
+                            )}
+                            onChange={(e) => {
+                              field.onChange(e);
+                              dispatch(reset_address_discount());
+                              setValue('state', e.target.value);
+                              setFormValues(prev => ({
+                                ...prev,
+                                state: e.target.value,
+                              }));
+                            }}
+                          />
+                        </div>
+                      );
+                    }
+
                     const stateOptions = states.map(state => ({
                       value: state.isoCode,
                       label: state.name,
                     }));
+
+                    // Add manual entry option at the top of the list by default
+                    if (stateOptions.length > 0) {
+                      stateOptions.unshift({
+                        value: '__manual__',
+                        label: 'State not listed? Enter manually',
+                      });
+                    }
 
                     return (
                       <>
@@ -332,18 +383,31 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
                           options={stateOptions}
                           value={field.value || selectedState?.isoCode || ''}
                           onValueChange={(value) => {
-                            field.onChange(value);
-                            // Simulate event for handleStateChange
-                            const syntheticEvent = {
-                              target: { value },
-                            };
-                            handleStateChange(syntheticEvent);
+                            if (value === '__manual__') {
+                              setShowManualStateInput(true);
+                              field.onChange('');
+                              setSelectedState(null);
+                            } else {
+                              field.onChange(value);
+                              // Simulate event for handleStateChange
+                              const syntheticEvent = {
+                                target: { value },
+                              };
+                              handleStateChange(syntheticEvent);
+                            }
                           }}
                           placeholder={selectedCountry ? 'Select State' : 'Select country first'}
                           searchPlaceholder="Search states..."
                           emptyMessage="No state found."
                           disabled={!selectedCountry}
                           error={!!errors?.state}
+                          showManualEntry={true}
+                          onManualEntry={() => {
+                            setShowManualStateInput(true);
+                            setValue('state', '');
+                            setSelectedState(null);
+                          }}
+                          manualEntryLabel="State not listed? Enter manually"
                         />
                       </>
                     );
@@ -361,27 +425,28 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
                   control={control}
                   rules={{ required: 'City is required!' }}
                   render={({ field }) => {
-                    // Case 1: No cities available - auto show input
-                    if (cities.length === 0 && selectedState) {
+                    // Check if state is selected or entered manually
+                    const hasState = !!stateValue || !!selectedState;
+                    // Check if state was selected from dropdown (has selectedState) vs manually entered (only stateValue)
+                    const isStateFromDropdown = !!selectedState;
+
+                    // Case 1: No cities available and state was selected from dropdown - show manual input
+                    // OR state was entered manually - always show manual input
+                    if ((cities.length === 0 && isStateFromDropdown) || (!isStateFromDropdown && hasState)) {
                       return (
-                        <div className="space-y-2">
-                          <div className="text-sm text-muted-foreground bg-muted/50 p-2 rounded-md">
-                            No cities found for this state. Please enter your city manually.
-                          </div>
-                          <input
-                            {...field}
-                            type="text"
-                            placeholder="Enter city name"
-                            className={cn(
-                              'w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring',
-                              errors?.city && 'border-destructive'
-                            )}
-                            onChange={(e) => {
-                              field.onChange(e);
-                              handleCityChange(e);
-                            }}
-                          />
-                        </div>
+                        <input
+                          {...field}
+                          type="text"
+                          placeholder="Enter city name"
+                          className={cn(
+                            'w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring',
+                            errors?.city && 'border-destructive'
+                          )}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            handleCityChange(e);
+                          }}
+                        />
                       );
                     }
 
@@ -419,9 +484,9 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
                       label: city.name,
                     }));
 
-                    // Add manual entry option if cities are available
+                    // Add manual entry option at the top of the list if cities are available
                     if (cityOptions.length > 0) {
-                      cityOptions.push({
+                      cityOptions.unshift({
                         value: '__manual__',
                         label: 'City not listed? Enter manually',
                       });
@@ -446,10 +511,10 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
                               handleCityChange(syntheticEvent);
                             }
                           }}
-                          placeholder={selectedState ? 'Select City' : 'Select state first'}
+                          placeholder={hasState ? 'Select City' : 'Select state first'}
                           searchPlaceholder="Search cities..."
                           emptyMessage="No city found."
-                          disabled={!selectedState}
+                          disabled={!hasState}
                           error={!!errors?.city}
                         />
                       </>

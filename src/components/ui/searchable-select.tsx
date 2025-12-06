@@ -34,6 +34,9 @@ interface SearchableSelectProps {
   disabled?: boolean;
   className?: string;
   error?: boolean;
+  showManualEntry?: boolean;
+  onManualEntry?: () => void;
+  manualEntryLabel?: string;
 }
 
 const SearchableSelect = React.forwardRef<
@@ -51,6 +54,9 @@ const SearchableSelect = React.forwardRef<
       disabled = false,
       className,
       error = false,
+      showManualEntry = false,
+      onManualEntry,
+      manualEntryLabel = 'Enter manually',
     },
     ref
   ) => {
@@ -102,7 +108,23 @@ const SearchableSelect = React.forwardRef<
           >
             <CommandInput placeholder={searchPlaceholder} className="h-9" />
             <CommandList>
-              <CommandEmpty>{emptyMessage}</CommandEmpty>
+              <CommandEmpty>
+                <div className="py-2 text-center text-sm">
+                  <p className="text-muted-foreground mb-2">{emptyMessage}</p>
+                    {showManualEntry && onManualEntry && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onManualEntry();
+                        setOpen(false);
+                      }}
+                      className="text-primary hover:text-primary/80 underline text-sm font-medium"
+                    >
+                      {manualEntryLabel}
+                    </button>
+                  )}
+                </div>
+              </CommandEmpty>
               <CommandGroup>
                 {options.map(option => (
                   <CommandItem
