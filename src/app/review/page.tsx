@@ -41,7 +41,7 @@ const ReviewPageContent = () => {
     setError('');
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8090';
+      const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8090';
       const response = await fetch(`${apiUrl}/api/review/submit-unified-feedback`, {
         method: 'POST',
         headers: {
@@ -155,11 +155,10 @@ const ReviewPageContent = () => {
                   className="transition-transform duration-200 hover:scale-110 focus:outline-none"
                 >
                   <Star
-                    className={`h-10 w-10 md:h-12 md:w-12 transition-colors duration-200 ${
-                      star <= (hoveredRating || rating)
-                        ? 'fill-yellow-400 text-yellow-400'
-                        : 'fill-gray-200 text-gray-200'
-                    }`}
+                    className={`h-10 w-10 md:h-12 md:w-12 transition-colors duration-200 ${star <= (hoveredRating || rating)
+                      ? 'fill-yellow-400 text-yellow-400'
+                      : 'fill-gray-200 text-gray-200'
+                      }`}
                   />
                 </button>
               ))}
@@ -202,11 +201,10 @@ const ReviewPageContent = () => {
           <button
             type="submit"
             disabled={loading || !rating}
-            className={`w-full py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg ${
-              loading || !rating
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-gradient-to-r from-emerald-500 to-green-600 text-white hover:from-emerald-600 hover:to-green-700 hover:shadow-xl transform hover:-translate-y-1'
-            }`}
+            className={`w-full py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg ${loading || !rating
+              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              : 'bg-gradient-to-r from-emerald-500 to-green-600 text-white hover:from-emerald-600 hover:to-green-700 hover:shadow-xl transform hover:-translate-y-1'
+              }`}
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
