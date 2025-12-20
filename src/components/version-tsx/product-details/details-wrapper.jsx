@@ -55,6 +55,7 @@ import ProductDetailsCountdown from './product-details-countdown';
 import ProductQuantity from './product-quantity';
 import ReviewForm from './review-form';
 import ReviewItem from './review-item';
+import ProductConfigurations from './product-configurations';
 
 // Custom Rating Component
 const ProductRating = ({ rating, reviewCount }) => {
@@ -122,12 +123,33 @@ export default function DetailsWrapper({
     tags,
     offerDate,
     options,
+    productConfigurations,
     updatedPrice,
     finalPriceDiscount,
     description,
     specifications,
   } = productItem || {};
   const [selectedOption, setSelectedOption] = useState(null);
+  // Initialize selectedConfigurations with preselected options from backend
+  const [selectedConfigurations, setSelectedConfigurations] = useState(() => {
+    const initial = {};
+    if (productConfigurations && productConfigurations.length > 0) {
+      productConfigurations.forEach((config, configIndex) => {
+        if (config.options && config.options.length > 0) {
+          const preselectedIndex = config.options.findIndex(
+            opt => opt.isSelected
+          );
+          if (preselectedIndex !== -1) {
+            initial[configIndex] = {
+              optionIndex: preselectedIndex,
+              option: config.options[preselectedIndex],
+            };
+          }
+        }
+      });
+    }
+    return initial;
+  });
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
   const [isReviewsPopoverOpen, setIsReviewsPopoverOpen] = useState(false);
   const { data: session } = authClient.useSession();
@@ -148,23 +170,128 @@ export default function DetailsWrapper({
     setIsReviewDialogOpen(true);
   };
 
+  // Parse specifications helper function
+  const parseSpecification = (spec) => {
+    // If it's already an object, return it
+    if (typeof spec !== 'string') {
+      return spec;
+    }
+
+    // Parse string format: YEAR_RANGE:DRIVE_TYPE:MAKE:MODEL
+    const parts = spec.split(':').map(part => part.trim());
+
+    return {
+      yearRange: parts[0] || '',
+      driveType: parts[1] || '',
+      make: parts[2] || '',
+      model: parts[3]?.replace(/,/g, '').trim() || '', // Remove trailing comma
+    };
+  };
+
+  // Normalize specifications data
+  const normalizeSpecifications = (specs) => {
+    if (!specs) {
+      return [];
+    }
+
+    // If it's a string, try to parse it
+    if (typeof specs === 'string') {
+      // Check if it's a newline-separated string
+      if (specs.includes('\n')) {
+        return specs
+          .split('\n')
+          .map(line => line.trim())
+          .filter(line => line.length > 0)
+          .map(parseSpecification);
+      }
+      // Single string specification
+      return [parseSpecification(specs)];
+    }
+
+    // If it's an array, map over it
+    if (Array.isArray(specs)) {
+      return specs.map(parseSpecification);
+    }
+
+    return [];
+  };
+
+  // Parse specifications for display
+  const parsedSpecs = normalizeSpecifications(
+    specifications && specifications.length > 0
+      ? specifications
+      : [
+        '1973-1991:4WD:Chevy:K5 BLAZER',
+        '1973-1987:4WD:Chevy:V10',
+        '1973-1991:4WD:Chevy:Suburban 1500',
+        '1973-1991:4WD:Chevy:Suburban 2500',
+        '1973-1987:4WD:Chevy:V20',
+        '1973-1987:4WD:Chevy:K20',
+        '1973-1987:4WD:Chevy:K10',
+        '1973-1991:4WD:GMC:Jimmy',
+        '1973-1987:4WD:GMC:K10',
+        '1973-1987:4WD:GMC:K20',
+        '1973-1991:4WD:GMC:Suburban 1500',
+        '1973-1991:4WD:GMC:Suburban 2500',
+      ]
+  );
+
+  // Get selected configuration price (replaces base price, not adds to it)
+  const getSelectedConfigurationPrice = () => {
+    if (!productConfigurations || productConfigurations.length === 0) {
+      return null;
+    }
+
+    // Check if any configuration has a selected option
+    const selectedConfigEntries = Object.values(selectedConfigurations);
+    if (selectedConfigEntries.length === 0) {
+      return null;
+    }
+
+    // Find the first selected configuration option
+    // If the option has a price > 0, use it; if price is 0 or undefined, return null to use base price
+    for (const { option } of selectedConfigEntries) {
+      if (option && option.price !== undefined && option.price !== null) {
+        const configPrice = Number(option.price);
+        // Only replace base price if configuration price is greater than 0
+        if (configPrice > 0) {
+          return configPrice;
+        }
+      }
+    }
+
+    return null;
+  };
+
   // Calculate final price using pre-calculated database values
   const calculateFinalPrice = () => {
+    // If a configuration option with price is selected, use that price instead of base price
+    const configPrice = getSelectedConfigurationPrice();
+    if (configPrice !== null) {
+      // Configuration price replaces the base price
+      // Still add option price if selected (options are different from configurations)
+      const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+      return (configPrice + optionPrice).toFixed(2);
+    }
+
     // Use pre-calculated finalPriceDiscount from database, fallback to original price
     const baseFinalPrice = finalPriceDiscount || price;
 
     // Add option price if an option is selected
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+
     return (Number(baseFinalPrice) + optionPrice).toFixed(2);
   };
 
   // Calculate marked up price for display using pre-calculated database values
+  // Marked up price stays as original - doesn't change with configuration selections
   const calculateMarkedUpPrice = () => {
     // Use pre-calculated updatedPrice from database, fallback to original price
     const baseMarkedUpPrice = updatedPrice || price;
 
-    // Add option price if an option is selected
+    // Add option price if an option is selected (options are different from configurations)
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+
     return (Number(baseMarkedUpPrice) + optionPrice).toFixed(2);
   };
 
@@ -176,6 +303,33 @@ export default function DetailsWrapper({
     } else {
       setSelectedOption(options[parseInt(optionIndex)]);
     }
+  };
+
+  // Helper function to compare configurations
+  const configurationsChanged = (existingConfigs, currentConfigs) => {
+    if (!existingConfigs && !currentConfigs) return false;
+    if (!existingConfigs || !currentConfigs) return true;
+
+    // Normalize both configurations for comparison
+    const normalizeConfig = (configs) => {
+      if (!configs) return {};
+      return Object.keys(configs).reduce((acc, key) => {
+        const config = configs[key];
+        if (config && config.option) {
+          acc[key] = {
+            optionIndex: config.optionIndex,
+            optionName: config.option?.name,
+            optionPrice: config.option?.price,
+          };
+        }
+        return acc;
+      }, {});
+    };
+
+    const normalizedExisting = normalizeConfig(existingConfigs);
+    const normalizedCurrent = normalizeConfig(currentConfigs);
+
+    return JSON.stringify(normalizedExisting) !== JSON.stringify(normalizedCurrent);
   };
 
   // handle add product
@@ -197,13 +351,35 @@ export default function DetailsWrapper({
       JSON.stringify(existingProduct.selectedOption) !==
       JSON.stringify(selectedOption);
 
+    // Check if configuration has changed
+    const configurationChanged =
+      existingProduct &&
+      configurationsChanged(
+        existingProduct.selectedConfigurations,
+        selectedConfigurations
+      );
+
+    // If either option or configuration changed, we need to update the cart item
+    const productChanged = optionChanged || configurationChanged;
+
     // Get current quantity from existing product
     const currentQty = existingProduct ? existingProduct.orderQuantity : 0;
 
-    // Determine final quantity based on whether option changed
-    const finalQuantity = optionChanged
-      ? currentQty
-      : currentQty + orderQuantity;
+    // Determine final quantity:
+    // - If configuration changed: RESET to current orderQuantity (fresh start)
+    // - If only option changed: Keep existing quantity (update option only)
+    // - If nothing changed: Add orderQuantity to existing quantity
+    let finalQuantity;
+    if (configurationChanged) {
+      // Configuration changed: Reset quantity to current selector value
+      finalQuantity = orderQuantity;
+    } else if (optionChanged) {
+      // Only option changed: Keep existing quantity
+      finalQuantity = currentQty;
+    } else {
+      // Nothing changed: Add to existing quantity
+      finalQuantity = currentQty + orderQuantity;
+    }
 
     // If product has quantity limitation and requested quantity exceeds available
     if (prd.quantity && finalQuantity > prd.quantity) {
@@ -214,8 +390,8 @@ export default function DetailsWrapper({
       return;
     }
 
-    // If option changed, remove the existing product first
-    if (optionChanged) {
+    // If option or configuration changed, remove the existing product first
+    if (productChanged) {
       dispatch(
         update_product_option({
           id: existingProduct._id,
@@ -223,30 +399,58 @@ export default function DetailsWrapper({
         })
       );
 
-      // Reset order quantity to 1
-      dispatch(initialOrderQuantity());
-
-      // Increment to match the existing quantity
-      for (let i = 1; i < currentQty; i++) {
-        dispatch(increment());
+      // Reset order quantity based on what changed
+      if (configurationChanged) {
+        // Configuration changed: Reset to current orderQuantity (already set above)
+        // No need to increment - use the current selector value
+      } else {
+        // Only option changed: Keep existing quantity
+        dispatch(initialOrderQuantity());
+        for (let i = 1; i < currentQty; i++) {
+          dispatch(increment());
+        }
       }
     }
     //
-    // Use pre-calculated prices from database
-    const finalSellingPrice = Number(prd.finalPriceDiscount || 0);
-    const markedUpPrice = prd.updatedPrice || prd.finalPriceDiscount;
+    // SIMPLE PRICE CALCULATION - Always start fresh from original product price
+    const originalProductPrice = Number(prd.price || 0);
+    const markedUpPrice = prd.updatedPrice || originalProductPrice;
 
-    // Calculate total price with selected option
+    // Step 1: Determine base price
+    // If configurations exist and one is selected with a price > 0, use that price
+    // Otherwise, use original product price
+    let basePrice = originalProductPrice;
+
+    if (
+      productConfigurations &&
+      productConfigurations.length > 0 &&
+      Object.keys(selectedConfigurations).length > 0
+    ) {
+      const configPrice = getSelectedConfigurationPrice();
+      if (configPrice !== null && configPrice > 0) {
+        // Configuration price REPLACES base price completely
+        basePrice = configPrice;
+      }
+      // If configPrice is 0 or null, keep using originalProductPrice
+    } else {
+      // No configurations - use finalPriceDiscount if available, otherwise original price
+      basePrice = Number(prd.finalPriceDiscount || originalProductPrice);
+    }
+
+    // Step 2: Add option price (options are different from configurations)
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    const totalPriceWithOption = finalSellingPrice + optionPrice;
+    const finalPrice = basePrice + optionPrice;
 
     const productToAdd = {
       ...prd,
-      finalPriceDiscount: totalPriceWithOption, // Include option price (this is the price field we use)
+      // Always set price from scratch - never use existing prd.finalPriceDiscount
+      finalPriceDiscount: finalPrice,
       updatedPrice: markedUpPrice,
       selectedOption,
-      basePrice: finalSellingPrice, // Store original base price for reference
-      // Replace the options array with only the selected option
+      basePrice: basePrice, // Store base price (configuration price or original)
+      selectedConfigurations: Object.keys(selectedConfigurations).length > 0
+        ? selectedConfigurations
+        : undefined,
       options: selectedOption ? [selectedOption] : [],
     };
 
@@ -255,7 +459,7 @@ export default function DetailsWrapper({
     // Cart confirmation modal will handle user feedback - no toast needed
 
     // Reset the order quantity back to 1 for future additions
-    if (optionChanged) {
+    if (productChanged) {
       dispatch(initialOrderQuantity());
     }
   };
@@ -286,10 +490,34 @@ export default function DetailsWrapper({
       JSON.stringify(existingProduct.selectedOption) !==
       JSON.stringify(selectedOption);
 
+    // Check if configuration has changed
+    const configurationChanged =
+      existingProduct &&
+      configurationsChanged(
+        existingProduct.selectedConfigurations,
+        selectedConfigurations
+      );
+
+    // If either option or configuration changed, we need to update the cart item
+    const productChanged = optionChanged || configurationChanged;
+
     const currentQty = existingProduct ? existingProduct.orderQuantity : 0;
-    const finalQuantity = optionChanged
-      ? currentQty
-      : currentQty + orderQuantity;
+
+    // Determine final quantity:
+    // - If configuration changed: RESET to current orderQuantity (fresh start)
+    // - If only option changed: Keep existing quantity (update option only)
+    // - If nothing changed: Add orderQuantity to existing quantity
+    let finalQuantity;
+    if (configurationChanged) {
+      // Configuration changed: Reset quantity to current selector value
+      finalQuantity = orderQuantity;
+    } else if (optionChanged) {
+      // Only option changed: Keep existing quantity
+      finalQuantity = currentQty;
+    } else {
+      // Nothing changed: Add to existing quantity
+      finalQuantity = currentQty + orderQuantity;
+    }
 
     if (prd.quantity && finalQuantity > prd.quantity) {
       notifyError(
@@ -299,36 +527,72 @@ export default function DetailsWrapper({
       return;
     }
 
-    if (optionChanged) {
+    if (productChanged) {
       dispatch(
         update_product_option({
           id: existingProduct._id,
           title: existingProduct.title,
         })
       );
-      dispatch(initialOrderQuantity());
-      for (let i = 1; i < currentQty; i++) {
-        dispatch(increment());
+
+      // Reset order quantity based on what changed
+      if (configurationChanged) {
+        // Configuration changed: Reset to current orderQuantity (already set above)
+        // No need to increment - use the current selector value
+      } else {
+        // Only option changed: Keep existing quantity
+        dispatch(initialOrderQuantity());
+        for (let i = 1; i < currentQty; i++) {
+          dispatch(increment());
+        }
       }
     }
 
-    const finalSellingPrice = Number(prd.finalPriceDiscount || 0);
-    const markedUpPrice = prd.updatedPrice || prd.finalPriceDiscount;
+    // SIMPLE PRICE CALCULATION - Always start fresh from original product price
+    const originalProductPrice = Number(prd.price || 0);
+    const markedUpPrice = prd.updatedPrice || originalProductPrice;
+
+    // Step 1: Determine base price
+    // If configurations exist and one is selected with a price > 0, use that price
+    // Otherwise, use original product price
+    let basePrice = originalProductPrice;
+
+    if (
+      productConfigurations &&
+      productConfigurations.length > 0 &&
+      Object.keys(selectedConfigurations).length > 0
+    ) {
+      const configPrice = getSelectedConfigurationPrice();
+      if (configPrice !== null && configPrice > 0) {
+        // Configuration price REPLACES base price completely
+        basePrice = configPrice;
+      }
+      // If configPrice is 0 or null, keep using originalProductPrice
+    } else {
+      // No configurations - use finalPriceDiscount if available, otherwise original price
+      basePrice = Number(prd.finalPriceDiscount || originalProductPrice);
+    }
+
+    // Step 2: Add option price (options are different from configurations)
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    const totalPriceWithOption = finalSellingPrice + optionPrice;
+    const finalPrice = basePrice + optionPrice;
 
     const productToAdd = {
       ...prd,
-      finalPriceDiscount: totalPriceWithOption,
+      // Always set price from scratch - never use existing prd.finalPriceDiscount
+      finalPriceDiscount: finalPrice,
       updatedPrice: markedUpPrice,
       selectedOption,
-      basePrice: finalSellingPrice,
+      basePrice: basePrice, // Store base price (configuration price or original)
+      selectedConfigurations: Object.keys(selectedConfigurations).length > 0
+        ? selectedConfigurations
+        : undefined,
       options: selectedOption ? [selectedOption] : [],
     };
 
     dispatch(add_cart_product(productToAdd));
 
-    if (optionChanged) {
+    if (productChanged) {
       dispatch(initialOrderQuantity());
     }
 
@@ -543,6 +807,26 @@ export default function DetailsWrapper({
         </div>
       )}
 
+      {/* Product Configurations */}
+      {productConfigurations &&
+        productConfigurations.length > 0 &&
+        productConfigurations.some(
+          config => config.options && config.options.length > 0
+        ) && (
+          <div className="space-y-6">
+            <ProductConfigurations
+              configurations={productConfigurations}
+              onConfigurationChange={(configIndex, optionIndex, option) => {
+                // Update selected configurations state
+                setSelectedConfigurations(prev => ({
+                  ...prev,
+                  [configIndex]: { optionIndex, option },
+                }));
+              }}
+            />
+          </div>
+        )}
+
       {/* Add to Cart Section - Hidden on mobile, shown on desktop */}
       <div className="hidden md:block space-y-4">
         <div className="flex items-center gap-4">
@@ -570,7 +854,7 @@ export default function DetailsWrapper({
           <Heart className="w-5 h-5 mr-2" />
           Add to Wishlist
         </Button>
-        <Button
+        {/* <Button
           onClick={() => handleCompareProduct(productItem)}
           variant="outline"
           size="lg"
@@ -578,19 +862,14 @@ export default function DetailsWrapper({
         >
           <BarChart3 className="w-5 h-5 mr-2" />
           Add to Compare
-        </Button>
+        </Button> */}
       </div>
 
-      <Separator />
+
 
       {/* Product Details */}
       <div className="space-y-4">
-        {sku && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Package className="w-4 h-4" />
-            <span>SKU: {sku}</span>
-          </div>
-        )}
+
 
         {tags && tags.length > 0 && (
           <div className="space-y-2">
@@ -608,6 +887,70 @@ export default function DetailsWrapper({
           </div>
         )}
       </div>
+
+      <Separator />
+
+      {/* Compatibility Chart Table UNCOMMENT LATER */}
+      {/* {parsedSpecs.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <BarChart3 className="w-5 h-5 text-primary" />
+            <h3 className="text-lg font-semibold text-foreground">
+              Compatibility Chart
+            </h3>
+            <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
+              {parsedSpecs.length}
+            </span>
+          </div>
+
+          <div className="border rounded-lg overflow-hidden">
+            <div className="overflow-x-auto">
+              <div className="w-full min-w-[600px]">
+
+                <div className="bg-muted/50 border-b">
+                  <div className="grid grid-cols-4 gap-4 p-3">
+                    <div className="font-semibold text-sm text-foreground">
+                      Year Range
+                    </div>
+                    <div className="font-semibold text-sm text-foreground">
+                      Drive Type
+                    </div>
+                    <div className="font-semibold text-sm text-foreground">
+                      Make
+                    </div>
+                    <div className="font-semibold text-sm text-foreground">
+                      Model
+                    </div>
+                  </div>
+                </div>
+
+
+                <div className="divide-y divide-border">
+                  {parsedSpecs.map((spec, index) => (
+                    <div
+                      key={index}
+                      className="grid grid-cols-4 gap-4 p-3 hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="font-medium text-sm text-foreground">
+                        {spec.yearRange || '-'}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {spec.driveType || '-'}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {spec.make || '-'}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {spec.model || '-'}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )} */}
 
       <Separator />
 
@@ -858,6 +1201,13 @@ export default function DetailsWrapper({
       </div>
 
       {/* Spacer to prevent content from being hidden behind fixed bar on mobile */}
+      <Separator />
+      {sku && (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Package className="w-4 h-4" />
+          <span>SKU: {sku}</span>
+        </div>
+      )}
       <div className="h-20 md:h-0" />
     </div>
   );
