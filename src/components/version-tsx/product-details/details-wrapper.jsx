@@ -441,6 +441,33 @@ export default function DetailsWrapper({
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
     const finalPrice = basePrice + optionPrice;
 
+    // Create properly formatted productConfigurations array with correct isSelected flags
+    let updatedProductConfigurations = undefined;
+    if (
+      productConfigurations &&
+      productConfigurations.length > 0 &&
+      Object.keys(selectedConfigurations).length > 0
+    ) {
+      updatedProductConfigurations = productConfigurations.map((config, configIndex) => {
+        const selectedConfig = selectedConfigurations[configIndex];
+
+        // If this configuration has a user selection, update isSelected flags
+        if (selectedConfig) {
+          return {
+            ...config,
+            options: config.options.map((option, optionIndex) => ({
+              ...option,
+              // Set isSelected to true only for the user-selected option
+              isSelected: optionIndex === selectedConfig.optionIndex,
+            })),
+          };
+        }
+
+        // If no user selection for this config, keep original (preselected) state
+        return config;
+      });
+    }
+
     const productToAdd = {
       ...prd,
       // Always set price from scratch - never use existing prd.finalPriceDiscount
@@ -448,6 +475,8 @@ export default function DetailsWrapper({
       updatedPrice: markedUpPrice,
       selectedOption,
       basePrice: basePrice, // Store base price (configuration price or original)
+      // Replace productConfigurations with updated version that has correct isSelected flags
+      productConfigurations: updatedProductConfigurations || prd.productConfigurations,
       selectedConfigurations: Object.keys(selectedConfigurations).length > 0
         ? selectedConfigurations
         : undefined,
@@ -577,6 +606,33 @@ export default function DetailsWrapper({
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
     const finalPrice = basePrice + optionPrice;
 
+    // Create properly formatted productConfigurations array with correct isSelected flags
+    let updatedProductConfigurations = undefined;
+    if (
+      productConfigurations &&
+      productConfigurations.length > 0 &&
+      Object.keys(selectedConfigurations).length > 0
+    ) {
+      updatedProductConfigurations = productConfigurations.map((config, configIndex) => {
+        const selectedConfig = selectedConfigurations[configIndex];
+
+        // If this configuration has a user selection, update isSelected flags
+        if (selectedConfig) {
+          return {
+            ...config,
+            options: config.options.map((option, optionIndex) => ({
+              ...option,
+              // Set isSelected to true only for the user-selected option
+              isSelected: optionIndex === selectedConfig.optionIndex,
+            })),
+          };
+        }
+
+        // If no user selection for this config, keep original (preselected) state
+        return config;
+      });
+    }
+
     const productToAdd = {
       ...prd,
       // Always set price from scratch - never use existing prd.finalPriceDiscount
@@ -584,6 +640,8 @@ export default function DetailsWrapper({
       updatedPrice: markedUpPrice,
       selectedOption,
       basePrice: basePrice, // Store base price (configuration price or original)
+      // Replace productConfigurations with updated version that has correct isSelected flags
+      productConfigurations: updatedProductConfigurations || prd.productConfigurations,
       selectedConfigurations: Object.keys(selectedConfigurations).length > 0
         ? selectedConfigurations
         : undefined,
