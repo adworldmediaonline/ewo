@@ -37,7 +37,7 @@ interface ProductConfigurationDialogProps {
   };
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onAddToCart: (product: any) => void;
+  onAddToCart?: (product: Product, selectedOption?: any) => void;
 }
 
 export default function ProductConfigurationDialog({
@@ -310,10 +310,12 @@ export default function ProductConfigurationDialog({
 
     const productToAdd = {
       ...product,
+      img: product.img || product.imageURLs?.[0] || '',
       finalPriceDiscount: finalPrice,
       updatedPrice: markedUpPrice,
       selectedOption,
       basePrice: basePrice,
+      orderQuantity: orderQuantity,
       productConfigurations:
         updatedProductConfigurations || product.productConfigurations,
       selectedConfigurations:
@@ -341,7 +343,6 @@ export default function ProductConfigurationDialog({
     configurationsChanged,
     dispatch,
     onOpenChange,
-    onAddToCart,
   ]);
 
   return (
@@ -382,7 +383,7 @@ export default function ProductConfigurationDialog({
                   const optionIndex = e.target.value;
                   if (optionIndex === '') {
                     setSelectedOption(null);
-                  } else {
+                  } else if (product.options && product.options.length > 0) {
                     setSelectedOption(product.options[parseInt(optionIndex)]);
                   }
                 }}
