@@ -128,6 +128,7 @@ export default function DetailsWrapper({
     finalPriceDiscount,
     description,
     specifications,
+    children,
   } = productItem || {};
   const [selectedOption, setSelectedOption] = useState(null);
   // Initialize selectedConfigurations with preselected options from backend
@@ -948,67 +949,69 @@ export default function DetailsWrapper({
 
       <Separator />
 
-      {/* Compatibility Chart Table UNCOMMENT LATER */}
-      {/* {parsedSpecs.length > 0 && (
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-primary" />
-            <h3 className="text-lg font-semibold text-foreground">
-              Compatibility Chart
-            </h3>
-            <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
-              {parsedSpecs.length}
-            </span>
-          </div>
+      {/* Compatibility Chart Table - Only show if product has children with specific values */}
+      {children &&
+        (children === '10 bolt kits' || children === 'DANA 44') &&
+        parsedSpecs.length > 0 && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-primary" />
+              <h3 className="text-lg font-semibold text-foreground">
+                Compatibility Chart
+              </h3>
+              <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
+                {parsedSpecs.length}
+              </span>
+            </div>
 
-          <div className="border rounded-lg overflow-hidden">
-            <div className="overflow-x-auto">
-              <div className="w-full min-w-[600px]">
+            <div className="border rounded-lg overflow-hidden">
+              <div className="overflow-x-auto">
+                <div className="w-full min-w-[600px]">
 
-                <div className="bg-muted/50 border-b">
-                  <div className="grid grid-cols-4 gap-4 p-3">
-                    <div className="font-semibold text-sm text-foreground">
-                      Year Range
-                    </div>
-                    <div className="font-semibold text-sm text-foreground">
-                      Drive Type
-                    </div>
-                    <div className="font-semibold text-sm text-foreground">
-                      Make
-                    </div>
-                    <div className="font-semibold text-sm text-foreground">
-                      Model
+                  <div className="bg-muted/50 border-b">
+                    <div className="grid grid-cols-4 gap-4 p-3">
+                      <div className="font-semibold text-sm text-foreground">
+                        Year Range
+                      </div>
+                      <div className="font-semibold text-sm text-foreground">
+                        Drive Type
+                      </div>
+                      <div className="font-semibold text-sm text-foreground">
+                        Make
+                      </div>
+                      <div className="font-semibold text-sm text-foreground">
+                        Model
+                      </div>
                     </div>
                   </div>
-                </div>
 
 
-                <div className="divide-y divide-border">
-                  {parsedSpecs.map((spec, index) => (
-                    <div
-                      key={index}
-                      className="grid grid-cols-4 gap-4 p-3 hover:bg-muted/50 transition-colors"
-                    >
-                      <div className="font-medium text-sm text-foreground">
-                        {spec.yearRange || '-'}
+                  <div className="divide-y divide-border">
+                    {parsedSpecs.map((spec, index) => (
+                      <div
+                        key={index}
+                        className="grid grid-cols-4 gap-4 p-3 hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="font-medium text-sm text-foreground">
+                          {spec.yearRange || '-'}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {spec.driveType || '-'}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {spec.make || '-'}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {spec.model || '-'}
+                        </div>
                       </div>
-                      <div className="text-sm text-muted-foreground">
-                        {spec.driveType || '-'}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {spec.make || '-'}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {spec.model || '-'}
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      )} */}
+        )}
 
       <Separator />
 
