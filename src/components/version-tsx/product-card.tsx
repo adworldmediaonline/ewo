@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Heart, ShoppingCart, Star, Ticket } from 'lucide-react';
+import { Heart, ShoppingCart, Star, Ticket, Settings } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 import { useSelector } from 'react-redux';
@@ -18,6 +18,7 @@ import { notifyError } from '@/utils/toast';
 import { useProductCoupon } from '@/hooks/useProductCoupon';
 import { ProductLinkIndicatorMinimal } from '@/components/ui/product-link-indicator';
 import { CldImage } from 'next-cloudinary';
+import ProductConfigurationDialog from '@/components/version-tsx/product-configuration-dialog';
 
 // Star rating component
 const StarRating = ({
@@ -101,6 +102,14 @@ export interface Product {
     title: string;
     price: number;
   }>;
+  productConfigurations?: Array<{
+    title: string;
+    options: Array<{
+      name: string;
+      price: number;
+      isSelected: boolean;
+    }>;
+  }>;
 }
 
 interface ProductCardProps {
@@ -119,6 +128,41 @@ export default function ProductCard({
   const [isImageLoading, setIsImageLoading] = React.useState(true);
   const [isHovered, setIsHovered] = React.useState(false);
   const [selectedOption, setSelectedOption] = React.useState<any>(null);
+  const [isConfigDialogOpen, setIsConfigDialogOpen] = React.useState(false);
+
+  // Check if product has configurations
+  const hasConfigurations = React.useMemo(() => {
+    const configs = product.productConfigurations;
+
+    // Debug log for ALL products to see what's happening
+    if (product.title?.includes('Rod End Kit') || product._id === '694907824e932a61f0bc8fae') {
+      console.log(`[ProductCard Debug] ${product.title}:`, {
+        _id: product._id,
+        hasProductConfigurations: !!configs,
+        isArray: Array.isArray(configs),
+        length: configs?.length,
+        configs: configs,
+        allKeys: Object.keys(product),
+        productConfigurationsValue: product.productConfigurations,
+        rawProduct: product,
+      });
+    }
+
+    if (!configs || !Array.isArray(configs) || configs.length === 0) {
+      return false;
+    }
+
+    // Check if at least one configuration has options
+    const hasValidConfigs = configs.some(
+      (config: any) =>
+        config &&
+        config.options &&
+        Array.isArray(config.options) &&
+        config.options.length > 0
+    );
+
+    return hasValidConfigs;
+  }, [product.productConfigurations, product.title, product._id]);
 
   // Get cart and wishlist state
   const { cart_products } = useSelector((state: any) => state.cart);
@@ -165,6 +209,12 @@ export default function ProductCard({
     e.preventDefault();
     e.stopPropagation();
 
+    // If product has configurations, open dialog instead
+    if (hasConfigurations) {
+      setIsConfigDialogOpen(true);
+      return;
+    }
+
     // Check if product has options but none are selected
     if (product.options && product.options.length > 0 && !selectedOption) {
       notifyError(
@@ -174,6 +224,12 @@ export default function ProductCard({
     }
 
     onAddToCart?.(product, selectedOption);
+  };
+
+  const handleChooseOptions = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsConfigDialogOpen(true);
   };
 
   const handleAddToWishlist = (e: React.MouseEvent) => {
@@ -374,7 +430,7 @@ export default function ProductCard({
             <span className="text-sm sm:text-lg font-bold">${calculateFinalPrice()}</span>
           </div>
 
-          {/* Add to Cart Button */}
+          {/* Add to Cart / Choose Options Button */}
           {isAddedToCart ? (
             <Link href="/cart" className="w-full block">
               <Button className="w-full h-8 text-[10px] sm:h-10 sm:text-sm" variant="outline" rounded="full">
@@ -385,16 +441,30 @@ export default function ProductCard({
             <Button
               className="w-full h-8 text-[10px] sm:h-10 sm:text-sm"
               rounded="full"
-              onClick={handleAddToCart}
+              onClick={hasConfigurations ? handleChooseOptions : handleAddToCart}
               disabled={product.status === 'out-of-stock'}
+              data-testid={`product-button-${product._id}`}
+              data-has-configurations={hasConfigurations}
             >
               {product.status === 'out-of-stock'
                 ? 'Out of Stock'
+                : hasConfigurations
+                ? 'Choose Options'
                 : 'Add to Cart'}
             </Button>
           )}
         </div>
       </div>
+
+      {/* Configuration Dialog */}
+      {hasConfigurations && (
+        <ProductConfigurationDialog
+          product={product}
+          open={isConfigDialogOpen}
+          onOpenChange={setIsConfigDialogOpen}
+          onAddToCart={onAddToCart}
+        />
+      )}
     </Card>
   );
 }
