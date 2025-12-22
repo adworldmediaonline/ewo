@@ -94,35 +94,87 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
 
   const showErrorState = status === 'error';
 
+  // Check if selected category matches the filter image categories
+  const shouldShowFilterImage = useMemo(() => {
+    const category = filters.category;
+    const subcategory = filters.subcategory;
+
+    // Check for steering-knuckles category
+    if (category === 'steering-knuckles') {
+      return true;
+    }
+
+    // Check for crossover-and-high-steer-kits category
+    if (category === 'crossover-and-high-steer-kits') {
+      // Show image for main category or specific subcategories
+      if (!subcategory || subcategory === '10-bolt-kits' || subcategory === 'dana-44') {
+        return true;
+      }
+    }
+
+    return false;
+  }, [filters.category, filters.subcategory]);
+
   return (
-    <div className="min-h-screen bg-background py-2 lg:py-6">
-      <div className="mx-auto flex w-full max-w-7xl gap-2 lg:gap-4 px-0 md:px-4">
-        <ShopSidebar
-          categories={categories}
-          activeCategory={filters.category}
-          activeSubcategory={filters.subcategory}
-          onToggleCategory={toggleCategory}
-          onToggleSubcategory={toggleSubcategory}
-          onReset={handleClearFilters}
-          hasActiveFilters={hasActiveFilters}
-          activeFiltersCount={activeFiltersCount}
-        />
-
-        <section className="flex-1 space-y-6">
-          {/* Mobile: Single row with Filters + Toolbar */}
-          <div className="flex items-start gap-2 lg:hidden">
-            <ShopMobileFilters
-              categories={categories}
-              activeCategory={filters.category}
-              activeSubcategory={filters.subcategory}
-              onToggleCategory={toggleCategory}
-              onToggleSubcategory={toggleSubcategory}
-              onReset={handleClearFilters}
-              activeFiltersCount={activeFiltersCount}
-              hasActiveFilters={hasActiveFilters}
+    <>
+      {/* filter category image show here */}
+      {shouldShowFilterImage && (
+        <div className="w-full flex items-center justify-center py-2">
+          <div className="relative w-full max-w-md mx-auto px-4">
+            <img
+              src="/assets/filter-category.jpeg"
+              alt="Category Filter"
+              className="w-full h-auto max-h-[150px] md:max-h-[180px] lg:max-h-[200px] object-contain rounded shadow-sm"
             />
+          </div>
+        </div>
+      )}
+      {/* filter image category show here code end */}
+      <div className="min-h-screen bg-background py-2 lg:py-6">
+        <div className="mx-auto flex w-full max-w-7xl gap-2 lg:gap-4 px-0 md:px-4">
+          <ShopSidebar
+            categories={categories}
+            activeCategory={filters.category}
+            activeSubcategory={filters.subcategory}
+            onToggleCategory={toggleCategory}
+            onToggleSubcategory={toggleSubcategory}
+            onReset={handleClearFilters}
+            hasActiveFilters={hasActiveFilters}
+            activeFiltersCount={activeFiltersCount}
+          />
 
-            <div className="flex-1 min-w-0">
+          <section className="flex-1 space-y-6">
+            {/* Mobile: Single row with Filters + Toolbar */}
+            <div className="flex items-start gap-2 lg:hidden">
+              <ShopMobileFilters
+                categories={categories}
+                activeCategory={filters.category}
+                activeSubcategory={filters.subcategory}
+                onToggleCategory={toggleCategory}
+                onToggleSubcategory={toggleSubcategory}
+                onReset={handleClearFilters}
+                activeFiltersCount={activeFiltersCount}
+                hasActiveFilters={hasActiveFilters}
+              />
+
+              <div className="flex-1 min-w-0">
+                <ShopToolbar
+                  initialSearch={filters.search}
+                  onSearchCommit={value => {
+                    void setSearch(value);
+                  }}
+                  sortKey={sortKey}
+                  onSortChange={handleSortChange}
+                  hasActiveFilters={hasActiveFilters}
+                  activeFiltersCount={activeFiltersCount}
+                  onClearFilters={handleClearFilters}
+                  totalProducts={totalProducts}
+                />
+              </div>
+            </div>
+
+            {/* Desktop: Toolbar only (sidebar has filters) */}
+            <div className="hidden lg:block">
               <ShopToolbar
                 initialSearch={filters.search}
                 onSearchCommit={value => {
@@ -136,53 +188,37 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
                 totalProducts={totalProducts}
               />
             </div>
-          </div>
 
-          {/* Desktop: Toolbar only (sidebar has filters) */}
-          <div className="hidden lg:block">
-            <ShopToolbar
-              initialSearch={filters.search}
-              onSearchCommit={value => {
-                void setSearch(value);
-              }}
-              sortKey={sortKey}
-              onSortChange={handleSortChange}
-              hasActiveFilters={hasActiveFilters}
-              activeFiltersCount={activeFiltersCount}
-              onClearFilters={handleClearFilters}
-              totalProducts={totalProducts}
-            />
-          </div>
-
-          {showErrorState ? (
-            <ShopEmptyState
-              variant="error"
-              onReset={refresh}
-              message={errorMessage}
-            />
-          ) : showEmptyState ? (
-            <ShopEmptyState variant="empty" onReset={handleClearFilters} />
-          ) : (
-            <>
-              <ShopProductGrid
-                products={products}
-                isLoading={isLoading}
-                onAddToCart={handleAddToCart}
-                onAddToWishlist={handleAddToWishlist}
+            {showErrorState ? (
+              <ShopEmptyState
+                variant="error"
+                onReset={refresh}
+                message={errorMessage}
               />
+            ) : showEmptyState ? (
+              <ShopEmptyState variant="empty" onReset={handleClearFilters} />
+            ) : (
+              <>
+                <ShopProductGrid
+                  products={products}
+                  isLoading={isLoading}
+                  onAddToCart={handleAddToCart}
+                  onAddToWishlist={handleAddToWishlist}
+                />
 
-              <ShopLoadMoreTrigger
-                ref={loadMoreRef}
-                canFetchMore={canFetchMore}
-                isLoadingMore={isLoadingMore}
-                onLoadMore={fetchNext}
-                hasProducts={products.length > 0}
-              />
-            </>
-          )}
-        </section>
+                <ShopLoadMoreTrigger
+                  ref={loadMoreRef}
+                  canFetchMore={canFetchMore}
+                  isLoadingMore={isLoadingMore}
+                  onLoadMore={fetchNext}
+                  hasProducts={products.length > 0}
+                />
+              </>
+            )}
+          </section>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
