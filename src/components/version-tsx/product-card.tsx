@@ -178,7 +178,7 @@ export default function ProductCard({
     (prd: any) => prd._id === product._id
   );
 
-  const imageUrl = product.imageURLs?.[0] || product.img;
+  const imageUrl = product.img || product.imageURLs?.[0];
   const isCloudinaryAsset =
     typeof imageUrl === 'string' &&
     imageUrl.startsWith('https://res.cloudinary.com/') &&
@@ -449,8 +449,8 @@ export default function ProductCard({
               {product.status === 'out-of-stock'
                 ? 'Out of Stock'
                 : hasConfigurations
-                ? 'Choose Options'
-                : 'Add to Cart'}
+                  ? 'Choose Options'
+                  : 'Add to Cart'}
             </Button>
           )}
         </div>
