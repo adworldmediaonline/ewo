@@ -37,6 +37,38 @@
   animation: shimmer 1.5s infinite;
 }
 
+/* Subtle flash animation for announcement bar */
+@keyframes subtle-flash {
+  0%, 100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 0.92;
+    filter: brightness(1.12);
+  }
+}
+
+.animate-subtle-flash {
+  animation: subtle-flash 2s ease-in-out infinite;
+}
+
+/* Flash effect for text content */
+@keyframes content-flash {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.96;
+    transform: scale(1.008);
+  }
+}
+
+.animate-content-flash {
+  animation: content-flash 2s ease-in-out infinite;
+}
+
 /* Pulse glow animation for coupon text - Smooth and polished */
 @keyframes pulse-glow {
   0% {
