@@ -61,23 +61,17 @@ export default function AnnouncementBar({ announcements }: AnnouncementBarProps)
   const currentAnnouncement = activeAnnouncements[currentIndex];
 
   return (
-    <div
-      className="w-full py-2.5 px-4 text-center relative overflow-hidden transition-all duration-500"
-      style={{
-        backgroundColor: currentAnnouncement.backgroundColor,
-        color: currentAnnouncement.textColor,
-      }}
-    >
+    <div className="w-full py-3 px-4 text-center relative overflow-hidden bg-primary text-primary-foreground animate-subtle-flash">
       <div className="container mx-auto flex items-center justify-center gap-2 relative">
         {/* Title (Mobile: Hidden, Desktop: Shown) */}
         {currentAnnouncement.title && (
-          <span className="inline font-semibold text-[10px] sm:text-sm">
+          <span className="inline font-semibold text-sm sm:text-base animate-content-flash">
             {currentAnnouncement.title}:
           </span>
         )}
 
         {/* Message */}
-        <p className="text-[10px] sm:text-sm font-medium">
+        <p className="text-sm sm:text-base font-medium animate-content-flash">
           {currentAnnouncement.message}
         </p>
 
@@ -85,10 +79,10 @@ export default function AnnouncementBar({ announcements }: AnnouncementBarProps)
         {currentAnnouncement.link && (
           <Link
             href={currentAnnouncement.link}
-            className="inline-flex items-center gap-1 text-[10px] sm:text-sm font-semibold underline hover:no-underline transition-all"
+            className="inline-flex items-center gap-1 text-sm sm:text-base font-semibold underline hover:no-underline transition-all animate-content-flash"
           >
             {currentAnnouncement.linkText || 'Learn More'}
-            <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
+            <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
           </Link>
         )}
 
@@ -99,9 +93,8 @@ export default function AnnouncementBar({ announcements }: AnnouncementBarProps)
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
-                className="h-1.5 w-1.5 rounded-full transition-all"
+                className="h-1.5 rounded-full transition-all bg-primary-foreground"
                 style={{
-                  backgroundColor: currentAnnouncement.textColor,
                   opacity: index === currentIndex ? 1 : 0.4,
                   width: index === currentIndex ? '1rem' : '0.375rem',
                 }}
@@ -116,10 +109,9 @@ export default function AnnouncementBar({ announcements }: AnnouncementBarProps)
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-2 h-6 w-6 rounded-full hover:bg-white/20 transition-colors"
+            className="absolute right-2 h-6 w-6 rounded-full hover:bg-white/20 transition-colors text-primary-foreground"
             onClick={() => handleDismiss(currentAnnouncement._id)}
             aria-label="Dismiss announcement"
-            style={{ color: currentAnnouncement.textColor }}
           >
             <X className="h-4 w-4" />
           </Button>
