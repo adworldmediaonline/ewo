@@ -8,6 +8,11 @@ import CloudinaryImage from '../../common/CloudinaryImage';
 import { Gallery, Item } from 'react-photoswipe-gallery';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import 'photoswipe/dist/photoswipe.css';
+import { useMagnifier } from '@/hooks/useMagnifier';
+import { MagnifierLens } from '@/components/common/magnifier/MagnifierLens';
+import { SidePreview } from '@/components/common/magnifier/SidePreview';
+import '@/components/common/magnifier/magnifier.css';
+import { useState } from 'react';
 
 // Component that uses the gallery hook
 const GalleryContent = ({
@@ -20,6 +25,60 @@ const GalleryContent = ({
 }) => {
   const thumbnailsRef = useRef(null);
   const verticalThumbnailsRef = useRef(null);
+  const [containerRect, setContainerRect] = useState({
+    top: 0,
+    left: 0,
+    width: 0,
+    height: 0,
+  });
+
+  // Constants for magnifier
+  const ZOOM_LEVEL = 2.5;
+  const LENS_SIZE = 180;
+
+  // Magnifier hook
+  const {
+    isActive,
+    lensStyle,
+    previewStyle,
+    containerRef,
+    containerProps,
+    imageProps,
+  } = useMagnifier({
+    imageSrc: activeImg,
+    zoomImageSrc: activeImg,
+    zoomLevel: ZOOM_LEVEL,
+    lensSize: LENS_SIZE,
+  });
+
+  // Track container rect for fixed preview positioning
+  useEffect(() => {
+    const updateRect = () => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        setContainerRect({
+          top: rect.top,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height,
+        });
+      }
+    };
+
+    // Update on mount, scroll, resize, and when active
+    updateRect();
+    window.addEventListener('scroll', updateRect, { passive: true });
+    window.addEventListener('resize', updateRect, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', updateRect);
+      window.removeEventListener('resize', updateRect);
+    };
+  }, [containerRef, isActive]);
+
+  // Calculate fixed position for side preview - appears to the right of the container
+  const previewLeft = containerRect.left + containerRect.width + 20;
+  const previewTop = containerRect.top;
 
   // Prepare images for react-photoswipe-gallery
   const allImages = [
@@ -129,11 +188,10 @@ const GalleryContent = ({
                 key={i}
                 variant="ghost"
                 size="sm"
-                className={`w-20 h-20 p-1 rounded-lg border-2 transition-all hover:border-primary focus:border-primary ${
-                  activeImg === url
-                    ? 'border-primary ring-2 ring-primary/20'
-                    : 'border-border hover:border-primary/50'
-                }`}
+                className={`w-20 h-20 p-1 rounded-lg border-2 transition-all hover:border-primary focus:border-primary ${activeImg === url
+                  ? 'border-primary ring-2 ring-primary/20'
+                  : 'border-border hover:border-primary/50'
+                  }`}
                 onClick={() => handleImageActive(url)}
                 aria-label={`View product image ${i + 1}`}
                 data-active={activeImg === url}
@@ -168,7 +226,7 @@ const GalleryContent = ({
                   {({ ref, open }) => (
                     <div
                       ref={ref}
-                      className="cursor-zoom-in transition-all duration-200 group-hover:scale-[1.02] group-hover:shadow-lg relative"
+                      className="cursor-zoom-in transition-all duration-200 group-hover:scale-[1.02] group-hover:shadow-lg relative magnifier-with-preview"
                       onClick={open}
                       role="button"
                       tabIndex={0}
@@ -179,21 +237,54 @@ const GalleryContent = ({
                         }
                       }}
                       aria-label="Click to open image lightbox"
+                      {...containerProps}
+                      onMouseEnter={() => {
+                        containerProps.onMouseEnter();
+                        // Update rect on mouse enter to ensure correct position
+                        if (containerRef.current) {
+                          const rect = containerRef.current.getBoundingClientRect();
+                          setContainerRect({
+                            top: rect.top,
+                            left: rect.left,
+                            width: rect.width,
+                            height: rect.height,
+                          });
+                        }
+                      }}
                     >
-                      {/* Image container - no forced aspect ratio */}
-                      <div className="w-full bg-gray-50 flex items-center justify-center p-4">
-                        <CloudinaryImage
-                          src={activeImg}
-                          alt="Product main image"
-                          width={imgWidth}
-                          height={imgHeight}
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px"
-                          className="max-w-full max-h-[500px] w-auto h-auto object-contain"
-                          priority={true}
-                          crop="pad"
-                          gravity="center"
-                        />
+                      {/* Magnifier container ref */}
+                      <div ref={containerRef} className="w-full h-full">
+                        {/* Image container - no forced aspect ratio */}
+                        <div className="w-full bg-gray-50 flex items-center justify-center p-4">
+                          <CloudinaryImage
+                            src={activeImg}
+                            alt="Product main image"
+                            width={imgWidth}
+                            height={imgHeight}
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px"
+                            className="max-w-full max-h-[500px] w-auto h-auto object-contain"
+                            priority={true}
+                            crop="pad"
+                            gravity="center"
+                            onLoad={imageProps.onLoad}
+                            onError={imageProps.onError}
+                          />
+                        </div>
+
+                        {/* Magnifier lens */}
+                        <MagnifierLens style={lensStyle} isActive={isActive} />
                       </div>
+
+                      {/* Side Preview (Fixed/Floating) */}
+                      <SidePreview
+                        style={previewStyle}
+                        isActive={isActive}
+                        width={LENS_SIZE * ZOOM_LEVEL}
+                        height={LENS_SIZE * ZOOM_LEVEL}
+                        top={previewTop}
+                        left={previewLeft}
+                        alt="Zoomed preview"
+                      />
 
                       {/* Subtle zoom indicator */}
                       <div className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -252,11 +343,10 @@ const GalleryContent = ({
                 key={i}
                 variant="ghost"
                 size="sm"
-                className={`w-16 h-16 p-1 rounded-lg border-2 transition-all hover:border-primary focus:border-primary flex-shrink-0 ${
-                  activeImg === url
-                    ? 'border-primary ring-2 ring-primary/20'
-                    : 'border-border hover:border-primary/50'
-                }`}
+                className={`w-16 h-16 p-1 rounded-lg border-2 transition-all hover:border-primary focus:border-primary flex-shrink-0 ${activeImg === url
+                  ? 'border-primary ring-2 ring-primary/20'
+                  : 'border-border hover:border-primary/50'
+                  }`}
                 onClick={() => handleImageActive(url)}
                 aria-label={`View product image ${i + 1}`}
                 data-active={activeImg === url}

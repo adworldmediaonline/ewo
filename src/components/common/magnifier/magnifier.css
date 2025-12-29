@@ -1,0 +1,95 @@
+/* ===================================
+   Magnifier Lens Styles
+   =================================== */
+
+.magnifier-lens {
+    position: absolute;
+    pointer-events: none;
+    z-index: 50;
+    border-radius: 50%;
+    box-shadow:
+        0 0 0 3px rgba(255, 255, 255, 0.9),
+        0 8px 32px rgba(0, 0, 0, 0.25),
+        0 2px 8px rgba(0, 0, 0, 0.15),
+        inset 0 0 60px rgba(255, 255, 255, 0.1);
+    transition:
+        opacity 0.15s ease-out,
+        transform 0.15s ease-out;
+    will-change: transform, left, top;
+
+    /* Glass effect */
+    backdrop-filter: blur(0.5px);
+}
+
+.magnifier-lens::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.2) 0%,
+            transparent 50%,
+            rgba(0, 0, 0, 0.1) 100%);
+    pointer-events: none;
+}
+
+/* Dark mode lens */
+.dark .magnifier-lens {
+    box-shadow:
+        0 0 0 3px rgba(255, 255, 255, 0.3),
+        0 8px 32px rgba(0, 0, 0, 0.5),
+        0 2px 8px rgba(0, 0, 0, 0.3),
+        inset 0 0 60px rgba(255, 255, 255, 0.05);
+}
+
+/* ===================================
+   Magnifier with Side Preview Layout
+   =================================== */
+
+.magnifier-with-preview {
+    position: relative;
+}
+
+.magnifier-main-image {
+    position: relative;
+}
+
+/* ===================================
+   Side Preview Panel (Floating/Fixed)
+   =================================== */
+
+.side-preview {
+    position: fixed;
+    border-radius: 12px;
+    background-repeat: no-repeat;
+    background-color: #fff;
+    box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.08),
+        0 20px 60px rgba(0, 0, 0, 0.15),
+        0 4px 16px rgba(0, 0, 0, 0.1);
+    transition:
+        opacity 0.2s ease-out,
+        transform 0.2s ease-out;
+    overflow: hidden;
+    z-index: 9999;
+}
+
+.side-preview-active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.side-preview-hidden {
+    opacity: 0;
+    transform: scale(0.98);
+    pointer-events: none;
+}
+
+/* Dark mode side preview */
+.dark .side-preview {
+    background-color: #1a1a1a;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 4px 16px rgba(0, 0, 0, 0.3);
+}
