@@ -112,19 +112,36 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
       }
     }
 
+    // Check for rod-ends-heim-joints category
+    if (category === 'rod-ends-heim-joints') {
+      return true;
+    }
+
     return false;
   }, [filters.category, filters.subcategory]);
+
+  // Determine which image to show based on category
+  const filterImageSrc = useMemo(() => {
+    const category = filters.category;
+
+    if (category === 'rod-ends-heim-joints') {
+      return '/assets/1-25-inch-rod-end-kit-save-amount.webp';
+    }
+
+    // Default image for other categories
+    return '/assets/dana-44-high-steer-vs-stock-steering-comparison-kit.webp';
+  }, [filters.category]);
 
   return (
     <>
       {/* filter category image show here */}
       {shouldShowFilterImage && (
-        <div className="w-full flex items-center justify-center py-2">
-          <div className="relative w-full max-w-5xl mx-auto px-4">
+        <div className="w-full flex items-center justify-center">
+          <div className="relative w-full mx-auto">
             <img
-              src="/assets/dana-44-high-steer-vs-stock-steering-comparison-kit.webp"
+              src={filterImageSrc}
               alt="Category Filter"
-              className="w-full h-auto object-contain rounded shadow-sm"
+              className="w-full h-auto object-contain"
               style={{ aspectRatio: '1920 / 800' }}
             />
           </div>
