@@ -66,12 +66,12 @@ export default function AnnouncementBar({ announcements }: AnnouncementBarProps)
         {/* Title (Mobile: Hidden, Desktop: Shown) */}
         {currentAnnouncement.title && (
           <span className="inline font-semibold text-sm sm:text-base animate-content-flash">
-            {currentAnnouncement.title}:
+            {currentAnnouncement.title}
           </span>
         )}
 
         {/* Message */}
-        <p className="text-sm sm:text-base font-medium animate-content-flash">
+        <p className="text-sm sm:text-base font-semibold animate-content-flash">
           {currentAnnouncement.message}
         </p>
 
@@ -93,7 +93,7 @@ export default function AnnouncementBar({ announcements }: AnnouncementBarProps)
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
-                className="h-1.5 rounded-full transition-all bg-primary-foreground"
+                className="h-1.5 rounded-full transition-all bg-primary-foreground font-semibold"
                 style={{
                   opacity: index === currentIndex ? 1 : 0.4,
                   width: index === currentIndex ? '1rem' : '0.375rem',
