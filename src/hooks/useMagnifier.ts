@@ -59,7 +59,8 @@ interface UseMagnifierReturn {
     zoomImageSrc: string;
 
     // Container props
-    containerRef: React.RefObject<HTMLDivElement | null>;
+    containerRef: (node: HTMLDivElement | null) => void;
+    containerElement: HTMLDivElement | null;
     containerProps: {
         onMouseEnter: () => void;
         onMouseLeave: () => void;
@@ -109,6 +110,7 @@ export function useMagnifier(options: UseMagnifierOptions): UseMagnifierReturn {
     const {
         position,
         containerRef,
+        containerElement,
         handleMouseEnter,
         handleMouseLeave,
         handleMouseMove,
@@ -212,6 +214,7 @@ export function useMagnifier(options: UseMagnifierOptions): UseMagnifierReturn {
         previewStyle,
         zoomImageSrc: resolvedZoomSrc,
         containerRef,
+        containerElement,
         containerProps: {
             onMouseEnter: handleMouseEnter,
             onMouseLeave: handleMouseLeave,

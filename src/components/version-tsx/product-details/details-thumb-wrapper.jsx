@@ -42,6 +42,7 @@ const GalleryContent = ({
     lensStyle,
     previewStyle,
     containerRef,
+    containerElement,
     containerProps,
     imageProps,
   } = useMagnifier({
@@ -54,8 +55,8 @@ const GalleryContent = ({
   // Track container rect for fixed preview positioning
   useEffect(() => {
     const updateRect = () => {
-      if (containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect();
+      if (containerElement) {
+        const rect = containerElement.getBoundingClientRect();
         setContainerRect({
           top: rect.top,
           left: rect.left,
@@ -74,7 +75,7 @@ const GalleryContent = ({
       window.removeEventListener('scroll', updateRect);
       window.removeEventListener('resize', updateRect);
     };
-  }, [containerRef, isActive]);
+  }, [containerElement, isActive]);
 
   // Calculate fixed position for side preview - appears to the right of the container
   const previewLeft = containerRect.left + containerRect.width + 20;
@@ -241,8 +242,8 @@ const GalleryContent = ({
                       onMouseEnter={() => {
                         containerProps.onMouseEnter();
                         // Update rect on mouse enter to ensure correct position
-                        if (containerRef.current) {
-                          const rect = containerRef.current.getBoundingClientRect();
+                        if (containerElement) {
+                          const rect = containerElement.getBoundingClientRect();
                           setContainerRect({
                             top: rect.top,
                             left: rect.left,

@@ -19,7 +19,8 @@ interface UseMousePositionOptions {
 
 interface UseMousePositionReturn {
     position: MousePosition;
-    containerRef: React.RefObject<HTMLDivElement | null>;
+    containerRef: (node: HTMLDivElement | null) => void;
+    containerElement: HTMLDivElement | null;
     handleMouseEnter: () => void;
     handleMouseLeave: () => void;
     handleMouseMove: (e: React.MouseEvent<HTMLDivElement>) => void;
@@ -45,13 +46,18 @@ export function useMousePosition(
         height: 0,
     });
 
-    const containerRef = useRef<HTMLDivElement | null>(null);
+    const [containerElement, setContainerElement] = useState<HTMLDivElement | null>(null);
+
+    const containerRef = useCallback((node: HTMLDivElement | null) => {
+        setContainerElement(node);
+    }, []);
+
     const rafIdRef = useRef<number | null>(null);
     const lastPositionRef = useRef<MousePosition>(defaultPosition);
 
     // Update container dimensions on resize
     useEffect(() => {
-        const container = containerRef.current;
+        const container = containerElement;
         if (!container) return;
 
         const updateDimensions = () => {
@@ -69,11 +75,11 @@ export function useMousePosition(
         return () => {
             resizeObserver.disconnect();
         };
-    }, []);
+    }, [containerElement]);
 
     const calculatePosition = useCallback(
         (clientX: number, clientY: number): MousePosition => {
-            const container = containerRef.current;
+            const container = containerElement;
             if (!container) return defaultPosition;
 
             const rect = container.getBoundingClientRect();
@@ -171,6 +177,7 @@ export function useMousePosition(
     return {
         position,
         containerRef,
+        containerElement,
         handleMouseEnter,
         handleMouseLeave,
         handleMouseMove,
