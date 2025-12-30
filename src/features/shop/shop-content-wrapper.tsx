@@ -120,11 +120,12 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
       {/* filter category image show here */}
       {shouldShowFilterImage && (
         <div className="w-full flex items-center justify-center py-2">
-          <div className="relative w-full max-w-md mx-auto px-4">
+          <div className="relative w-full max-w-5xl mx-auto px-4">
             <img
-              src="/assets/filter-category.jpeg"
+              src="/assets/dana-44-high-steer-vs-stock-steering-comparison-kit.webp"
               alt="Category Filter"
-              className="w-full h-auto max-h-[150px] md:max-h-[180px] lg:max-h-[200px] object-contain rounded shadow-sm"
+              className="w-full h-auto object-contain rounded shadow-sm"
+              style={{ aspectRatio: '1920 / 800' }}
             />
           </div>
         </div>
