@@ -266,6 +266,19 @@ export default function TrackOrderArea({ orderId }: { orderId: string }) {
   };
 
   const isShipped = status?.toLowerCase() === 'shipped';
+
+  // Support both new (multiple carriers) and legacy (single carrier) formats
+  const shippingCarriers = shippingDetails?.carriers && Array.isArray(shippingDetails.carriers) && shippingDetails.carriers.length > 0
+    ? shippingDetails.carriers
+    : shippingDetails?.carrier
+      ? [{
+        carrier: shippingDetails.carrier,
+        trackingNumber: shippingDetails.trackingNumber,
+        trackingUrl: shippingDetails.trackingUrl,
+      }]
+      : [];
+
+  // Legacy fields for backward compatibility
   const trackingUrl = shippingDetails?.trackingUrl;
   const trackingNumber = shippingDetails?.trackingNumber;
   const carrier = shippingDetails?.carrier || 'Standard Shipping';
@@ -353,78 +366,154 @@ export default function TrackOrderArea({ orderId }: { orderId: string }) {
               <CardTitle className="flex items-center gap-2">
                 <Truck className="w-5 h-5 text-primary" />
                 Shipping Information
+                {shippingCarriers.length > 1 && (
+                  <Badge variant="secondary" className="ml-2">
+                    {shippingCarriers.length} Packages
+                  </Badge>
+                )}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Tracking URL - Most Important */}
-              {trackingUrl && (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-foreground flex items-center gap-2">
-                      <ExternalLink className="w-4 h-4 text-primary" />
-                      Track Your Package
-                    </h3>
-                  </div>
-                  <div className="bg-background border-2 border-primary/20 rounded-lg p-4 space-y-3">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                      <div className="space-y-1">
-                        <p className="text-sm text-muted-foreground">Carrier</p>
-                        <p className="font-semibold text-foreground">{carrier}</p>
-                        {trackingNumber && (
-                          <>
-                            <p className="text-sm text-muted-foreground">
-                              Tracking Number
+              {/* Multiple Carriers Display */}
+              {shippingCarriers.length > 0 ? (
+                <div className="space-y-4">
+                  {shippingCarriers.map((carrierItem: { carrier?: string; trackingNumber?: string; trackingUrl?: string }, index: number) => (
+                    <div
+                      key={index}
+                      className="bg-background border-2 border-primary/20 rounded-lg p-4 space-y-3"
+                    >
+                      {shippingCarriers.length > 1 && (
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline" className="text-xs">
+                            Package {index + 1} of {shippingCarriers.length}
+                          </Badge>
+                        </div>
+                      )}
+
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div className="space-y-2 flex-1">
+                          <div>
+                            <p className="text-sm text-muted-foreground">Carrier</p>
+                            <p className="font-semibold text-foreground">
+                              {carrierItem.carrier || 'Standard Shipping'}
                             </p>
-                            <p className="font-mono text-sm text-foreground">
-                              {trackingNumber}
-                            </p>
-                          </>
+                          </div>
+                          {carrierItem.trackingNumber && (
+                            <div>
+                              <p className="text-sm text-muted-foreground">
+                                Tracking Number
+                              </p>
+                              <p className="font-mono text-sm text-foreground break-all">
+                                {carrierItem.trackingNumber}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+
+                        {carrierItem.trackingUrl && (
+                          <Button
+                            asChild
+                            size="lg"
+                            className="w-full sm:w-auto shrink-0"
+                          >
+                            <a
+                              href={carrierItem.trackingUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-2"
+                            >
+                              Track Package {shippingCarriers.length > 1 ? index + 1 : ''}
+                              <ExternalLink className="w-4 h-4" />
+                            </a>
+                          </Button>
                         )}
                       </div>
-                      <Button
-                        asChild
-                        size="lg"
-                        className="w-full sm:w-auto"
-                      >
-                        <a
-                          href={trackingUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2"
-                        >
-                          Track Order
-                          <ExternalLink className="w-4 h-4" />
-                        </a>
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              )}
 
-              {/* Tracking Number Only (if URL not available) */}
-              {!trackingUrl && trackingNumber && (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-foreground flex items-center gap-2">
-                      <Truck className="w-4 h-4 text-primary" />
-                      Tracking Information
-                    </h3>
-                  </div>
-                  <div className="bg-background border rounded-lg p-4 space-y-3">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Carrier</p>
-                      <p className="font-semibold text-foreground">{carrier}</p>
+                      {!carrierItem.trackingUrl && !carrierItem.trackingNumber && (
+                        <Alert className="mt-2">
+                          <Clock className="h-4 w-4" />
+                          <AlertDescription className="text-sm">
+                            Tracking information will be available soon for this package.
+                          </AlertDescription>
+                        </Alert>
+                      )}
                     </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">
-                        Tracking Number
-                      </p>
-                      <p className="font-mono text-sm text-foreground break-all">
-                        {trackingNumber}
-                      </p>
-                    </div>
-                  </div>
+                  ))}
                 </div>
+              ) : (
+                /* Fallback: Legacy single carrier display */
+                <>
+                  {/* Tracking URL - Most Important */}
+                  {trackingUrl && (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-foreground flex items-center gap-2">
+                          <ExternalLink className="w-4 h-4 text-primary" />
+                          Track Your Package
+                        </h3>
+                      </div>
+                      <div className="bg-background border-2 border-primary/20 rounded-lg p-4 space-y-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                          <div className="space-y-1">
+                            <p className="text-sm text-muted-foreground">Carrier</p>
+                            <p className="font-semibold text-foreground">{carrier}</p>
+                            {trackingNumber && (
+                              <>
+                                <p className="text-sm text-muted-foreground">
+                                  Tracking Number
+                                </p>
+                                <p className="font-mono text-sm text-foreground">
+                                  {trackingNumber}
+                                </p>
+                              </>
+                            )}
+                          </div>
+                          <Button
+                            asChild
+                            size="lg"
+                            className="w-full sm:w-auto"
+                          >
+                            <a
+                              href={trackingUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-2"
+                            >
+                              Track Order
+                              <ExternalLink className="w-4 h-4" />
+                            </a>
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Tracking Number Only (if URL not available) */}
+                  {!trackingUrl && trackingNumber && (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-foreground flex items-center gap-2">
+                          <Truck className="w-4 h-4 text-primary" />
+                          Tracking Information
+                        </h3>
+                      </div>
+                      <div className="bg-background border rounded-lg p-4 space-y-3">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Carrier</p>
+                          <p className="font-semibold text-foreground">{carrier}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">
+                            Tracking Number
+                          </p>
+                          <p className="font-mono text-sm text-foreground break-all">
+                            {trackingNumber}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
 
               {/* Shipped Date */}
@@ -445,13 +534,14 @@ export default function TrackOrderArea({ orderId }: { orderId: string }) {
                   <p className="text-sm font-medium text-muted-foreground">
                     Estimated Delivery
                   </p>
-                  <p className="text-lg font-semibold text-foreground text-primary">
+                  <p className="text-lg font-semibold text-primary">
                     {formatEstimatedDelivery()}
                   </p>
                 </div>
               )}
 
-              {!trackingUrl && !trackingNumber && (
+              {/* No tracking info available */}
+              {shippingCarriers.length === 0 && !trackingUrl && !trackingNumber && (
                 <Alert>
                   <Clock className="h-4 w-4" />
                   <AlertDescription>
@@ -628,7 +718,7 @@ export default function TrackOrderArea({ orderId }: { orderId: string }) {
                   key={i}
                   className="flex items-center gap-4 p-4 rounded-lg border bg-muted/30"
                 >
-                  <div className="w-16 h-16 flex-shrink-0">
+                  <div className="w-16 h-16 shrink-0">
                     <Image
                       src={item.img}
                       alt={item.title}
@@ -651,7 +741,7 @@ export default function TrackOrderArea({ orderId }: { orderId: string }) {
                       Quantity: {item.orderQuantity}
                     </p>
                   </div>
-                  <div className="text-right flex-shrink-0">
+                  <div className="text-right shrink-0">
                     <div className="font-semibold text-foreground">
                       $
                       {(
