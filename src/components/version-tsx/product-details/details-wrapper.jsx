@@ -237,7 +237,7 @@ export default function DetailsWrapper({
       ]
   );
 
-  // Get selected configuration price (replaces base price, not adds to it)
+  // Get sum of all selected configuration option prices
   const getSelectedConfigurationPrice = () => {
     if (!productConfigurations || productConfigurations.length === 0) {
       return null;
@@ -249,19 +249,22 @@ export default function DetailsWrapper({
       return null;
     }
 
-    // Find the first selected configuration option
-    // If the option has a price > 0, use it; if price is 0 or undefined, return null to use base price
+    // Sum all selected option prices
+    let totalConfigPrice = 0;
+    let hasAnyPrice = false;
+
     for (const { option } of selectedConfigEntries) {
       if (option && option.price !== undefined && option.price !== null) {
         const configPrice = Number(option.price);
-        // Only replace base price if configuration price is greater than 0
+        // Sum all prices from selected configuration options
         if (configPrice > 0) {
-          return configPrice;
+          totalConfigPrice += configPrice;
+          hasAnyPrice = true;
         }
       }
     }
 
-    return null;
+    return hasAnyPrice ? totalConfigPrice : null;
   };
 
   // Calculate final price using pre-calculated database values
@@ -417,9 +420,7 @@ export default function DetailsWrapper({
     const originalProductPrice = Number(prd.price || 0);
     const markedUpPrice = prd.updatedPrice || originalProductPrice;
 
-    // Step 1: Determine base price
-    // If configurations exist and one is selected with a price > 0, use that price
-    // Otherwise, use original product price
+    // Step 1: Determine base price - sum all selected configuration option prices
     let basePrice = originalProductPrice;
 
     if (
@@ -429,16 +430,18 @@ export default function DetailsWrapper({
     ) {
       const configPrice = getSelectedConfigurationPrice();
       if (configPrice !== null && configPrice > 0) {
-        // Configuration price REPLACES base price completely
+        // Use sum of all configuration option prices as base
         basePrice = configPrice;
+      } else {
+        // If configurations exist but none have prices, use original price
+        basePrice = Number(prd.finalPriceDiscount || originalProductPrice);
       }
-      // If configPrice is 0 or null, keep using originalProductPrice
     } else {
       // No configurations - use finalPriceDiscount if available, otherwise original price
       basePrice = Number(prd.finalPriceDiscount || originalProductPrice);
     }
 
-    // Step 2: Add option price (options are different from configurations)
+    // Step 2: Add product option price (from product.options, not configurations)
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
     const finalPrice = basePrice + optionPrice;
 
@@ -582,9 +585,7 @@ export default function DetailsWrapper({
     const originalProductPrice = Number(prd.price || 0);
     const markedUpPrice = prd.updatedPrice || originalProductPrice;
 
-    // Step 1: Determine base price
-    // If configurations exist and one is selected with a price > 0, use that price
-    // Otherwise, use original product price
+    // Step 1: Determine base price - sum all selected configuration option prices
     let basePrice = originalProductPrice;
 
     if (
@@ -594,16 +595,18 @@ export default function DetailsWrapper({
     ) {
       const configPrice = getSelectedConfigurationPrice();
       if (configPrice !== null && configPrice > 0) {
-        // Configuration price REPLACES base price completely
+        // Use sum of all configuration option prices as base
         basePrice = configPrice;
+      } else {
+        // If configurations exist but none have prices, use original price
+        basePrice = Number(prd.finalPriceDiscount || originalProductPrice);
       }
-      // If configPrice is 0 or null, keep using originalProductPrice
     } else {
       // No configurations - use finalPriceDiscount if available, otherwise original price
       basePrice = Number(prd.finalPriceDiscount || originalProductPrice);
     }
 
-    // Step 2: Add option price (options are different from configurations)
+    // Step 2: Add product option price (from product.options, not configurations)
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
     const finalPrice = basePrice + optionPrice;
 

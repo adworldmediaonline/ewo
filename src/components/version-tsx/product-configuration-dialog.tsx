@@ -137,7 +137,7 @@ export default function ProductConfigurationDialog({
     []
   );
 
-  // Get selected configuration price (replaces base price, not adds to it)
+  // Get sum of all selected configuration option prices
   const getSelectedConfigurationPrice = useCallback(() => {
     if (!product.productConfigurations || product.productConfigurations.length === 0) {
       return null;
@@ -148,16 +148,21 @@ export default function ProductConfigurationDialog({
       return null;
     }
 
+    // Sum all selected option prices
+    let totalConfigPrice = 0;
+    let hasAnyPrice = false;
+
     for (const { option } of selectedConfigEntries) {
       if (option && option.price !== undefined && option.price !== null) {
         const configPrice = Number(option.price);
         if (configPrice > 0) {
-          return configPrice;
+          totalConfigPrice += configPrice;
+          hasAnyPrice = true;
         }
       }
     }
 
-    return null;
+    return hasAnyPrice ? totalConfigPrice : null;
   }, [product.productConfigurations, selectedConfigurations]);
 
   // Calculate final price
@@ -228,7 +233,7 @@ export default function ProductConfigurationDialog({
     const optionChanged =
       existingProduct &&
       JSON.stringify(existingProduct.selectedOption) !==
-        JSON.stringify(selectedOption);
+      JSON.stringify(selectedOption);
 
     // Check if configuration has changed
     const configurationChanged =
@@ -254,8 +259,7 @@ export default function ProductConfigurationDialog({
     // Check quantity limits
     if (product.quantity && finalQuantity > product.quantity) {
       notifyError(
-        `Sorry, only ${product.quantity} items available. ${
-          existingProduct ? `You already have ${currentQty} in your cart.` : ''
+        `Sorry, only ${product.quantity} items available. ${existingProduct ? `You already have ${currentQty} in your cart.` : ''
         }`
       );
       return;
@@ -265,7 +269,7 @@ export default function ProductConfigurationDialog({
     const originalProductPrice = Number(product.price || 0);
     const markedUpPrice = product.updatedPrice || originalProductPrice;
 
-    // Determine base price
+    // Calculate base price - sum all selected configuration option prices
     let basePrice = originalProductPrice;
     if (
       product.productConfigurations &&
@@ -274,13 +278,17 @@ export default function ProductConfigurationDialog({
     ) {
       const configPrice = getSelectedConfigurationPrice();
       if (configPrice !== null && configPrice > 0) {
+        // Use sum of all configuration option prices as base
         basePrice = configPrice;
+      } else {
+        // If configurations exist but none have prices, use original price
+        basePrice = Number(product.finalPriceDiscount || originalProductPrice);
       }
     } else {
       basePrice = Number(product.finalPriceDiscount || originalProductPrice);
     }
 
-    // Add option price
+    // Add product option price (from product.options, not configurations)
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
     const finalPrice = basePrice + optionPrice;
 
