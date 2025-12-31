@@ -28,7 +28,7 @@ export interface SocialShareProps {
   /** Variant: 'horizontal' | 'vertical' */
   variant?: 'horizontal' | 'vertical';
   /** Size of buttons */
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'lg' | 'default';
   /** Custom className for container */
   className?: string;
   /** Platforms to show (default: all) */
@@ -51,7 +51,7 @@ interface ShareButtonProps {
   title: string;
   description?: string;
   brandName: string;
-  size: 'sm' | 'md' | 'lg';
+  size: 'sm' | 'lg' | 'default';
   formatShareText?: (title: string, url: string, brandName: string) => string;
   onShare?: (platform: string) => void;
   iconOnly?: boolean;
@@ -162,13 +162,13 @@ const ShareButton = ({
 
   const sizeClasses = {
     sm: iconOnly ? 'h-9 w-9 p-0' : 'h-9 px-3 text-xs',
-    md: iconOnly ? 'h-10 w-10 p-0' : 'h-10 px-4 text-sm',
+    default: iconOnly ? 'h-10 w-10 p-0' : 'h-10 px-4 text-sm',
     lg: iconOnly ? 'h-11 w-11 p-0' : 'h-11 px-5 text-base',
   };
 
   const iconSizes = {
     sm: 'w-4 h-4',
-    md: 'w-5 h-5',
+    default: 'w-5 h-5',
     lg: 'w-5 h-5',
   };
 
