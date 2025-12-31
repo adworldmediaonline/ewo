@@ -51,11 +51,14 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import ProductDetailsCountdown from './product-details-countdown';
 import ProductQuantity from './product-quantity';
 import ReviewForm from './review-form';
 import ReviewItem from './review-item';
 import ProductConfigurations from './product-configurations';
+// import FreeShippingBadge from '@/components/version-tsx/free-shipping-badge';
+import freeShippingImage from '../../../../public/assets/free-shipping-1.webp';
 
 // Custom Rating Component
 const ProductRating = ({ rating, reviewCount }) => {
@@ -814,6 +817,18 @@ export default function DetailsWrapper({
             {selectedOption.title}
           </Badge>
         )}
+
+        {/* Free Shipping Badge */}
+        <div className="pt-2 relative overflow-hidden">
+          <Image
+            src={freeShippingImage}
+            alt="Free Shipping on orders over $100"
+
+            className="object-contain w-auto h-[110px]"
+            priority={false}
+          />
+        </div>
+        {/* <FreeShippingBadge minimumOrder={500} variant='horizontal' /> */}
       </div>
 
       {/* Color Options */}
@@ -1035,7 +1050,7 @@ export default function DetailsWrapper({
             <AccordionContent>
               <div className="pt-4">
                 <div
-                  className="prose prose-sm max-w-none text-foreground"
+                  className="prose max-w-none"
                   dangerouslySetInnerHTML={{ __html: description }}
                 />
               </div>
