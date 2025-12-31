@@ -818,6 +818,17 @@ export default function DetailsWrapper({
           </Badge>
         )}
 
+        {/* Shipping Calculated Text */}
+        <p className="text-base text-foreground">
+          <Link
+            href="/shipping"
+            className="underline hover:no-underline font-medium"
+          >
+            Shipping
+          </Link>{' '}
+          calculated at checkout.
+        </p>
+
         {/* Free Shipping Badge */}
         <div className="pt-2 relative overflow-hidden">
           <Image
