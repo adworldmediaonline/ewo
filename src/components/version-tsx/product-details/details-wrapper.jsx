@@ -1119,7 +1119,7 @@ export default function DetailsWrapper({
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              <div className="pt-4">
+              <div className="pt-4 em-text">
                 <div
                   className="prose max-w-none"
                   dangerouslySetInnerHTML={{ __html: description }}

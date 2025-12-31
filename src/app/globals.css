@@ -529,3 +529,10 @@
     -webkit-line-clamp: 3;
   }
 }
+
+
+
+
+ em {
+  font-style: normal!important;
+}
