@@ -832,7 +832,8 @@ export default function DetailsWrapper({
         </p>
 
         {/* Free Shipping Badge */}
-        <div className="pt-2 relative overflow-hidden">
+        {/* UNCOMMENT LATER */}
+        {/* <div className="pt-2 relative overflow-hidden">
           <Image
             src={freeShippingImage}
             alt="Free Shipping on orders over $100"
@@ -840,7 +841,7 @@ export default function DetailsWrapper({
             className="object-contain w-auto h-[110px]"
             priority={false}
           />
-        </div>
+        </div> */}
         {/* <FreeShippingBadge minimumOrder={500} variant='horizontal' /> */}
       </div>
 
