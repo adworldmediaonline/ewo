@@ -46,10 +46,11 @@ import {
   Truck,
   XCircle,
   Zap,
+  Share2,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import ProductDetailsCountdown from './product-details-countdown';
@@ -159,6 +160,7 @@ export default function DetailsWrapper({
   const { data: session } = authClient.useSession();
   const dispatch = useDispatch();
   const router = useRouter();
+  const pathname = usePathname();
   const { orderQuantity, cart_products } = useSelector(state => state.cart);
 
   // Calculate average rating (derived state - no memoization needed for simple calculation)
@@ -818,6 +820,17 @@ export default function DetailsWrapper({
           </Badge>
         )}
 
+        {/* Shipping Calculated Text */}
+        <p className="text-base text-foreground">
+          <Link
+            href="/shipping"
+            className="underline hover:no-underline font-medium"
+          >
+            Shipping
+          </Link>{' '}
+          calculated at checkout.
+        </p>
+
         {/* Free Shipping Badge */}
         <div className="pt-2 relative overflow-hidden">
           <Image
@@ -921,7 +934,7 @@ export default function DetailsWrapper({
       </div>
 
       {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col items-center sm:flex-row gap-3">
         <Button
           onClick={() => handleWishlistProduct(productItem)}
           variant="outline"
@@ -940,6 +953,63 @@ export default function DetailsWrapper({
           <BarChart3 className="w-5 h-5 mr-2" />
           Add to Compare
         </Button> */}
+        {/* Share Button */}
+        <div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-9 px-3 w-full sm:w-auto"
+            onClick={async () => {
+              const productUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}${pathname}`;
+              const shareTitle = replaceTextCharacters(title, '*', '');
+              const shareText = `Check out ${shareTitle} on East West Offroad!`;
+
+              // Try Web Share API first (mobile and modern browsers)
+              if (navigator.share) {
+                try {
+                  await navigator.share({
+                    title: shareTitle,
+                    text: shareText,
+                    url: productUrl,
+                  });
+                  return;
+                } catch (err) {
+                  // User cancelled or error occurred, fallback to copy
+                  if (err.name !== 'AbortError') {
+                    console.error('Error sharing:', err);
+                  }
+                }
+              }
+
+              // Fallback: Copy to clipboard
+              try {
+                await navigator.clipboard.writeText(productUrl);
+                notifySuccess('Product link copied to clipboard!');
+              } catch (err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = productUrl;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                notifySuccess('Product link copied to clipboard!');
+              }
+            }}
+            aria-label="Share product"
+            title="Share product"
+          >
+            <Share2 className="w-4 h-4 mr-2" />
+            <span className="text-sm">Share</span>
+          </Button>
+        </div>
+
+        {sku && (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Package className="w-4 h-4" />
+            <span>SKU: {sku}</span>
+          </div>
+        )}
       </div>
 
 
@@ -965,7 +1035,7 @@ export default function DetailsWrapper({
         )}
       </div>
 
-      <Separator />
+
 
       {/* Compatibility Chart Table - Only show if product has children with specific values */}
       {children &&
@@ -1031,7 +1101,7 @@ export default function DetailsWrapper({
           </div>
         )}
 
-      <Separator />
+      {/* <Separator /> */}
 
       {/* Product Information Accordion - Desktop */}
       <div className="hidden lg:block">
@@ -1280,13 +1350,8 @@ export default function DetailsWrapper({
       </div>
 
       {/* Spacer to prevent content from being hidden behind fixed bar on mobile */}
-      <Separator />
-      {sku && (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Package className="w-4 h-4" />
-          <span>SKU: {sku}</span>
-        </div>
-      )}
+
+
       <div className="h-20 md:h-0" />
     </div>
   );
