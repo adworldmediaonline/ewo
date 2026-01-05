@@ -2,8 +2,8 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Search } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import CloudinaryImage from '../../common/CloudinaryImage';
 import { Gallery, Item } from 'react-photoswipe-gallery';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
@@ -27,7 +27,7 @@ const GalleryContent = ({
     ...(imageURLs?.filter(url => url !== activeImg) || []),
   ];
 
-  // Add CSS to ensure PhotoSwipe arrows are visible
+  // Add CSS to ensure PhotoSwipe arrows are visible and custom scrollbar styles
   useEffect(() => {
     const style = document.createElement('style');
     style.textContent = `
@@ -48,6 +48,28 @@ const GalleryContent = ({
         max-height: 90vh !important;
         object-fit: contain !important;
       }
+      /* Custom scrollbar for vertical thumbnails */
+      .vertical-thumbnails-scroll::-webkit-scrollbar {
+        width: 6px;
+      }
+      .vertical-thumbnails-scroll::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .vertical-thumbnails-scroll::-webkit-scrollbar-thumb {
+        background-color: hsl(var(--border));
+        border-radius: 3px;
+      }
+      .vertical-thumbnails-scroll::-webkit-scrollbar-thumb:hover {
+        background-color: hsl(var(--primary) / 0.5);
+      }
+      /* Hide scrollbar for vertical thumbnails slider */
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
     `;
     document.head.appendChild(style);
     return () => {
@@ -57,7 +79,7 @@ const GalleryContent = ({
     };
   }, []);
 
-  // Handle thumbnail scroll
+  // Handle horizontal thumbnail scroll
   const scrollThumbnails = direction => {
     if (thumbnailsRef.current) {
       const container = thumbnailsRef.current;
@@ -72,6 +94,53 @@ const GalleryContent = ({
       });
     }
   };
+
+  // Handle vertical thumbnail scroll
+  const scrollVerticalThumbnails = direction => {
+    if (verticalThumbnailsRef.current) {
+      const container = verticalThumbnailsRef.current;
+      const thumbnailHeight = 80 + 12; // 80px height + 12px gap (gap-3)
+      const scrollAmount =
+        direction === 'up' ? -thumbnailHeight : thumbnailHeight;
+      const currentScroll = container.scrollTop;
+
+      container.scrollTo({
+        top: currentScroll + scrollAmount,
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  // Check if vertical thumbnails can scroll
+  const [canScrollUp, setCanScrollUp] = useState(false);
+  const [canScrollDown, setCanScrollDown] = useState(false);
+
+  useEffect(() => {
+    const checkScrollPosition = () => {
+      const container = verticalThumbnailsRef.current;
+      if (container) {
+        setCanScrollUp(container.scrollTop > 0);
+        setCanScrollDown(
+          container.scrollTop < container.scrollHeight - container.clientHeight - 1
+        );
+      }
+    };
+
+    const container = verticalThumbnailsRef.current;
+    if (container) {
+      checkScrollPosition();
+      container.addEventListener('scroll', checkScrollPosition);
+
+      // Also check when images change
+      const resizeObserver = new ResizeObserver(checkScrollPosition);
+      resizeObserver.observe(container);
+
+      return () => {
+        container.removeEventListener('scroll', checkScrollPosition);
+        resizeObserver.disconnect();
+      };
+    }
+  }, [imageURLs, activeImg]);
 
   // Scroll to active thumbnail when it changes
   useEffect(() => {
@@ -117,46 +186,78 @@ const GalleryContent = ({
   return (
     <div className="space-y-6">
       {/* Main image and vertical thumbnails (Desktop only) */}
-      <div className="flex gap-4">
+      <div className="flex gap-4 items-start">
         {/* Vertical thumbnails for desktop only */}
         {imageURLs && imageURLs.length > 0 && (
-          <div
-            className="hidden lg:flex flex-col gap-3"
-            ref={verticalThumbnailsRef}
-          >
-            {imageURLs.map((url, i) => (
+          <div className="hidden lg:flex flex-col items-center gap-2 relative">
+            {/* Up arrow button */}
+            {imageURLs.length > 5 && canScrollUp && (
               <Button
-                key={i}
-                variant="ghost"
+                variant="outline"
                 size="sm"
-                className={`w-20 h-20 p-1 rounded-lg border-2 transition-all hover:border-primary focus:border-primary ${
-                  activeImg === url
+                className="h-8 w-20 p-0 rounded-md bg-background/95 backdrop-blur-sm border-border shadow-sm hover:bg-background z-10"
+                onClick={() => scrollVerticalThumbnails('up')}
+                aria-label="Scroll thumbnails up"
+              >
+                <ChevronUp className="w-4 h-4" />
+              </Button>
+            )}
+
+            {/* Thumbnail container */}
+            <div
+              className="flex flex-col gap-3 max-h-[500px] overflow-y-auto overflow-x-hidden scrollbar-hide"
+              ref={verticalThumbnailsRef}
+              style={{
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+              }}
+            >
+              {imageURLs.map((url, i) => (
+                <Button
+                  key={i}
+                  variant="ghost"
+                  size="sm"
+                  className={`w-20 h-20 p-1 rounded-lg border-2 transition-all hover:border-primary focus:border-primary shrink-0 ${activeImg === url
                     ? 'border-primary ring-2 ring-primary/20'
                     : 'border-border hover:border-primary/50'
-                }`}
-                onClick={() => handleImageActive(url)}
-                aria-label={`View product image ${i + 1}`}
-                data-active={activeImg === url}
+                    }`}
+                  onClick={() => handleImageActive(url)}
+                  aria-label={`View product image ${i + 1}`}
+                  data-active={activeImg === url}
+                >
+                  <CloudinaryImage
+                    src={url ?? null}
+                    alt={`Product thumbnail ${i + 1}`}
+                    width={80}
+                    height={80}
+                    className="w-full h-full object-cover rounded-md"
+                    crop="pad"
+                    gravity="center"
+                  />
+                </Button>
+              ))}
+            </div>
+
+            {/* Down arrow button */}
+            {imageURLs.length > 5 && canScrollDown && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 w-20 p-0 rounded-md bg-background/95 backdrop-blur-sm border-border shadow-sm hover:bg-background z-10"
+                onClick={() => scrollVerticalThumbnails('down')}
+                aria-label="Scroll thumbnails down"
               >
-                <CloudinaryImage
-                  src={url ?? null}
-                  alt={`Product thumbnail ${i + 1}`}
-                  width={80}
-                  height={80}
-                  className="w-full h-full object-cover rounded-md"
-                  crop="pad"
-                  gravity="center"
-                />
+                <ChevronDown className="w-4 h-4" />
               </Button>
-            ))}
+            )}
           </div>
         )}
 
         {/* Main image container */}
-        <div className="flex-1">
+        <div className="flex-1 min-h-0">
           <Card className="overflow-hidden">
             <CardContent className="p-0">
-              <div className="relative group">
+              <div className="relative group max-h-[500px]">
                 {/* Main image display - clickable to open gallery */}
                 <Item
                   original={activeImg}
@@ -168,7 +269,7 @@ const GalleryContent = ({
                   {({ ref, open }) => (
                     <div
                       ref={ref}
-                      className="cursor-zoom-in transition-all duration-200 group-hover:scale-[1.02] group-hover:shadow-lg relative"
+                      className="cursor-zoom-in transition-all duration-200 group-hover:scale-[1.02] group-hover:shadow-lg relative h-full"
                       onClick={open}
                       role="button"
                       tabIndex={0}
@@ -181,7 +282,7 @@ const GalleryContent = ({
                       aria-label="Click to open image lightbox"
                     >
                       {/* Image container - no forced aspect ratio */}
-                      <div className="w-full bg-gray-50 flex items-center justify-center p-4">
+                      <div className="w-full h-full bg-gray-50 flex items-center justify-center p-4">
                         <CloudinaryImage
                           src={activeImg}
                           alt="Product main image"
@@ -252,11 +353,10 @@ const GalleryContent = ({
                 key={i}
                 variant="ghost"
                 size="sm"
-                className={`w-16 h-16 p-1 rounded-lg border-2 transition-all hover:border-primary focus:border-primary flex-shrink-0 ${
-                  activeImg === url
-                    ? 'border-primary ring-2 ring-primary/20'
-                    : 'border-border hover:border-primary/50'
-                }`}
+                className={`w-16 h-16 p-1 rounded-lg border-2 transition-all hover:border-primary focus:border-primary shrink-0 ${activeImg === url
+                  ? 'border-primary ring-2 ring-primary/20'
+                  : 'border-border hover:border-primary/50'
+                  }`}
                 onClick={() => handleImageActive(url)}
                 aria-label={`View product image ${i + 1}`}
                 data-active={activeImg === url}
