@@ -134,19 +134,7 @@ export default function ProductCard({
   const hasConfigurations = React.useMemo(() => {
     const configs = product.productConfigurations;
 
-    // Debug log for ALL products to see what's happening
-    if (product.title?.includes('Rod End Kit') || product._id === '694907824e932a61f0bc8fae') {
-      console.log(`[ProductCard Debug] ${product.title}:`, {
-        _id: product._id,
-        hasProductConfigurations: !!configs,
-        isArray: Array.isArray(configs),
-        length: configs?.length,
-        configs: configs,
-        allKeys: Object.keys(product),
-        productConfigurationsValue: product.productConfigurations,
-        rawProduct: product,
-      });
-    }
+
 
     if (!configs || !Array.isArray(configs) || configs.length === 0) {
       return false;
@@ -178,7 +166,7 @@ export default function ProductCard({
     (prd: any) => prd._id === product._id
   );
 
-  const imageUrl = product.img || product.imageURLs?.[0];
+  const imageUrl = product.img;
   const isCloudinaryAsset =
     typeof imageUrl === 'string' &&
     imageUrl.startsWith('https://res.cloudinary.com/') &&

@@ -152,6 +152,7 @@ export default function RelatedProductCard({
         href={`/product/${product.slug || product._id}`}
         className="flex flex-1 flex-col"
         prefetch={true}
+        rel="nofollow"
       >
         {/* useLinkStatus loading indicator - shows during navigation */}
         <ProductLinkIndicatorMinimal />
@@ -196,8 +197,12 @@ export default function RelatedProductCard({
               </Badge>
             )}
 
-            {/* Product Image */}
-            <div className="relative h-full w-full overflow-hidden">
+            {/* Product Image - No indexing for search engines */}
+            <div
+              className="relative h-full w-full overflow-hidden"
+              data-noindex="true"
+              data-nosnippet="true"
+            >
               {imageUrl ? (
                 <CldImage
                   src={imageUrl}
@@ -209,6 +214,9 @@ export default function RelatedProductCard({
                   onLoad={() => setIsImageLoading(false)}
                   preserveTransformations={isCloudinaryAsset}
                   deliveryType={isCloudinaryAsset ? undefined : 'fetch'}
+                  loading="lazy"
+                  fetchPriority="low"
+                  data-noindex="true"
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-muted">
