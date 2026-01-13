@@ -4,10 +4,10 @@ import { authClient } from '@/lib/authClient';
 import { reset_address_discount } from '@/redux/features/order/orderSlice';
 import { cn } from '@/lib/utils';
 
-import { City, Country, State } from 'country-state-city';
+import { Country } from 'country-state-city';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Controller, useWatch } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import ErrorMsg from '../../common/error-msg';
 import { SearchableSelect } from '@/components/ui/searchable-select';
 
@@ -16,9 +16,6 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
   const user = {};
   const { isCheckoutSubmitting } = useSelector(state => state.order);
   const dispatch = useDispatch();
-
-  // Watch state field value to enable city field when state is entered manually
-  const stateValue = useWatch({ control, name: 'state' });
 
   const {
     stripe,
@@ -43,20 +40,6 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
   const [selectedCountry, setSelectedCountry] = useState(
     defaultCountry || null
   );
-  const [selectedState, setSelectedState] = useState(null);
-  const [selectedCity, setSelectedCity] = useState('');
-  const [states, setStates] = useState([]);
-  const [cities, setCities] = useState([]);
-  const [showManualStateInput, setShowManualStateInput] = useState(false);
-  const [showManualCityInput, setShowManualCityInput] = useState(false);
-
-  const [formValues, setFormValues] = useState({
-    country: 'US',
-    state: '',
-    city: '',
-    address: '',
-    zipCode: '',
-  });
 
   // Set initial form values to prevent validation errors
   useEffect(() => {
@@ -65,43 +48,6 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
     if (user?.email) setValue('email', user.email);
     if (defaultCountry) setValue('country', defaultCountry.isoCode);
   }, [user, setValue, defaultCountry]);
-
-  // 1. Initial load - load US states on mount
-  useEffect(() => {
-    if (defaultCountry) {
-      const countryStates = State.getStatesOfCountry(defaultCountry.isoCode);
-      setStates(countryStates);
-      setValue('country', defaultCountry.isoCode);
-    }
-  }, [defaultCountry, setValue]);
-
-  // 2. Country change - load new states and reset dependents
-  useEffect(() => {
-    if (selectedCountry) {
-      const countryStates = State.getStatesOfCountry(selectedCountry.isoCode);
-      setStates(countryStates);
-
-      // Reset state and city when country changes
-      setSelectedState(null);
-      setSelectedCity('');
-      setCities([]);
-      setShowManualStateInput(false);
-      setShowManualCityInput(false);
-    }
-  }, [selectedCountry]);
-
-  // 3. State change - load cities
-  useEffect(() => {
-    if (selectedCountry && selectedState) {
-      const stateCities = City.getCitiesOfState(
-        selectedCountry.isoCode,
-        selectedState.isoCode
-      );
-      setCities(stateCities);
-    } else {
-      setCities([]);
-    }
-  }, [selectedCountry, selectedState]);
 
   const handleCountryChange = e => {
     if (isCheckoutSubmitting) return;
@@ -118,101 +64,38 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
 
     // Update form values immediately
     setValue('country', countryCode);
-    setValue('state', '');
-    setValue('city', '');
-
-    // Reset state and city immediately
-    setSelectedState(null);
-    setSelectedCity('');
-    setCities([]);
-    setShowManualCityInput(false);
-
-    setFormValues(prev => ({
-      ...prev,
-      country: countryCode,
-      state: '',
-      city: '',
-    }));
   };
 
   const handleStateChange = e => {
     if (isCheckoutSubmitting) return;
 
-    const stateCode = e.target.value;
-    if (!stateCode) return;
-
+    const stateValue = e.target.value;
     dispatch(reset_address_discount());
-
-    const state = states.find(s => s.isoCode === stateCode);
-    setSelectedState(state);
-
-    setValue('state', stateCode);
-    setValue('city', '');
-
-    // Reset city immediately
-    setSelectedCity('');
-    setShowManualCityInput(false);
-
-    setFormValues(prev => ({
-      ...prev,
-      state: stateCode,
-      city: '',
-    }));
+    setValue('state', stateValue);
   };
 
   const handleCityChange = e => {
     if (isCheckoutSubmitting) return;
 
-    const cityName = e.target.value;
-
-    // Handle manual entry trigger
-    if (cityName === '__manual__') {
-      setShowManualCityInput(true);
-      setValue('city', '');
-      setSelectedCity('');
-      return;
-    }
-
+    const cityValue = e.target.value;
     dispatch(reset_address_discount());
-
-    setSelectedCity(cityName);
-
-    setValue('city', cityName);
-
-    setFormValues(prev => ({
-      ...prev,
-      city: cityName,
-    }));
+    setValue('city', cityValue);
   };
 
   const handleAddressChange = e => {
     if (isCheckoutSubmitting) return;
 
     const address = e.target.value;
-
     dispatch(reset_address_discount());
-
     setValue('address', address);
-
-    setFormValues(prev => ({
-      ...prev,
-      address,
-    }));
   };
 
   const handleZipCodeChange = e => {
     if (isCheckoutSubmitting) return;
 
     const zipCode = e.target.value;
-
     dispatch(reset_address_discount());
-
     setValue('zipCode', zipCode);
-
-    setFormValues(prev => ({
-      ...prev,
-      zipCode,
-    }));
   };
 
   // Calculate final total with all discounts - Simplified to match cart dropdown logic
@@ -322,96 +205,21 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
                 <label className="block text-sm font-medium text-foreground mb-2">
                   State <span className="text-destructive">*</span>
                 </label>
-                <Controller
+                <input
+                  {...register('state', {
+                    required: 'State is required!',
+                    onChange: e => {
+                      handleStateChange(e);
+                    },
+                  })}
                   name="state"
-                  control={control}
-                  rules={{ required: 'State is required!' }}
-                  render={({ field }) => {
-                    // Show manual input if user selected manual entry
-                    if (showManualStateInput) {
-                      return (
-                        <div className="space-y-2">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setShowManualStateInput(false);
-                              setValue('state', '');
-                              setSelectedState(null);
-                            }}
-                            className="text-sm text-primary hover:text-primary/80 underline"
-                          >
-                            ← Back to state list
-                          </button>
-                          <input
-                            {...field}
-                            type="text"
-                            placeholder="Enter state name"
-                            className={cn(
-                              'w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring',
-                              errors?.state && 'border-destructive'
-                            )}
-                            onChange={(e) => {
-                              field.onChange(e);
-                              dispatch(reset_address_discount());
-                              setValue('state', e.target.value);
-                              setFormValues(prev => ({
-                                ...prev,
-                                state: e.target.value,
-                              }));
-                            }}
-                          />
-                        </div>
-                      );
-                    }
-
-                    const stateOptions = states.map(state => ({
-                      value: state.isoCode,
-                      label: state.name,
-                    }));
-
-                    // Add manual entry option at the top of the list by default
-                    if (stateOptions.length > 0) {
-                      stateOptions.unshift({
-                        value: '__manual__',
-                        label: 'State not listed? Enter manually',
-                      });
-                    }
-
-                    return (
-                      <>
-                        <SearchableSelect
-                          options={stateOptions}
-                          value={field.value || selectedState?.isoCode || ''}
-                          onValueChange={(value) => {
-                            if (value === '__manual__') {
-                              setShowManualStateInput(true);
-                              field.onChange('');
-                              setSelectedState(null);
-                            } else {
-                              field.onChange(value);
-                              // Simulate event for handleStateChange
-                              const syntheticEvent = {
-                                target: { value },
-                              };
-                              handleStateChange(syntheticEvent);
-                            }
-                          }}
-                          placeholder={selectedCountry ? 'Select State' : 'Select country first'}
-                          searchPlaceholder="Search states..."
-                          emptyMessage="No state found."
-                          disabled={!selectedCountry}
-                          error={!!errors?.state}
-                          showManualEntry={true}
-                          onManualEntry={() => {
-                            setShowManualStateInput(true);
-                            setValue('state', '');
-                            setSelectedState(null);
-                          }}
-                          manualEntryLabel="State not listed? Enter manually"
-                        />
-                      </>
-                    );
-                  }}
+                  id="state"
+                  type="text"
+                  placeholder="Enter state name"
+                  className={cn(
+                    'w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring',
+                    errors?.state && 'border-destructive'
+                  )}
                 />
                 <ErrorMsg msg={errors?.state?.message} />
               </div>
@@ -420,106 +228,21 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
                 <label className="block text-sm font-medium text-foreground mb-2">
                   City <span className="text-destructive">*</span>
                 </label>
-                <Controller
+                <input
+                  {...register('city', {
+                    required: 'City is required!',
+                    onChange: e => {
+                      handleCityChange(e);
+                    },
+                  })}
                   name="city"
-                  control={control}
-                  rules={{ required: 'City is required!' }}
-                  render={({ field }) => {
-                    // Check if state is selected or entered manually
-                    const hasState = !!stateValue || !!selectedState;
-                    // Check if state was selected from dropdown (has selectedState) vs manually entered (only stateValue)
-                    const isStateFromDropdown = !!selectedState;
-
-                    // Case 1: No cities available and state was selected from dropdown - show manual input
-                    // OR state was entered manually - always show manual input
-                    if ((cities.length === 0 && isStateFromDropdown) || (!isStateFromDropdown && hasState)) {
-                      return (
-                        <input
-                          {...field}
-                          type="text"
-                          placeholder="Enter city name"
-                          className={cn(
-                            'w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring',
-                            errors?.city && 'border-destructive'
-                          )}
-                          onChange={(e) => {
-                            field.onChange(e);
-                            handleCityChange(e);
-                          }}
-                        />
-                      );
-                    }
-
-                    // Case 2: Cities available but user wants manual entry
-                    if (showManualCityInput && cities.length > 0) {
-                      return (
-                        <div className="space-y-2">
-                          <button
-                            type="button"
-                            onClick={() => setShowManualCityInput(false)}
-                            className="text-sm text-primary hover:text-primary/80 underline"
-                          >
-                            ← Back to city list
-                          </button>
-                          <input
-                            {...field}
-                            type="text"
-                            placeholder="Enter city name"
-                            className={cn(
-                              'w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring',
-                              errors?.city && 'border-destructive'
-                            )}
-                            onChange={(e) => {
-                              field.onChange(e);
-                              handleCityChange(e);
-                            }}
-                          />
-                        </div>
-                      );
-                    }
-
-                    // Case 3: Cities available - show searchable combobox with manual option
-                    const cityOptions = cities.map(city => ({
-                      value: city.name,
-                      label: city.name,
-                    }));
-
-                    // Add manual entry option at the top of the list if cities are available
-                    if (cityOptions.length > 0) {
-                      cityOptions.unshift({
-                        value: '__manual__',
-                        label: 'City not listed? Enter manually',
-                      });
-                    }
-
-                    return (
-                      <>
-                        <SearchableSelect
-                          options={cityOptions}
-                          value={field.value || selectedCity || ''}
-                          onValueChange={(value) => {
-                            if (value === '__manual__') {
-                              setShowManualCityInput(true);
-                              field.onChange('');
-                              setSelectedCity('');
-                            } else {
-                              field.onChange(value);
-                              // Simulate event for handleCityChange
-                              const syntheticEvent = {
-                                target: { value },
-                              };
-                              handleCityChange(syntheticEvent);
-                            }
-                          }}
-                          placeholder={hasState ? 'Select City' : 'Select state first'}
-                          searchPlaceholder="Search cities..."
-                          emptyMessage="No city found."
-                          disabled={!hasState}
-                          error={!!errors?.city}
-                        />
-                      </>
-                    );
-                  }}
+                  id="city"
+                  type="text"
+                  placeholder="Enter city name"
+                  className={cn(
+                    'w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring',
+                    errors?.city && 'border-destructive'
+                  )}
                 />
                 <ErrorMsg msg={errors?.city?.message} />
               </div>
