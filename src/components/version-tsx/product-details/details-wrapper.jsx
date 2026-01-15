@@ -59,7 +59,7 @@ import ReviewForm from './review-form';
 import ReviewItem from './review-item';
 import ProductConfigurations from './product-configurations';
 // import FreeShippingBadge from '@/components/version-tsx/free-shipping-badge';
-import freeShippingImage from '../../../../public/assets/free-shipping-1.webp';
+// import freeShippingImage from '../../../../public/assets/free-shipping-1.webp';
 
 // Custom Rating Component
 const ProductRating = ({ rating, reviewCount }) => {
