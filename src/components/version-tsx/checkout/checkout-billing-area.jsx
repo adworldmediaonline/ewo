@@ -7,9 +7,10 @@ import { cn } from '@/lib/utils';
 import { Country } from 'country-state-city';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Controller } from 'react-hook-form';
+import { Controller, useWatch } from 'react-hook-form';
 import ErrorMsg from '../../common/error-msg';
 import { SearchableSelect } from '@/components/ui/searchable-select';
+import { useTaxCalculation } from '@/hooks/use-tax-calculation';
 
 const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData }) => {
   const { data: session } = authClient.useSession();
@@ -34,6 +35,22 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
   // Enhanced multiple coupon state - get coupon discount from coupon state like cart dropdown
   const { total_coupon_discount } = useSelector(state => state.coupon);
 
+  // Tax calculation hook
+  const { taxData, calculateTax, isLoading: taxLoading, error: taxError } = useTaxCalculation();
+  const { cart_products } = useSelector(state => state.cart);
+
+  // Watch address fields for tax calculation
+  const watchedAddress = useWatch({
+    control,
+    name: ['address', 'city', 'state', 'zipCode', 'country'],
+  });
+
+  // Extract individual values for easier access
+  const [address, city, state, zipCode, country] = watchedAddress || [];
+
+  // Get tax data setter from checkoutData
+  const { setTaxData } = checkoutData || {};
+
   const countries = Country.getAllCountries();
   const defaultCountry = countries.find(country => country.isoCode === 'US');
 
@@ -48,6 +65,47 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
     if (user?.email) setValue('email', user.email);
     if (defaultCountry) setValue('country', defaultCountry.isoCode);
   }, [user, setValue, defaultCountry]);
+
+  // Calculate tax when address changes
+  useEffect(() => {
+
+    // Only calculate tax for US addresses with complete information
+    // Minimum required: state, city, and zipCode
+    if (country === 'US' && state && city && zipCode && cart_products.length > 0 && totalShippingCost >= 0) {
+      calculateTax(
+        {
+          line1: address || '',
+          address: address || '',
+          city: city || '',
+          state: state || '',
+          zipCode: zipCode || '',
+          postal_code: zipCode || '',
+          country: country || 'US',
+        },
+        cart_products,
+        totalShippingCost
+      );
+    } else {
+      // Clear tax data if address is incomplete or not US
+      if (setTaxData) {
+        setTaxData(null);
+      }
+    }
+  }, [watchedAddress, cart_products, totalShippingCost, calculateTax, setTaxData]);
+
+  // Update tax data, loading, and error in checkoutData
+  useEffect(() => {
+    if (setTaxData && taxData) {
+      console.log('Setting tax data in checkoutData:', taxData);
+      setTaxData(taxData);
+    }
+    if (checkoutData && typeof checkoutData.setTaxLoading === 'function') {
+      checkoutData.setTaxLoading(taxLoading);
+    }
+    if (checkoutData && typeof checkoutData.setTaxError === 'function') {
+      checkoutData.setTaxError(taxError);
+    }
+  }, [taxData, taxLoading, taxError, setTaxData, checkoutData]);
 
   const handleCountryChange = e => {
     if (isCheckoutSubmitting) return;
@@ -321,6 +379,49 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
               <ErrorMsg msg={errors?.email?.message} />
             </div>
           </div>
+
+          {/* Tax Calculation Status */}
+          {country === 'US' && (
+            <div className="mt-4 p-3 bg-muted rounded-md border border-border">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-foreground">Tax Calculation</span>
+                {taxLoading && (
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                    <span className="text-xs text-muted-foreground">Calculating...</span>
+                  </div>
+                )}
+                {!taxLoading && taxData && (
+                  <span className="text-sm font-semibold text-primary">
+                    ${Number(taxData.taxAmount || 0).toFixed(2)}
+                  </span>
+                )}
+                {taxError && (
+                  <span className="text-xs text-destructive">{taxError}</span>
+                )}
+                {!taxLoading && !taxData && !taxError && state && city && zipCode && (
+                  <span className="text-xs text-muted-foreground">Ready to calculate</span>
+                )}
+              </div>
+              {taxData && (
+                <div className="space-y-1">
+                  {taxData.taxAmount > 0 ? (
+                    <p className="text-xs text-muted-foreground">
+                      Estimated tax for {city}, {state} {zipCode}
+                    </p>
+                  ) : taxData.taxabilityReason === 'not_collecting' ? (
+                    <p className="text-xs text-muted-foreground">
+                      Tax not applicable for this location. Registration may need activation.
+                    </p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      No tax applicable for {city}, {state} {zipCode}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Order Summary and Complete Purchase moved to right side - see checkout-order-area.jsx */}

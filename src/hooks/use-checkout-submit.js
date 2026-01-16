@@ -90,6 +90,10 @@ const useCheckoutSubmit = () => {
   // Thank You Modal
   const [showThankYouModal, setShowThankYouModal] = useState(false);
   const [orderDataForModal, setOrderDataForModal] = useState({});
+  // Tax calculation data
+  const [taxData, setTaxData] = useState(null);
+  const [taxLoading, setTaxLoading] = useState(false);
+  const [taxError, setTaxError] = useState(null);
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -506,13 +510,25 @@ const useCheckoutSubmit = () => {
   // create stripe payment intent
   const createStripePaymentIntent = async orderData => {
     try {
+      // Get tax information from orderData
+      const taxInfo = orderData.tax || null;
+      const taxCalculationId = taxInfo?.calculationId || null;
+      const taxAmount = taxInfo?.taxAmount || 0;
+      const amountTotal = taxInfo?.amountTotal || orderData.totalAmount || Math.max(0, cartTotal);
+
+      // Calculate amount in cents for Stripe (must be integer)
+      const amountInCents = Math.round(Math.max(0, amountTotal) * 100);
+
       const response = await createPaymentIntent({
-        price: parseInt(Math.max(0, cartTotal)), // Ensure never negative
+        price: amountInCents / 100, // Convert back to dollars for price field
         email: orderData.email,
         cart: cart_products,
+        taxCalculationId: taxCalculationId,
+        taxAmount: taxAmount,
+        amountTotal: amountTotal,
         orderData: {
           ...orderData,
-          totalAmount: Math.max(0, cartTotal), // Ensure never negative
+          totalAmount: amountTotal, // Total including tax
           isGuestOrder: !session?.user?.id,
         },
       });
@@ -579,8 +595,13 @@ const useCheckoutSubmit = () => {
     // Calculate total discount amount (coupon + first-time discount)
     const totalDiscount = discountAmount + (firstTimeDiscountAmount || 0);
 
+    // Get tax amount from taxData
+    const taxAmount = Number(taxData?.taxAmount || 0);
+    const taxCalculationId = taxData?.calculationId || null;
+
+    // Calculate final total: subtotal + shipping + tax - discounts
     // Ensure total amount is never negative (for 100% discount coupons)
-    const finalTotalAmount = Math.max(0, cartTotal);
+    const finalTotalAmount = Math.max(0, rawSubTotal + shippingCost + taxAmount - totalDiscount);
 
     const orderInfo = {
       cart: cart_products?.map(item => {
@@ -597,7 +618,7 @@ const useCheckoutSubmit = () => {
       subTotal: rawSubTotal, // Raw subtotal before any discounts
       shippingCost: shippingCost,
       discount: discountAmount, // Coupon discount only
-      totalAmount: finalTotalAmount, // Ensure never negative
+      totalAmount: finalTotalAmount, // Subtotal + Shipping + Tax - Discounts
       name: newShippingInfo.name,
       email: newShippingInfo.email,
       address: newShippingInfo.address,
@@ -616,6 +637,14 @@ const useCheckoutSubmit = () => {
       },
       // Add enhanced coupon information
       appliedCoupons: applied_coupons,
+      // Add tax information
+      tax: taxData ? {
+        calculationId: taxCalculationId,
+        taxAmount: taxAmount,
+        taxAmountExclusive: Number(taxData.taxAmountExclusive || 0),
+        amountTotal: Number(taxData.amountTotal || finalTotalAmount),
+        taxBreakdown: taxData.taxBreakdown || [],
+      } : null,
     };
 
     const card = elements?.getElement(CardElement);
@@ -982,6 +1011,13 @@ const useCheckoutSubmit = () => {
     coupon_error,
     coupon_loading,
     calculateTotals,
+    // Tax calculation
+    taxData,
+    setTaxData,
+    taxLoading,
+    setTaxLoading,
+    taxError,
+    setTaxError,
   };
 };
 
