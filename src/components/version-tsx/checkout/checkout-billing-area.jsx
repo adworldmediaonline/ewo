@@ -39,14 +39,13 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
   const { taxData, calculateTax, isLoading: taxLoading, error: taxError } = useTaxCalculation();
   const { cart_products } = useSelector(state => state.cart);
 
-  // Watch address fields for tax calculation
-  const watchedAddress = useWatch({
-    control,
-    name: ['address', 'city', 'state', 'zipCode', 'country'],
-  });
-
-  // Extract individual values for easier access
-  const [address, city, state, zipCode, country] = watchedAddress || [];
+  // Watch individual address fields for tax calculation
+  // Watch each field separately to ensure proper reactivity
+  const address = useWatch({ control, name: 'address' });
+  const city = useWatch({ control, name: 'city' });
+  const state = useWatch({ control, name: 'state' });
+  const zipCode = useWatch({ control, name: 'zipCode' });
+  const country = useWatch({ control, name: 'country' });
 
   // Get tax data setter from checkoutData
   const { setTaxData } = checkoutData || {};
@@ -66,32 +65,53 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
     if (defaultCountry) setValue('country', defaultCountry.isoCode);
   }, [user, setValue, defaultCountry]);
 
-  // Calculate tax when address changes
+  // Calculate tax when ANY address field changes
+  // This handles all edge cases: country change, state/city/zip change, address change
   useEffect(() => {
+    // Clear tax data immediately if country is not US
+    if (country && country !== 'US') {
+      if (setTaxData) {
+        setTaxData(null);
+      }
+      return;
+    }
 
-    // Only calculate tax for US addresses with complete information
-    // Minimum required: state, city, and zipCode
-    if (country === 'US' && state && city && zipCode && cart_products.length > 0 && totalShippingCost >= 0) {
+    // For US addresses, check if we have minimum required fields
+    // Minimum required: state, city, and zipCode (address/line1 is optional for tax calculation)
+    const hasMinimumFields = country === 'US' &&
+                             state &&
+                             state.trim() !== '' &&
+                             city &&
+                             city.trim() !== '' &&
+                             zipCode &&
+                             zipCode.trim() !== '';
+
+    // Only calculate if:
+    // 1. Country is US
+    // 2. We have minimum required fields (state, city, zipCode)
+    // 3. Cart has products
+    // 4. Shipping cost is valid (>= 0)
+    if (hasMinimumFields && cart_products.length > 0 && totalShippingCost >= 0) {
       calculateTax(
         {
           line1: address || '',
           address: address || '',
-          city: city || '',
-          state: state || '',
-          zipCode: zipCode || '',
-          postal_code: zipCode || '',
-          country: country || 'US',
+          city: city.trim(),
+          state: state.trim(),
+          zipCode: zipCode.trim(),
+          postal_code: zipCode.trim(),
+          country: 'US',
         },
         cart_products,
         totalShippingCost
       );
     } else {
-      // Clear tax data if address is incomplete or not US
+      // Clear tax data if address is incomplete
       if (setTaxData) {
         setTaxData(null);
       }
     }
-  }, [watchedAddress, cart_products, totalShippingCost, calculateTax, setTaxData]);
+  }, [address, city, state, zipCode, country, cart_products, totalShippingCost, calculateTax, setTaxData]);
 
   // Update tax data, loading, and error in checkoutData
   useEffect(() => {

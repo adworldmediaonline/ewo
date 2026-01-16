@@ -32,11 +32,15 @@ export const useTaxCalculation = (): UseTaxCalculationReturn => {
     if (!address) return false;
 
     // For US addresses, we need state, city, and zip code
+    // Address/line1 is optional for tax calculation
     if (address.country === 'US') {
       return !!(
         address.state &&
+        address.state.trim() !== '' &&
         address.city &&
-        (address.postal_code || address.zipCode)
+        address.city.trim() !== '' &&
+        (address.postal_code || address.zipCode) &&
+        (address.postal_code || address.zipCode || '').trim() !== ''
       );
     }
 
@@ -46,14 +50,25 @@ export const useTaxCalculation = (): UseTaxCalculationReturn => {
 
   /**
    * Create a cache key from address and cart
+   * Normalize values to ensure consistent caching
    */
   const createCacheKey = useCallback((
     address: TaxCalculationRequest['address'],
     cart: TaxCalculationRequest['cart'],
     shippingCost: number
   ): string => {
-    const addressKey = `${address.country}-${address.state}-${address.city}-${address.postal_code || address.zipCode}`;
-    const cartKey = cart.map(item => `${item._id}-${item.orderQuantity}-${item.finalPriceDiscount || item.price}`).join('|');
+    // Normalize address fields (trim and lowercase for comparison)
+    const normalizedState = (address.state || '').trim().toLowerCase();
+    const normalizedCity = (address.city || '').trim().toLowerCase();
+    const normalizedZip = ((address.postal_code || address.zipCode) || '').trim();
+    const addressKey = `${address.country || 'US'}-${normalizedState}-${normalizedCity}-${normalizedZip}`;
+
+    // Create cart key from product IDs, quantities, and prices
+    const cartKey = cart
+      .map(item => `${item._id || ''}-${item.orderQuantity || 1}-${item.finalPriceDiscount || item.price || 0}`)
+      .sort() // Sort to ensure consistent key regardless of order
+      .join('|');
+
     return `${addressKey}-${cartKey}-${shippingCost}`;
   }, []);
 
