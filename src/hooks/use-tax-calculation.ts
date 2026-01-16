@@ -80,33 +80,68 @@ export const useTaxCalculation = (): UseTaxCalculationReturn => {
     cart?: TaxCalculationRequest['cart'],
     shippingCost?: number
   ) => {
+    console.log('🔵 [TAX CALC] calculateTax called with:', {
+      address: {
+        line1: address.line1 || address.address || '',
+        city: address.city || '',
+        state: address.state || '',
+        postal_code: address.postal_code || address.zipCode || '',
+        country: address.country || 'US',
+      },
+      cartItems: cart?.length || cart_products.length,
+      shippingCost: shippingCost !== undefined ? shippingCost : totalShippingCost,
+    });
+
     // Clear previous timer
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
+      console.log('⏱️ [TAX CALC] Cleared previous debounce timer');
     }
 
     // Validate address
     if (!hasCompleteAddress(address)) {
+      console.log('❌ [TAX CALC] Address incomplete, clearing tax data');
       setTaxData(null);
       setError(null);
       return;
     }
 
+    console.log('✅ [TAX CALC] Address validation passed');
+
     // Use provided cart or fallback to Redux cart
     const cartToUse = cart || cart_products;
     const shippingToUse = shippingCost !== undefined ? shippingCost : totalShippingCost;
 
+    console.log('📦 [TAX CALC] Cart details:', {
+      itemCount: cartToUse.length,
+      items: cartToUse.map(item => ({
+        id: item._id || item.productId,
+        title: item.title,
+        price: item.price,
+        finalPriceDiscount: item.finalPriceDiscount,
+        updatedPrice: item.updatedPrice,
+        quantity: item.orderQuantity,
+      })),
+      shippingCost: shippingToUse,
+    });
+
     // Create cache key
     const cacheKey = createCacheKey(address, cartToUse, shippingToUse);
+    console.log('🔑 [TAX CALC] Cache key:', cacheKey);
+    console.log('🔑 [TAX CALC] Last request key:', lastRequestRef.current);
 
     // Skip if same request
     if (lastRequestRef.current === cacheKey && taxData) {
+      console.log('⏭️ [TAX CALC] Skipping - same request as before');
       return;
     }
+
+    console.log('⏳ [TAX CALC] Starting debounce timer (300ms)...');
 
     // Debounce the API call
     debounceTimerRef.current = setTimeout(async () => {
       try {
+        console.log('🚀 [TAX CALC] Making API call after debounce...');
         setError(null);
         lastRequestRef.current = cacheKey;
 
@@ -131,36 +166,59 @@ export const useTaxCalculation = (): UseTaxCalculationReturn => {
           },
         };
 
+        console.log('📤 [TAX CALC] API Request:', JSON.stringify(request, null, 2));
+
         // Call API
         const result = await calculateTaxMutation(request).unwrap();
 
-        console.log('Tax calculation result:', result);
+        console.log('📥 [TAX CALC] API Response:', JSON.stringify(result, null, 2));
+        console.log('📊 [TAX CALC] Response Summary:', {
+          success: result.success,
+          calculationId: result.calculationId,
+          taxAmount: result.taxAmount,
+          taxAmountExclusive: result.taxAmountExclusive,
+          amountTotal: result.amountTotal,
+          subtotal: result.subtotal,
+          taxBreakdownCount: result.taxBreakdown?.length || 0,
+          isCollectingTax: result.isCollectingTax,
+          taxabilityReason: result.taxabilityReason,
+        });
 
         if (result.success) {
           setTaxData(result);
-          console.log('Tax data set:', result);
+          console.log('✅ [TAX CALC] Tax data set successfully');
         } else {
+          console.log('❌ [TAX CALC] Tax calculation failed:', result.message);
           setTaxData(null);
           setError(result.message || 'Failed to calculate tax');
         }
       } catch (err: any) {
-        console.error('Tax calculation error:', err);
+        console.error('❌ [TAX CALC] API Error:', err);
+        console.error('❌ [TAX CALC] Error Details:', {
+          type: err?.type,
+          code: err?.code,
+          message: err?.message,
+          data: err?.data,
+        });
         setTaxData(null);
         setError(err?.data?.message || err?.message || 'Failed to calculate tax');
       }
     }, 300); // 300ms debounce
-  }, [cart_products, totalShippingCost, hasCompleteAddress, createCacheKey, calculateTaxMutation]);
+  }, [cart_products, totalShippingCost, hasCompleteAddress, createCacheKey, calculateTaxMutation, taxData]);
 
   /**
    * Clear tax data
    */
   const clearTax = useCallback(() => {
+    console.log('🧹 [TAX CALC] clearTax called - clearing all tax data');
     setTaxData(null);
     setError(null);
     lastRequestRef.current = null;
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
+      console.log('⏱️ [TAX CALC] Cleared debounce timer');
     }
+    console.log('✅ [TAX CALC] Tax data cleared successfully');
   }, []);
 
   // Cleanup on unmount

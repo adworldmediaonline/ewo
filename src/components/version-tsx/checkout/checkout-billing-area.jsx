@@ -36,7 +36,7 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
   const { total_coupon_discount } = useSelector(state => state.coupon);
 
   // Tax calculation hook
-  const { taxData, calculateTax, isLoading: taxLoading, error: taxError } = useTaxCalculation();
+  const { taxData, calculateTax, isLoading: taxLoading, error: taxError, clearTax } = useTaxCalculation();
   const { cart_products } = useSelector(state => state.cart);
 
   // Watch individual address fields for tax calculation
@@ -68,23 +68,54 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
   // Calculate tax when ANY address field changes
   // This handles all edge cases: country change, state/city/zip change, address change
   useEffect(() => {
-    // Clear tax data immediately if country is not US
-    if (country && country !== 'US') {
+    console.log('🔄 [BILLING AREA] Address fields changed:', {
+      address: address || '(empty)',
+      city: city || '(empty)',
+      state: state || '(empty)',
+      zipCode: zipCode || '(empty)',
+      country: country || '(empty)',
+      cartProductsCount: cart_products.length,
+      totalShippingCost,
+    });
+
+    // Clear tax data immediately if country is not US or not set
+    if (!country || country !== 'US') {
+      console.log('🌍 [BILLING AREA] Country is not US, clearing tax');
       if (setTaxData) {
         setTaxData(null);
       }
+      // Clear tax in the hook
+      clearTax();
       return;
     }
 
     // For US addresses, check if we have minimum required fields
     // Minimum required: state, city, and zipCode (address/line1 is optional for tax calculation)
+    // Check for empty strings, null, undefined, or whitespace-only values
+    const stateValue = state?.trim() || '';
+    const cityValue = city?.trim() || '';
+    const zipCodeValue = zipCode?.trim() || '';
+
+    console.log('🔍 [BILLING AREA] Validating fields:', {
+      stateValue,
+      cityValue,
+      zipCodeValue,
+      stateValid: stateValue !== '',
+      cityValid: cityValue !== '',
+      zipCodeValid: zipCodeValue !== '',
+    });
+
     const hasMinimumFields = country === 'US' &&
-                             state &&
-                             state.trim() !== '' &&
-                             city &&
-                             city.trim() !== '' &&
-                             zipCode &&
-                             zipCode.trim() !== '';
+                             stateValue !== '' &&
+                             cityValue !== '' &&
+                             zipCodeValue !== '';
+
+    console.log('✅ [BILLING AREA] Validation result:', {
+      hasMinimumFields,
+      cartHasProducts: cart_products.length > 0,
+      shippingCostValid: totalShippingCost >= 0,
+      willCalculate: hasMinimumFields && cart_products.length > 0 && totalShippingCost >= 0,
+    });
 
     // Only calculate if:
     // 1. Country is US
@@ -92,14 +123,15 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
     // 3. Cart has products
     // 4. Shipping cost is valid (>= 0)
     if (hasMinimumFields && cart_products.length > 0 && totalShippingCost >= 0) {
+      console.log('🚀 [BILLING AREA] Calling calculateTax...');
       calculateTax(
         {
           line1: address || '',
           address: address || '',
-          city: city.trim(),
-          state: state.trim(),
-          zipCode: zipCode.trim(),
-          postal_code: zipCode.trim(),
+          city: cityValue,
+          state: stateValue,
+          zipCode: zipCodeValue,
+          postal_code: zipCodeValue,
           country: 'US',
         },
         cart_products,
@@ -107,18 +139,33 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
       );
     } else {
       // Clear tax data if address is incomplete
+      // This handles cases where user clears city, state, or zipCode
+      console.log('🧹 [BILLING AREA] Address incomplete, clearing tax');
       if (setTaxData) {
         setTaxData(null);
       }
+      // Clear tax in the hook to ensure UI updates immediately
+      clearTax();
     }
-  }, [address, city, state, zipCode, country, cart_products, totalShippingCost, calculateTax, setTaxData]);
+  }, [address, city, state, zipCode, country, cart_products, totalShippingCost, calculateTax, setTaxData, clearTax]);
 
   // Update tax data, loading, and error in checkoutData
   useEffect(() => {
+    console.log('📊 [BILLING AREA] Tax state update:', {
+      hasTaxData: !!taxData,
+      taxAmount: taxData?.taxAmount,
+      taxLoading,
+      taxError,
+    });
+
     if (setTaxData && taxData) {
-      console.log('Setting tax data in checkoutData:', taxData);
+      console.log('💾 [BILLING AREA] Setting tax data in checkoutData:', taxData);
       setTaxData(taxData);
+    } else if (setTaxData && !taxData) {
+      console.log('🧹 [BILLING AREA] Clearing tax data in checkoutData');
+      setTaxData(null);
     }
+
     if (checkoutData && typeof checkoutData.setTaxLoading === 'function') {
       checkoutData.setTaxLoading(taxLoading);
     }
@@ -400,8 +447,8 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
             </div>
           </div>
 
-          {/* Tax Calculation Status */}
-          {country === 'US' && (
+          {/* Tax Calculation Status - Only show for US and when fields are filled or tax is being calculated */}
+          {country === 'US' && (state || city || zipCode || taxData || taxLoading) && (
             <div className="mt-4 p-3 bg-muted rounded-md border border-border">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-foreground">Tax Calculation</span>
@@ -421,6 +468,9 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
                 )}
                 {!taxLoading && !taxData && !taxError && state && city && zipCode && (
                   <span className="text-xs text-muted-foreground">Ready to calculate</span>
+                )}
+                {!taxLoading && !taxData && !taxError && (!state || !city || !zipCode) && (
+                  <span className="text-xs text-muted-foreground">Complete address required</span>
                 )}
               </div>
               {taxData && (

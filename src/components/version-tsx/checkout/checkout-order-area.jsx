@@ -645,8 +645,9 @@ export default function CheckoutOrderArea({ checkoutData }) {
             )}
           </div>
 
-          {/* Tax display - Always show when tax data exists or is being calculated */}
-          {(taxData || taxLoading || taxError) && (
+          {/* Tax display - Only show when tax data exists, is loading, or has error */}
+          {/* Hide completely when taxData is null (fields cleared) */}
+          {(taxData !== null || taxLoading || taxError) && (
             <div className="flex items-center justify-between border-t border-border pt-3 mt-3">
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
