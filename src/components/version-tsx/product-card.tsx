@@ -179,16 +179,24 @@ export default function ProductCard({
       product.reviews.length
       : 0;
 
-  // Calculate final price with selected option
+  // Calculate final selling price (bold) - finalPriceDiscount after coupon discount
   const calculateFinalPrice = () => {
     const basePrice = product.finalPriceDiscount || product.price;
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    return (Number(basePrice) + optionPrice).toFixed(2);
+    const priceWithOption = Number(basePrice) + optionPrice;
+
+    // Apply coupon discount if available
+    if (hasCoupon && couponPercentage) {
+      const discountedPrice = priceWithOption * (1 - couponPercentage / 100);
+      return discountedPrice.toFixed(2);
+    }
+
+    return priceWithOption.toFixed(2);
   };
 
-  // Calculate marked up price with selected option
-  const calculateMarkedUpPrice = () => {
-    const basePrice = product.updatedPrice || product.price;
+  // Calculate marked price (strikethrough) - finalPriceDiscount before coupon
+  const calculateMarkedPrice = () => {
+    const basePrice = product.finalPriceDiscount || product.price;
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
     return (Number(basePrice) + optionPrice).toFixed(2);
   };
@@ -412,9 +420,11 @@ export default function ProductCard({
         <div className="mt-auto pt-2 sm:pt-3">
           {/* Price */}
           <div className="flex items-center gap-1.5 sm:gap-2 mb-2">
-            <span className="text-[10px] sm:text-sm text-primary line-through">
-              ${calculateMarkedUpPrice()}
-            </span>
+            {hasCoupon && couponPercentage && (
+              <span className="text-[10px] sm:text-sm text-primary line-through">
+                ${calculateMarkedPrice()}
+              </span>
+            )}
             <span className="text-sm sm:text-lg font-bold">${calculateFinalPrice()}</span>
           </div>
 
