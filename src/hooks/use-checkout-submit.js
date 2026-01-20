@@ -514,7 +514,11 @@ const useCheckoutSubmit = () => {
       const taxInfo = orderData.tax || null;
       const taxCalculationId = taxInfo?.calculationId || null;
       const taxAmount = taxInfo?.taxAmount || 0;
-      const amountTotal = taxInfo?.amountTotal || orderData.totalAmount || Math.max(0, cartTotal);
+
+      // FIX: Use orderData.totalAmount as the primary source for the payment amount
+      // orderData.totalAmount includes subtotals + shipping + tax - discounts
+      // taxInfo.amountTotal is the total from Stripe Tax which DOES NOT include coupon discounts
+      const amountTotal = orderData.totalAmount || taxInfo?.amountTotal || Math.max(0, cartTotal);
 
       // Calculate amount in cents for Stripe (must be integer)
       const amountInCents = Math.round(Math.max(0, amountTotal) * 100);
@@ -528,7 +532,7 @@ const useCheckoutSubmit = () => {
         amountTotal: amountTotal,
         orderData: {
           ...orderData,
-          totalAmount: amountTotal, // Total including tax
+          totalAmount: amountTotal, // Total including tax and discounts
           isGuestOrder: !session?.user?.id,
         },
       });
