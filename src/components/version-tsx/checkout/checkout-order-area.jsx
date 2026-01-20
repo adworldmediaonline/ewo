@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // internal
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -90,6 +90,66 @@ export default function CheckoutOrderArea({ checkoutData }) {
     isLoading: couponsLoading,
     isError: couponsError,
   } = useGetAllActiveCouponsQuery();
+
+  // Check for active coupons for products in cart (same logic as product card)
+  // Collect unique coupons that apply to products in the cart
+  const activeCouponsForCart = useMemo(() => {
+    if (!activeCouponsData?.success || !activeCouponsData?.data || !cart_products || cart_products.length === 0) {
+      return [];
+    }
+
+    const coupons = activeCouponsData.data;
+    const applicableCoupons = [];
+
+    // Check each coupon to see if it applies to any product in cart
+    for (const coupon of coupons) {
+      if (coupon.status !== 'active') continue;
+
+      // Check if coupon applies to products
+      if (coupon.applicableType === 'product' || coupon.applicableType === 'all') {
+        // If it's an "all" type coupon, it applies to all products
+        if (coupon.applicableType === 'all') {
+          applicableCoupons.push({
+            couponCode: coupon.couponCode || '',
+            couponPercentage: coupon.discountPercentage || 0,
+            couponTitle: coupon.title || null,
+            appliesToAll: true,
+          });
+          continue;
+        }
+
+        // For product-specific coupons, check if any cart product is in the applicable list
+        if (
+          coupon.applicableProducts &&
+          Array.isArray(coupon.applicableProducts) &&
+          coupon.applicableProducts.length > 0
+        ) {
+          const appliesToCart = cart_products.some((item) =>
+            coupon.applicableProducts.some(
+              (product) => product._id === item._id || product === item._id
+            )
+          );
+
+          if (appliesToCart) {
+            applicableCoupons.push({
+              couponCode: coupon.couponCode || '',
+              couponPercentage: coupon.discountPercentage || 0,
+              couponTitle: coupon.title || null,
+              appliesToAll: false,
+            });
+          }
+        }
+      }
+    }
+
+    // Remove duplicates (same coupon code)
+    const uniqueCoupons = applicableCoupons.filter(
+      (coupon, index, self) =>
+        index === self.findIndex((c) => c.couponCode === coupon.couponCode)
+    );
+
+    return uniqueCoupons;
+  }, [activeCouponsData, cart_products]);
 
   // Load applied coupons on component mount and ensure cart data is loaded
   useEffect(() => {
@@ -518,6 +578,51 @@ export default function CheckoutOrderArea({ checkoutData }) {
           })}
         </div>
       </ScrollArea>
+
+      {/* Active Coupons Section - Shows "Applied Successfully" UI when coupons are active */}
+      {/* Uses same coupon check logic as product card (useProductCoupon) */}
+      {activeCouponsForCart.length > 0 && (
+        <div className="mb-6 mt-6">
+          <div className="space-y-3">
+            {activeCouponsForCart.map((coupon, index) => {
+              return (
+                <div
+                  key={`${coupon.couponCode}-${index}`}
+                  className="relative overflow-hidden bg-gradient-to-r from-emerald-500 to-green-500 rounded-lg p-4 shadow-md"
+                >
+                  {/* Decorative corner */}
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-bl-full" />
+
+                  <div className="relative flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-white/20 backdrop-blur-sm rounded-full p-2">
+                        <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-white uppercase tracking-wide">
+                          {coupon.couponCode}
+                        </p>
+                        <p className="text-xs text-white/90 font-medium">
+                          Applied Successfully
+                        </p>
+                      </div>
+                    </div>
+                    {coupon.couponPercentage > 0 && (
+                      <div className="bg-white rounded-full px-3 py-1.5">
+                        <span className="text-sm font-extrabold text-emerald-600">
+                          {coupon.couponPercentage}% OFF
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Order Summary Section - moved from billing area */}
       <div className="border-t border-border pt-6 mt-6">

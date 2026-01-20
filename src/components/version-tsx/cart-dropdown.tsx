@@ -25,6 +25,7 @@ import {
   load_applied_coupons,
 } from '@/redux/features/coupon/couponSlice';
 import { ENABLE_AUTO_COUPON_FILL } from '@/config/coupon-config';
+import { useProductCoupon } from '@/hooks/useProductCoupon';
 import { X as XIcon } from 'lucide-react';
 
 interface CartItem {
@@ -122,6 +123,71 @@ export default function CartDropdown({
   } = useGetAllActiveCouponsQuery({});
 
   const items: CartItem[] = Array.isArray(cart_products) ? cart_products : [];
+
+  // Check for active coupons for products in cart (same logic as product card)
+  // Collect unique coupons that apply to products in the cart
+  const activeCouponsForCart = React.useMemo(() => {
+    if (!activeCouponsData?.success || !activeCouponsData?.data || items.length === 0) {
+      return [];
+    }
+
+    const coupons = activeCouponsData.data;
+    const applicableCoupons: Array<{
+      couponCode: string;
+      couponPercentage: number;
+      couponTitle: string | null;
+      appliesToAll: boolean;
+    }> = [];
+
+    // Check each coupon to see if it applies to any product in cart
+    for (const coupon of coupons) {
+      if (coupon.status !== 'active') continue;
+
+      // Check if coupon applies to products
+      if (coupon.applicableType === 'product' || coupon.applicableType === 'all') {
+        // If it's an "all" type coupon, it applies to all products
+        if (coupon.applicableType === 'all') {
+          applicableCoupons.push({
+            couponCode: coupon.couponCode || '',
+            couponPercentage: coupon.discountPercentage || 0,
+            couponTitle: coupon.title || null,
+            appliesToAll: true,
+          });
+          continue;
+        }
+
+        // For product-specific coupons, check if any cart product is in the applicable list
+        if (
+          coupon.applicableProducts &&
+          Array.isArray(coupon.applicableProducts) &&
+          coupon.applicableProducts.length > 0
+        ) {
+          const appliesToCart = items.some((item: CartItem) =>
+            coupon.applicableProducts.some(
+              (product: any) => product._id === item._id || product === item._id
+            )
+          );
+
+          if (appliesToCart) {
+            applicableCoupons.push({
+              couponCode: coupon.couponCode || '',
+              couponPercentage: coupon.discountPercentage || 0,
+              couponTitle: coupon.title || null,
+              appliesToAll: false,
+            });
+          }
+        }
+      }
+    }
+
+    // Remove duplicates (same coupon code)
+    const uniqueCoupons = applicableCoupons.filter(
+      (coupon, index, self) =>
+        index === self.findIndex((c) => c.couponCode === coupon.couponCode)
+    );
+
+    return uniqueCoupons;
+  }, [activeCouponsData, items]);
 
   // Load applied coupons on component mount
   React.useEffect(() => {
@@ -448,23 +514,17 @@ export default function CartDropdown({
               </div>
             </div>
 
-            {/* Fixed Coupon Section - Always Visible */}
-            {applied_coupons.length > 0 && (
+            {/* Fixed Coupon Section - Shows "Applied Successfully" UI when coupons are active */}
+            {/* Uses same coupon check logic as product card (useProductCoupon) */}
+            {activeCouponsForCart.length > 0 && (
               <div className="px-4 py-2 border-t border-border/60 bg-popover shrink-0">
                 <div className="space-y-2">
-                  {applied_coupons.map(
-                    (coupon: AppliedCoupon, index: number) => {
-                      // Calculate discount percentage if available
-                      const discountPercent = coupon.discountType === 'percentage' && coupon.discountPercentage
-                        ? coupon.discountPercentage
-                        : coupon.discount && subtotal > 0
-                          ? ((coupon.discount / subtotal) * 100).toFixed(1)
-                          : null;
-
+                  {activeCouponsForCart.map(
+                    (coupon, index: number) => {
                       return (
                         <div
-                          key={index}
-                          className="relative overflow-hidden bg-linear-to-r from-emerald-500 to-green-500 rounded-lg p-3 shadow-md"
+                          key={`${coupon.couponCode}-${index}`}
+                          className="relative overflow-hidden bg-gradient-to-r from-emerald-500 to-green-500 rounded-lg p-3 shadow-md"
                         >
                           {/* Decorative corner */}
                           <div className="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-bl-full" />
@@ -485,17 +545,10 @@ export default function CartDropdown({
                                 </p>
                               </div>
                             </div>
-                            {discountPercent && (
+                            {coupon.couponPercentage > 0 && (
                               <div className="bg-white rounded-full px-2.5 py-1">
                                 <span className="text-xs font-extrabold text-emerald-600">
-                                  {discountPercent}% OFF
-                                </span>
-                              </div>
-                            )}
-                            {!discountPercent && (
-                              <div className="bg-white rounded-full px-2.5 py-1">
-                                <span className="text-xs font-extrabold text-emerald-600">
-                                  -${coupon.discount?.toFixed(2)}
+                                  {coupon.couponPercentage}% OFF
                                 </span>
                               </div>
                             )}
