@@ -20,6 +20,12 @@ export const useTaxCalculation = (): UseTaxCalculationReturn => {
   const [calculateTaxMutation, { isLoading }] = useCalculateTaxMutation();
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const lastRequestRef = useRef<string | null>(null);
+  const taxDataRef = useRef<TaxCalculationResponse | null>(null); // Ref to track taxData without stale closure
+
+  // Keep taxDataRef in sync with taxData state
+  useEffect(() => {
+    taxDataRef.current = taxData;
+  }, [taxData]);
 
   // Get cart products from Redux
   const cart_products = useSelector((state: any) => state.cart.cart_products || []);
@@ -65,7 +71,7 @@ export const useTaxCalculation = (): UseTaxCalculationReturn => {
 
     // Create cart key from product IDs, quantities, and prices
     const cartKey = cart
-      .map(item => `${item._id || ''}-${item.orderQuantity || 1}-${item.finalPriceDiscount || item.price || 0}`)
+      .map((item: TaxCalculationRequest['cart'][number]) => `${item._id || ''}-${item.orderQuantity || 1}-${item.finalPriceDiscount || item.price || 0}`)
       .sort() // Sort to ensure consistent key regardless of order
       .join('|');
 
@@ -114,7 +120,7 @@ export const useTaxCalculation = (): UseTaxCalculationReturn => {
 
     console.log('📦 [TAX CALC] Cart details:', {
       itemCount: cartToUse.length,
-      items: cartToUse.map(item => ({
+      items: cartToUse.map((item: TaxCalculationRequest['cart'][number] | any) => ({
         id: item._id || item.productId,
         title: item.title,
         price: item.price,
@@ -130,9 +136,10 @@ export const useTaxCalculation = (): UseTaxCalculationReturn => {
     console.log('🔑 [TAX CALC] Cache key:', cacheKey);
     console.log('🔑 [TAX CALC] Last request key:', lastRequestRef.current);
 
-    // Skip if same request
-    if (lastRequestRef.current === cacheKey && taxData) {
-      console.log('⏭️ [TAX CALC] Skipping - same request as before');
+    // Skip if same request AND we already have tax data for it
+    // Use ref to avoid stale closure issues
+    if (lastRequestRef.current === cacheKey && taxDataRef.current) {
+      console.log('⏭️ [TAX CALC] Skipping - same request as before, already have data');
       return;
     }
 
@@ -147,7 +154,7 @@ export const useTaxCalculation = (): UseTaxCalculationReturn => {
 
         // Prepare request
         const request: TaxCalculationRequest = {
-          cart: cartToUse.map(item => ({
+          cart: cartToUse.map((item: TaxCalculationRequest['cart'][number] | any) => ({
             _id: item._id || item.productId || '',
             title: item.title || '',
             price: Number(item.price) || 0,
@@ -204,7 +211,7 @@ export const useTaxCalculation = (): UseTaxCalculationReturn => {
         setError(err?.data?.message || err?.message || 'Failed to calculate tax');
       }
     }, 300); // 300ms debounce
-  }, [cart_products, totalShippingCost, hasCompleteAddress, createCacheKey, calculateTaxMutation, taxData]);
+  }, [cart_products, totalShippingCost, hasCompleteAddress, createCacheKey, calculateTaxMutation]); // Removed taxData to avoid stale closure
 
   /**
    * Clear tax data
