@@ -24,6 +24,7 @@ import { useGetAllActiveCouponsQuery } from '@/redux/features/coupon/couponApi';
 import {
   load_applied_coupons,
 } from '@/redux/features/coupon/couponSlice';
+import { ENABLE_AUTO_COUPON_FILL } from '@/config/coupon-config';
 import { X as XIcon } from 'lucide-react';
 
 interface CartItem {
@@ -128,7 +129,13 @@ export default function CartDropdown({
   }, [dispatch]);
 
   // Smart auto-fill coupon code from various sources including backend
+  // Only enabled if ENABLE_AUTO_COUPON_FILL is true
   React.useEffect(() => {
+    // Skip auto-fill if feature is disabled
+    if (!ENABLE_AUTO_COUPON_FILL) {
+      return;
+    }
+
     const autoFillCouponCode = () => {
       // Don't proceed if coupons are still loading or input already has value
       if (couponsLoading || couponCode) {

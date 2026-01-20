@@ -32,6 +32,7 @@ import {
 import { add_to_compare } from '@/redux/features/compareSlice';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { notifyError, notifySuccess } from '@/utils/toast';
+import { useProductCoupon } from '@/hooks/useProductCoupon';
 import {
   BarChart3,
   CheckCircle,
@@ -135,6 +136,10 @@ export default function DetailsWrapper({
     children,
   } = productItem || {};
   const [selectedOption, setSelectedOption] = useState(null);
+
+  // Check if coupon is active for this product
+  const { hasCoupon, couponPercentage } = useProductCoupon(productItem?._id || '');
+
   // Initialize selectedConfigurations with preselected options from backend
   const [selectedConfigurations, setSelectedConfigurations] = useState(() => {
     const initial = {};
@@ -448,7 +453,13 @@ export default function DetailsWrapper({
 
     // Step 2: Add product option price (from product.options, not configurations)
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    const finalPrice = basePrice + optionPrice;
+    const priceWithOption = basePrice + optionPrice;
+
+    // Step 3: Apply coupon discount if available
+    let finalPrice = priceWithOption;
+    if (hasCoupon && couponPercentage) {
+      finalPrice = priceWithOption * (1 - couponPercentage / 100);
+    }
 
     // Create properly formatted productConfigurations array with correct isSelected flags
     let updatedProductConfigurations = undefined;
@@ -480,6 +491,7 @@ export default function DetailsWrapper({
     const productToAdd = {
       ...prd,
       // Always set price from scratch - never use existing prd.finalPriceDiscount
+      // Price includes coupon discount if coupon is active
       finalPriceDiscount: finalPrice,
       updatedPrice: markedUpPrice,
       selectedOption,
@@ -613,7 +625,13 @@ export default function DetailsWrapper({
 
     // Step 2: Add product option price (from product.options, not configurations)
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    const finalPrice = basePrice + optionPrice;
+    const priceWithOption = basePrice + optionPrice;
+
+    // Step 3: Apply coupon discount if available
+    let finalPrice = priceWithOption;
+    if (hasCoupon && couponPercentage) {
+      finalPrice = priceWithOption * (1 - couponPercentage / 100);
+    }
 
     // Create properly formatted productConfigurations array with correct isSelected flags
     let updatedProductConfigurations = undefined;
@@ -645,6 +663,7 @@ export default function DetailsWrapper({
     const productToAdd = {
       ...prd,
       // Always set price from scratch - never use existing prd.finalPriceDiscount
+      // Price includes coupon discount if coupon is active
       finalPriceDiscount: finalPrice,
       updatedPrice: markedUpPrice,
       selectedOption,

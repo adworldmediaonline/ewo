@@ -16,6 +16,7 @@ import {
   initialOrderQuantity,
 } from '@/redux/features/cartSlice';
 import { notifyError } from '@/utils/toast';
+import { useProductCoupon } from '@/hooks/useProductCoupon';
 import type { Product } from '@/components/version-tsx/product-card';
 
 interface ProductConfigurationDialogProps {
@@ -48,6 +49,9 @@ export default function ProductConfigurationDialog({
 }: ProductConfigurationDialogProps) {
   const dispatch = useDispatch();
   const { cart_products, orderQuantity } = useSelector((state: any) => state.cart);
+
+  // Check if coupon is active for this product
+  const { hasCoupon, couponPercentage } = useProductCoupon(product._id);
   const [selectedOption, setSelectedOption] = useState<any>(null);
   const [selectedConfigurations, setSelectedConfigurations] = useState<{
     [configIndex: number]: {
@@ -290,7 +294,13 @@ export default function ProductConfigurationDialog({
 
     // Add product option price (from product.options, not configurations)
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    const finalPrice = basePrice + optionPrice;
+    const priceWithOption = basePrice + optionPrice;
+
+    // Apply coupon discount if available
+    let finalPrice = priceWithOption;
+    if (hasCoupon && couponPercentage) {
+      finalPrice = priceWithOption * (1 - couponPercentage / 100);
+    }
 
     // Create properly formatted productConfigurations array
     let updatedProductConfigurations = undefined;

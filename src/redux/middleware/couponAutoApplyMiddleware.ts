@@ -5,6 +5,7 @@
 
 import { Middleware, AnyAction } from '@reduxjs/toolkit';
 import { autoApplyCoupon, revalidateAppliedCoupons } from '@/utils/coupon-auto-apply';
+import { ENABLE_AUTO_COUPON_APPLICATION } from '@/config/coupon-config';
 
 // Debounce helper to prevent multiple simultaneous auto-apply attempts
 let autoApplyTimeout: NodeJS.Timeout | null = null;
@@ -25,7 +26,8 @@ export const couponAutoApplyMiddleware: Middleware = store => next => action => 
     'cart/remove_product',
   ].includes(typedAction.type);
 
-  if (shouldAutoApply) {
+  // Skip auto-apply if feature is disabled
+  if (shouldAutoApply && ENABLE_AUTO_COUPON_APPLICATION) {
     // Clear any pending auto-apply
     if (autoApplyTimeout) {
       clearTimeout(autoApplyTimeout);

@@ -219,7 +219,22 @@ export default function ProductCard({
       return;
     }
 
-    onAddToCart?.(product, selectedOption);
+    // Calculate final price (with coupon discount if active)
+    const basePrice = product.finalPriceDiscount || product.price;
+    const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+    const priceWithOption = Number(basePrice) + optionPrice;
+
+    // Apply coupon discount if available
+    let finalPrice = priceWithOption;
+    if (hasCoupon && couponPercentage) {
+      finalPrice = priceWithOption * (1 - couponPercentage / 100);
+    }
+
+    // Pass product with calculated final price
+    onAddToCart?.(
+      { ...product, finalPriceDiscount: finalPrice },
+      selectedOption
+    );
   };
 
   const handleChooseOptions = (e: React.MouseEvent) => {
