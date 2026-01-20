@@ -7,6 +7,7 @@ import {
   quantityDecrement,
 } from '@/redux/features/cartSlice';
 import { remove_wishlist_product } from '@/redux/features/wishlist-slice';
+import { useProductCoupon } from '@/hooks/useProductCoupon';
 import { Eye, Minus, Plus, ShoppingCart, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -47,13 +48,44 @@ export default function WishlistItem({
   const isAddToCart = cart_products.find((item: any) => item._id === _id);
   const dispatch = useDispatch();
 
+  // Check if coupon is active for this product
+  const { hasCoupon, couponPercentage } = useProductCoupon(_id);
+
+  // Calculate final selling price (bold) - finalPriceDiscount after coupon discount
+  const calculateFinalPrice = () => {
+    const basePrice = finalPriceDiscount || price;
+    const priceWithOption = Number(basePrice);
+
+    // Apply coupon discount if available
+    if (hasCoupon && couponPercentage) {
+      const discountedPrice = priceWithOption * (1 - couponPercentage / 100);
+      return discountedPrice.toFixed(2);
+    }
+
+    return priceWithOption.toFixed(2);
+  };
+
+  // Calculate marked price (strikethrough) - finalPriceDiscount before coupon
+  const calculateMarkedPrice = () => {
+    const basePrice = finalPriceDiscount || price;
+    return Number(basePrice).toFixed(2);
+  };
+
   // handle add product
   const handleAddProduct = (prd: WishlistProduct) => {
+    // Calculate final price with coupon discount if active
+    const basePrice = prd.finalPriceDiscount || prd.price;
+    let finalPrice = Number(basePrice);
+
+    if (hasCoupon && couponPercentage) {
+      finalPrice = finalPrice * (1 - couponPercentage / 100);
+    }
+
     const cartProduct = {
       ...prd,
       orderQuantity: 1,
       quantity: 1,
-      finalPriceDiscount: prd.finalPriceDiscount || prd.price,
+      finalPriceDiscount: finalPrice,
       sku: prd.sku || prd._id,
     };
     dispatch(add_cart_product(cartProduct));
@@ -61,11 +93,19 @@ export default function WishlistItem({
 
   // handle decrement product
   const handleDecrement = (prd: WishlistProduct) => {
+    // Calculate final price with coupon discount if active
+    const basePrice = prd.finalPriceDiscount || prd.price;
+    let finalPrice = Number(basePrice);
+
+    if (hasCoupon && couponPercentage) {
+      finalPrice = finalPrice * (1 - couponPercentage / 100);
+    }
+
     const cartProduct = {
       ...prd,
       orderQuantity: 1,
       quantity: 1,
-      finalPriceDiscount: prd.finalPriceDiscount || prd.price,
+      finalPriceDiscount: finalPrice,
       sku: prd.sku || prd._id,
     };
     dispatch(quantityDecrement(cartProduct));
@@ -75,9 +115,6 @@ export default function WishlistItem({
   const handleRemovePrd = (prd: { title: string; id: string }) => {
     dispatch(remove_wishlist_product(prd));
   };
-
-  const finalPrice = finalPriceDiscount || price;
-  const hasDiscount = updatedPrice && updatedPrice !== price;
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-200 border-border/50">
@@ -134,14 +171,14 @@ export default function WishlistItem({
                 )}
 
                 {/* Price */}
-                <div className="flex items-center gap-3">
-                  {hasDiscount && (
+                <div className="flex items-center gap-2">
+                  {hasCoupon && couponPercentage && (
                     <span className="text-sm text-muted-foreground line-through font-medium">
-                      ${Number(updatedPrice).toFixed(2)}
+                      ${calculateMarkedPrice()}
                     </span>
                   )}
                   <span className="text-xl font-bold text-primary">
-                    ${Number(finalPrice).toFixed(2)}
+                    ${calculateFinalPrice()}
                   </span>
                 </div>
               </div>
