@@ -290,14 +290,14 @@ export default function ProductCard({
                 )} */}
 
               {/* Coupon Badge */}
-              {hasCoupon && couponPercentage && (
+              {/* {hasCoupon && couponPercentage && (
                 <Badge
                   className="bg-linear-to-r from-emerald-500 to-green-500 text-white border-0 shadow-lg flex items-center gap-0.5 sm:gap-1 px-1 py-0  sm:px-2 sm:py-1 text-[8px] sm:text-[11px]"
                 >
-                  {/* <Ticket className="h-2 w-2 sm:h-3 sm:w-3" /> */}
+
                   <span className="font-medium">GET EXTRA <span className="font-semibold text-[13px]">{couponPercentage}%</span> OFF AT CHECKOUT</span>
                 </Badge>
-              )}
+              )} */}
             </div>
 
             {/* Status Badge - Top Right */}

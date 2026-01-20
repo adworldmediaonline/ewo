@@ -277,36 +277,52 @@ export default function DetailsWrapper({
     return hasAnyPrice ? totalConfigPrice : null;
   };
 
-  // Calculate final price using pre-calculated database values
+  // Calculate final selling price (bold) - finalPriceDiscount after coupon discount
   const calculateFinalPrice = () => {
     // If a configuration option with price is selected, use that price instead of base price
     const configPrice = getSelectedConfigurationPrice();
+    let basePrice;
+
     if (configPrice !== null) {
       // Configuration price replaces the base price
-      // Still add option price if selected (options are different from configurations)
-      const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-      return (configPrice + optionPrice).toFixed(2);
+      basePrice = configPrice;
+    } else {
+      // Use pre-calculated finalPriceDiscount from database, fallback to original price
+      basePrice = finalPriceDiscount || price;
     }
 
-    // Use pre-calculated finalPriceDiscount from database, fallback to original price
-    const baseFinalPrice = finalPriceDiscount || price;
-
-    // Add option price if an option is selected
+    // Add option price if selected (options are different from configurations)
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+    const priceWithOption = Number(basePrice) + optionPrice;
 
-    return (Number(baseFinalPrice) + optionPrice).toFixed(2);
+    // Apply coupon discount if available
+    if (hasCoupon && couponPercentage) {
+      const discountedPrice = priceWithOption * (1 - couponPercentage / 100);
+      return discountedPrice.toFixed(2);
+    }
+
+    return priceWithOption.toFixed(2);
   };
 
-  // Calculate marked up price for display using pre-calculated database values
-  // Marked up price stays as original - doesn't change with configuration selections
+  // Calculate marked price (strikethrough) - finalPriceDiscount before coupon
   const calculateMarkedUpPrice = () => {
-    // Use pre-calculated updatedPrice from database, fallback to original price
-    const baseMarkedUpPrice = updatedPrice || price;
+    // If a configuration option with price is selected, use that price instead of base price
+    const configPrice = getSelectedConfigurationPrice();
+    let basePrice;
 
-    // Add option price if an option is selected (options are different from configurations)
+    if (configPrice !== null) {
+      // Configuration price replaces the base price
+      basePrice = configPrice;
+    } else {
+      // Use pre-calculated finalPriceDiscount from database, fallback to original price
+      // This is the marked price (before coupon discount)
+      basePrice = finalPriceDiscount || price;
+    }
+
+    // Add option price if selected (options are different from configurations)
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
 
-    return (Number(baseMarkedUpPrice) + optionPrice).toFixed(2);
+    return (Number(basePrice) + optionPrice).toFixed(2);
   };
 
   // Handle option selection
@@ -823,14 +839,14 @@ export default function DetailsWrapper({
       {/* Pricing */}
       <div className="space-y-3">
         <div className="flex items-baseline gap-3">
-          <span className="text-3xl font-bold text-foreground">
-            ${calculateFinalPrice()}
-          </span>
-          {updatedPrice && updatedPrice !== price && (
+          {hasCoupon && couponPercentage && (
             <span className="text-lg text-muted-foreground line-through">
               ${calculateMarkedUpPrice()}
             </span>
           )}
+          <span className="text-3xl font-bold text-foreground">
+            ${calculateFinalPrice()}
+          </span>
         </div>
 
         {selectedOption && (
