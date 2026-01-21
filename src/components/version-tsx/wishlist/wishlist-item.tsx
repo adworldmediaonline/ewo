@@ -440,7 +440,13 @@ export default function WishlistItem({
     {/* Configuration Dialog */}
     {hasConfigurations && (
       <ProductConfigurationDialog
-        product={product}
+        product={{
+          ...product,
+          sku: product.sku || product._id,
+          category: product.category || { name: '', id: '' },
+          status: product.status || 'in-stock',
+          quantity: product.quantity || 0,
+        } as any}
         open={isConfigDialogOpen}
         onOpenChange={setIsConfigDialogOpen}
         onAddToCart={(productWithPrice: any, selectedOption?: any) => {

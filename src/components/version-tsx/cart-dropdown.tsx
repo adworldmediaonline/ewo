@@ -633,12 +633,12 @@ export default function CartDropdown({
                 </div>
 
                 <Button size="lg" asChild className="flex-1">
-                  <Link
+                  <a
                     href="/checkout"
                     onClick={() => setOpen(false)}
                   >
                     Proceed to Buy
-                  </Link>
+                  </a>
                 </Button>
               </div>
             </div>

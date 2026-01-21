@@ -398,8 +398,8 @@ export default function CartCheckout() {
                 const discountPercent = coupon.discountType === 'percentage' && coupon.discountPercentage
                   ? coupon.discountPercentage
                   : coupon.discount && subtotal > 0
-                  ? ((coupon.discount / subtotal) * 100).toFixed(1)
-                  : null;
+                    ? ((coupon.discount / subtotal) * 100).toFixed(1)
+                    : null;
 
                 return (
                   <div
@@ -532,12 +532,12 @@ export default function CartCheckout() {
       </div>
 
       <div className="mt-6">
-        <Link
+        <a
           href="/checkout"
           className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background w-full py-2.5"
         >
           Proceed to Checkout
-        </Link>
+        </a>
       </div>
     </div>
   );
