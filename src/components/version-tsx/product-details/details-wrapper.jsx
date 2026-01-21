@@ -60,7 +60,7 @@ import ReviewForm from './review-form';
 import ReviewItem from './review-item';
 import ProductConfigurations from './product-configurations';
 // import FreeShippingBadge from '@/components/version-tsx/free-shipping-badge';
-// import freeShippingImage from '../../../../public/assets/free-shipping-1.webp';
+import freeShippingImage from '../../../../public/assets/free-shipping-1.webp';
 
 // Custom Rating Component
 const ProductRating = ({ rating, reviewCount }) => {
@@ -865,18 +865,17 @@ export default function DetailsWrapper({
           calculated at checkout.
         </p>
 
-        {/* Free Shipping Badge */}
-        {/* UNCOMMENT LATER */}
-        {/* <div className="pt-2 relative overflow-hidden">
-          <Image
-            src={freeShippingImage}
-            alt="Free Shipping on orders over $100"
-
-            className="object-contain w-auto h-[110px]"
-            priority={false}
-          />
-        </div> */}
-        {/* <FreeShippingBadge minimumOrder={500} variant='horizontal' /> */}
+        {/* Free Shipping Badge - Only show if final price is $500 or more */}
+        {Number(calculateFinalPrice()) >= 500 && (
+          <div className="pt-2 relative overflow-hidden">
+            <Image
+              src={freeShippingImage}
+              alt="Free Shipping on orders over $500"
+              className="object-contain w-auto h-[110px]"
+              priority={false}
+            />
+          </div>
+        )}
       </div>
 
       {/* Color Options */}
