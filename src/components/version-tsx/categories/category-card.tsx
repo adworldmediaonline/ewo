@@ -42,13 +42,19 @@ export const CategoryCard = ({ item, index = 0 }: CategoryCardProps) => {
     router.push(`/shop?category=${parentSlug}&subcategory=${childSlug}`);
   };
 
+  // Check if this is a special subcategory card that needs parent+subcategory URL
+  const isSubcategoryCard = (item as any).parentCategorySlug && (item as any).subcategorySlug;
+  const href = isSubcategoryCard
+    ? `/shop?category=${(item as any).parentCategorySlug}&subcategory=${(item as any).subcategorySlug}`
+    : `/shop?category=${toSlug(item.parent)}`;
+
   return (
     <div className="group flex flex-col overflow-hidden rounded-lg sm:rounded-xl border border-border bg-card text-left shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring h-full">
       {/* Main category link - covers the image and title area */}
       <div></div>
       <Link
         // scroll={true}
-        href={`/shop?category=${toSlug(item.parent)}`}
+        href={href}
         className="flex-1 flex flex-col"
         aria-label={`Browse ${item.parent}`}
       >
