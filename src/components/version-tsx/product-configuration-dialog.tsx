@@ -172,15 +172,29 @@ export default function ProductConfigurationDialog({
   // Calculate final price
   const calculateFinalPrice = useCallback(() => {
     const configPrice = getSelectedConfigurationPrice();
+    let basePrice;
+
     if (configPrice !== null) {
-      const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-      return (configPrice + optionPrice).toFixed(2);
+      // Configuration price replaces the base price
+      basePrice = configPrice;
+    } else {
+      // Get base price (original price, not discounted)
+      basePrice = Number(product.finalPriceDiscount || product.price);
     }
 
-    const baseFinalPrice = product.finalPriceDiscount || product.price;
+    // Apply coupon discount to base price FIRST (if coupon is active)
+    let discountedBasePrice = basePrice;
+    if (hasCoupon && couponPercentage) {
+      discountedBasePrice = basePrice * (1 - couponPercentage / 100);
+    }
+
+    // THEN add option price to the already discounted base price
+    // No discount is applied to options - they're added at full price
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    return (Number(baseFinalPrice) + optionPrice).toFixed(2);
-  }, [getSelectedConfigurationPrice, selectedOption, product.finalPriceDiscount, product.price]);
+    const finalPrice = discountedBasePrice + optionPrice;
+
+    return finalPrice.toFixed(2);
+  }, [getSelectedConfigurationPrice, selectedOption, product.finalPriceDiscount, product.price, hasCoupon, couponPercentage]);
 
   // Calculate marked up price
   const calculateMarkedUpPrice = useCallback(() => {
@@ -274,7 +288,8 @@ export default function ProductConfigurationDialog({
     const markedUpPrice = product.updatedPrice || originalProductPrice;
 
     // Calculate base price - sum all selected configuration option prices
-    let basePrice = originalProductPrice;
+    // Get base price (original price, not discounted)
+    let basePrice = Number(product.finalPriceDiscount || originalProductPrice);
     if (
       product.productConfigurations &&
       product.productConfigurations.length > 0 &&
@@ -285,22 +300,21 @@ export default function ProductConfigurationDialog({
         // Use sum of all configuration option prices as base
         basePrice = configPrice;
       } else {
-        // If configurations exist but none have prices, use original price
+        // If configurations exist but none have prices, use finalPriceDiscount
         basePrice = Number(product.finalPriceDiscount || originalProductPrice);
       }
-    } else {
-      basePrice = Number(product.finalPriceDiscount || originalProductPrice);
     }
 
-    // Add product option price (from product.options, not configurations)
-    const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    const priceWithOption = basePrice + optionPrice;
-
-    // Apply coupon discount if available
-    let finalPrice = priceWithOption;
+    // Apply coupon discount to base price FIRST (if coupon is active)
+    let discountedBasePrice = basePrice;
     if (hasCoupon && couponPercentage) {
-      finalPrice = priceWithOption * (1 - couponPercentage / 100);
+      discountedBasePrice = basePrice * (1 - couponPercentage / 100);
     }
+
+    // THEN add product option price to the already discounted base price
+    // No discount is applied to options - they're added at full price
+    const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+    const finalPrice = discountedBasePrice + optionPrice;
 
     // Create properly formatted productConfigurations array
     let updatedProductConfigurations = undefined;
