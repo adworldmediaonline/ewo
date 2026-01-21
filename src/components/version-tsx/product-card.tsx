@@ -325,6 +325,25 @@ export default function ProductCard({
               </Badge>
             )}
 
+            {/* In Stock Seal - Bottom Right */}
+            {product.status !== 'out-of-stock' && (
+              <div className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 z-10">
+                <div
+                  className="rounded-full bg-gradient-to-r from-emerald-500 to-green-600 text-white border-2 border-white shadow-lg flex flex-col items-center justify-center text-center h-14 w-14 sm:h-16 sm:w-16"
+                  style={{
+                    borderRadius: '50%',
+                  }}
+                >
+                  <span className="text-[8px] sm:text-[9px] font-bold leading-tight">
+                    In Stock
+                  </span>
+                  <span className="text-[7px] sm:text-[8px] font-medium leading-tight mt-0.5">
+                    Ready to Ship
+                  </span>
+                </div>
+              </div>
+            )}
+
             {/* Product Image */}
             <div className="relative h-full w-full overflow-hidden">
               {imageUrl ? (
