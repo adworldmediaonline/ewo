@@ -66,6 +66,7 @@ async function GetCategoriesShowItems() {
 
   if (parentCategoryIndex !== -1) {
     const parentCategory = processedCategories[parentCategoryIndex];
+    let dana60Category: (CategoryItem & { parentCategorySlug?: string; subcategorySlug?: string }) | null = null;
 
     // Check if DANA 60 is in the children array by matching slug
     if (parentCategory.children && Array.isArray(parentCategory.children)) {
@@ -84,7 +85,7 @@ async function GetCategoriesShowItems() {
         updatedChildren.splice(dana60Index, 1);
 
         // Update the parent category with filtered children
-        processedCategories[parentCategoryIndex] = {
+        const updatedParentCategory = {
           ...parentCategory,
           children: updatedChildren,
         };
@@ -100,7 +101,7 @@ async function GetCategoriesShowItems() {
 
         // If Dana 60 doesn't exist as a parent category, create a separate card for it
         if (!dana60Exists) {
-          const dana60Category: CategoryItem & { parentCategorySlug?: string; subcategorySlug?: string } = {
+          dana60Category = {
             _id: `dana-60-standalone-${parentCategory._id}`, // Generate a stable unique ID
             parent: dana60Name || dana60SubcategoryName,
             children: [], // No subcategories for Dana 60
@@ -113,10 +114,30 @@ async function GetCategoriesShowItems() {
             parentCategorySlug: parentCategorySlug,
             subcategorySlug: dana60Slug,
           };
-
-          // Insert Dana 60 category after the parent category
-          processedCategories.splice(parentCategoryIndex + 1, 0, dana60Category);
         }
+
+        // Remove parent category from its current position
+        processedCategories.splice(parentCategoryIndex, 1);
+
+        // Remove DANA 60 if it exists elsewhere in the array
+        const existingDana60Index = processedCategories.findIndex(
+          (item: CategoryItem) => {
+            if (!item.parent) return false;
+            const itemSlug = toSlug(item.parent);
+            return itemSlug === dana60Slug;
+          }
+        );
+        if (existingDana60Index !== -1) {
+          dana60Category = processedCategories[existingDana60Index] as CategoryItem & { parentCategorySlug?: string; subcategorySlug?: string };
+          processedCategories.splice(existingDana60Index, 1);
+        }
+
+        // Insert parent category and DANA 60 at the beginning
+        // Insert DANA 60 first, then parent category, so parent appears first in the grid
+        if (dana60Category) {
+          processedCategories.unshift(dana60Category);
+        }
+        processedCategories.unshift(updatedParentCategory);
       }
     }
   }
