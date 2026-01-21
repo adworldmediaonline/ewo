@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { add_cart_product } from '@/redux/features/cartSlice';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { notifyError, notifySuccess } from '@/utils/toast';
+import { useProductCoupon } from '@/hooks/useProductCoupon';
 
 import type { ShopProduct } from '../shop-types';
 
@@ -48,23 +49,23 @@ export const useShopActions = () => {
         return;
       }
 
-      // Calculate base price and total price with option
-      const basePrice = Number(product.finalPriceDiscount || 0);
-      const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-      const totalPrice = basePrice + optionPrice;
+      // Use the finalPriceDiscount from product (already calculated with coupon discount if active)
+      // The product card calculates this price: if coupon is active, it applies the discount;
+      // if not active, it uses the original finalPriceDiscount
+      const finalPrice = Number(product.finalPriceDiscount || 0);
 
       const cartProduct = {
         _id: product._id,
         title: product.title,
         img: product.imageURLs?.[0] || product.img || '',
-        finalPriceDiscount: totalPrice, // Include option price (this is the price field we use)
+        finalPriceDiscount: finalPrice, // Use price from product (already includes coupon discount if active)
         orderQuantity: 1,
         quantity: product.quantity,
         slug: product.slug,
         shipping: product.shipping || { price: 0 },
         sku: product.sku,
         selectedOption: selectedOption, // Store selected option details
-        basePrice: basePrice, // Store original base price for reference
+        basePrice: Number(product.finalPriceDiscount || product.price || 0), // Store original base price for reference
       };
 
       dispatch(add_cart_product(cartProduct));
@@ -86,6 +87,12 @@ export const useShopActions = () => {
         sku: product.sku,
         finalPriceDiscount: product.finalPriceDiscount,
         updatedPrice: product.updatedPrice,
+        quantity: product.quantity,
+        shipping: product.shipping || { price: 0 },
+        // Preserve option and configuration data if they exist
+        selectedOption: (product as any).selectedOption || undefined,
+        options: (product as any).options || undefined,
+        productConfigurations: (product as any).productConfigurations || undefined,
       };
 
       dispatch(add_to_wishlist(wishlistProduct));

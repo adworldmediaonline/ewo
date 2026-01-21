@@ -130,10 +130,43 @@ export default function RelatedProductCard({
       product.reviews.length
       : 0;
 
+  // Calculate final selling price (bold) - finalPriceDiscount after coupon discount
+  const calculateFinalPrice = () => {
+    const basePrice = product.finalPriceDiscount || product.price;
+    const priceWithOption = Number(basePrice);
+
+    // Apply coupon discount if available
+    if (hasCoupon && couponPercentage) {
+      const discountedPrice = priceWithOption * (1 - couponPercentage / 100);
+      return discountedPrice.toFixed(2);
+    }
+
+    return priceWithOption.toFixed(2);
+  };
+
+  // Calculate marked price (strikethrough) - finalPriceDiscount before coupon
+  const calculateMarkedPrice = () => {
+    const basePrice = product.finalPriceDiscount || product.price;
+    return Number(basePrice).toFixed(2);
+  };
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    onAddToCart?.(product);
+
+    // Calculate final price with coupon discount if active
+    const basePrice = product.finalPriceDiscount || product.price;
+    let finalPrice = Number(basePrice);
+
+    if (hasCoupon && couponPercentage) {
+      finalPrice = finalPrice * (1 - couponPercentage / 100);
+    }
+
+    // Pass product with updated finalPriceDiscount
+    onAddToCart?.({
+      ...product,
+      finalPriceDiscount: finalPrice,
+    });
   };
 
   const handleAddToWishlist = (e: React.MouseEvent) => {
@@ -179,12 +212,12 @@ export default function RelatedProductCard({
                 )}
 
               {/* Coupon Badge */}
-              {hasCoupon && couponPercentage && (
-                <Badge className="bg-linear-to-r from-emerald-500 to-green-500 text-white border-0 shadow-lg flex items-center gap-1 px-2 py-1">
+              {/* {hasCoupon && couponPercentage && (
+                <Badge className="bg-gradient-to-r from-emerald-500 to-green-500 text-white border-0 shadow-lg flex items-center gap-1 px-2 py-1">
                   <Ticket className="h-3 w-3" />
                   <span className="font-bold">{couponPercentage}% OFF</span>
                 </Badge>
-              )}
+              )} */}
             </div>
 
             {/* Status Badge - Top Right */}
@@ -301,14 +334,14 @@ export default function RelatedProductCard({
         {/* Price and Button - Fixed at Bottom */}
         <div className="mt-auto pt-3">
           {/* Price */}
-          <div className="flex items-center gap-2 mb-2.5">
-            {product.updatedPrice && product.updatedPrice !== product.price && (
-              <span className="text-sm text-primary line-through">
-                ${Number(product.updatedPrice).toFixed(2)}
+          <div className="flex items-center gap-1.5 sm:gap-2 mb-2.5">
+            {hasCoupon && couponPercentage && (
+              <span className="text-xs sm:text-sm text-primary line-through">
+                ${calculateMarkedPrice()}
               </span>
             )}
-            <span className="text-lg font-bold">
-              ${Number(product.finalPriceDiscount || product.price).toFixed(2)}
+            <span className="text-base sm:text-lg font-bold">
+              ${calculateFinalPrice()}
             </span>
           </div>
 

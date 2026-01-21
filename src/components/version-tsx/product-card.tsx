@@ -179,16 +179,28 @@ export default function ProductCard({
       product.reviews.length
       : 0;
 
-  // Calculate final price with selected option
+  // Calculate final selling price (bold) - finalPriceDiscount after coupon discount
   const calculateFinalPrice = () => {
+    // Get base price (original price, not discounted)
     const basePrice = product.finalPriceDiscount || product.price;
+
+    // Apply coupon discount to base price FIRST (if coupon is active)
+    let discountedBasePrice = Number(basePrice);
+    if (hasCoupon && couponPercentage) {
+      discountedBasePrice = basePrice * (1 - couponPercentage / 100);
+    }
+
+    // THEN add option price to the already discounted base price
+    // No discount is applied to options - they're added at full price
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    return (Number(basePrice) + optionPrice).toFixed(2);
+    const finalPrice = discountedBasePrice + optionPrice;
+
+    return finalPrice.toFixed(2);
   };
 
-  // Calculate marked up price with selected option
-  const calculateMarkedUpPrice = () => {
-    const basePrice = product.updatedPrice || product.price;
+  // Calculate marked price (strikethrough) - finalPriceDiscount before coupon
+  const calculateMarkedPrice = () => {
+    const basePrice = product.finalPriceDiscount || product.price;
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
     return (Number(basePrice) + optionPrice).toFixed(2);
   };
@@ -211,7 +223,26 @@ export default function ProductCard({
       return;
     }
 
-    onAddToCart?.(product, selectedOption);
+    // Calculate final price
+    // Get base price (original price, not discounted)
+    const basePrice = product.finalPriceDiscount || product.price;
+
+    // Apply coupon discount to base price FIRST (if coupon is active)
+    let discountedBasePrice = Number(basePrice);
+    if (hasCoupon && couponPercentage) {
+      discountedBasePrice = basePrice * (1 - couponPercentage / 100);
+    }
+
+    // THEN add option price to the already discounted base price
+    // No discount is applied to options - they're added at full price
+    const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+    const finalPrice = discountedBasePrice + optionPrice;
+
+    // Pass product with calculated final price
+    onAddToCart?.(
+      { ...product, finalPriceDiscount: finalPrice },
+      selectedOption
+    );
   };
 
   const handleChooseOptions = (e: React.MouseEvent) => {
@@ -223,7 +254,14 @@ export default function ProductCard({
   const handleAddToWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    onAddToWishlist?.(product);
+    // Include selectedOption and options when adding to wishlist
+    const productWithOption = {
+      ...product,
+      selectedOption: selectedOption || undefined,
+      options: product.options || undefined,
+      productConfigurations: product.productConfigurations || undefined,
+    };
+    onAddToWishlist?.(productWithOption);
   };
 
   const handleOptionChange = (value: string) => {
@@ -267,14 +305,14 @@ export default function ProductCard({
                 )} */}
 
               {/* Coupon Badge */}
-              {hasCoupon && couponPercentage && (
+              {/* {hasCoupon && couponPercentage && (
                 <Badge
                   className="bg-linear-to-r from-emerald-500 to-green-500 text-white border-0 shadow-lg flex items-center gap-0.5 sm:gap-1 px-1 py-0  sm:px-2 sm:py-1 text-[8px] sm:text-[11px]"
                 >
-                  {/* <Ticket className="h-2 w-2 sm:h-3 sm:w-3" /> */}
+
                   <span className="font-medium">GET EXTRA <span className="font-semibold text-[13px]">{couponPercentage}%</span> OFF AT CHECKOUT</span>
                 </Badge>
-              )}
+              )} */}
             </div>
 
             {/* Status Badge - Top Right */}
@@ -412,9 +450,11 @@ export default function ProductCard({
         <div className="mt-auto pt-2 sm:pt-3">
           {/* Price */}
           <div className="flex items-center gap-1.5 sm:gap-2 mb-2">
-            <span className="text-[10px] sm:text-sm text-primary line-through">
-              ${calculateMarkedUpPrice()}
-            </span>
+            {hasCoupon && couponPercentage && (
+              <span className="text-[10px] sm:text-sm text-primary line-through">
+                ${calculateMarkedPrice()}
+              </span>
+            )}
             <span className="text-sm sm:text-lg font-bold">${calculateFinalPrice()}</span>
           </div>
 

@@ -32,6 +32,7 @@ import {
 import { add_to_compare } from '@/redux/features/compareSlice';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { notifyError, notifySuccess } from '@/utils/toast';
+import { useProductCoupon } from '@/hooks/useProductCoupon';
 import {
   BarChart3,
   CheckCircle,
@@ -135,6 +136,10 @@ export default function DetailsWrapper({
     children,
   } = productItem || {};
   const [selectedOption, setSelectedOption] = useState(null);
+
+  // Check if coupon is active for this product
+  const { hasCoupon, couponPercentage } = useProductCoupon(productItem?._id || '');
+
   // Initialize selectedConfigurations with preselected options from backend
   const [selectedConfigurations, setSelectedConfigurations] = useState(() => {
     const initial = {};
@@ -272,36 +277,53 @@ export default function DetailsWrapper({
     return hasAnyPrice ? totalConfigPrice : null;
   };
 
-  // Calculate final price using pre-calculated database values
+  // Calculate final selling price (bold) - finalPriceDiscount after coupon discount
   const calculateFinalPrice = () => {
     // If a configuration option with price is selected, use that price instead of base price
     const configPrice = getSelectedConfigurationPrice();
+    let basePrice;
+
     if (configPrice !== null) {
       // Configuration price replaces the base price
-      // Still add option price if selected (options are different from configurations)
-      const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-      return (configPrice + optionPrice).toFixed(2);
+      basePrice = configPrice;
+    } else {
+      // Get base price (original price, not discounted)
+      basePrice = finalPriceDiscount || price;
     }
 
-    // Use pre-calculated finalPriceDiscount from database, fallback to original price
-    const baseFinalPrice = finalPriceDiscount || price;
+    // Apply coupon discount to base price FIRST (if coupon is active)
+    let discountedBasePrice = Number(basePrice);
+    if (hasCoupon && couponPercentage) {
+      discountedBasePrice = basePrice * (1 - couponPercentage / 100);
+    }
 
-    // Add option price if an option is selected
+    // THEN add option price to the already discounted base price
+    // No discount is applied to options - they're added at full price
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+    const finalPrice = discountedBasePrice + optionPrice;
 
-    return (Number(baseFinalPrice) + optionPrice).toFixed(2);
+    return finalPrice.toFixed(2);
   };
 
-  // Calculate marked up price for display using pre-calculated database values
-  // Marked up price stays as original - doesn't change with configuration selections
+  // Calculate marked price (strikethrough) - finalPriceDiscount before coupon
   const calculateMarkedUpPrice = () => {
-    // Use pre-calculated updatedPrice from database, fallback to original price
-    const baseMarkedUpPrice = updatedPrice || price;
+    // If a configuration option with price is selected, use that price instead of base price
+    const configPrice = getSelectedConfigurationPrice();
+    let basePrice;
 
-    // Add option price if an option is selected (options are different from configurations)
+    if (configPrice !== null) {
+      // Configuration price replaces the base price
+      basePrice = configPrice;
+    } else {
+      // Use pre-calculated finalPriceDiscount from database, fallback to original price
+      // This is the marked price (before coupon discount)
+      basePrice = finalPriceDiscount || price;
+    }
+
+    // Add option price if selected (options are different from configurations)
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
 
-    return (Number(baseMarkedUpPrice) + optionPrice).toFixed(2);
+    return (Number(basePrice) + optionPrice).toFixed(2);
   };
 
   // Handle option selection
@@ -426,7 +448,8 @@ export default function DetailsWrapper({
     const markedUpPrice = prd.updatedPrice || originalProductPrice;
 
     // Step 1: Determine base price - sum all selected configuration option prices
-    let basePrice = originalProductPrice;
+    // Get base price (original price, not discounted)
+    let basePrice = Number(prd.finalPriceDiscount || originalProductPrice);
 
     if (
       productConfigurations &&
@@ -438,17 +461,21 @@ export default function DetailsWrapper({
         // Use sum of all configuration option prices as base
         basePrice = configPrice;
       } else {
-        // If configurations exist but none have prices, use original price
+        // If configurations exist but none have prices, use finalPriceDiscount
         basePrice = Number(prd.finalPriceDiscount || originalProductPrice);
       }
-    } else {
-      // No configurations - use finalPriceDiscount if available, otherwise original price
-      basePrice = Number(prd.finalPriceDiscount || originalProductPrice);
     }
 
-    // Step 2: Add product option price (from product.options, not configurations)
+    // Step 2: Apply coupon discount to base price FIRST (if coupon is active)
+    let discountedBasePrice = basePrice;
+    if (hasCoupon && couponPercentage) {
+      discountedBasePrice = basePrice * (1 - couponPercentage / 100);
+    }
+
+    // Step 3: THEN add product option price to the already discounted base price
+    // No discount is applied to options - they're added at full price
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    const finalPrice = basePrice + optionPrice;
+    const finalPrice = discountedBasePrice + optionPrice;
 
     // Create properly formatted productConfigurations array with correct isSelected flags
     let updatedProductConfigurations = undefined;
@@ -480,6 +507,7 @@ export default function DetailsWrapper({
     const productToAdd = {
       ...prd,
       // Always set price from scratch - never use existing prd.finalPriceDiscount
+      // Price includes coupon discount if coupon is active
       finalPriceDiscount: finalPrice,
       updatedPrice: markedUpPrice,
       selectedOption,
@@ -591,7 +619,8 @@ export default function DetailsWrapper({
     const markedUpPrice = prd.updatedPrice || originalProductPrice;
 
     // Step 1: Determine base price - sum all selected configuration option prices
-    let basePrice = originalProductPrice;
+    // Get base price (original price, not discounted)
+    let basePrice = Number(prd.finalPriceDiscount || originalProductPrice);
 
     if (
       productConfigurations &&
@@ -603,17 +632,21 @@ export default function DetailsWrapper({
         // Use sum of all configuration option prices as base
         basePrice = configPrice;
       } else {
-        // If configurations exist but none have prices, use original price
+        // If configurations exist but none have prices, use finalPriceDiscount
         basePrice = Number(prd.finalPriceDiscount || originalProductPrice);
       }
-    } else {
-      // No configurations - use finalPriceDiscount if available, otherwise original price
-      basePrice = Number(prd.finalPriceDiscount || originalProductPrice);
     }
 
-    // Step 2: Add product option price (from product.options, not configurations)
+    // Step 2: Apply coupon discount to base price FIRST (if coupon is active)
+    let discountedBasePrice = basePrice;
+    if (hasCoupon && couponPercentage) {
+      discountedBasePrice = basePrice * (1 - couponPercentage / 100);
+    }
+
+    // Step 3: THEN add product option price to the already discounted base price
+    // No discount is applied to options - they're added at full price
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    const finalPrice = basePrice + optionPrice;
+    const finalPrice = discountedBasePrice + optionPrice;
 
     // Create properly formatted productConfigurations array with correct isSelected flags
     let updatedProductConfigurations = undefined;
@@ -645,6 +678,7 @@ export default function DetailsWrapper({
     const productToAdd = {
       ...prd,
       // Always set price from scratch - never use existing prd.finalPriceDiscount
+      // Price includes coupon discount if coupon is active
       finalPriceDiscount: finalPrice,
       updatedPrice: markedUpPrice,
       selectedOption,
@@ -804,14 +838,14 @@ export default function DetailsWrapper({
       {/* Pricing */}
       <div className="space-y-3">
         <div className="flex items-baseline gap-3">
-          <span className="text-3xl font-bold text-foreground">
-            ${calculateFinalPrice()}
-          </span>
-          {updatedPrice && updatedPrice !== price && (
+          {hasCoupon && couponPercentage && (
             <span className="text-lg text-muted-foreground line-through">
               ${calculateMarkedUpPrice()}
             </span>
           )}
+          <span className="text-3xl font-bold text-foreground">
+            ${calculateFinalPrice()}
+          </span>
         </div>
 
         {selectedOption && (
