@@ -181,17 +181,21 @@ export default function ProductCard({
 
   // Calculate final selling price (bold) - finalPriceDiscount after coupon discount
   const calculateFinalPrice = () => {
+    // Get base price (original price, not discounted)
     const basePrice = product.finalPriceDiscount || product.price;
-    const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    const priceWithOption = Number(basePrice) + optionPrice;
 
-    // Apply coupon discount if available
+    // Apply coupon discount to base price FIRST (if coupon is active)
+    let discountedBasePrice = Number(basePrice);
     if (hasCoupon && couponPercentage) {
-      const discountedPrice = priceWithOption * (1 - couponPercentage / 100);
-      return discountedPrice.toFixed(2);
+      discountedBasePrice = basePrice * (1 - couponPercentage / 100);
     }
 
-    return priceWithOption.toFixed(2);
+    // THEN add option price to the already discounted base price
+    // No discount is applied to options - they're added at full price
+    const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+    const finalPrice = discountedBasePrice + optionPrice;
+
+    return finalPrice.toFixed(2);
   };
 
   // Calculate marked price (strikethrough) - finalPriceDiscount before coupon
@@ -219,16 +223,20 @@ export default function ProductCard({
       return;
     }
 
-    // Calculate final price (with coupon discount if active)
+    // Calculate final price
+    // Get base price (original price, not discounted)
     const basePrice = product.finalPriceDiscount || product.price;
-    const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    const priceWithOption = Number(basePrice) + optionPrice;
 
-    // Apply coupon discount if available
-    let finalPrice = priceWithOption;
+    // Apply coupon discount to base price FIRST (if coupon is active)
+    let discountedBasePrice = Number(basePrice);
     if (hasCoupon && couponPercentage) {
-      finalPrice = priceWithOption * (1 - couponPercentage / 100);
+      discountedBasePrice = basePrice * (1 - couponPercentage / 100);
     }
+
+    // THEN add option price to the already discounted base price
+    // No discount is applied to options - they're added at full price
+    const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+    const finalPrice = discountedBasePrice + optionPrice;
 
     // Pass product with calculated final price
     onAddToCart?.(
