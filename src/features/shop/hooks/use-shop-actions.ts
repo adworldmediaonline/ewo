@@ -87,6 +87,12 @@ export const useShopActions = () => {
         sku: product.sku,
         finalPriceDiscount: product.finalPriceDiscount,
         updatedPrice: product.updatedPrice,
+        quantity: product.quantity,
+        shipping: product.shipping || { price: 0 },
+        // Preserve option and configuration data if they exist
+        selectedOption: (product as any).selectedOption || undefined,
+        options: (product as any).options || undefined,
+        productConfigurations: (product as any).productConfigurations || undefined,
       };
 
       dispatch(add_to_wishlist(wishlistProduct));

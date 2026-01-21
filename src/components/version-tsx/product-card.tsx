@@ -254,7 +254,14 @@ export default function ProductCard({
   const handleAddToWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    onAddToWishlist?.(product);
+    // Include selectedOption and options when adding to wishlist
+    const productWithOption = {
+      ...product,
+      selectedOption: selectedOption || undefined,
+      options: product.options || undefined,
+      productConfigurations: product.productConfigurations || undefined,
+    };
+    onAddToWishlist?.(productWithOption);
   };
 
   const handleOptionChange = (value: string) => {
