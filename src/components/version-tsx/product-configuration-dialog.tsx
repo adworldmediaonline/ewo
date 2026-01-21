@@ -196,12 +196,26 @@ export default function ProductConfigurationDialog({
     return finalPrice.toFixed(2);
   }, [getSelectedConfigurationPrice, selectedOption, product.finalPriceDiscount, product.price, hasCoupon, couponPercentage]);
 
-  // Calculate marked up price
+  // Calculate marked up price (strikethrough) - original price before discount
   const calculateMarkedUpPrice = useCallback(() => {
-    const baseMarkedUpPrice = product.updatedPrice || product.price;
+    const configPrice = getSelectedConfigurationPrice();
+    let basePrice;
+
+    if (configPrice !== null) {
+      // Configuration price replaces the base price
+      basePrice = configPrice;
+    } else {
+      // Get base price (original price, not discounted)
+      basePrice = Number(product.finalPriceDiscount || product.price);
+    }
+
+    // Add option price to the original base price (no discount)
+    // The marked price shows the original price before discount is applied
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    return (Number(baseMarkedUpPrice) + optionPrice).toFixed(2);
-  }, [selectedOption, product.updatedPrice, product.price]);
+    const markedPrice = basePrice + optionPrice;
+
+    return markedPrice.toFixed(2);
+  }, [getSelectedConfigurationPrice, selectedOption, product.finalPriceDiscount, product.price]);
 
   // Helper function to compare configurations
   const configurationsChanged = useCallback(
