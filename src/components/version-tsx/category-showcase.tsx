@@ -103,8 +103,8 @@ async function GetCategoriesShowItems() {
         if (!dana60Exists) {
           dana60Category = {
             _id: `dana-60-standalone-${parentCategory._id}`, // Generate a stable unique ID
-            parent: dana60Name || dana60SubcategoryName,
-            children: [], // No subcategories for Dana 60
+            parent: parentCategory.parent, // Show the parent category name (Crossover & High Steer Kits)
+            children: [dana60Name || dana60SubcategoryName], // Show DANA 60 as a subcategory tag
             status: parentCategory.status || 'Show',
             // Preserve other properties if they exist
             description: parentCategory.description,
@@ -128,7 +128,16 @@ async function GetCategoriesShowItems() {
           }
         );
         if (existingDana60Index !== -1) {
-          dana60Category = processedCategories[existingDana60Index] as CategoryItem & { parentCategorySlug?: string; subcategorySlug?: string };
+          // Update existing DANA 60 to show parent category and subcategory
+          const existingDana60 = processedCategories[existingDana60Index];
+          dana60Category = {
+            ...existingDana60,
+            parent: parentCategory.parent, // Show the parent category name
+            children: [dana60Name || dana60SubcategoryName], // Show DANA 60 as a subcategory tag
+            img: 'https://res.cloudinary.com/datdyxl7o/image/upload/v1768978611/dana_60_cybdcn.webp', // Use the dedicated DANA 60 image
+            parentCategorySlug: parentCategorySlug,
+            subcategorySlug: dana60Slug,
+          } as CategoryItem & { parentCategorySlug?: string; subcategorySlug?: string };
           processedCategories.splice(existingDana60Index, 1);
         }
 
