@@ -284,48 +284,72 @@ export default function DetailsWrapper({
       ]
   );
 
-  // Get sum of all selected configuration option prices
+  // Get sum of all selected configuration option prices (for fixed prices)
+  // Also calculate percentage adjustments
   const getSelectedConfigurationPrice = () => {
     if (!productConfigurations || productConfigurations.length === 0) {
-      return null;
+      return { fixedPrice: 0, percentageAdjustments: [] };
     }
 
     // Check if any configuration has a selected option
     const selectedConfigEntries = Object.values(selectedConfigurations);
     if (selectedConfigEntries.length === 0) {
-      return null;
+      return { fixedPrice: 0, percentageAdjustments: [] };
     }
 
-    // Sum all selected option prices
-    let totalConfigPrice = 0;
-    let hasAnyPrice = false;
+    let fixedPrice = 0;
+    const percentageAdjustments = [];
 
-    for (const { option } of selectedConfigEntries) {
-      if (option && option.price !== undefined && option.price !== null) {
-        const configPrice = Number(option.price);
-        // Sum all prices from selected configuration options
-        if (configPrice > 0) {
-          totalConfigPrice += configPrice;
-          hasAnyPrice = true;
+    // Process all selected options
+    selectedConfigEntries.forEach((selectedConfig) => {
+      if (selectedConfig && selectedConfig.option) {
+        const option = selectedConfig.option;
+
+        if (option.priceType === 'percentage') {
+          // Store percentage adjustment for later calculation
+          percentageAdjustments.push({
+            percentage: option.percentage || 0,
+            isIncrease: option.isPercentageIncrease !== false,
+          });
+        } else {
+          // Fixed price - add to sum
+          fixedPrice += Number(option.price || 0);
         }
       }
-    }
+    });
 
-    return hasAnyPrice ? totalConfigPrice : null;
+    return { fixedPrice, percentageAdjustments };
+  };
+
+  // Calculate price with percentage adjustments
+  const applyPercentageAdjustments = (basePrice, percentageAdjustments) => {
+    let adjustedPrice = basePrice;
+
+    percentageAdjustments.forEach((adjustment) => {
+      const percentage = adjustment.percentage || 0;
+      if (adjustment.isIncrease) {
+        adjustedPrice = adjustedPrice * (1 + percentage / 100);
+      } else {
+        adjustedPrice = adjustedPrice * (1 - percentage / 100);
+      }
+    });
+
+    return adjustedPrice;
   };
 
   // Calculate final selling price (bold) - finalPriceDiscount after coupon discount
   const calculateFinalPrice = () => {
-    // If a configuration option with price is selected, use that price instead of base price
-    const configPrice = getSelectedConfigurationPrice();
-    let basePrice;
+    // Get base price (original price, not discounted)
+    let basePrice = finalPriceDiscount || price;
 
-    if (configPrice !== null) {
-      // Configuration price replaces the base price
-      basePrice = configPrice;
-    } else {
-      // Get base price (original price, not discounted)
-      basePrice = finalPriceDiscount || price;
+    // Get configuration prices and percentage adjustments
+    const configResult = getSelectedConfigurationPrice();
+    const configFixedPrice = configResult.fixedPrice || 0;
+    const percentageAdjustments = configResult.percentageAdjustments || [];
+
+    // If configuration has fixed price, use it instead of base price
+    if (configFixedPrice > 0) {
+      basePrice = configFixedPrice;
     }
 
     // Apply coupon discount to base price FIRST (if coupon is active)
@@ -334,33 +358,39 @@ export default function DetailsWrapper({
       discountedBasePrice = basePrice * (1 - couponPercentage / 100);
     }
 
-    // THEN add option price to the already discounted base price
+    // Apply percentage adjustments to the discounted base price
+    let adjustedPrice = applyPercentageAdjustments(discountedBasePrice, percentageAdjustments);
+
+    // THEN add option price to the already discounted and adjusted base price
     // No discount is applied to options - they're added at full price
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    const finalPrice = discountedBasePrice + optionPrice;
+    const finalPrice = adjustedPrice + optionPrice;
 
     return finalPrice.toFixed(2);
   };
 
   // Calculate marked price (strikethrough) - finalPriceDiscount before coupon
   const calculateMarkedUpPrice = () => {
-    // If a configuration option with price is selected, use that price instead of base price
-    const configPrice = getSelectedConfigurationPrice();
-    let basePrice;
+    // Get base price (original price, not discounted)
+    let basePrice = finalPriceDiscount || price;
 
-    if (configPrice !== null) {
-      // Configuration price replaces the base price
-      basePrice = configPrice;
-    } else {
-      // Use pre-calculated finalPriceDiscount from database, fallback to original price
-      // This is the marked price (before coupon discount)
-      basePrice = finalPriceDiscount || price;
+    // Get configuration prices and percentage adjustments
+    const configResult = getSelectedConfigurationPrice();
+    const configFixedPrice = configResult.fixedPrice || 0;
+    const percentageAdjustments = configResult.percentageAdjustments || [];
+
+    // If configuration has fixed price, use it instead of base price
+    if (configFixedPrice > 0) {
+      basePrice = configFixedPrice;
     }
+
+    // Apply percentage adjustments to base price (before coupon)
+    let adjustedPrice = applyPercentageAdjustments(Number(basePrice), percentageAdjustments);
 
     // Add option price if selected (options are different from configurations)
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
 
-    return (Number(basePrice) + optionPrice).toFixed(2);
+    return (adjustedPrice + optionPrice).toFixed(2);
   };
 
   // Handle option selection
