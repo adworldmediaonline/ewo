@@ -484,9 +484,16 @@ export default function DetailsWrapper({
     let updatedProductConfigurations = undefined;
     if (productConfigurations && productConfigurations.length > 0) {
       updatedProductConfigurations = productConfigurations.map((config, configIndex) => {
-        // If custom note is enabled, just return the config as-is
+        // If custom note is enabled, include the custom note value in the config
         if (config.enableCustomNote) {
-          return config;
+          const customNoteValue = customNotes && customNotes[configIndex] && typeof customNotes[configIndex] === 'string' && customNotes[configIndex].trim() !== ''
+            ? customNotes[configIndex].trim()
+            : undefined;
+
+          return {
+            ...config,
+            ...(customNoteValue && { customNoteValue }),
+          };
         }
         // Otherwise, handle selected configurations
         const selectedConfig = selectedConfigurations[configIndex];
@@ -508,6 +515,40 @@ export default function DetailsWrapper({
       });
     }
 
+    const computedCustomNotes = (() => {
+      // Check if there are any configurations with enableCustomNote
+      const hasCustomNoteConfigs = productConfigurations && productConfigurations.some(config => config.enableCustomNote);
+      if (!hasCustomNoteConfigs) return undefined;
+
+      // If no customNotes object, return undefined
+      if (!customNotes || typeof customNotes !== 'object' || Array.isArray(customNotes)) {
+        return undefined;
+      }
+
+      // Filter and trim all non-empty values
+      const filteredNotes = {};
+      for (const key in customNotes) {
+        if (Object.prototype.hasOwnProperty.call(customNotes, key)) {
+          const note = customNotes[key];
+          // Check if note is a non-empty string
+          if (note !== null && note !== undefined && typeof note === 'string' && note.trim() !== '') {
+            filteredNotes[key] = note.trim();
+          }
+        }
+      }
+
+      // Return filtered notes only if there are any non-empty values
+      return Object.keys(filteredNotes).length > 0 ? filteredNotes : undefined;
+    })();
+
+    // LOG: Check customNotes before adding to cart
+    console.log('🔍 [Product Details] Adding to Cart - Debug Info:', {
+      customNotesState: customNotes,
+      computedCustomNotes: computedCustomNotes,
+      hasCustomNoteConfigs: productConfigurations && productConfigurations.some(config => config.enableCustomNote),
+      productConfigurations: productConfigurations,
+    });
+
     const productToAdd = {
       ...prd,
       // Always set price from scratch - never use existing prd.finalPriceDiscount
@@ -521,9 +562,18 @@ export default function DetailsWrapper({
       selectedConfigurations: Object.keys(selectedConfigurations).length > 0
         ? selectedConfigurations
         : undefined,
-      customNotes: Object.keys(customNotes).length > 0 ? customNotes : undefined,
+      customNotes: computedCustomNotes,
       options: selectedOption ? [selectedOption] : [],
     };
+
+    // LOG: Check productToAdd before dispatching
+    console.log('🛒 [Product Details] Product to Add:', {
+      _id: productToAdd._id,
+      title: productToAdd.title,
+      customNotes: productToAdd.customNotes,
+      hasCustomNotes: !!productToAdd.customNotes,
+      customNotesKeys: productToAdd.customNotes ? Object.keys(productToAdd.customNotes) : [],
+    });
 
     dispatch(add_cart_product(productToAdd));
 
@@ -657,9 +707,16 @@ export default function DetailsWrapper({
     let updatedProductConfigurations = undefined;
     if (productConfigurations && productConfigurations.length > 0) {
       updatedProductConfigurations = productConfigurations.map((config, configIndex) => {
-        // If custom note is enabled, just return the config as-is
+        // If custom note is enabled, include the custom note value in the config
         if (config.enableCustomNote) {
-          return config;
+          const customNoteValue = customNotes && customNotes[configIndex] && typeof customNotes[configIndex] === 'string' && customNotes[configIndex].trim() !== ''
+            ? customNotes[configIndex].trim()
+            : undefined;
+
+          return {
+            ...config,
+            ...(customNoteValue && { customNoteValue }),
+          };
         }
         // Otherwise, handle selected configurations
         const selectedConfig = selectedConfigurations[configIndex];
@@ -681,6 +738,40 @@ export default function DetailsWrapper({
       });
     }
 
+    const computedCustomNotes = (() => {
+      // Check if there are any configurations with enableCustomNote
+      const hasCustomNoteConfigs = productConfigurations && productConfigurations.some(config => config.enableCustomNote);
+      if (!hasCustomNoteConfigs) return undefined;
+
+      // If no customNotes object, return undefined
+      if (!customNotes || typeof customNotes !== 'object' || Array.isArray(customNotes)) {
+        return undefined;
+      }
+
+      // Filter and trim all non-empty values
+      const filteredNotes = {};
+      for (const key in customNotes) {
+        if (Object.prototype.hasOwnProperty.call(customNotes, key)) {
+          const note = customNotes[key];
+          // Check if note is a non-empty string
+          if (note !== null && note !== undefined && typeof note === 'string' && note.trim() !== '') {
+            filteredNotes[key] = note.trim();
+          }
+        }
+      }
+
+      // Return filtered notes only if there are any non-empty values
+      return Object.keys(filteredNotes).length > 0 ? filteredNotes : undefined;
+    })();
+
+    // LOG: Check customNotes before adding to cart
+    console.log('🔍 [Product Details] Adding to Cart - Debug Info:', {
+      customNotesState: customNotes,
+      computedCustomNotes: computedCustomNotes,
+      hasCustomNoteConfigs: productConfigurations && productConfigurations.some(config => config.enableCustomNote),
+      productConfigurations: productConfigurations,
+    });
+
     const productToAdd = {
       ...prd,
       // Always set price from scratch - never use existing prd.finalPriceDiscount
@@ -694,9 +785,18 @@ export default function DetailsWrapper({
       selectedConfigurations: Object.keys(selectedConfigurations).length > 0
         ? selectedConfigurations
         : undefined,
-      customNotes: Object.keys(customNotes).length > 0 ? customNotes : undefined,
+      customNotes: computedCustomNotes,
       options: selectedOption ? [selectedOption] : [],
     };
+
+    // LOG: Check productToAdd before dispatching
+    console.log('🛒 [Product Details] Product to Add:', {
+      _id: productToAdd._id,
+      title: productToAdd.title,
+      customNotes: productToAdd.customNotes,
+      hasCustomNotes: !!productToAdd.customNotes,
+      customNotesKeys: productToAdd.customNotes ? Object.keys(productToAdd.customNotes) : [],
+    });
 
     dispatch(add_cart_product(productToAdd));
 
@@ -946,19 +1046,19 @@ export default function DetailsWrapper({
             {productConfigurations.some(
               config => !config.enableCustomNote && config.options && config.options.length > 0
             ) && (
-              <ProductConfigurations
-                configurations={productConfigurations.filter(
-                  config => !config.enableCustomNote
-                )}
-                onConfigurationChange={(configIndex, optionIndex, option) => {
-                  // Update selected configurations state
-                  setSelectedConfigurations(prev => ({
-                    ...prev,
-                    [configIndex]: { optionIndex, option },
-                  }));
-                }}
-              />
-            )}
+                <ProductConfigurations
+                  configurations={productConfigurations.filter(
+                    config => !config.enableCustomNote
+                  )}
+                  onConfigurationChange={(configIndex, optionIndex, option) => {
+                    // Update selected configurations state
+                    setSelectedConfigurations(prev => ({
+                      ...prev,
+                      [configIndex]: { optionIndex, option },
+                    }));
+                  }}
+                />
+              )}
             {/* Custom Note Fields (when custom note is enabled) */}
             {productConfigurations.map((config, configIndex) => {
               if (!config.enableCustomNote) return null;

@@ -30,6 +30,9 @@ interface ProductConfigurationDialogProps {
         price: number;
         isSelected: boolean;
       }>;
+      enableCustomNote?: boolean;
+      customNotePlaceholder?: string;
+      customNoteValue?: string;
     }>;
     options?: Array<{
       title: string;
@@ -340,17 +343,24 @@ export default function ProductConfigurationDialog({
     let updatedProductConfigurations = undefined;
     if (product.productConfigurations && product.productConfigurations.length > 0) {
       updatedProductConfigurations = product.productConfigurations.map(
-        (config, configIndex) => {
-          // If custom note is enabled, just return the config as-is
+        (config: any, configIndex: number) => {
+          // If custom note is enabled, include the custom note value in the config
           if (config.enableCustomNote) {
-            return config;
+            const customNoteValue = customNotes && customNotes[configIndex] && typeof customNotes[configIndex] === 'string' && customNotes[configIndex].trim() !== ''
+              ? customNotes[configIndex].trim()
+              : undefined;
+
+            return {
+              ...config,
+              ...(customNoteValue && { customNoteValue }),
+            };
           }
           // Otherwise, handle selected configurations
           const selectedConfig = selectedConfigurations[configIndex];
           if (selectedConfig) {
             return {
               ...config,
-              options: config.options.map((option, optionIndex) => ({
+              options: config.options.map((option: any, optionIndex: number) => ({
                 ...option,
                 isSelected: optionIndex === selectedConfig.optionIndex,
               })),
@@ -360,6 +370,40 @@ export default function ProductConfigurationDialog({
         }
       );
     }
+
+    const computedCustomNotes = (() => {
+      // Check if there are any configurations with enableCustomNote
+      const hasCustomNoteConfigs = product.productConfigurations && product.productConfigurations.some((config: any) => config.enableCustomNote);
+      if (!hasCustomNoteConfigs) return undefined;
+
+      // If no customNotes object, return undefined
+      if (!customNotes || typeof customNotes !== 'object' || Array.isArray(customNotes)) {
+        return undefined;
+      }
+
+      // Filter and trim all non-empty values
+      const filteredNotes: { [key: number]: string } = {};
+      for (const key in customNotes) {
+        if (Object.prototype.hasOwnProperty.call(customNotes, key)) {
+          const note = customNotes[key];
+          // Check if note is a non-empty string
+          if (note !== null && note !== undefined && typeof note === 'string' && note.trim() !== '') {
+            filteredNotes[Number(key)] = note.trim();
+          }
+        }
+      }
+
+      // Return filtered notes only if there are any non-empty values
+      return Object.keys(filteredNotes).length > 0 ? filteredNotes : undefined;
+    })();
+
+    // LOG: Check customNotes before adding to cart
+    console.log('🔍 [Config Dialog] Adding to Cart - Debug Info:', {
+      customNotesState: customNotes,
+      computedCustomNotes: computedCustomNotes,
+      hasCustomNoteConfigs: product.productConfigurations && product.productConfigurations.some((config: any) => config.enableCustomNote),
+      productConfigurations: product.productConfigurations,
+    });
 
     const productToAdd = {
       ...product,
@@ -375,9 +419,18 @@ export default function ProductConfigurationDialog({
         Object.keys(selectedConfigurations).length > 0
           ? selectedConfigurations
           : undefined,
-      customNotes: Object.keys(customNotes).length > 0 ? customNotes : undefined,
+      customNotes: computedCustomNotes,
       options: selectedOption ? [selectedOption] : [],
     };
+
+    // LOG: Check productToAdd before dispatching
+    console.log('🛒 [Config Dialog] Product to Add:', {
+      _id: productToAdd._id,
+      title: productToAdd.title,
+      customNotes: productToAdd.customNotes,
+      hasCustomNotes: !!productToAdd.customNotes,
+      customNotesKeys: productToAdd.customNotes ? Object.keys(productToAdd.customNotes) : [],
+    });
 
     dispatch(add_cart_product(productToAdd));
 
@@ -417,12 +470,12 @@ export default function ProductConfigurationDialog({
                 {/* Render configurations with options (when custom note is disabled) */}
                 <ProductConfigurations
                   configurations={product.productConfigurations.filter(
-                    config => !config.enableCustomNote
+                    (config: any) => !config.enableCustomNote
                   )}
                   onConfigurationChange={handleConfigurationChange}
                 />
                 {/* Custom Note Fields (when custom note is enabled) */}
-                {product.productConfigurations.map((config, configIndex) => {
+                {product.productConfigurations.map((config: any, configIndex: number) => {
                   if (!config.enableCustomNote) return null;
                   return (
                     <div key={`custom-note-${configIndex}`} className="space-y-2">

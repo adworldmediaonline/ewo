@@ -582,6 +582,18 @@ const useCheckoutSubmit = () => {
     // Ensure total amount is never negative (for 100% discount coupons)
     const finalTotalAmount = Math.max(0, cartTotal);
 
+    // LOG: Check cart products before mapping
+    console.log('🛒 [Checkout] Cart Products Before Mapping:', {
+      cartProductsCount: cart_products?.length || 0,
+      cartProducts: cart_products?.map(item => ({
+        _id: item._id,
+        title: item.title,
+        customNotes: item.customNotes,
+        hasCustomNotes: !!item.customNotes,
+        customNotesKeys: item.customNotes ? Object.keys(item.customNotes) : [],
+      })),
+    });
+
     const orderInfo = {
       cart: cart_products?.map(item => {
         const {
@@ -592,6 +604,17 @@ const useCheckoutSubmit = () => {
           sellCount,
           ...otherProperties
         } = item;
+
+        // LOG: Check each item being mapped
+        console.log('📦 [Checkout] Mapping Cart Item:', {
+          _id: item._id,
+          title: item.title,
+          customNotes: item.customNotes,
+          hasCustomNotes: !!item.customNotes,
+          otherPropertiesKeys: Object.keys(otherProperties),
+          customNotesInOtherProps: otherProperties.customNotes,
+        });
+
         return otherProperties;
       }),
       subTotal: rawSubTotal, // Raw subtotal before any discounts
@@ -617,6 +640,18 @@ const useCheckoutSubmit = () => {
       // Add enhanced coupon information
       appliedCoupons: applied_coupons,
     };
+
+    // LOG: Check final order info before sending
+    console.log('📋 [Checkout] Final Order Info:', {
+      cartItemsCount: orderInfo.cart?.length || 0,
+      cartItems: orderInfo.cart?.map(cartItem => ({
+        _id: cartItem._id,
+        title: cartItem.title,
+        customNotes: cartItem.customNotes,
+        hasCustomNotes: !!cartItem.customNotes,
+        customNotesKeys: cartItem.customNotes ? Object.keys(cartItem.customNotes) : [],
+      })),
+    });
 
     const card = elements?.getElement(CardElement);
 
