@@ -198,6 +198,7 @@ export const cartSlice = createSlice({
             price: parseFloat(String(payload.finalPriceDiscount)),
           }),
         };
+
         state.cart_products.push(newItem);
 
         // Show cart confirmation modal

@@ -10,6 +10,8 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import ProductConfigurations from '@/components/version-tsx/product-details/product-configurations';
 import {
   add_cart_product,
@@ -28,6 +30,9 @@ interface ProductConfigurationDialogProps {
         price: number;
         isSelected: boolean;
       }>;
+      enableCustomNote?: boolean;
+      customNotePlaceholder?: string;
+      customNoteValue?: string;
     }>;
     options?: Array<{
       title: string;
@@ -53,6 +58,9 @@ export default function ProductConfigurationDialog({
   // Check if coupon is active for this product
   const { hasCoupon, couponPercentage } = useProductCoupon(product._id);
   const [selectedOption, setSelectedOption] = useState<any>(null);
+  const [customNotes, setCustomNotes] = useState<{
+    [configIndex: number]: string;
+  }>({});
   const [selectedConfigurations, setSelectedConfigurations] = useState<{
     [configIndex: number]: {
       optionIndex: number;
@@ -120,6 +128,7 @@ export default function ProductConfigurationDialog({
       }
       setSelectedConfigurations(initial);
       setSelectedOption(null);
+      setCustomNotes({});
     }
   }, [open, product.productConfigurations]);
 
@@ -332,18 +341,26 @@ export default function ProductConfigurationDialog({
 
     // Create properly formatted productConfigurations array
     let updatedProductConfigurations = undefined;
-    if (
-      product.productConfigurations &&
-      product.productConfigurations.length > 0 &&
-      Object.keys(selectedConfigurations).length > 0
-    ) {
+    if (product.productConfigurations && product.productConfigurations.length > 0) {
       updatedProductConfigurations = product.productConfigurations.map(
-        (config, configIndex) => {
+        (config: any, configIndex: number) => {
+          // If custom note is enabled, include the custom note value in the config
+          if (config.enableCustomNote) {
+            const customNoteValue = customNotes && customNotes[configIndex] && typeof customNotes[configIndex] === 'string' && customNotes[configIndex].trim() !== ''
+              ? customNotes[configIndex].trim()
+              : undefined;
+
+            return {
+              ...config,
+              ...(customNoteValue && { customNoteValue }),
+            };
+          }
+          // Otherwise, handle selected configurations
           const selectedConfig = selectedConfigurations[configIndex];
           if (selectedConfig) {
             return {
               ...config,
-              options: config.options.map((option, optionIndex) => ({
+              options: config.options.map((option: any, optionIndex: number) => ({
                 ...option,
                 isSelected: optionIndex === selectedConfig.optionIndex,
               })),
@@ -353,6 +370,32 @@ export default function ProductConfigurationDialog({
         }
       );
     }
+
+    const computedCustomNotes = (() => {
+      // Check if there are any configurations with enableCustomNote
+      const hasCustomNoteConfigs = product.productConfigurations && product.productConfigurations.some((config: any) => config.enableCustomNote);
+      if (!hasCustomNoteConfigs) return undefined;
+
+      // If no customNotes object, return undefined
+      if (!customNotes || typeof customNotes !== 'object' || Array.isArray(customNotes)) {
+        return undefined;
+      }
+
+      // Filter and trim all non-empty values
+      const filteredNotes: { [key: number]: string } = {};
+      for (const key in customNotes) {
+        if (Object.prototype.hasOwnProperty.call(customNotes, key)) {
+          const note = customNotes[key];
+          // Check if note is a non-empty string
+          if (note !== null && note !== undefined && typeof note === 'string' && note.trim() !== '') {
+            filteredNotes[Number(key)] = note.trim();
+          }
+        }
+      }
+
+      // Return filtered notes only if there are any non-empty values
+      return Object.keys(filteredNotes).length > 0 ? filteredNotes : undefined;
+    })();
 
     const productToAdd = {
       ...product,
@@ -368,6 +411,7 @@ export default function ProductConfigurationDialog({
         Object.keys(selectedConfigurations).length > 0
           ? selectedConfigurations
           : undefined,
+      customNotes: computedCustomNotes,
       options: selectedOption ? [selectedOption] : [],
     };
 
@@ -387,6 +431,7 @@ export default function ProductConfigurationDialog({
     orderQuantity,
     getSelectedConfigurationPrice,
     configurationsChanged,
+    customNotes,
     dispatch,
     onOpenChange,
   ]);
@@ -404,11 +449,38 @@ export default function ProductConfigurationDialog({
           {/* Product Configurations */}
           {product.productConfigurations &&
             product.productConfigurations.length > 0 && (
-              <div>
+              <div className="space-y-6">
+                {/* Render configurations with options (when custom note is disabled) */}
                 <ProductConfigurations
-                  configurations={product.productConfigurations}
+                  configurations={product.productConfigurations.filter(
+                    (config: any) => !config.enableCustomNote
+                  )}
                   onConfigurationChange={handleConfigurationChange}
                 />
+                {/* Custom Note Fields (when custom note is enabled) */}
+                {product.productConfigurations.map((config: any, configIndex: number) => {
+                  if (!config.enableCustomNote) return null;
+                  return (
+                    <div key={`custom-note-${configIndex}`} className="space-y-2">
+                      <Label htmlFor={`custom-note-${configIndex}`} className="text-sm font-medium">
+                        {config.title}
+                      </Label>
+                      <Textarea
+                        id={`custom-note-${configIndex}`}
+                        placeholder={config.customNotePlaceholder || 'Specify Rod Ends preference (All left, All right, mixed, or custom).'}
+                        value={customNotes[configIndex] || ''}
+                        onChange={(e) =>
+                          setCustomNotes((prev) => ({
+                            ...prev,
+                            [configIndex]: e.target.value,
+                          }))
+                        }
+                        className="min-h-[100px] resize-y"
+                        rows={3}
+                      />
+                    </div>
+                  );
+                })}
               </div>
             )}
 

@@ -21,6 +21,8 @@ import {
 } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { authClient } from '@/lib/authClient';
 import { replaceTextCharacters } from '@/lib/replaceTextCharacters';
 import {
@@ -136,6 +138,7 @@ export default function DetailsWrapper({
     children,
   } = productItem || {};
   const [selectedOption, setSelectedOption] = useState(null);
+  const [customNotes, setCustomNotes] = useState({});
 
   // Check if coupon is active for this product
   const { hasCoupon, couponPercentage } = useProductCoupon(productItem?._id || '');
@@ -479,12 +482,20 @@ export default function DetailsWrapper({
 
     // Create properly formatted productConfigurations array with correct isSelected flags
     let updatedProductConfigurations = undefined;
-    if (
-      productConfigurations &&
-      productConfigurations.length > 0 &&
-      Object.keys(selectedConfigurations).length > 0
-    ) {
+    if (productConfigurations && productConfigurations.length > 0) {
       updatedProductConfigurations = productConfigurations.map((config, configIndex) => {
+        // If custom note is enabled, include the custom note value in the config
+        if (config.enableCustomNote) {
+          const customNoteValue = customNotes && customNotes[configIndex] && typeof customNotes[configIndex] === 'string' && customNotes[configIndex].trim() !== ''
+            ? customNotes[configIndex].trim()
+            : undefined;
+
+          return {
+            ...config,
+            ...(customNoteValue && { customNoteValue }),
+          };
+        }
+        // Otherwise, handle selected configurations
         const selectedConfig = selectedConfigurations[configIndex];
 
         // If this configuration has a user selection, update isSelected flags
@@ -504,6 +515,32 @@ export default function DetailsWrapper({
       });
     }
 
+    const computedCustomNotes = (() => {
+      // Check if there are any configurations with enableCustomNote
+      const hasCustomNoteConfigs = productConfigurations && productConfigurations.some(config => config.enableCustomNote);
+      if (!hasCustomNoteConfigs) return undefined;
+
+      // If no customNotes object, return undefined
+      if (!customNotes || typeof customNotes !== 'object' || Array.isArray(customNotes)) {
+        return undefined;
+      }
+
+      // Filter and trim all non-empty values
+      const filteredNotes = {};
+      for (const key in customNotes) {
+        if (Object.prototype.hasOwnProperty.call(customNotes, key)) {
+          const note = customNotes[key];
+          // Check if note is a non-empty string
+          if (note !== null && note !== undefined && typeof note === 'string' && note.trim() !== '') {
+            filteredNotes[key] = note.trim();
+          }
+        }
+      }
+
+      // Return filtered notes only if there are any non-empty values
+      return Object.keys(filteredNotes).length > 0 ? filteredNotes : undefined;
+    })();
+
     const productToAdd = {
       ...prd,
       // Always set price from scratch - never use existing prd.finalPriceDiscount
@@ -517,6 +554,7 @@ export default function DetailsWrapper({
       selectedConfigurations: Object.keys(selectedConfigurations).length > 0
         ? selectedConfigurations
         : undefined,
+      customNotes: computedCustomNotes,
       options: selectedOption ? [selectedOption] : [],
     };
 
@@ -650,12 +688,20 @@ export default function DetailsWrapper({
 
     // Create properly formatted productConfigurations array with correct isSelected flags
     let updatedProductConfigurations = undefined;
-    if (
-      productConfigurations &&
-      productConfigurations.length > 0 &&
-      Object.keys(selectedConfigurations).length > 0
-    ) {
+    if (productConfigurations && productConfigurations.length > 0) {
       updatedProductConfigurations = productConfigurations.map((config, configIndex) => {
+        // If custom note is enabled, include the custom note value in the config
+        if (config.enableCustomNote) {
+          const customNoteValue = customNotes && customNotes[configIndex] && typeof customNotes[configIndex] === 'string' && customNotes[configIndex].trim() !== ''
+            ? customNotes[configIndex].trim()
+            : undefined;
+
+          return {
+            ...config,
+            ...(customNoteValue && { customNoteValue }),
+          };
+        }
+        // Otherwise, handle selected configurations
         const selectedConfig = selectedConfigurations[configIndex];
 
         // If this configuration has a user selection, update isSelected flags
@@ -675,6 +721,32 @@ export default function DetailsWrapper({
       });
     }
 
+    const computedCustomNotes = (() => {
+      // Check if there are any configurations with enableCustomNote
+      const hasCustomNoteConfigs = productConfigurations && productConfigurations.some(config => config.enableCustomNote);
+      if (!hasCustomNoteConfigs) return undefined;
+
+      // If no customNotes object, return undefined
+      if (!customNotes || typeof customNotes !== 'object' || Array.isArray(customNotes)) {
+        return undefined;
+      }
+
+      // Filter and trim all non-empty values
+      const filteredNotes = {};
+      for (const key in customNotes) {
+        if (Object.prototype.hasOwnProperty.call(customNotes, key)) {
+          const note = customNotes[key];
+          // Check if note is a non-empty string
+          if (note !== null && note !== undefined && typeof note === 'string' && note.trim() !== '') {
+            filteredNotes[key] = note.trim();
+          }
+        }
+      }
+
+      // Return filtered notes only if there are any non-empty values
+      return Object.keys(filteredNotes).length > 0 ? filteredNotes : undefined;
+    })();
+
     const productToAdd = {
       ...prd,
       // Always set price from scratch - never use existing prd.finalPriceDiscount
@@ -688,6 +760,7 @@ export default function DetailsWrapper({
       selectedConfigurations: Object.keys(selectedConfigurations).length > 0
         ? selectedConfigurations
         : undefined,
+      customNotes: computedCustomNotes,
       options: selectedOption ? [selectedOption] : [],
     };
 
@@ -933,21 +1006,49 @@ export default function DetailsWrapper({
 
       {/* Product Configurations */}
       {productConfigurations &&
-        productConfigurations.length > 0 &&
-        productConfigurations.some(
-          config => config.options && config.options.length > 0
-        ) && (
+        productConfigurations.length > 0 && (
           <div className="space-y-6">
-            <ProductConfigurations
-              configurations={productConfigurations}
-              onConfigurationChange={(configIndex, optionIndex, option) => {
-                // Update selected configurations state
-                setSelectedConfigurations(prev => ({
-                  ...prev,
-                  [configIndex]: { optionIndex, option },
-                }));
-              }}
-            />
+            {/* Render configurations with options (when custom note is disabled) */}
+            {productConfigurations.some(
+              config => !config.enableCustomNote && config.options && config.options.length > 0
+            ) && (
+                <ProductConfigurations
+                  configurations={productConfigurations.filter(
+                    config => !config.enableCustomNote
+                  )}
+                  onConfigurationChange={(configIndex, optionIndex, option) => {
+                    // Update selected configurations state
+                    setSelectedConfigurations(prev => ({
+                      ...prev,
+                      [configIndex]: { optionIndex, option },
+                    }));
+                  }}
+                />
+              )}
+            {/* Custom Note Fields (when custom note is enabled) */}
+            {productConfigurations.map((config, configIndex) => {
+              if (!config.enableCustomNote) return null;
+              return (
+                <div key={`custom-note-${configIndex}`} className="space-y-2">
+                  <Label htmlFor={`custom-note-${configIndex}`} className="text-sm font-medium">
+                    {config.title}
+                  </Label>
+                  <Textarea
+                    id={`custom-note-${configIndex}`}
+                    placeholder={config.customNotePlaceholder || 'Specify Rod Ends preference (All left, All right, mixed, or custom).'}
+                    value={customNotes[configIndex] || ''}
+                    onChange={(e) =>
+                      setCustomNotes((prev) => ({
+                        ...prev,
+                        [configIndex]: e.target.value,
+                      }))
+                    }
+                    className="min-h-[100px] resize-y"
+                    rows={3}
+                  />
+                </div>
+              );
+            })}
           </div>
         )}
 

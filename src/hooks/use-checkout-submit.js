@@ -592,6 +592,7 @@ const useCheckoutSubmit = () => {
           sellCount,
           ...otherProperties
         } = item;
+
         return otherProperties;
       }),
       subTotal: rawSubTotal, // Raw subtotal before any discounts

@@ -11,6 +11,8 @@ interface ConfigurationOption {
 interface ProductConfiguration {
   title: string;
   options: ConfigurationOption[];
+  enableCustomNote?: boolean;
+  customNotePlaceholder?: string;
 }
 
 interface ProductConfigurationsProps {
@@ -86,6 +88,12 @@ export default function ProductConfigurations({
   return (
     <div className="space-y-6">
       {configurations.map((config, configIndex) => {
+        // Skip rendering if custom note is enabled (options won't be shown)
+        if (config.enableCustomNote) {
+          return null;
+        }
+
+        // Skip if no options available
         if (!config.options || config.options.length === 0) {
           return null;
         }
