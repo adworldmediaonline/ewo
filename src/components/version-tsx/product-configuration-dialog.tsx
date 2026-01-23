@@ -28,7 +28,11 @@ interface ProductConfigurationDialogProps {
       options: Array<{
         name: string;
         price: number;
+        priceType?: 'fixed' | 'percentage';
+        percentage?: number;
+        isPercentageIncrease?: boolean;
         isSelected: boolean;
+        image?: string;
       }>;
       enableCustomNote?: boolean;
       customNotePlaceholder?: string;
@@ -67,6 +71,10 @@ export default function ProductConfigurationDialog({
       option: {
         name: string;
         price: number;
+        priceType?: 'fixed' | 'percentage';
+        percentage?: number;
+        isPercentageIncrease?: boolean;
+        image?: string;
       };
     };
   }>(() => {
@@ -150,45 +158,74 @@ export default function ProductConfigurationDialog({
     []
   );
 
-  // Get sum of all selected configuration option prices
+  // Get sum of all selected configuration option prices (for fixed prices)
+  // Also calculate percentage adjustments
   const getSelectedConfigurationPrice = useCallback(() => {
     if (!product.productConfigurations || product.productConfigurations.length === 0) {
-      return null;
+      return { fixedPrice: 0, percentageAdjustments: [] };
     }
 
     const selectedConfigEntries = Object.values(selectedConfigurations);
     if (selectedConfigEntries.length === 0) {
-      return null;
+      return { fixedPrice: 0, percentageAdjustments: [] };
     }
 
-    // Sum all selected option prices
-    let totalConfigPrice = 0;
-    let hasAnyPrice = false;
+    let fixedPrice = 0;
+    const percentageAdjustments = [];
 
+    // Process all selected options
     for (const { option } of selectedConfigEntries) {
-      if (option && option.price !== undefined && option.price !== null) {
-        const configPrice = Number(option.price);
-        if (configPrice > 0) {
-          totalConfigPrice += configPrice;
-          hasAnyPrice = true;
+      if (option) {
+        if (option.priceType === 'percentage') {
+          // Store percentage adjustment for later calculation
+          percentageAdjustments.push({
+            percentage: option.percentage || 0,
+            isIncrease: option.isPercentageIncrease !== false,
+          });
+        } else {
+          // Fixed price - add to sum
+          if (option.price !== undefined && option.price !== null) {
+            const configPrice = Number(option.price);
+            if (configPrice > 0) {
+              fixedPrice += configPrice;
+            }
+          }
         }
       }
     }
 
-    return hasAnyPrice ? totalConfigPrice : null;
+    return { fixedPrice, percentageAdjustments };
   }, [product.productConfigurations, selectedConfigurations]);
+
+  // Calculate price with percentage adjustments
+  const applyPercentageAdjustments = useCallback((basePrice: number, percentageAdjustments: Array<{ percentage: number; isIncrease: boolean }>) => {
+    let adjustedPrice = basePrice;
+
+    percentageAdjustments.forEach((adjustment) => {
+      const percentage = adjustment.percentage || 0;
+      if (adjustment.isIncrease) {
+        adjustedPrice = adjustedPrice * (1 + percentage / 100);
+      } else {
+        adjustedPrice = adjustedPrice * (1 - percentage / 100);
+      }
+    });
+
+    return adjustedPrice;
+  }, []);
 
   // Calculate final price
   const calculateFinalPrice = useCallback(() => {
-    const configPrice = getSelectedConfigurationPrice();
-    let basePrice;
+    // Get base price (original price, not discounted)
+    let basePrice = Number(product.finalPriceDiscount || product.price);
 
-    if (configPrice !== null) {
-      // Configuration price replaces the base price
-      basePrice = configPrice;
-    } else {
-      // Get base price (original price, not discounted)
-      basePrice = Number(product.finalPriceDiscount || product.price);
+    // Get configuration prices and percentage adjustments
+    const configResult = getSelectedConfigurationPrice();
+    const configFixedPrice = configResult.fixedPrice || 0;
+    const percentageAdjustments = configResult.percentageAdjustments || [];
+
+    // If configuration has fixed price, use it instead of base price
+    if (configFixedPrice > 0) {
+      basePrice = configFixedPrice;
     }
 
     // Apply coupon discount to base price FIRST (if coupon is active)
@@ -197,34 +234,42 @@ export default function ProductConfigurationDialog({
       discountedBasePrice = basePrice * (1 - couponPercentage / 100);
     }
 
-    // THEN add option price to the already discounted base price
+    // Apply percentage adjustments to the discounted base price
+    let adjustedPrice = applyPercentageAdjustments(discountedBasePrice, percentageAdjustments);
+
+    // THEN add option price to the already discounted and adjusted base price
     // No discount is applied to options - they're added at full price
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    const finalPrice = discountedBasePrice + optionPrice;
+    const finalPrice = adjustedPrice + optionPrice;
 
     return finalPrice.toFixed(2);
-  }, [getSelectedConfigurationPrice, selectedOption, product.finalPriceDiscount, product.price, hasCoupon, couponPercentage]);
+  }, [getSelectedConfigurationPrice, applyPercentageAdjustments, selectedOption, product.finalPriceDiscount, product.price, hasCoupon, couponPercentage]);
 
   // Calculate marked up price (strikethrough) - original price before discount
   const calculateMarkedUpPrice = useCallback(() => {
-    const configPrice = getSelectedConfigurationPrice();
-    let basePrice;
+    // Get base price (original price, not discounted)
+    let basePrice = Number(product.finalPriceDiscount || product.price);
 
-    if (configPrice !== null) {
-      // Configuration price replaces the base price
-      basePrice = configPrice;
-    } else {
-      // Get base price (original price, not discounted)
-      basePrice = Number(product.finalPriceDiscount || product.price);
+    // Get configuration prices and percentage adjustments
+    const configResult = getSelectedConfigurationPrice();
+    const configFixedPrice = configResult.fixedPrice || 0;
+    const percentageAdjustments = configResult.percentageAdjustments || [];
+
+    // If configuration has fixed price, use it instead of base price
+    if (configFixedPrice > 0) {
+      basePrice = configFixedPrice;
     }
 
-    // Add option price to the original base price (no discount)
+    // Apply percentage adjustments to base price (before coupon)
+    let adjustedPrice = applyPercentageAdjustments(Number(basePrice), percentageAdjustments);
+
+    // Add option price to the adjusted base price (no discount)
     // The marked price shows the original price before discount is applied
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    const markedPrice = basePrice + optionPrice;
+    const markedPrice = adjustedPrice + optionPrice;
 
     return markedPrice.toFixed(2);
-  }, [getSelectedConfigurationPrice, selectedOption, product.finalPriceDiscount, product.price]);
+  }, [getSelectedConfigurationPrice, applyPercentageAdjustments, selectedOption, product.finalPriceDiscount, product.price]);
 
   // Helper function to compare configurations
   const configurationsChanged = useCallback(
@@ -313,19 +358,15 @@ export default function ProductConfigurationDialog({
     // Calculate base price - sum all selected configuration option prices
     // Get base price (original price, not discounted)
     let basePrice = Number(product.finalPriceDiscount || originalProductPrice);
-    if (
-      product.productConfigurations &&
-      product.productConfigurations.length > 0 &&
-      Object.keys(selectedConfigurations).length > 0
-    ) {
-      const configPrice = getSelectedConfigurationPrice();
-      if (configPrice !== null && configPrice > 0) {
-        // Use sum of all configuration option prices as base
-        basePrice = configPrice;
-      } else {
-        // If configurations exist but none have prices, use finalPriceDiscount
-        basePrice = Number(product.finalPriceDiscount || originalProductPrice);
-      }
+
+    // Get configuration prices and percentage adjustments
+    const configResult = getSelectedConfigurationPrice();
+    const configFixedPrice = configResult.fixedPrice || 0;
+    const percentageAdjustments = configResult.percentageAdjustments || [];
+
+    // If configuration has fixed price, use it instead of base price
+    if (configFixedPrice > 0) {
+      basePrice = configFixedPrice;
     }
 
     // Apply coupon discount to base price FIRST (if coupon is active)
@@ -334,10 +375,28 @@ export default function ProductConfigurationDialog({
       discountedBasePrice = basePrice * (1 - couponPercentage / 100);
     }
 
-    // THEN add product option price to the already discounted base price
+    // Apply percentage adjustments to the discounted base price
+    let adjustedPrice = applyPercentageAdjustments(discountedBasePrice, percentageAdjustments);
+
+    // THEN add product option price to the already discounted and adjusted base price
     // No discount is applied to options - they're added at full price
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    const finalPrice = discountedBasePrice + optionPrice;
+    const finalPrice = adjustedPrice + optionPrice;
+
+    // Determine the product image to use (option image if available, otherwise original)
+    let productImage = product.img;
+    if (selectedConfigurations && Object.keys(selectedConfigurations).length > 0) {
+      // Find the first selected option with an image (prioritize last selected)
+      const configIndices = Object.keys(selectedConfigurations);
+      for (let i = configIndices.length - 1; i >= 0; i--) {
+        const configIndex = parseInt(configIndices[i]);
+        const selectedConfig = selectedConfigurations[configIndex];
+        if (selectedConfig && selectedConfig.option && selectedConfig.option.image) {
+          productImage = selectedConfig.option.image;
+          break;
+        }
+      }
+    }
 
     // Create properly formatted productConfigurations array
     let updatedProductConfigurations = undefined;
@@ -360,10 +419,22 @@ export default function ProductConfigurationDialog({
           if (selectedConfig) {
             return {
               ...config,
-              options: config.options.map((option: any, optionIndex: number) => ({
-                ...option,
-                isSelected: optionIndex === selectedConfig.optionIndex,
-              })),
+              options: config.options.map((option: any, optionIndex: number) => {
+                const isSelected = optionIndex === selectedConfig.optionIndex;
+                // Preserve all option properties including priceType, percentage, isPercentageIncrease, and image
+                return {
+                  ...option,
+                  // Set isSelected to true only for the user-selected option
+                  isSelected,
+                  // Preserve the selected option's image, priceType, percentage, and isPercentageIncrease if they exist
+                  ...(isSelected && selectedConfig.option && {
+                    ...(selectedConfig.option.image && { image: selectedConfig.option.image }),
+                    ...(selectedConfig.option.priceType && { priceType: selectedConfig.option.priceType }),
+                    ...(selectedConfig.option.percentage !== undefined && { percentage: selectedConfig.option.percentage }),
+                    ...(selectedConfig.option.isPercentageIncrease !== undefined && { isPercentageIncrease: selectedConfig.option.isPercentageIncrease }),
+                  }),
+                };
+              }),
             };
           }
           return config;
@@ -399,7 +470,8 @@ export default function ProductConfigurationDialog({
 
     const productToAdd = {
       ...product,
-      img: product.img || product.imageURLs?.[0] || '',
+      // Update product image if option image is selected
+      img: productImage || product.img || product.imageURLs?.[0] || '',
       finalPriceDiscount: finalPrice,
       updatedPrice: markedUpPrice,
       selectedOption,

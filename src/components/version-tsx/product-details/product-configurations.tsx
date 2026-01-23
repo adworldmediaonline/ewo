@@ -5,7 +5,11 @@ import { cn } from '@/lib/utils';
 interface ConfigurationOption {
   name: string;
   price: number;
+  priceType?: 'fixed' | 'percentage';
+  percentage?: number;
+  isPercentageIncrease?: boolean;
   isSelected: boolean;
+  image?: string;
 }
 
 interface ProductConfiguration {
