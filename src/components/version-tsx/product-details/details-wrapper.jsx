@@ -518,19 +518,14 @@ export default function DetailsWrapper({
     // Get base price (original price, not discounted)
     let basePrice = Number(prd.finalPriceDiscount || originalProductPrice);
 
-    if (
-      productConfigurations &&
-      productConfigurations.length > 0 &&
-      Object.keys(selectedConfigurations).length > 0
-    ) {
-      const configPrice = getSelectedConfigurationPrice();
-      if (configPrice !== null && configPrice > 0) {
-        // Use sum of all configuration option prices as base
-        basePrice = configPrice;
-      } else {
-        // If configurations exist but none have prices, use finalPriceDiscount
-        basePrice = Number(prd.finalPriceDiscount || originalProductPrice);
-      }
+    // Get configuration prices and percentage adjustments
+    const configResult = getSelectedConfigurationPrice();
+    const configFixedPrice = configResult.fixedPrice || 0;
+    const percentageAdjustments = configResult.percentageAdjustments || [];
+
+    // If configuration has fixed price, use it instead of base price
+    if (configFixedPrice > 0) {
+      basePrice = configFixedPrice;
     }
 
     // Step 2: Apply coupon discount to base price FIRST (if coupon is active)
@@ -539,10 +534,28 @@ export default function DetailsWrapper({
       discountedBasePrice = basePrice * (1 - couponPercentage / 100);
     }
 
-    // Step 3: THEN add product option price to the already discounted base price
+    // Step 3: Apply percentage adjustments to the discounted base price
+    let adjustedPrice = applyPercentageAdjustments(discountedBasePrice, percentageAdjustments);
+
+    // Step 4: THEN add product option price to the already discounted and adjusted base price
     // No discount is applied to options - they're added at full price
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    const finalPrice = discountedBasePrice + optionPrice;
+    const finalPrice = adjustedPrice + optionPrice;
+
+    // Determine the product image to use (option image if available, otherwise original)
+    let productImage = prd.img;
+    if (selectedConfigurations && Object.keys(selectedConfigurations).length > 0) {
+      // Find the first selected option with an image (prioritize last selected)
+      const configIndices = Object.keys(selectedConfigurations);
+      for (let i = configIndices.length - 1; i >= 0; i--) {
+        const configIndex = parseInt(configIndices[i]);
+        const selectedConfig = selectedConfigurations[configIndex];
+        if (selectedConfig && selectedConfig.option && selectedConfig.option.image) {
+          productImage = selectedConfig.option.image;
+          break;
+        }
+      }
+    }
 
     // Create properly formatted productConfigurations array with correct isSelected flags
     let updatedProductConfigurations = undefined;
@@ -566,11 +579,22 @@ export default function DetailsWrapper({
         if (selectedConfig) {
           return {
             ...config,
-            options: config.options.map((option, optionIndex) => ({
-              ...option,
-              // Set isSelected to true only for the user-selected option
-              isSelected: optionIndex === selectedConfig.optionIndex,
-            })),
+            options: config.options.map((option, optionIndex) => {
+              const isSelected = optionIndex === selectedConfig.optionIndex;
+              // Preserve all option properties including priceType, percentage, isPercentageIncrease, and image
+              return {
+                ...option,
+                // Set isSelected to true only for the user-selected option
+                isSelected,
+                // Preserve the selected option's image, priceType, percentage, and isPercentageIncrease if they exist
+                ...(isSelected && selectedConfig.option && {
+                  ...(selectedConfig.option.image && { image: selectedConfig.option.image }),
+                  ...(selectedConfig.option.priceType && { priceType: selectedConfig.option.priceType }),
+                  ...(selectedConfig.option.percentage !== undefined && { percentage: selectedConfig.option.percentage }),
+                  ...(selectedConfig.option.isPercentageIncrease !== undefined && { isPercentageIncrease: selectedConfig.option.isPercentageIncrease }),
+                }),
+              };
+            }),
           };
         }
 
@@ -607,6 +631,8 @@ export default function DetailsWrapper({
 
     const productToAdd = {
       ...prd,
+      // Update product image if option image is selected
+      img: productImage,
       // Always set price from scratch - never use existing prd.finalPriceDiscount
       // Price includes coupon discount if coupon is active
       finalPriceDiscount: finalPrice,
@@ -724,19 +750,14 @@ export default function DetailsWrapper({
     // Get base price (original price, not discounted)
     let basePrice = Number(prd.finalPriceDiscount || originalProductPrice);
 
-    if (
-      productConfigurations &&
-      productConfigurations.length > 0 &&
-      Object.keys(selectedConfigurations).length > 0
-    ) {
-      const configPrice = getSelectedConfigurationPrice();
-      if (configPrice !== null && configPrice > 0) {
-        // Use sum of all configuration option prices as base
-        basePrice = configPrice;
-      } else {
-        // If configurations exist but none have prices, use finalPriceDiscount
-        basePrice = Number(prd.finalPriceDiscount || originalProductPrice);
-      }
+    // Get configuration prices and percentage adjustments
+    const configResult = getSelectedConfigurationPrice();
+    const configFixedPrice = configResult.fixedPrice || 0;
+    const percentageAdjustments = configResult.percentageAdjustments || [];
+
+    // If configuration has fixed price, use it instead of base price
+    if (configFixedPrice > 0) {
+      basePrice = configFixedPrice;
     }
 
     // Step 2: Apply coupon discount to base price FIRST (if coupon is active)
@@ -745,10 +766,28 @@ export default function DetailsWrapper({
       discountedBasePrice = basePrice * (1 - couponPercentage / 100);
     }
 
-    // Step 3: THEN add product option price to the already discounted base price
+    // Step 3: Apply percentage adjustments to the discounted base price
+    let adjustedPrice = applyPercentageAdjustments(discountedBasePrice, percentageAdjustments);
+
+    // Step 4: THEN add product option price to the already discounted and adjusted base price
     // No discount is applied to options - they're added at full price
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    const finalPrice = discountedBasePrice + optionPrice;
+    const finalPrice = adjustedPrice + optionPrice;
+
+    // Determine the product image to use (option image if available, otherwise original)
+    let productImage = prd.img;
+    if (selectedConfigurations && Object.keys(selectedConfigurations).length > 0) {
+      // Find the first selected option with an image (prioritize last selected)
+      const configIndices = Object.keys(selectedConfigurations);
+      for (let i = configIndices.length - 1; i >= 0; i--) {
+        const configIndex = parseInt(configIndices[i]);
+        const selectedConfig = selectedConfigurations[configIndex];
+        if (selectedConfig && selectedConfig.option && selectedConfig.option.image) {
+          productImage = selectedConfig.option.image;
+          break;
+        }
+      }
+    }
 
     // Create properly formatted productConfigurations array with correct isSelected flags
     let updatedProductConfigurations = undefined;
@@ -772,11 +811,22 @@ export default function DetailsWrapper({
         if (selectedConfig) {
           return {
             ...config,
-            options: config.options.map((option, optionIndex) => ({
-              ...option,
-              // Set isSelected to true only for the user-selected option
-              isSelected: optionIndex === selectedConfig.optionIndex,
-            })),
+            options: config.options.map((option, optionIndex) => {
+              const isSelected = optionIndex === selectedConfig.optionIndex;
+              // Preserve all option properties including priceType, percentage, isPercentageIncrease, and image
+              return {
+                ...option,
+                // Set isSelected to true only for the user-selected option
+                isSelected,
+                // Preserve the selected option's image, priceType, percentage, and isPercentageIncrease if they exist
+                ...(isSelected && selectedConfig.option && {
+                  ...(selectedConfig.option.image && { image: selectedConfig.option.image }),
+                  ...(selectedConfig.option.priceType && { priceType: selectedConfig.option.priceType }),
+                  ...(selectedConfig.option.percentage !== undefined && { percentage: selectedConfig.option.percentage }),
+                  ...(selectedConfig.option.isPercentageIncrease !== undefined && { isPercentageIncrease: selectedConfig.option.isPercentageIncrease }),
+                }),
+              };
+            }),
           };
         }
 
@@ -813,6 +863,8 @@ export default function DetailsWrapper({
 
     const productToAdd = {
       ...prd,
+      // Update product image if option image is selected
+      img: productImage,
       // Always set price from scratch - never use existing prd.finalPriceDiscount
       // Price includes coupon discount if coupon is active
       finalPriceDiscount: finalPrice,
