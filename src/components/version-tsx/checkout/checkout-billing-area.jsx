@@ -320,6 +320,21 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
               />
               <ErrorMsg msg={errors?.email?.message} />
             </div>
+
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">
+                Important Note
+              </label>
+              <textarea
+                {...register('orderNote')}
+                name="orderNote"
+                id="orderNote"
+                rows={4}
+                placeholder="Add any important notes or special instructions for your order..."
+                className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+              />
+              <ErrorMsg msg={errors?.orderNote?.message} />
+            </div>
           </div>
         </div>
 

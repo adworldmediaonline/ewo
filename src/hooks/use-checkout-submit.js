@@ -609,6 +609,8 @@ const useCheckoutSubmit = () => {
       state: newShippingInfo.state,
       user: session?.user?.id,
       paymentMethod: 'Card',
+      // Add order note if provided
+      ...(newShippingInfo.orderNote && { orderNote: newShippingInfo.orderNote.trim() }),
       // Add first-time discount information
       firstTimeDiscount: {
         isApplied: firstTimeDiscount?.isApplied || false,
