@@ -199,25 +199,7 @@ export const cartSlice = createSlice({
           }),
         };
 
-        // LOG: Check what's being added to cart
-        console.log('📦 [Redux Cart] Adding Product to Cart:', {
-          _id: newItem._id,
-          title: newItem.title,
-          customNotes: (newItem as any).customNotes,
-          hasCustomNotes: !!(newItem as any).customNotes,
-          customNotesKeys: (newItem as any).customNotes ? Object.keys((newItem as any).customNotes) : [],
-          fullPayload: payload,
-          newItemKeys: Object.keys(newItem),
-        });
-
         state.cart_products.push(newItem);
-
-        // LOG: Check cart state after adding
-        console.log('🛒 [Redux Cart] Cart State After Add:', {
-          cartItemsCount: state.cart_products.length,
-          lastItem: state.cart_products[state.cart_products.length - 1],
-          lastItemCustomNotes: (state.cart_products[state.cart_products.length - 1] as any).customNotes,
-        });
 
         // Show cart confirmation modal
         state.showCartConfirmation = true;

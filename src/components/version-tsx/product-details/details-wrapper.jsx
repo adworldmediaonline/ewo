@@ -541,14 +541,6 @@ export default function DetailsWrapper({
       return Object.keys(filteredNotes).length > 0 ? filteredNotes : undefined;
     })();
 
-    // LOG: Check customNotes before adding to cart
-    console.log('🔍 [Product Details] Adding to Cart - Debug Info:', {
-      customNotesState: customNotes,
-      computedCustomNotes: computedCustomNotes,
-      hasCustomNoteConfigs: productConfigurations && productConfigurations.some(config => config.enableCustomNote),
-      productConfigurations: productConfigurations,
-    });
-
     const productToAdd = {
       ...prd,
       // Always set price from scratch - never use existing prd.finalPriceDiscount
@@ -565,15 +557,6 @@ export default function DetailsWrapper({
       customNotes: computedCustomNotes,
       options: selectedOption ? [selectedOption] : [],
     };
-
-    // LOG: Check productToAdd before dispatching
-    console.log('🛒 [Product Details] Product to Add:', {
-      _id: productToAdd._id,
-      title: productToAdd.title,
-      customNotes: productToAdd.customNotes,
-      hasCustomNotes: !!productToAdd.customNotes,
-      customNotesKeys: productToAdd.customNotes ? Object.keys(productToAdd.customNotes) : [],
-    });
 
     dispatch(add_cart_product(productToAdd));
 
@@ -764,14 +747,6 @@ export default function DetailsWrapper({
       return Object.keys(filteredNotes).length > 0 ? filteredNotes : undefined;
     })();
 
-    // LOG: Check customNotes before adding to cart
-    console.log('🔍 [Product Details] Adding to Cart - Debug Info:', {
-      customNotesState: customNotes,
-      computedCustomNotes: computedCustomNotes,
-      hasCustomNoteConfigs: productConfigurations && productConfigurations.some(config => config.enableCustomNote),
-      productConfigurations: productConfigurations,
-    });
-
     const productToAdd = {
       ...prd,
       // Always set price from scratch - never use existing prd.finalPriceDiscount
@@ -788,15 +763,6 @@ export default function DetailsWrapper({
       customNotes: computedCustomNotes,
       options: selectedOption ? [selectedOption] : [],
     };
-
-    // LOG: Check productToAdd before dispatching
-    console.log('🛒 [Product Details] Product to Add:', {
-      _id: productToAdd._id,
-      title: productToAdd.title,
-      customNotes: productToAdd.customNotes,
-      hasCustomNotes: !!productToAdd.customNotes,
-      customNotesKeys: productToAdd.customNotes ? Object.keys(productToAdd.customNotes) : [],
-    });
 
     dispatch(add_cart_product(productToAdd));
 

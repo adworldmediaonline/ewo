@@ -397,14 +397,6 @@ export default function ProductConfigurationDialog({
       return Object.keys(filteredNotes).length > 0 ? filteredNotes : undefined;
     })();
 
-    // LOG: Check customNotes before adding to cart
-    console.log('🔍 [Config Dialog] Adding to Cart - Debug Info:', {
-      customNotesState: customNotes,
-      computedCustomNotes: computedCustomNotes,
-      hasCustomNoteConfigs: product.productConfigurations && product.productConfigurations.some((config: any) => config.enableCustomNote),
-      productConfigurations: product.productConfigurations,
-    });
-
     const productToAdd = {
       ...product,
       img: product.img || product.imageURLs?.[0] || '',
@@ -422,15 +414,6 @@ export default function ProductConfigurationDialog({
       customNotes: computedCustomNotes,
       options: selectedOption ? [selectedOption] : [],
     };
-
-    // LOG: Check productToAdd before dispatching
-    console.log('🛒 [Config Dialog] Product to Add:', {
-      _id: productToAdd._id,
-      title: productToAdd.title,
-      customNotes: productToAdd.customNotes,
-      hasCustomNotes: !!productToAdd.customNotes,
-      customNotesKeys: productToAdd.customNotes ? Object.keys(productToAdd.customNotes) : [],
-    });
 
     dispatch(add_cart_product(productToAdd));
 
