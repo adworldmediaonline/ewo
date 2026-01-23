@@ -71,6 +71,10 @@ export default function ProductConfigurationDialog({
       option: {
         name: string;
         price: number;
+        priceType?: 'fixed' | 'percentage';
+        percentage?: number;
+        isPercentageIncrease?: boolean;
+        image?: string;
       };
     };
   }>(() => {
