@@ -122,6 +122,7 @@ export default function DetailsWrapper({
   const {
     sku,
     title,
+    img,
     imageURLs,
     category,
     price,
@@ -163,6 +164,39 @@ export default function DetailsWrapper({
     }
     return initial;
   });
+
+  // Update main product image when option with image is selected (preselected or manually)
+  useEffect(() => {
+    if (!productConfigurations || productConfigurations.length === 0) return;
+    if (!handleImageActive) return;
+
+    // Check all selected configurations for images
+    let optionImage = null;
+    const configIndices = Object.keys(selectedConfigurations);
+
+    // Find the first selected option with an image (prioritize last selected)
+    for (let i = configIndices.length - 1; i >= 0; i--) {
+      const configIndex = parseInt(configIndices[i]);
+      const selectedConfig = selectedConfigurations[configIndex];
+
+      if (selectedConfig && selectedConfig.option && selectedConfig.option.image) {
+        optionImage = selectedConfig.option.image;
+        break; // Use the most recently selected option's image
+      }
+    }
+
+    // Update the main product image
+    // If an option image is found, use it; otherwise, revert to original product image
+    if (optionImage) {
+      handleImageActive(optionImage);
+    } else if (imageURLs && imageURLs.length > 0) {
+      // Revert to first product image if no option image is selected
+      handleImageActive(imageURLs[0] || img);
+    } else if (img) {
+      // Fallback to main product image
+      handleImageActive(img);
+    }
+  }, [selectedConfigurations, productConfigurations, handleImageActive, imageURLs, img]);
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
   const [isReviewsPopoverOpen, setIsReviewsPopoverOpen] = useState(false);
   const { data: session } = authClient.useSession();
@@ -1022,6 +1056,11 @@ export default function DetailsWrapper({
                       ...prev,
                       [configIndex]: { optionIndex, option },
                     }));
+
+                    // Update main product image if this option has an image
+                    if (option && option.image && handleImageActive) {
+                      handleImageActive(option.image);
+                    }
                   }}
                 />
               )}

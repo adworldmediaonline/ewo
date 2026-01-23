@@ -6,6 +6,7 @@ interface ConfigurationOption {
   name: string;
   price: number;
   isSelected: boolean;
+  image?: string;
 }
 
 interface ProductConfiguration {
