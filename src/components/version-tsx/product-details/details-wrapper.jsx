@@ -137,6 +137,7 @@ export default function DetailsWrapper({
     description,
     specifications,
     children,
+    parent
   } = productItem || {};
   const [selectedOption, setSelectedOption] = useState(null);
   const [customNotes, setCustomNotes] = useState({});
@@ -915,6 +916,7 @@ export default function DetailsWrapper({
           <span>ITEM NUMBER: {sku}</span>
         </div>
       )}
+
 
       {/* Rating and Status */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
