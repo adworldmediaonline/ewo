@@ -269,7 +269,7 @@ export default function DetailsWrapper({
     specifications && specifications.length > 0
       ? specifications
       : [
-        '1973-1991:4WD:Chevy:K5 BLAZER',
+        '1969–1991:4WD:Chevy:K5 BLAZER',
         '1973-1987:4WD:Chevy:V10',
         '1973-1991:4WD:Chevy:Suburban 1500',
         '1973-1991:4WD:Chevy:Suburban 2500',
@@ -901,13 +901,20 @@ export default function DetailsWrapper({
   }, [onAddToCartRef, onProceedToBuyRef, handleAddProduct, handleProceedToBuy]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Product Title */}
       <div className="space-y-4">
         <h1 className="text-3xl sm:text-4xl font-bold text-foreground leading-tight">
           {replaceTextCharacters(title, '*', '')}
         </h1>
       </div>
+
+      {sku && (
+        <div className="flex items-center gap-2 text-sm font-bold text-foreground">
+          {/* <Package className="w-4 h-4" /> */}
+          <span>ITEM NUMBER: {sku}</span>
+        </div>
+      )}
 
       {/* Rating and Status */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
@@ -1260,12 +1267,7 @@ export default function DetailsWrapper({
           </Button>
         </div>
 
-        {sku && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Package className="w-4 h-4" />
-            <span>SKU: {sku}</span>
-          </div>
-        )}
+
       </div>
 
 
