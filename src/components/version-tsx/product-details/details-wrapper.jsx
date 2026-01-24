@@ -137,6 +137,7 @@ export default function DetailsWrapper({
     description,
     specifications,
     children,
+    parent
   } = productItem || {};
   const [selectedOption, setSelectedOption] = useState(null);
   const [customNotes, setCustomNotes] = useState({});
@@ -269,7 +270,7 @@ export default function DetailsWrapper({
     specifications && specifications.length > 0
       ? specifications
       : [
-        '1973-1991:4WD:Chevy:K5 BLAZER',
+        '1969–1991:4WD:Chevy:K5 BLAZER',
         '1973-1987:4WD:Chevy:V10',
         '1973-1991:4WD:Chevy:Suburban 1500',
         '1973-1991:4WD:Chevy:Suburban 2500',
@@ -901,13 +902,21 @@ export default function DetailsWrapper({
   }, [onAddToCartRef, onProceedToBuyRef, handleAddProduct, handleProceedToBuy]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Product Title */}
       <div className="space-y-4">
         <h1 className="text-3xl sm:text-4xl font-bold text-foreground leading-tight">
           {replaceTextCharacters(title, '*', '')}
         </h1>
       </div>
+
+      {sku && (
+        <div className="flex items-center gap-2 text-sm font-bold text-foreground">
+          {/* <Package className="w-4 h-4" /> */}
+          <span>ITEM NUMBER: {sku}</span>
+        </div>
+      )}
+
 
       {/* Rating and Status */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
@@ -1260,12 +1269,7 @@ export default function DetailsWrapper({
           </Button>
         </div>
 
-        {sku && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Package className="w-4 h-4" />
-            <span>SKU: {sku}</span>
-          </div>
-        )}
+
       </div>
 
 
@@ -1307,6 +1311,54 @@ export default function DetailsWrapper({
                 {parsedSpecs.length}
               </span>
             </div>
+
+            {/* Conditional Note for Crossover & High Steer Kits with specific SKUs */}
+            {parent === 'Crossover & High Steer Kits' &&
+              sku &&
+              [
+                'E90190',
+                'E90301',
+                'E90188',
+                'E90199',
+                'E90148',
+                'E90174',
+                'E90090',
+                'E90307',
+                'E90087',
+                'E90178',
+                'E90088',
+                'E90180',
+                'E90306',
+                'E90089',
+                'E90157',
+              ].includes(sku) && (
+                <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800/30 rounded-lg p-4">
+                  <p className="text-sm text-blue-800 dark:text-blue-200">
+                    <strong>Please Note:</strong> This kit will fit all Chevy Dana 44 Front Axles and Chevy 10 Bolt/ GM Corporate 10 Bolt Axles including Chevy Dana 44 Front axles on Jeep/Dodge and Toyotas
+                  </p>
+                </div>
+              )}
+
+            {/* Conditional Note for Crossover & High Steer Kits with different SKUs */}
+            {parent === 'Crossover & High Steer Kits' &&
+              sku &&
+              ['E90073', 'E90602', 'E90085', 'E90182'].includes(sku) && (
+                <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800/30 rounded-lg p-4">
+                  <p className="text-sm text-blue-800 dark:text-blue-200">
+                    <strong>Please Note:</strong> This kit will fit all Chevy, Chevy 10 Bolt, Ford, Dodge and Jeep Dana 44 Axles
+                  </p>
+                </div>
+              )}
+
+            {/* General Note for 10 bolt kits or DANA 44 (except Crossover & High Steer Kits) */}
+            {(children === '10 bolt kits' || children === 'DANA 44') &&
+              parent !== 'Crossover & High Steer Kits' && (
+                <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800/30 rounded-lg p-4">
+                  <p className="text-sm text-blue-800 dark:text-blue-200">
+                    <strong>Please Note:</strong> This kit will fit all Chevy, Chevy 10 Bolt, Ford, Dodge and Jeep Dana 44 Axles
+                  </p>
+                </div>
+              )}
 
             <div className="border rounded-lg overflow-hidden">
               <div className="overflow-x-auto">
