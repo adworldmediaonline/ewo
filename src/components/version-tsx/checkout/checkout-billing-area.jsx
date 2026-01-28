@@ -5,7 +5,7 @@ import { reset_address_discount } from '@/redux/features/order/orderSlice';
 import { cn } from '@/lib/utils';
 
 import { Country } from 'country-state-city';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Controller } from 'react-hook-form';
 import ErrorMsg from '../../common/error-msg';
@@ -23,6 +23,7 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
     processingPayment,
     cardError,
     register: checkoutRegister,
+    handleCalculateTax,
   } = checkoutData;
 
   const { totalShippingCost, addressDiscountAmount } = useSelector(
@@ -96,7 +97,39 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
     const zipCode = e.target.value;
     dispatch(reset_address_discount());
     setValue('zipCode', zipCode);
+
+    // Trigger tax calculation when zip code changes (debounced)
+    if (zipCode && zipCode.length >= 5 && handleCalculateTax) {
+      // Clear any existing debounce timer
+      if (taxCalcTimeoutRef.current) {
+        clearTimeout(taxCalcTimeoutRef.current);
+      }
+      // Debounce the tax calculation by 500ms
+      taxCalcTimeoutRef.current = setTimeout(() => {
+        // Get current form values for tax calculation
+        const formData = {
+          country: selectedCountry?.isoCode || 'US',
+          state: document.querySelector('[name="state"]')?.value || '',
+          city: document.querySelector('[name="city"]')?.value || '',
+          address: document.querySelector('[name="address"]')?.value || '',
+          zipCode: zipCode,
+        };
+        handleCalculateTax(formData);
+      }, 500);
+    }
   };
+
+  // Ref for debouncing tax calculation
+  const taxCalcTimeoutRef = useRef(null);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (taxCalcTimeoutRef.current) {
+        clearTimeout(taxCalcTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Calculate final total with all discounts - Simplified to match cart dropdown logic
   const calculateFinalTotal = () => {

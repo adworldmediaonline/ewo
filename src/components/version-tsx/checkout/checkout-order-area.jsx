@@ -64,6 +64,10 @@ export default function CheckoutOrderArea({ checkoutData }) {
     couponApplyMsg,
     stripe,
     cardError,
+    // Tax calculation
+    taxAmount = 0,
+    taxCollected = false,
+    taxLoading = false,
   } = checkoutData;
 
   const {
@@ -760,6 +764,25 @@ export default function CheckoutOrderArea({ checkoutData }) {
             </div>
           )}
 
+          {/* Tax */}
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">
+              Tax
+              {!taxCollected && !taxLoading && (
+                <span className="ml-1 text-xs text-muted-foreground">
+                  (No tax for your location)
+                </span>
+              )}
+            </span>
+            <span className="font-medium text-foreground">
+              {taxLoading ? (
+                <span className="text-muted-foreground">Calculating...</span>
+              ) : (
+                `$${(Number(taxAmount) || 0).toFixed(2)}`
+              )}
+            </span>
+          </div>
+
         </div>
 
         {/* Total */}
@@ -767,7 +790,7 @@ export default function CheckoutOrderArea({ checkoutData }) {
           <div className="flex items-center justify-between">
             <span className="text-lg font-semibold text-foreground">Total</span>
             <span className="text-lg font-semibold text-foreground">
-              ${displayFinalTotal.toFixed(2)}
+              ${(displayFinalTotal + (Number(taxAmount) || 0)).toFixed(2)}
             </span>
           </div>
         </div>

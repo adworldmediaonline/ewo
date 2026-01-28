@@ -7,6 +7,12 @@ const initialState = {
   address_discount_message: '',
   address_discount_percentage: 10, // 10% discount
   isCheckoutSubmitting: false, // Track checkout submission state
+  // Stripe Tax state
+  taxAmount: 0,
+  taxCalculationId: null,
+  taxCollected: false,
+  taxLoading: false,
+  taxError: null,
 };
 
 export const orderSlice = createSlice({
@@ -55,6 +61,28 @@ export const orderSlice = createSlice({
     end_checkout_submission: state => {
       state.isCheckoutSubmitting = false;
     },
+    // Stripe Tax actions
+    set_tax_info: (state, { payload }) => {
+      state.taxAmount = payload.taxAmount || 0;
+      state.taxCalculationId = payload.taxCalculationId || null;
+      state.taxCollected = payload.taxCollected || false;
+      state.taxLoading = false;
+      state.taxError = null;
+    },
+    set_tax_loading: (state, { payload }) => {
+      state.taxLoading = payload;
+    },
+    set_tax_error: (state, { payload }) => {
+      state.taxError = payload;
+      state.taxLoading = false;
+    },
+    reset_tax_info: state => {
+      state.taxAmount = 0;
+      state.taxCalculationId = null;
+      state.taxCollected = false;
+      state.taxLoading = false;
+      state.taxError = null;
+    },
   },
 });
 
@@ -66,5 +94,10 @@ export const {
   reset_address_discount,
   begin_checkout_submission,
   end_checkout_submission,
+  set_tax_info,
+  set_tax_loading,
+  set_tax_error,
+  reset_tax_info,
 } = orderSlice.actions;
 export default orderSlice.reducer;
+

@@ -29,6 +29,14 @@ export const authApi = apiSlice.injectEndpoints({
         } catch (err) { }
       },
     }),
+    // calculateTax - Calculate tax before payment
+    calculateTax: builder.mutation({
+      query: data => ({
+        url: 'api/order/calculate-tax',
+        method: 'POST',
+        body: data,
+      }),
+    }),
     // checkAddressDiscount
     checkAddressDiscount: builder.mutation({
       query: data => ({
@@ -87,6 +95,7 @@ export const authApi = apiSlice.injectEndpoints({
 
 export const {
   useCreatePaymentIntentMutation,
+  useCalculateTaxMutation,
   useSaveOrderMutation,
   useGetUserOrderByIdQuery,
   useGetUserOrdersQuery,

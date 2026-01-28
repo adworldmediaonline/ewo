@@ -18,14 +18,19 @@ import {
   set_coupon_loading,
 } from '@/redux/features/coupon/couponSlice';
 import {
+  useCalculateTaxMutation,
   useCreatePaymentIntentMutation,
   useSaveOrderMutation,
 } from '@/redux/features/order/orderApi';
 import {
   begin_checkout_submission,
   end_checkout_submission,
+  reset_tax_info,
   set_client_secret,
   set_shipping,
+  set_tax_error,
+  set_tax_info,
+  set_tax_loading,
 } from '@/redux/features/order/orderSlice';
 import { notifyError, notifySuccess } from '@/utils/toast';
 import { authClient } from '../lib/authClient';
@@ -42,11 +47,13 @@ const useCheckoutSubmit = () => {
   const [saveOrder, { }] = useSaveOrderMutation();
   // createPaymentIntent
   const [createPaymentIntent, { }] = useCreatePaymentIntentMutation();
+  // calculateTax - Stripe Tax calculation
+  const [calculateTax] = useCalculateTaxMutation();
   // cart_products
   const { cart_products, firstTimeDiscount } = useSelector(state => state.cart);
 
-  // shipping_info
-  const { shipping_info } = useSelector(state => state.order);
+  // shipping_info and tax state
+  const { shipping_info, taxAmount, taxCalculationId, taxCollected, taxLoading, taxError } = useSelector(state => state.order);
   // total amount
   const { total, setTotal, firstTimeDiscountAmount } = useCartInfo();
 
@@ -503,16 +510,95 @@ const useCheckoutSubmit = () => {
     setShippingCost(value);
   };
 
+  // Calculate tax based on billing address
+  const handleCalculateTax = async (addressData) => {
+    // Validate required address fields
+    if (!addressData.country || !addressData.zipCode) {
+      return;
+    }
+
+    // Don't calculate if cart is empty
+    if (!cart_products || cart_products.length === 0) {
+      return;
+    }
+
+    dispatch(set_tax_loading(true));
+
+    try {
+      // Calculate cart total for tax calculation
+      const { cartSubtotal } = calculateTotals();
+
+      // Prepare items for tax calculation
+      const items = cart_products.map(item => ({
+        id: item._id || item.productId,
+        amount: Number(item.price) * Number(item.orderQuantity || 1),
+        quantity: item.orderQuantity || 1,
+      }));
+
+      const response = await calculateTax({
+        items,
+        customer_details: {
+          address: {
+            line1: addressData.address || '',
+            city: addressData.city || '',
+            state: addressData.state || '',
+            postal_code: addressData.zipCode,
+            country: addressData.country,
+          },
+        },
+      });
+
+      const result = response.data || response;
+
+      if (result.success) {
+        dispatch(set_tax_info({
+          taxAmount: result.tax / 100, // Convert from cents to dollars
+          taxCalculationId: result.calculationId,
+          taxCollected: result.taxCollected,
+        }));
+      } else {
+        // Tax calculation failed, but allow checkout to continue
+        dispatch(set_tax_info({
+          taxAmount: 0,
+          taxCalculationId: null,
+          taxCollected: false,
+        }));
+        if (result.error) {
+          dispatch(set_tax_error(result.error));
+        }
+      }
+    } catch (error) {
+      console.error('Tax calculation error:', error);
+      // Reset tax on error but allow checkout to continue
+      dispatch(set_tax_info({
+        taxAmount: 0,
+        taxCalculationId: null,
+        taxCollected: false,
+      }));
+      dispatch(set_tax_error(error.message || 'Failed to calculate tax'));
+    }
+  };
+
   // create stripe payment intent
   const createStripePaymentIntent = async orderData => {
     try {
+      // Calculate total including tax if collected
+      const totalWithTax = taxCollected
+        ? Math.max(0, cartTotal) + taxAmount
+        : Math.max(0, cartTotal);
+
       const response = await createPaymentIntent({
-        price: parseInt(Math.max(0, cartTotal)), // Ensure never negative
+        price: parseInt(Math.max(0, totalWithTax * 100) / 100), // Ensure never negative
         email: orderData.email,
         cart: cart_products,
+        // Include tax calculation data
+        calculationId: taxCollected ? taxCalculationId : null,
+        taxCollected: taxCollected,
         orderData: {
           ...orderData,
-          totalAmount: Math.max(0, cartTotal), // Ensure never negative
+          totalAmount: Math.max(0, totalWithTax), // Include tax in total
+          taxAmount: taxAmount,
+          taxCalculationId: taxCalculationId,
           isGuestOrder: !session?.user?.id,
         },
       });
@@ -985,6 +1071,13 @@ const useCheckoutSubmit = () => {
     coupon_error,
     coupon_loading,
     calculateTotals,
+    // Tax calculation
+    handleCalculateTax,
+    taxAmount,
+    taxCollected,
+    taxLoading,
+    taxError,
+    taxCalculationId,
   };
 };
 
