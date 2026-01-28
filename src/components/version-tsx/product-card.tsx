@@ -419,7 +419,7 @@ export default function ProductCard({
       <div className="flex flex-col h-full px-2 pb-3 pt-1 sm:px-4 sm:pb-4">
         <div className="flex-1">
           <Link href={`/product/${product.slug}`} className="block">
-            <h3 className="mb-1 text-xs sm:text-sm font-medium leading-tight hover:text-primary transition-colors cursor-pointer line-clamp-2">
+            <h3 className="mb-1 text-xs sm:text-sm font-medium leading-tight hover:text-primary transition-colors cursor-pointer">
               {product.title}
             </h3>
           </Link>
