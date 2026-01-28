@@ -65,6 +65,41 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
 
     // Update form values immediately
     setValue('country', countryCode);
+
+    // Trigger tax recalculation when country changes
+    triggerTaxCalculation({ country: countryCode });
+  };
+
+  // Ref for debouncing tax calculation
+  const taxCalcTimeoutRef = useRef(null);
+
+  // Reusable function to trigger tax calculation with current form values
+  const triggerTaxCalculation = (overrides = {}) => {
+    if (!handleCalculateTax) return;
+
+    // Clear any existing debounce timer
+    if (taxCalcTimeoutRef.current) {
+      clearTimeout(taxCalcTimeoutRef.current);
+    }
+
+    // Debounce the tax calculation by 500ms
+    taxCalcTimeoutRef.current = setTimeout(() => {
+      // Get current form values for tax calculation
+      const currentZipCode = document.querySelector('[name="zipCode"]')?.value || '';
+      const currentState = document.querySelector('[name="state"]')?.value || '';
+
+      // Only calculate if we have at least a zip code (required for tax calculation)
+      if (!currentZipCode || currentZipCode.length < 5) return;
+
+      const formData = {
+        country: overrides.country || selectedCountry?.isoCode || 'US',
+        state: overrides.state || currentState,
+        city: document.querySelector('[name="city"]')?.value || '',
+        address: document.querySelector('[name="address"]')?.value || '',
+        zipCode: overrides.zipCode || currentZipCode,
+      };
+      handleCalculateTax(formData);
+    }, 500);
   };
 
   const handleStateChange = e => {
@@ -73,6 +108,9 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
     const stateValue = e.target.value;
     dispatch(reset_address_discount());
     setValue('state', stateValue);
+
+    // Trigger tax recalculation when state changes
+    triggerTaxCalculation({ state: stateValue });
   };
 
   const handleCityChange = e => {
@@ -98,29 +136,11 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
     dispatch(reset_address_discount());
     setValue('zipCode', zipCode);
 
-    // Trigger tax calculation when zip code changes (debounced)
-    if (zipCode && zipCode.length >= 5 && handleCalculateTax) {
-      // Clear any existing debounce timer
-      if (taxCalcTimeoutRef.current) {
-        clearTimeout(taxCalcTimeoutRef.current);
-      }
-      // Debounce the tax calculation by 500ms
-      taxCalcTimeoutRef.current = setTimeout(() => {
-        // Get current form values for tax calculation
-        const formData = {
-          country: selectedCountry?.isoCode || 'US',
-          state: document.querySelector('[name="state"]')?.value || '',
-          city: document.querySelector('[name="city"]')?.value || '',
-          address: document.querySelector('[name="address"]')?.value || '',
-          zipCode: zipCode,
-        };
-        handleCalculateTax(formData);
-      }, 500);
+    // Trigger tax calculation when zip code changes
+    if (zipCode && zipCode.length >= 5) {
+      triggerTaxCalculation({ zipCode: zipCode });
     }
   };
-
-  // Ref for debouncing tax calculation
-  const taxCalcTimeoutRef = useRef(null);
 
   // Cleanup timeout on unmount
   useEffect(() => {
