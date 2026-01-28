@@ -20,6 +20,46 @@ import { ProductLinkIndicatorMinimal } from '@/components/ui/product-link-indica
 import { CldImage } from 'next-cloudinary';
 import ProductConfigurationDialog from '@/components/version-tsx/product-configuration-dialog';
 
+type TitleSegment = { kind: 'outside' | 'inside'; text: string };
+
+/**
+ * Splits a product title into segments outside vs inside parentheses.
+ * Parenthetical segments are wrapped in a span with white-space: nowrap
+ * so they never break onto the next line.
+ */
+const parseTitleSegments = (str: string): TitleSegment[] => {
+  const segments: TitleSegment[] = [];
+  let current: TitleSegment = { kind: 'outside', text: '' };
+  let depth = 0;
+
+  for (const c of str) {
+    if (c === '(') {
+      if (depth === 0) {
+        if (current.text) {
+          segments.push(current);
+          current = { kind: 'outside', text: '' };
+        }
+        current = { kind: 'inside', text: '(' };
+      } else {
+        current.text += c;
+      }
+      depth += 1;
+    } else if (c === ')') {
+      depth -= 1;
+      current.text += c;
+      if (depth === 0) {
+        segments.push(current);
+        current = { kind: 'outside', text: '' };
+      }
+    } else {
+      current.text += c;
+    }
+  }
+
+  if (current.text) segments.push(current);
+  return segments;
+};
+
 // Star rating component
 const StarRating = ({
   rating,
@@ -420,7 +460,15 @@ export default function ProductCard({
         <div className="flex-1">
           <Link href={`/product/${product.slug}`} className="block">
             <h3 className="mb-1 text-xs sm:text-sm font-medium leading-tight hover:text-primary transition-colors cursor-pointer">
-              {product.title}
+              {parseTitleSegments(product.title).map((seg, i) =>
+                seg.kind === 'inside' ? (
+                  <span key={i} className="whitespace-nowrap">
+                    {seg.text}
+                  </span>
+                ) : (
+                  <React.Fragment key={i}>{seg.text}</React.Fragment>
+                )
+              )}
             </h3>
           </Link>
 
