@@ -1,7 +1,32 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable Cache Components for explicit opt-in caching
-  // This changes the paradigm: routes are dynamic by default, use "use cache" to opt-in to caching
+
+  async redirects() {
+    return [
+
+      {
+        source: '/product/ewo-chevy-10-bolt-complete-1-ton-crossover-high-steer-kit',
+        destination: '/product/ewo-chevy-10-bolt-complete-crossover-high-steer-kit',
+        permanent: true,
+      },
+      {
+        source: '/product/gmchevy-dana-44-1-ton-crossover-high-steer-kit-wknuckle-with-dom-tubing',
+        destination: '/product/gmchevy-dana-44-crossover-high-steer-kit-wknuckle-with-dom-tubing',
+        permanent: true,
+      },
+      {
+        source: '/product/dana-60-gmchevy-3%22-drop-pitman-arm-for-crossover-steering',
+        destination: '/product/dana-60-gmchevy-3%22-drop-pitman-arm-for-gm-tie-rod-ends-%28es-2234-res-2234-l%29',
+        permanent: true,
+      },
+      {
+        source: '/product/dana-44-gmchevy-3%22-drop-pitman-arm-for-crossover-steering',
+        destination: '/product/dana-44-gmchevy-3%22-drop-pitman-arm-for-gm-tie-rod-ends-%28es-2234-r-es-2234-l%29',
+        permanent: true,
+      }
+    ]
+  },
+
   cacheComponents: true,
   reactCompiler: true,
 
