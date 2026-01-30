@@ -37,6 +37,14 @@ export const authApi = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    // createCheckoutSession - Create Stripe Checkout Session with automatic tax
+    createCheckoutSession: builder.mutation({
+      query: data => ({
+        url: 'api/order/create-checkout-session',
+        method: 'POST',
+        body: data,
+      }),
+    }),
     // checkAddressDiscount
     checkAddressDiscount: builder.mutation({
       query: data => ({
@@ -96,6 +104,7 @@ export const authApi = apiSlice.injectEndpoints({
 export const {
   useCreatePaymentIntentMutation,
   useCalculateTaxMutation,
+  useCreateCheckoutSessionMutation,
   useSaveOrderMutation,
   useGetUserOrderByIdQuery,
   useGetUserOrdersQuery,

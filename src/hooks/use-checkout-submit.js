@@ -19,6 +19,7 @@ import {
 } from '@/redux/features/coupon/couponSlice';
 import {
   useCalculateTaxMutation,
+  useCreateCheckoutSessionMutation,
   useCreatePaymentIntentMutation,
   useSaveOrderMutation,
 } from '@/redux/features/order/orderApi';
@@ -47,6 +48,8 @@ const useCheckoutSubmit = () => {
   const [saveOrder, { }] = useSaveOrderMutation();
   // createPaymentIntent
   const [createPaymentIntent, { }] = useCreatePaymentIntentMutation();
+  // createCheckoutSession - Stripe Checkout Session
+  const [createCheckoutSession] = useCreateCheckoutSessionMutation();
   // calculateTax - Stripe Tax calculation
   const [calculateTax] = useCalculateTaxMutation();
   // cart_products
@@ -579,7 +582,75 @@ const useCheckoutSubmit = () => {
     }
   };
 
-  // create stripe payment intent
+  // create stripe checkout session
+  const createStripeCheckoutSession = async orderData => {
+    try {
+      // Prepare items for checkout session
+      const items = cart_products.map(item => {
+        const itemPrice = Number(item.finalPriceDiscount || item.price || 0);
+        const quantity = item.orderQuantity || 1;
+        const totalAmount = itemPrice * quantity;
+
+        return {
+          id: item._id || item.id,
+          name: item.title || item.name || 'Product',
+          title: item.title || item.name || 'Product',
+          description: item.description || '',
+          amount: totalAmount, // Total amount for this line item
+          quantity: quantity,
+          stripeProductId: item.stripeProductId || null, // Stripe product ID if available
+          stripePriceId: item.stripePriceId || null, // Stripe price ID if available
+          tax_code: item.tax_code || 'txcd_99999999', // Default general tax code
+        };
+      });
+
+      // Build success and cancel URLs
+      const baseUrl = window.location.origin;
+      const successUrl = `${baseUrl}/order/success?session_id={CHECKOUT_SESSION_ID}`;
+      const cancelUrl = `${baseUrl}/checkout`;
+
+      // Create checkout session
+      const response = await createCheckoutSession({
+        items: items,
+        customer_details: {
+          email: orderData.email,
+          address: {
+            line1: orderData.address || '',
+            city: orderData.city || '',
+            state: orderData.state || '',
+            postal_code: orderData.zipCode || '',
+            country: orderData.country || 'US',
+          },
+        },
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+        metadata: {
+          order_email: orderData.email,
+          order_name: orderData.name,
+          user_id: session?.user?.id || 'guest',
+          cart_items_count: cart_products.length.toString(),
+        },
+      });
+
+      const responseData = response.data || response;
+
+      if (!responseData.success) {
+        throw new Error(responseData.error || 'Failed to create checkout session');
+      }
+
+      if (!responseData.url) {
+        throw new Error('No checkout URL returned from server');
+      }
+
+      // Redirect to Stripe Checkout
+      window.location.href = responseData.url;
+    } catch (error) {
+      console.error('Checkout session creation error:', error);
+      throw error;
+    }
+  };
+
+  // create stripe payment intent (kept for backward compatibility)
   const createStripePaymentIntent = async orderData => {
     try {
       // Calculate total including tax if collected
@@ -707,17 +778,8 @@ const useCheckoutSubmit = () => {
       appliedCoupons: applied_coupons,
     };
 
-    const card = elements?.getElement(CardElement);
-
-    if (!stripe || !elements) {
-      return;
-    }
-    if (!card) {
-      notifyError('Please enter your card information');
-      setIsCheckoutSubmit(false);
-      dispatch(end_checkout_submission());
-      return;
-    }
+    // Note: For Stripe Checkout Session, we don't need card element validation
+    // Stripe handles card input on their hosted checkout page
 
     // COD logic
     if (newShippingInfo.shippingOption === 'COD') {
@@ -766,7 +828,7 @@ const useCheckoutSubmit = () => {
           dispatch(end_checkout_submission());
         });
     } else {
-      // Card Payment logic
+      // Card Payment logic - Using Stripe Checkout Session
       if (cart_products?.length === 0) {
         notifyError('Please add products to cart first');
         setIsCheckoutSubmit(false);
@@ -777,226 +839,83 @@ const useCheckoutSubmit = () => {
       try {
         setProcessingPayment(true);
 
-        // Step 1: Validate the card
-        const { error, paymentMethod } = await stripe.createPaymentMethod({
-          type: 'card',
-          card: card,
-        });
+        // Handle free orders (100% discount coupons) - check before checkout
+        if (finalTotalAmount <= 0) {
+          // Clean up first
+          localStorage.removeItem('cart_products');
+          localStorage.removeItem('couponInfo');
 
-        if (error) {
-          setCardError(error.message);
+          // Clear enhanced coupon
+          dispatch(clear_coupon());
 
-          // Create a summary of attempted purchase
-          const productSummary =
-            cart_products.length > 1
-              ? `${cart_products[0].title} and ${cart_products.length - 1
-              } more items`
-              : cart_products[0]?.title || 'your items';
+          // Mark first-time discount as used after successful free order
+          dispatch(completeFirstTimeDiscount());
 
-          // Show a user-friendly message
-          notifyError(
-            `We couldn't process your card for ${productSummary}. Please check your card details.`
-          );
           setIsCheckoutSubmit(false);
           setProcessingPayment(false);
+
+          // Save free order
+          saveOrder({
+            ...orderInfo,
+            paymentMethod: 'Free Order (100% Discount)',
+            isPaid: true,
+            paidAt: new Date(),
+            paymentInfo: {
+              id: `free_order_${Date.now()}`,
+              status: 'succeeded',
+              amount_received: 0,
+              currency: 'usd',
+              payment_method_types: ['coupon'],
+            },
+          })
+            .then(res => {
+              // Extract MongoDB ObjectId for the redirect
+              const orderId =
+                res.data?.order?._id ||
+                res.order?._id ||
+                res.data?.order?.invoice ||
+                res.order?.invoice;
+
+              // Set order data and show Thank You modal
+              setOrderDataForModal({
+                orderId: orderId,
+                customOrderId: res.data?.order?.orderId,
+              });
+              setShowThankYouModal(true);
+
+              notifySuccess(
+                '🎉 Your free order has been placed successfully!'
+              );
+            })
+            .catch(err => {
+              notifyError(
+                'Something went wrong with your free order. Please try again.'
+              );
+              setIsCheckoutSubmit(false);
+              setProcessingPayment(false);
+              dispatch(end_checkout_submission());
+            });
+
           dispatch(end_checkout_submission());
           return;
         }
 
-        // Step 2: Create payment intent with order data
+        // Create checkout session and redirect to Stripe Checkout
         try {
-          const paymentResult = await createStripePaymentIntent({
-            ...orderInfo,
-            cardInfo: paymentMethod,
-          });
+          await createStripeCheckoutSession(orderInfo);
 
-          // Handle free orders (100% discount coupons)
-          if (paymentResult.isFreeOrder) {
-            // Clean up first
-            localStorage.removeItem('cart_products');
-            localStorage.removeItem('couponInfo');
+          // Note: User will be redirected to Stripe Checkout
+          // The checkout session will handle payment and redirect back to success_url
+          // We don't need to do anything else here as the redirect happens automatically
 
-            // Clear enhanced coupon
-            dispatch(clear_coupon());
+        } catch (checkoutError) {
+          console.error('Checkout session error:', checkoutError);
 
-            // Mark first-time discount as used after successful free order
-            dispatch(completeFirstTimeDiscount());
+          const errorMessage = checkoutError?.data?.error ||
+            checkoutError?.message ||
+            'Failed to create checkout session. Please try again.';
 
-            setIsCheckoutSubmit(false);
-            setProcessingPayment(false);
-
-            // Save free order
-            saveOrder({
-              ...orderInfo,
-              paymentMethod: 'Free Order (100% Discount)',
-              isPaid: true,
-              paidAt: new Date(),
-              paymentInfo: {
-                id: `free_order_${Date.now()}`,
-                status: 'succeeded',
-                amount_received: 0,
-                currency: 'usd',
-                payment_method_types: ['coupon'],
-              },
-            })
-              .then(res => {
-                // Extract MongoDB ObjectId for the redirect
-                const orderId =
-                  res.data?.order?._id ||
-                  res.order?._id ||
-                  res.data?.order?.invoice ||
-                  res.order?.invoice;
-
-                // Set order data and show Thank You modal
-                setOrderDataForModal({
-                  orderId: orderId,
-                  customOrderId: res.data?.order?.orderId,
-                });
-                setShowThankYouModal(true);
-
-                notifySuccess(
-                  '🎉 Your free order has been placed successfully!'
-                );
-              })
-              .catch(err => {
-                notifyError(
-                  'Something went wrong with your free order. Please try again.'
-                );
-                setIsCheckoutSubmit(false);
-                setProcessingPayment(false);
-                dispatch(end_checkout_submission());
-              });
-
-            dispatch(end_checkout_submission());
-            return;
-          }
-
-          const secret = paymentResult;
-
-          // Step 3: Confirm the payment with Stripe
-          const { paymentIntent, error: confirmError } =
-            await stripe.confirmCardPayment(secret, {
-              payment_method: {
-                card: card,
-                billing_details: {
-                  name: orderInfo.name,
-                  email: orderInfo.email,
-                },
-              },
-            });
-
-          if (confirmError) {
-            let errorMessage = confirmError.message;
-            // Add more user-friendly error messages based on error types
-            if (confirmError.type === 'card_error') {
-              if (confirmError.code === 'card_declined') {
-                errorMessage =
-                  'Your card was declined. Please use a different card.';
-              } else if (confirmError.code === 'expired_card') {
-                errorMessage =
-                  'Your card has expired. Please use a different card.';
-              } else if (confirmError.code === 'incorrect_cvc') {
-                errorMessage =
-                  'The security code (CVC) is incorrect. Please check and try again.';
-              } else if (confirmError.code === 'processing_error') {
-                errorMessage =
-                  'An error occurred while processing your card. Please try again.';
-              }
-            }
-
-            // Create a summary of attempted purchase
-            const productSummary =
-              cart_products.length > 1
-                ? `${cart_products[0].title} and ${cart_products.length - 1
-                } more items`
-                : cart_products[0]?.title || 'your items';
-
-            setCardError(errorMessage);
-            notifyError(
-              `We couldn't complete your purchase for ${productSummary}: ${errorMessage}`
-            );
-            setIsCheckoutSubmit(false);
-            setProcessingPayment(false);
-            dispatch(end_checkout_submission());
-            return;
-          }
-
-          // Step 4: Payment confirmed by Stripe
-          if (paymentIntent.status === 'succeeded') {
-            // ✅ IMMEDIATELY show success feedback
-            setPaymentSuccessful(true);
-
-            // Clean up first - Remove from localStorage
-            localStorage.removeItem('cart_products');
-            localStorage.removeItem('couponInfo');
-            localStorage.removeItem('shipping_cost');
-
-            // Clear Redux cart state
-            dispatch(clearCart());
-
-            // Hide cart confirmation modal
-            dispatch(hideCartConfirmation());
-
-            // Clear enhanced coupon
-            dispatch(clear_coupon());
-            dispatch(clear_all_coupons());
-
-            // Mark first-time discount as used after successful payment
-            dispatch(completeFirstTimeDiscount());
-
-            setIsCheckoutSubmit(false);
-            setProcessingPayment(false);
-
-            // Save order and redirect to order page
-            saveOrder({
-              ...orderInfo,
-              paymentInfo: paymentIntent,
-              isPaid: true,
-              paidAt: new Date(),
-            })
-              .then(res => {
-                // Extract MongoDB ObjectId for the redirect
-                const orderId =
-                  res.data?.order?._id ||
-                  res.order?._id ||
-                  res.data?.order?.invoice ||
-                  res.order?.invoice;
-
-                // Keep success overlay visible for 1.5 seconds, then redirect
-                setTimeout(() => {
-                  setPaymentSuccessful(false);
-                  router.push(`/order/${orderId}`);
-                }, 1500);
-              })
-              .catch(err => {
-                setPaymentSuccessful(false);
-                const productSummary =
-                  cart_products.length > 1
-                    ? `${cart_products[0].title} and ${cart_products.length - 1
-                    } other items`
-                    : cart_products[0]?.title || 'your product';
-
-                notifyError(
-                  `Your payment for ${productSummary} was successful, but we encountered an issue saving your order details. Our team has been notified.`
-                );
-                router.push('/order');
-              });
-          } else {
-            notifyError(
-              `We couldn't complete your purchase. Please try again or contact customer support.`
-            );
-            setIsCheckoutSubmit(false);
-            notifyError(
-              `Payment not completed. Status: ${paymentIntent.status}`
-            );
-            setIsCheckoutSubmit(false);
-            setProcessingPayment(false);
-            dispatch(end_checkout_submission());
-          }
-        } catch (err) {
-          notifyError(
-            'Error creating payment: Please check your payment details and try again.'
-          );
+          notifyError(errorMessage);
           setIsCheckoutSubmit(false);
           setProcessingPayment(false);
           dispatch(end_checkout_submission());
