@@ -36,7 +36,8 @@ export default async function ProductBreadcrumbAsync({
 
   const categoryName = parentCategoryModified(product.category.name);
   const formattedCategoryName = formatCategoryName(categoryName);
-  const formattedProductTitle = formatProductTitle(product.title);
+  // const formattedProductTitle = formatProductTitle(product.title);
+  const formattedProductTitle = product.title;
 
   return (
     <BreadcrumbDynamicContent
