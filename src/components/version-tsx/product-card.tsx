@@ -10,7 +10,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Heart, ShoppingCart, Star, Ticket, Settings } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Heart, ShoppingCart, Star, Ticket, Settings, Youtube, Play, X } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 import { useSelector } from 'react-redux';
@@ -150,6 +156,7 @@ export interface Product {
       isSelected: boolean;
     }>;
   }>;
+  videoId?: string;
 }
 
 interface ProductCardProps {
@@ -169,6 +176,8 @@ export default function ProductCard({
   const [isHovered, setIsHovered] = React.useState(false);
   const [selectedOption, setSelectedOption] = React.useState<any>(null);
   const [isConfigDialogOpen, setIsConfigDialogOpen] = React.useState(false);
+  const [isVideoModalOpen, setIsVideoModalOpen] = React.useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = React.useState(false);
 
   // Check if product has configurations
   const hasConfigurations = React.useMemo(() => {
@@ -313,6 +322,21 @@ export default function ProductCard({
     }
   };
 
+
+  const handleVideoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsVideoModalOpen(true);
+    setIsVideoPlaying(false);
+  };
+
+  const handleVideoModalClose = (open: boolean) => {
+    setIsVideoModalOpen(open);
+    if (!open) {
+      setIsVideoPlaying(false);
+    }
+  };
+
   return (
     <Card
       className="group rounded-md relative overflow-hidden transition-all duration-300 hover:shadow-lg p-0"
@@ -327,6 +351,26 @@ export default function ProductCard({
           <div className="relative aspect-square overflow-hidden p-0.5 sm:p-1">
             {/* Left Side Badges - Stacked vertically */}
             <div className="absolute left-1 top-1 sm:left-2 sm:top-2 z-10 flex flex-col gap-1 sm:gap-2">
+              {product.videoId && (
+                <button
+                  onClick={handleVideoClick}
+                  className="group/video relative flex items-center gap-1 bg-linear-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white rounded-full px-1.5 py-1 sm:px-2 sm:py-1.5 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl active:scale-95"
+                  aria-label="Watch product video"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      handleVideoClick(e as unknown as React.MouseEvent);
+                    }
+                  }}
+                >
+                  <div className="relative">
+                    <Play className="h-3 w-3 sm:h-3.5 sm:w-3.5 fill-white" />
+                  </div>
+                  <span className="text-[8px] sm:text-[10px] font-semibold uppercase tracking-wide hidden sm:inline">
+                    Video
+                  </span>
+                </button>
+              )}
               {/* Discount Badge */}
               {/* {product.finalPriceDiscount &&
                 product.finalPriceDiscount < product.price && (
@@ -369,7 +413,7 @@ export default function ProductCard({
             {product.status !== 'out-of-stock' && (
               <div className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 z-10">
                 <div
-                  className="rounded-full bg-gradient-to-r from-emerald-500 to-green-600 text-white border-2 border-white shadow-lg flex flex-col items-center justify-center text-center h-14 w-14 sm:h-16 sm:w-16"
+                  className="rounded-full bg-linear-to-r from-emerald-500 to-green-600 text-white border-2 border-white shadow-lg flex flex-col items-center justify-center text-center h-14 w-14 sm:h-16 sm:w-16"
                   style={{
                     borderRadius: '50%',
                   }}
@@ -559,6 +603,105 @@ export default function ProductCard({
           onOpenChange={setIsConfigDialogOpen}
           onAddToCart={onAddToCart}
         />
+      )}
+
+      {/* Video Modal */}
+      {product.videoId && (
+        <Dialog open={isVideoModalOpen} onOpenChange={handleVideoModalClose}>
+          <DialogContent className="sm:max-w-4xl p-0 overflow-hidden bg-black border-0">
+            <DialogHeader className="absolute top-0 left-0 right-0 z-10 p-3 sm:p-4 bg-linear-to-b from-black/80 to-transparent">
+              <div className="flex items-start justify-between gap-4">
+                <DialogTitle className="text-white text-sm sm:text-base font-medium line-clamp-2">
+                  {product.title}
+                </DialogTitle>
+                <button
+                  onClick={() => handleVideoModalClose(false)}
+                  className="shrink-0 rounded-full bg-white/10 hover:bg-white/20 p-1.5 sm:p-2 transition-colors"
+                  aria-label="Close video"
+                >
+                  <X className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                </button>
+              </div>
+            </DialogHeader>
+
+            <div className="relative w-full aspect-video bg-black">
+              {!isVideoPlaying ? (
+                <>
+                  {/* YouTube Thumbnail with Play Button Overlay */}
+                  <img
+                    src={`https://img.youtube.com/vi/${product.videoId}/maxresdefault.jpg`}
+                    alt={`${product.title} video thumbnail`}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+
+                  {/* Play Button Overlay */}
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/40 transition-all duration-300">
+                    <button
+                      onClick={() => setIsVideoPlaying(true)}
+                      className="transform transition-all duration-300 hover:scale-110 active:scale-95"
+                      aria-label="Play video"
+                    >
+                      <div className="relative">
+                        {/* Glow effect */}
+                        <div className="absolute inset-0 bg-red-600 rounded-full blur-xl opacity-50" />
+
+                        {/* Play button */}
+                        <div className="relative bg-red-600 hover:bg-red-700 rounded-full p-4 sm:p-6 shadow-2xl border-4 border-white/90">
+                          <Play className="h-8 w-8 sm:h-12 sm:w-12 text-white fill-white ml-0.5 sm:ml-1" />
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+
+                  {/* YouTube watermark */}
+                  <div className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4">
+                    <div className="bg-black/70 backdrop-blur-sm rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-2 flex items-center gap-2">
+                      <Youtube className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
+                      <span className="text-white text-xs sm:text-sm font-medium">Watch on YouTube</span>
+                    </div>
+                  </div>
+
+                  {/* HD badge */}
+                  <div className="absolute top-14 sm:top-16 left-3 sm:left-4">
+                    <div className="bg-black/70 backdrop-blur-sm rounded px-2 py-1 text-white text-[10px] sm:text-xs font-semibold">
+                      HD
+                    </div>
+                  </div>
+                </>
+              ) : (
+                /* YouTube iframe player */
+                <iframe
+                  src={`https://www.youtube.com/embed/${product.videoId}?autoplay=1&rel=0&modestbranding=1`}
+                  title={`${product.title} - Product Video`}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="absolute inset-0 w-full h-full"
+                  loading="lazy"
+                />
+              )}
+            </div>
+
+            {/* Footer with actions */}
+            <div className="bg-linear-to-t from-black to-zinc-900 px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-zinc-400 text-xs sm:text-sm">
+                <Youtube className="h-4 w-4 text-red-600" />
+                <span>Product Video</span>
+              </div>
+              <a
+                href={`https://www.youtube.com/watch?v=${product.videoId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs sm:text-sm text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1"
+              >
+                Open in YouTube
+                <svg className="h-3 w-3 sm:h-4 sm:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
     </Card>
   );
