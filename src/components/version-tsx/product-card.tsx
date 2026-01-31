@@ -366,7 +366,7 @@ export default function ProductCard({
                   <div className="relative">
                     <Play className="h-3 w-3 sm:h-3.5 sm:w-3.5 fill-white" />
                   </div>
-                  <span className="text-[8px] sm:text-[10px] font-semibold uppercase tracking-wide hidden sm:inline">
+                  <span className="text-[8px] sm:text-[10px] font-semibold uppercase tracking-wide">
                     Video
                   </span>
                 </button>
