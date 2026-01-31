@@ -45,7 +45,7 @@ const ProductBadges: React.FC<ProductBadgesProps> = ({
         {badges.map((badge, index) => (
           <Badge
             key={index}
-            variant="secondary"
+            variant="destructive"
             className={cn(
               'text-[8px] sm:text-[9px] px-1.5 py-0.5 sm:px-2 sm:py-0.5 font-medium leading-tight whitespace-nowrap',
               badgeClassName
@@ -70,7 +70,7 @@ const ProductBadges: React.FC<ProductBadgesProps> = ({
         {badges.map((badge, index) => (
           <Badge
             key={index}
-            variant="secondary"
+            variant="destructive"
             className={cn(
               'text-[8px] sm:text-[9px] px-1.5 py-0.5 sm:px-2 sm:py-0.5 font-medium leading-tight whitespace-nowrap shadow-md',
               badgeClassName
@@ -95,7 +95,7 @@ const ProductBadges: React.FC<ProductBadgesProps> = ({
         {badges.map((badge, index) => (
           <Badge
             key={index}
-            variant="secondary"
+            variant="destructive"
             className={cn(
               'text-[8px] sm:text-[9px] px-1.5 py-0.5 sm:px-2 sm:py-0.5 font-medium leading-tight whitespace-nowrap shadow-md',
               badgeClassName
