@@ -354,14 +354,14 @@ export default function ProductCard({
         <CardContent className="p-0">
           <div className="relative aspect-square overflow-hidden p-0.5 sm:p-1">
             {/* Product Badges - Top Left Variant */}
-            {badgeVariant === 'top-left' && (
+            {/* {badgeVariant === 'top-left' && (
               <ProductBadges badges={product.badges || []} variant="top-left" />
-            )}
+            )} */}
 
             {/* Product Badges - Top Right Variant */}
-            {badgeVariant === 'top-right' && (
+            {/* {badgeVariant === 'top-right' && (
               <ProductBadges badges={product.badges || []} variant="top-right" />
-            )}
+            )} */}
 
             {/* Left Side Badges - Stacked vertically */}
             <div className="absolute left-1 top-1 sm:left-2 sm:top-2 z-10 flex flex-col gap-1 sm:gap-2">
@@ -531,7 +531,7 @@ export default function ProductCard({
           </Link>
 
           {/* Product Badges - Default Position */}
-          <ProductBadges badges={product.badges || []} variant="top-right" />
+          {/* <ProductBadges badges={product.badges || []} variant="top-right" /> */}
 
           {/* Rating - Only show when there are reviews */}
           {product.reviews &&
