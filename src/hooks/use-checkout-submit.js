@@ -67,6 +67,8 @@ const useCheckoutSubmit = () => {
   const [minimumAmount, setMinimumAmount] = useState(0);
   // shippingCost
   const [shippingCost, setShippingCost] = useState(0);
+  // tax
+  const [tax, setTax] = useState(0);
   // discountAmount - now using enhanced coupon discount
   const [discountAmount, setDiscountAmount] = useState(0);
   // discountPercentage
@@ -161,7 +163,7 @@ const useCheckoutSubmit = () => {
   // Calculate total and discount value
   useEffect(() => {
     let totalValue = '';
-    let subTotal = Number((total + shippingCost).toFixed(2));
+    let subTotal = Number((total + shippingCost + tax).toFixed(2));
 
     // Use enhanced coupon discount if available, otherwise fall back to legacy
     let totalDiscount = total_coupon_discount;
@@ -185,6 +187,7 @@ const useCheckoutSubmit = () => {
   }, [
     total,
     shippingCost,
+    tax,
     discountPercentage,
     cart_products,
     discountProductType,
@@ -503,6 +506,11 @@ const useCheckoutSubmit = () => {
     setShippingCost(value);
   };
 
+  // handle tax
+  const handleTax = value => {
+    setTax(value);
+  };
+
   // create stripe payment intent
   const createStripePaymentIntent = async orderData => {
     try {
@@ -597,6 +605,7 @@ const useCheckoutSubmit = () => {
       }),
       subTotal: rawSubTotal, // Raw subtotal before any discounts
       shippingCost: shippingCost,
+      tax: tax,
       discount: discountAmount, // Coupon discount only
       totalAmount: finalTotalAmount, // Ensure never negative
       name: newShippingInfo.name,
@@ -954,6 +963,8 @@ const useCheckoutSubmit = () => {
     revalidateAllCoupons,
     couponRef,
     handleShippingCost,
+    handleTax,
+    tax,
     discountAmount,
     total,
     shippingCost,

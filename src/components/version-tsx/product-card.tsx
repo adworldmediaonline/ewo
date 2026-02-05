@@ -25,6 +25,7 @@ import { useProductCoupon } from '@/hooks/useProductCoupon';
 import { ProductLinkIndicatorMinimal } from '@/components/ui/product-link-indicator';
 import { CldImage } from 'next-cloudinary';
 import ProductConfigurationDialog from '@/components/version-tsx/product-configuration-dialog';
+import ProductBadges from '@/components/version-tsx/product-badges';
 
 type TitleSegment = { kind: 'outside' | 'inside'; text: string };
 
@@ -157,6 +158,7 @@ export interface Product {
     }>;
   }>;
   videoId?: string;
+  badges?: string[];
 }
 
 interface ProductCardProps {
@@ -164,6 +166,7 @@ interface ProductCardProps {
   onAddToCart?: (product: Product, selectedOption?: any) => void;
   onAddToWishlist?: (product: Product) => void;
   index?: number;
+  badgeVariant?: 'default' | 'top-left' | 'top-right';
 }
 
 export default function ProductCard({
@@ -171,6 +174,7 @@ export default function ProductCard({
   onAddToCart,
   onAddToWishlist,
   index = 0,
+  badgeVariant = 'default',
 }: ProductCardProps): React.ReactElement {
   const [isImageLoading, setIsImageLoading] = React.useState(true);
   const [isHovered, setIsHovered] = React.useState(false);
@@ -349,6 +353,16 @@ export default function ProductCard({
 
         <CardContent className="p-0">
           <div className="relative aspect-square overflow-hidden p-0.5 sm:p-1">
+            {/* Product Badges - Top Left Variant */}
+            {badgeVariant === 'top-left' && (
+              <ProductBadges badges={product.badges || []} variant="top-left" />
+            )}
+
+            {/* Product Badges - Top Right Variant */}
+            {badgeVariant === 'top-right' && (
+              <ProductBadges badges={product.badges || []} variant="top-right" />
+            )}
+
             {/* Left Side Badges - Stacked vertically */}
             <div className="absolute left-1 top-1 sm:left-2 sm:top-2 z-10 flex flex-col gap-1 sm:gap-2">
               {product.videoId && (
@@ -515,6 +529,9 @@ export default function ProductCard({
               )}
             </h3>
           </Link>
+
+          {/* Product Badges - Default Position */}
+          <ProductBadges badges={product.badges || []} variant="top-right" />
 
           {/* Rating - Only show when there are reviews */}
           {product.reviews &&
