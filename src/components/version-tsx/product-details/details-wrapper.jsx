@@ -40,6 +40,7 @@ import {
   CheckCircle,
   FileText,
   Heart,
+  HelpCircle,
   MessageSquare,
   Package,
   Plus,
@@ -135,6 +136,7 @@ export default function DetailsWrapper({
     updatedPrice,
     finalPriceDiscount,
     description,
+    faqs,
     specifications,
     children,
     parent
@@ -1435,6 +1437,8 @@ export default function DetailsWrapper({
             </AccordionContent>
           </AccordionItem>
 
+
+
           <AccordionItem value="reviews" className="border-border/50">
             <AccordionTrigger className="text-lg font-semibold hover:no-underline">
               <div className="flex items-center gap-2">
@@ -1528,6 +1532,26 @@ export default function DetailsWrapper({
             </AccordionContent>
           </AccordionItem>
 
+          {/* FAQs Section - Only show if FAQs exist */}
+          {faqs && faqs.trim() !== '' && (
+            <AccordionItem value="faqs" className="border-border/50">
+              <AccordionTrigger className="text-lg font-semibold hover:no-underline">
+                <div className="flex items-center gap-2">
+                  <HelpCircle className="w-5 h-5 text-primary" />
+                  <span>Frequently Asked Questions (FAQs)</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="pt-4 em-text">
+                  <div
+                    className="prose max-w-none"
+                    dangerouslySetInnerHTML={{ __html: faqs }}
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          )}
+
           <AccordionItem value="shipping" className="border-border/50">
             <AccordionTrigger className="text-lg font-semibold hover:no-underline">
               <div className="flex items-center gap-2">
@@ -1584,6 +1608,26 @@ export default function DetailsWrapper({
               </div>
             </AccordionContent>
           </AccordionItem>
+
+          {/* FAQs Section - Only show if FAQs exist */}
+          {faqs && faqs.trim() !== '' && (
+            <AccordionItem value="faqs" className="border-border/50">
+              <AccordionTrigger className="text-lg font-semibold hover:no-underline">
+                <div className="flex items-center gap-2">
+                  <HelpCircle className="w-5 h-5 text-primary" />
+                  <span>Frequently Asked Questions</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="pt-4">
+                  <div
+                    className="prose prose-sm max-w-none text-foreground"
+                    dangerouslySetInnerHTML={{ __html: faqs }}
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          )}
 
           <AccordionItem value="reviews" className="border-border/50">
             <AccordionTrigger className="text-lg font-semibold hover:no-underline">
