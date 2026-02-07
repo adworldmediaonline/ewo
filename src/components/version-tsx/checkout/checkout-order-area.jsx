@@ -4,7 +4,6 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // internal
-import { ScrollArea } from '@/components/ui/scroll-area';
 import useCartInfo from '@/hooks/use-cart-info';
 import {
   add_cart_product,
@@ -502,27 +501,26 @@ export default function CheckoutOrderArea({ checkoutData }) {
         Your Order
       </h3>
 
-      {/* Scrollable area for order items */}
-      <ScrollArea className="h-[45px] md:h-[50px] pr-2">
-        <div className="space-y-2 mb-4">
-          {cart_products.map(item => {
+      {/* Order items - no height restriction */}
+      <div className="space-y-3 sm:space-y-2 mb-4 sm:mb-4">
+        {cart_products.map(item => {
             const imageUrl = item.img || '';
             const isCloudImage = isCloudinaryUrl(imageUrl);
 
             return (
               <div
                 key={item._id}
-                className="flex items-center justify-between py-2 border-b border-border last:border-0 gap-2"
+                className="flex flex-col sm:flex-row sm:items-center justify-between py-3 sm:py-2 border-b border-border last:border-0 gap-3 sm:gap-2"
               >
                 {/* Left side: Image + Product Info */}
-                <div className="flex items-center space-x-2 flex-1 min-w-0 max-w-[60%]">
-                  <div className="relative w-8 h-8 rounded overflow-hidden shrink-0 bg-muted">
+                <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0 sm:max-w-[60%]">
+                  <div className="relative w-12 h-12 sm:w-16 sm:h-16 rounded overflow-hidden shrink-0 bg-muted">
                     {imageUrl ? (
                       <CldImage
                         src={imageUrl}
                         alt={item.title}
                         fill
-                        sizes="32px"
+                        sizes="(max-width: 640px) 48px, 64px"
                         className="object-cover"
                         preserveTransformations={isCloudImage}
                         deliveryType={isCloudImage ? undefined : 'fetch'}
@@ -530,16 +528,14 @@ export default function CheckoutOrderArea({ checkoutData }) {
                         fetchPriority="low"
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">
+                      <div className="flex h-full w-full items-center justify-center text-[10px] sm:text-xs text-muted-foreground">
                         No Image
                       </div>
                     )}
                   </div>
-                  <div className="flex-1 min-w-0 overflow-hidden">
-                    <h4 className="font-medium text-foreground text-xs leading-tight truncate">
-                      {item.title.length > 25
-                        ? `${item.title.substring(0, 25)}...`
-                        : item.title}
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-foreground text-sm sm:text-xs leading-tight">
+                      {item.title}
                     </h4>
                     {item.selectedOption && (
                       <p className="text-xs text-muted-foreground truncate">
@@ -551,44 +547,43 @@ export default function CheckoutOrderArea({ checkoutData }) {
                 </div>
 
                 {/* Right side: Quantity Controls + Price */}
-                <div className="flex items-center space-x-3 shrink-0">
+                <div className="flex items-center justify-between sm:justify-end space-x-2 sm:space-x-3 shrink-0 w-full sm:w-auto">
                   {/* Compact quantity controls */}
                   <div className="flex items-center border border-border rounded">
                     <button
                       type="button"
                       onClick={() => handleDecrement(item)}
-                      className="w-5 h-5 flex items-center justify-center text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+                      className="w-6 h-6 sm:w-5 sm:h-5 flex items-center justify-center text-foreground hover:bg-muted transition-colors disabled:opacity-50"
                       disabled={
                         isCheckoutSubmit ||
                         processingPayment ||
                         item.orderQuantity <= 1
                       }
                     >
-                      <Minus width={8} height={8} />
+                      <Minus width={10} height={10} />
                     </button>
-                    <span className="w-6 h-5 flex items-center justify-center text-xs font-medium">
+                    <span className="w-8 h-6 sm:w-6 sm:h-5 flex items-center justify-center text-sm sm:text-xs font-medium">
                       {item.orderQuantity}
                     </span>
                     <button
                       type="button"
                       onClick={() => handleAddProduct(item)}
-                      className="w-5 h-5 flex items-center justify-center text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+                      className="w-6 h-6 sm:w-5 sm:h-5 flex items-center justify-center text-foreground hover:bg-muted transition-colors disabled:opacity-50"
                       disabled={isCheckoutSubmit || processingPayment}
                     >
-                      <Plus width={8} height={8} />
+                      <Plus width={10} height={10} />
                     </button>
                   </div>
 
                   {/* Price */}
-                  <div className="text-foreground font-medium text-sm min-w-[5rem] w-[5rem] text-right whitespace-nowrap">
+                  <div className="text-foreground font-medium text-base sm:text-sm min-w-[4rem] sm:min-w-[5rem] sm:w-[5rem] text-right whitespace-nowrap">
                     ${(item.price * item.orderQuantity).toFixed(2)}
                   </div>
                 </div>
               </div>
             );
           })}
-        </div>
-      </ScrollArea>
+      </div>
 
       {/* Active Coupons Section - Shows "Applied Successfully" UI when coupons are active */}
       {/* Uses same coupon check logic as product card (useProductCoupon) */}
@@ -745,14 +740,12 @@ export default function CheckoutOrderArea({ checkoutData }) {
           </div>
 
           {/* Tax */}
-          {Number(tax || 0) > 0 && (
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Tax</span>
-              <span className="font-medium text-foreground">
-                ${(Number(tax) || 0).toFixed(2)}
-              </span>
-            </div>
-          )}
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">Estimated Taxes</span>
+            <span className="font-medium text-foreground">
+              ${(Number(tax) || 0).toFixed(2)}
+            </span>
+          </div>
 
           {/* Multiple coupon discounts display */}
           {Number(displayTotalCouponDiscount) > 0 && (
