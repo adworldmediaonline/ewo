@@ -11,7 +11,7 @@ export const authApi = apiSlice.injectEndpoints({
     // calculateTax - tax preview for checkout UI
     calculateTax: builder.mutation({
       query: data => ({
-        url: 'api/order/calculate-tax',
+        url: '/api/order/calculate-tax',
         method: 'POST',
         body: data,
       }),
@@ -29,6 +29,8 @@ export const authApi = apiSlice.injectEndpoints({
                 taxCollected: result.data.taxCollected,
               })
             );
+          } else {
+            dispatch(set_tax_preview(null));
           }
         } catch {
           dispatch(set_tax_preview(null));

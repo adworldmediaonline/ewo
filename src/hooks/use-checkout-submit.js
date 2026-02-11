@@ -127,12 +127,17 @@ const useCheckoutSubmit = () => {
   let couponRef = useRef(null);
   const taxDebounceRef = useRef(null);
 
-  const watchedAddress = watch(['address', 'city', 'state', 'zipCode', 'country']);
+  const address = watch('address');
+  const city = watch('city');
+  const stateVal = watch('state');
+  const zipCode = watch('zipCode');
+  const country = watch('country');
 
-  const fetchTaxPreview = useCallback(() => {
-    const [address, city, state, zipCode, country] = watchedAddress;
+  const addressKey = `${address?.trim() || ''}|${city?.trim() || ''}|${stateVal?.trim() || ''}|${zipCode?.trim() || ''}|${country?.trim() || ''}`;
+
+  useEffect(() => {
     const hasCompleteAddress =
-      address?.trim() && city?.trim() && state?.trim() && zipCode?.trim() && country?.trim();
+      address?.trim() && city?.trim() && stateVal?.trim() && zipCode?.trim() && country?.trim();
 
     if (
       !hasCompleteAddress ||
@@ -140,41 +145,28 @@ const useCheckoutSubmit = () => {
       isCheckoutSubmit ||
       processingPayment
     ) {
+      dispatch(set_tax_preview(null));
       return;
     }
 
-    const orderDataForTax = {
-      address: address?.trim(),
-      city: city?.trim(),
-      state: state?.trim(),
-      zipCode: zipCode?.trim(),
-      country: country?.trim(),
-      shippingCost,
-    };
-
-    calculateTax({
-      cart: cart_products,
-      orderData: orderDataForTax,
-    }).catch(() => {
-      dispatch(set_tax_preview(null));
-    });
-  }, [
-    watchedAddress,
-    cart_products,
-    shippingCost,
-    isCheckoutSubmit,
-    processingPayment,
-    calculateTax,
-    dispatch,
-  ]);
-
-  useEffect(() => {
     if (taxDebounceRef.current) {
       clearTimeout(taxDebounceRef.current);
     }
 
     taxDebounceRef.current = setTimeout(() => {
-      fetchTaxPreview();
+      calculateTax({
+        cart: cart_products,
+        orderData: {
+          address: address?.trim(),
+          city: city?.trim(),
+          state: stateVal?.trim(),
+          zipCode: zipCode?.trim(),
+          country: country?.trim(),
+          shippingCost,
+        },
+      }).catch(() => {
+        dispatch(set_tax_preview(null));
+      });
       taxDebounceRef.current = null;
     }, 500);
 
@@ -183,7 +175,15 @@ const useCheckoutSubmit = () => {
         clearTimeout(taxDebounceRef.current);
       }
     };
-  }, [fetchTaxPreview]);
+  }, [
+    addressKey,
+    cart_products,
+    shippingCost,
+    isCheckoutSubmit,
+    processingPayment,
+    calculateTax,
+    dispatch,
+  ]);
 
   useEffect(() => {
     return () => {
