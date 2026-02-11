@@ -612,6 +612,7 @@ const useCheckoutSubmit = () => {
       return {
         clientSecret,
         taxAmount: responseData.taxAmount,
+        totalAmount: responseData.totalAmount,
       };
     } catch (error) {
       throw error;
@@ -865,6 +866,7 @@ const useCheckoutSubmit = () => {
 
           const secret = paymentResult.clientSecret;
           const paymentTaxAmount = paymentResult.taxAmount;
+          const paymentTotalAmount = paymentResult.totalAmount;
 
           // Step 3: Confirm the payment with Stripe
           const { paymentIntent, error: confirmError } =
@@ -949,6 +951,9 @@ const useCheckoutSubmit = () => {
             };
             if (paymentTaxAmount !== undefined && paymentTaxAmount > 0) {
               orderToSave.taxAmount = paymentTaxAmount;
+            }
+            if (paymentTotalAmount !== undefined && paymentTotalAmount > 0) {
+              orderToSave.totalAmount = paymentTotalAmount;
             }
             saveOrder(orderToSave)
               .then(res => {
