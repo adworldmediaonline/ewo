@@ -41,6 +41,8 @@ export default function CheckoutOrderArea({ checkoutData }) {
     totalCouponDiscount: 0,
     appliedCoupons: [],
     finalTotal: 0,
+    taxAmount: 0,
+    finalTotalWithTax: 0,
   });
 
   // State to store the auto-filled coupon info for percentage display
@@ -63,6 +65,8 @@ export default function CheckoutOrderArea({ checkoutData }) {
     couponApplyMsg,
     stripe,
     cardError,
+    tax_preview,
+    isTaxLoading,
   } = checkoutData;
 
   const {
@@ -393,16 +397,29 @@ export default function CheckoutOrderArea({ checkoutData }) {
     return isNaN(result) ? 0 : result;
   };
 
+  // Compute tax-inclusive total when tax_preview is available
+  const taxAmountDollars = tax_preview?.taxCollected
+    ? (tax_preview.tax ?? 0) / 100
+    : 0;
+  const totalWithTaxDollars = tax_preview?.taxCollected
+    ? (tax_preview.total ?? 0) / 100
+    : null;
+
   // Save complete order summary data when processing begins
   useEffect(() => {
     if (!isCheckoutSubmit && !isCheckoutSubmitting && !processingPayment) {
-      // Save current order summary state
+      const baseTotal = calculateFinalTotal();
+      const finalWithTax =
+        totalWithTaxDollars !== null ? totalWithTaxDollars : baseTotal;
+
       setSavedOrderSummary({
         subtotal: subtotal,
         shipping: totalShippingCost,
         totalCouponDiscount: total_coupon_discount,
         appliedCoupons: applied_coupons,
-        finalTotal: calculateFinalTotal(),
+        finalTotal: baseTotal,
+        taxAmount: taxAmountDollars,
+        finalTotalWithTax: finalWithTax,
       });
     }
   }, [
@@ -413,6 +430,10 @@ export default function CheckoutOrderArea({ checkoutData }) {
     isCheckoutSubmit,
     isCheckoutSubmitting,
     processingPayment,
+    taxAmountDollars,
+    totalWithTaxDollars,
+    addressDiscountAmount,
+    savedAddressDiscount,
   ]);
 
   // Use saved or current values depending on checkout state
@@ -439,9 +460,18 @@ export default function CheckoutOrderArea({ checkoutData }) {
   const displayAppliedCoupons = isProcessing
     ? savedOrderSummary.appliedCoupons
     : applied_coupons;
-  const displayFinalTotal = isProcessing
+  const displayTaxAmount = isProcessing
+    ? savedOrderSummary.taxAmount ?? 0
+    : taxAmountDollars;
+  const baseFinalTotal = isProcessing
     ? savedOrderSummary.finalTotal
     : calculateFinalTotal();
+  const displayFinalTotal =
+    isProcessing && savedOrderSummary.finalTotalWithTax !== undefined
+      ? savedOrderSummary.finalTotalWithTax
+      : totalWithTaxDollars !== null
+        ? totalWithTaxDollars
+        : baseFinalTotal;
 
   // Calculate final total BEFORE shipping for free shipping eligibility check
   const displayFinalTotalBeforeShipping = isProcessing
@@ -755,6 +785,32 @@ export default function CheckoutOrderArea({ checkoutData }) {
               </span>
             </div>
           )}
+
+          {/* Tax */}
+          {isTaxLoading ? (
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground">Tax (estimated)</span>
+              <span className="text-sm text-muted-foreground">
+                Calculating...
+              </span>
+            </div>
+          ) : tax_preview ? (
+            tax_preview.taxCollected ? (
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Tax (estimated)</span>
+                <span className="font-medium text-foreground">
+                  ${Number(displayTaxAmount).toFixed(2)}
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Tax</span>
+                <span className="text-sm text-muted-foreground">
+                  No tax for your location
+                </span>
+              </div>
+            )
+          ) : null}
 
         </div>
 
