@@ -48,11 +48,9 @@ export default function CheckoutOrderArea({ checkoutData }) {
 
   const {
     handleShippingCost,
-    handleTax,
     cartTotal = 0,
     isCheckoutSubmit,
     shippingCost,
-    tax,
     discountAmount,
     processingPayment,
     address_discount_eligible,
@@ -352,9 +350,8 @@ export default function CheckoutOrderArea({ checkoutData }) {
         ) || 0;
 
       const shipping = Number(totalShippingCost) || 0;
-      const taxAmount = Number(tax || 0);
 
-      const manualTotal = cartTotal + shipping + taxAmount;
+      const manualTotal = cartTotal + shipping;
 
       let finalTotal = manualTotal;
 
@@ -403,7 +400,6 @@ export default function CheckoutOrderArea({ checkoutData }) {
       setSavedOrderSummary({
         subtotal: subtotal,
         shipping: totalShippingCost,
-        tax: tax || 0,
         totalCouponDiscount: total_coupon_discount,
         appliedCoupons: applied_coupons,
         finalTotal: calculateFinalTotal(),
@@ -457,12 +453,6 @@ export default function CheckoutOrderArea({ checkoutData }) {
     handleShippingCost(totalShippingCost);
   }, [totalShippingCost, handleShippingCost]);
 
-  // Update tax in checkout data when it changes
-  useEffect(() => {
-    if (tax !== undefined && tax !== null) {
-      handleTax(tax);
-    }
-  }, [tax, handleTax]);
 
   // Calculate discount percentage to display
   const discountPercentage =
@@ -737,14 +727,6 @@ export default function CheckoutOrderArea({ checkoutData }) {
                 )}
               </span>
             )}
-          </div>
-
-          {/* Tax */}
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Estimated Taxes</span>
-            <span className="font-medium text-foreground">
-              ${(Number(tax) || 0).toFixed(2)}
-            </span>
           </div>
 
           {/* Multiple coupon discounts display */}
