@@ -1,7 +1,7 @@
 'use client';
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 //internal import
@@ -18,6 +18,7 @@ import {
   set_coupon_loading,
 } from '@/redux/features/coupon/couponSlice';
 import {
+  useCalculateTaxMutation,
   useCreatePaymentIntentMutation,
   useSaveOrderMutation,
 } from '@/redux/features/order/orderApi';
@@ -26,6 +27,7 @@ import {
   end_checkout_submission,
   set_client_secret,
   set_shipping,
+  set_tax_preview,
 } from '@/redux/features/order/orderSlice';
 import { notifyError, notifySuccess } from '@/utils/toast';
 import { authClient } from '../lib/authClient';
@@ -39,14 +41,16 @@ const useCheckoutSubmit = () => {
     useValidateCouponMutation();
 
   // addOrder
-  const [saveOrder, { }] = useSaveOrderMutation();
+  const [saveOrder] = useSaveOrderMutation();
   // createPaymentIntent
-  const [createPaymentIntent, { }] = useCreatePaymentIntentMutation();
+  const [createPaymentIntent] = useCreatePaymentIntentMutation();
+  // calculateTax
+  const [calculateTax, { isLoading: isTaxLoading }] = useCalculateTaxMutation();
   // cart_products
   const { cart_products, firstTimeDiscount } = useSelector(state => state.cart);
 
-  // shipping_info
-  const { shipping_info } = useSelector(state => state.order);
+  // shipping_info, tax_preview
+  const { shipping_info, tax_preview } = useSelector(state => state.order);
   // total amount
   const { total, setTotal, firstTimeDiscountAmount } = useCartInfo();
 
@@ -67,8 +71,6 @@ const useCheckoutSubmit = () => {
   const [minimumAmount, setMinimumAmount] = useState(0);
   // shippingCost
   const [shippingCost, setShippingCost] = useState(0);
-  // tax
-  const [tax, setTax] = useState(0);
   // discountAmount - now using enhanced coupon discount
   const [discountAmount, setDiscountAmount] = useState(0);
   // discountPercentage
@@ -103,6 +105,7 @@ const useCheckoutSubmit = () => {
     handleSubmit,
     setValue,
     control,
+    watch,
     formState: { errors },
   } = useForm({
     mode: 'onSubmit',
@@ -122,6 +125,71 @@ const useCheckoutSubmit = () => {
   });
 
   let couponRef = useRef(null);
+  const taxDebounceRef = useRef(null);
+
+  const address = watch('address');
+  const city = watch('city');
+  const stateVal = watch('state');
+  const zipCode = watch('zipCode');
+  const country = watch('country');
+
+  const addressKey = `${address?.trim() || ''}|${city?.trim() || ''}|${stateVal?.trim() || ''}|${zipCode?.trim() || ''}|${country?.trim() || ''}`;
+
+  useEffect(() => {
+    const hasCompleteAddress =
+      address?.trim() && city?.trim() && stateVal?.trim() && zipCode?.trim() && country?.trim();
+
+    if (
+      !hasCompleteAddress ||
+      !cart_products?.length ||
+      isCheckoutSubmit ||
+      processingPayment
+    ) {
+      dispatch(set_tax_preview(null));
+      return;
+    }
+
+    if (taxDebounceRef.current) {
+      clearTimeout(taxDebounceRef.current);
+    }
+
+    taxDebounceRef.current = setTimeout(() => {
+      calculateTax({
+        cart: cart_products,
+        orderData: {
+          address: address?.trim(),
+          city: city?.trim(),
+          state: stateVal?.trim(),
+          zipCode: zipCode?.trim(),
+          country: country?.trim(),
+          shippingCost,
+        },
+      }).catch(() => {
+        dispatch(set_tax_preview(null));
+      });
+      taxDebounceRef.current = null;
+    }, 500);
+
+    return () => {
+      if (taxDebounceRef.current) {
+        clearTimeout(taxDebounceRef.current);
+      }
+    };
+  }, [
+    addressKey,
+    cart_products,
+    shippingCost,
+    isCheckoutSubmit,
+    processingPayment,
+    calculateTax,
+    dispatch,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(set_tax_preview(null));
+    };
+  }, [dispatch]);
 
   // Load applied coupons on component mount
   useEffect(() => {
@@ -163,7 +231,7 @@ const useCheckoutSubmit = () => {
   // Calculate total and discount value
   useEffect(() => {
     let totalValue = '';
-    let subTotal = Number((total + shippingCost + tax).toFixed(2));
+    let subTotal = Number((total + shippingCost).toFixed(2));
 
     // Use enhanced coupon discount if available, otherwise fall back to legacy
     let totalDiscount = total_coupon_discount;
@@ -187,7 +255,6 @@ const useCheckoutSubmit = () => {
   }, [
     total,
     shippingCost,
-    tax,
     discountPercentage,
     cart_products,
     discountProductType,
@@ -506,34 +573,34 @@ const useCheckoutSubmit = () => {
     setShippingCost(value);
   };
 
-  // handle tax
-  const handleTax = value => {
-    setTax(value);
-  };
 
   // create stripe payment intent
   const createStripePaymentIntent = async orderData => {
     try {
+      const orderPayload = {
+        ...orderData,
+        totalAmount: Math.max(0, cartTotal), // Ensure never negative
+        isGuestOrder: !session?.user?.id,
+      };
+
+      if (tax_preview?.calculationId && tax_preview?.taxCollected) {
+        orderPayload.calculationId = tax_preview.calculationId;
+        orderPayload.taxCollected = tax_preview.taxCollected;
+      }
+
       const response = await createPaymentIntent({
-        price: parseInt(Math.max(0, cartTotal)), // Ensure never negative
+        price: parseInt(Math.max(0, cartTotal), 10),
         email: orderData.email,
         cart: cart_products,
-        orderData: {
-          ...orderData,
-          totalAmount: Math.max(0, cartTotal), // Ensure never negative
-          isGuestOrder: !session?.user?.id,
-        },
+        orderData: orderPayload,
       });
 
-      // Check if this is a free order
       const responseData = response.data || response;
       if (responseData.isFreeOrder) {
         return { isFreeOrder: true, totalAmount: responseData.totalAmount };
       }
 
-      // The backend returns: { clientSecret: '...', paymentIntentId: '...' }
-      // But RTK Query wraps it in { data: { clientSecret: '...', paymentIntentId: '...' } }
-      const clientSecret = response.data?.clientSecret || response.clientSecret;
+      const clientSecret = responseData.clientSecret;
 
       if (!clientSecret) {
         throw new Error('Failed to get client secret from payment intent');
@@ -541,7 +608,12 @@ const useCheckoutSubmit = () => {
 
       setClientSecret(clientSecret);
       dispatch(set_client_secret(clientSecret));
-      return clientSecret;
+
+      return {
+        clientSecret,
+        taxAmount: responseData.taxAmount,
+        totalAmount: responseData.totalAmount,
+      };
     } catch (error) {
       throw error;
     }
@@ -605,7 +677,6 @@ const useCheckoutSubmit = () => {
       }),
       subTotal: rawSubTotal, // Raw subtotal before any discounts
       shippingCost: shippingCost,
-      tax: tax,
       discount: discountAmount, // Coupon discount only
       totalAmount: finalTotalAmount, // Ensure never negative
       name: newShippingInfo.name,
@@ -733,7 +804,6 @@ const useCheckoutSubmit = () => {
             cardInfo: paymentMethod,
           });
 
-          // Handle free orders (100% discount coupons)
           if (paymentResult.isFreeOrder) {
             // Clean up first
             localStorage.removeItem('cart_products');
@@ -794,7 +864,9 @@ const useCheckoutSubmit = () => {
             return;
           }
 
-          const secret = paymentResult;
+          const secret = paymentResult.clientSecret;
+          const paymentTaxAmount = paymentResult.taxAmount;
+          const paymentTotalAmount = paymentResult.totalAmount;
 
           // Step 3: Confirm the payment with Stripe
           const { paymentIntent, error: confirmError } =
@@ -871,12 +943,19 @@ const useCheckoutSubmit = () => {
             setProcessingPayment(false);
 
             // Save order and redirect to order page
-            saveOrder({
+            const orderToSave = {
               ...orderInfo,
               paymentInfo: paymentIntent,
               isPaid: true,
               paidAt: new Date(),
-            })
+            };
+            if (paymentTaxAmount !== undefined && paymentTaxAmount > 0) {
+              orderToSave.taxAmount = paymentTaxAmount;
+            }
+            if (paymentTotalAmount !== undefined && paymentTotalAmount > 0) {
+              orderToSave.totalAmount = paymentTotalAmount;
+            }
+            saveOrder(orderToSave)
               .then(res => {
                 // Extract MongoDB ObjectId for the redirect
                 const orderId =
@@ -963,8 +1042,6 @@ const useCheckoutSubmit = () => {
     revalidateAllCoupons,
     couponRef,
     handleShippingCost,
-    handleTax,
-    tax,
     discountAmount,
     total,
     shippingCost,
@@ -996,6 +1073,8 @@ const useCheckoutSubmit = () => {
     coupon_error,
     coupon_loading,
     calculateTotals,
+    tax_preview,
+    isTaxLoading,
   };
 };
 

@@ -155,7 +155,8 @@ export default function TrackOrderArea({ orderId }: { orderId: string }) {
     cart,
     shippingCost,
     discount,
-    totalAmount,
+    totalAmount: orderTotalAmount,
+    taxAmount: orderTaxAmount = 0,
     paymentMethod,
     status,
     email,
@@ -639,6 +640,16 @@ export default function TrackOrderArea({ orderId }: { orderId: string }) {
                     </span>
                   </div>
                 )}
+
+                {/* Tax */}
+                {Number(orderTaxAmount) > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Tax</span>
+                    <span className="font-medium">
+                      ${Number(orderTaxAmount).toFixed(2)}
+                    </span>
+                  </div>
+                )}
               </div>
 
               <Separator />
@@ -651,11 +662,13 @@ export default function TrackOrderArea({ orderId }: { orderId: string }) {
                   <span className="text-lg font-semibold text-foreground">
                     $
                     {(
+                      orderTotalAmount ??
                       subtotal +
-                      parseFloat(shippingCost) -
-                      firstTimeDiscountAmount -
-                      couponDiscounts -
-                      otherDiscounts
+                        parseFloat(shippingCost) -
+                        firstTimeDiscountAmount -
+                        couponDiscounts -
+                        otherDiscounts +
+                        Number(orderTaxAmount || 0)
                     ).toFixed(2)}
                   </span>
                 </div>

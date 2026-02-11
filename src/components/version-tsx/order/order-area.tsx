@@ -296,7 +296,8 @@ export default function OrderArea({ orderId }: { orderId: string }) {
     cart,
     shippingCost,
     discount,
-    // totalAmount,
+    totalAmount: orderTotalAmount,
+    taxAmount: orderTaxAmount = 0,
     paymentMethod,
     status,
     email,
@@ -650,11 +651,21 @@ export default function OrderArea({ orderId }: { orderId: string }) {
                     </span>
                   </div>
                 )}
+
+                {/* Tax */}
+                {Number(orderTaxAmount) > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Tax</span>
+                    <span className="font-medium">
+                      ${Number(orderTaxAmount).toFixed(2)}
+                    </span>
+                  </div>
+                )}
               </div>
 
               <Separator />
 
-              {/* Total calculation: Subtotal + Shipping - All Discounts */}
+              {/* Total calculation: Subtotal + Shipping - All Discounts + Tax */}
               {/* <div className="flex justify-between items-center text-lg font-bold">
                 <span>Total</span>
                 <span className="text-primary">
@@ -669,18 +680,20 @@ export default function OrderArea({ orderId }: { orderId: string }) {
                 </span>
               </div> */}
 
-              {/* new total ui */}
+              {/* new total ui - orderTotalAmount is tax-inclusive when tax was collected */}
               <div className="border-t border-border pt-3 mt-4">
                 <div className="flex items-center justify-between">
                   <span className="text-lg font-semibold text-foreground">Total</span>
                   <span className="text-lg font-semibold text-foreground">
                     $
                     {(
+                      orderTotalAmount ??
                       subtotal +
-                      parseFloat(shippingCost) -
-                      firstTimeDiscountAmount -
-                      couponDiscounts -
-                      otherDiscounts
+                        parseFloat(shippingCost) -
+                        firstTimeDiscountAmount -
+                        couponDiscounts -
+                        otherDiscounts +
+                        Number(orderTaxAmount || 0)
                     ).toFixed(2)}
                   </span>
                 </div>

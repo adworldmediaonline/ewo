@@ -7,6 +7,7 @@ const initialState = {
   address_discount_message: '',
   address_discount_percentage: 10, // 10% discount
   isCheckoutSubmitting: false, // Track checkout submission state
+  tax_preview: null, // { subtotal, tax, total, calculationId, taxCollected } from calculate-tax
 };
 
 export const orderSlice = createSlice({
@@ -55,6 +56,9 @@ export const orderSlice = createSlice({
     end_checkout_submission: state => {
       state.isCheckoutSubmitting = false;
     },
+    set_tax_preview: (state, { payload }) => {
+      state.tax_preview = payload;
+    },
   },
 });
 
@@ -66,5 +70,6 @@ export const {
   reset_address_discount,
   begin_checkout_submission,
   end_checkout_submission,
+  set_tax_preview,
 } = orderSlice.actions;
 export default orderSlice.reducer;

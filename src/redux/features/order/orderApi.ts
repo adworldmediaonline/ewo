@@ -1,9 +1,42 @@
 import { apiSlice } from '../../api/apiSlice';
-import { set_address_discount_eligible, set_client_secret } from './orderSlice';
+import {
+  set_address_discount_eligible,
+  set_client_secret,
+  set_tax_preview,
+} from './orderSlice';
 
 export const authApi = apiSlice.injectEndpoints({
   overrideExisting: true,
   endpoints: builder => ({
+    // calculateTax - tax preview for checkout UI
+    calculateTax: builder.mutation({
+      query: data => ({
+        url: '/api/order/calculate-tax',
+        method: 'POST',
+        body: data,
+      }),
+
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          const result = await queryFulfilled;
+          if (result.data?.success) {
+            dispatch(
+              set_tax_preview({
+                subtotal: result.data.subtotal,
+                tax: result.data.tax,
+                total: result.data.total,
+                calculationId: result.data.calculationId,
+                taxCollected: result.data.taxCollected,
+              })
+            );
+          } else {
+            dispatch(set_tax_preview(null));
+          }
+        } catch {
+          dispatch(set_tax_preview(null));
+        }
+      },
+    }),
     // createPaymentIntent
     createPaymentIntent: builder.mutation({
       query: data => ({
@@ -86,6 +119,7 @@ export const authApi = apiSlice.injectEndpoints({
 });
 
 export const {
+  useCalculateTaxMutation,
   useCreatePaymentIntentMutation,
   useSaveOrderMutation,
   useGetUserOrderByIdQuery,
