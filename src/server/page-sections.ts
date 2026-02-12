@@ -14,6 +14,54 @@ export interface ImageWithMeta {
   link?: string;
 }
 
+export type CustomBlockType = 'text' | 'image' | 'button' | 'spacer';
+
+export interface CustomBlockBase {
+  id: string;
+  type: CustomBlockType;
+  /** Optional Tailwind classes applied to the block wrapper (e.g. text-center, flex justify-center) */
+  className?: string;
+}
+
+export interface CustomTextBlock extends CustomBlockBase {
+  type: 'text';
+  heading?: string;
+  body?: string;
+}
+
+export interface CustomImageBlock extends CustomBlockBase {
+  type: 'image';
+  image?: ImageWithMeta;
+}
+
+export interface CustomButtonBlock extends CustomBlockBase {
+  type: 'button';
+  text: string;
+  link: string;
+}
+
+export interface CustomSpacerBlock extends CustomBlockBase {
+  type: 'spacer';
+  height?: number;
+}
+
+export type CustomBlock =
+  | CustomTextBlock
+  | CustomImageBlock
+  | CustomButtonBlock
+  | CustomSpacerBlock;
+
+export interface CustomSectionLayout {
+  width?: 'full' | 'contained';
+  backgroundColor?: string;
+  backgroundImage?: ImageWithMeta;
+}
+
+export interface CustomSectionContent {
+  layout?: CustomSectionLayout;
+  blocks: CustomBlock[];
+}
+
 export interface HeroSectionContent {
   variant: 'image_only' | 'image_content' | 'content_only';
   image?: ImageWithMeta;

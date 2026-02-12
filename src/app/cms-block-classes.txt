@@ -1,0 +1,163 @@
+# Safelist for CMS block className - Tailwind v4 @source
+# Text alignment
+text-left
+text-center
+text-right
+text-justify
+
+# Flexbox
+flex
+flex-col
+flex-row
+flex-wrap
+flex-nowrap
+flex-1
+flex-auto
+flex-none
+justify-start
+justify-center
+justify-end
+justify-between
+justify-around
+justify-evenly
+items-start
+items-center
+items-end
+items-stretch
+items-baseline
+self-start
+self-center
+self-end
+gap-2
+gap-4
+gap-6
+gap-8
+
+# Grid
+grid
+grid-cols-1
+grid-cols-2
+grid-cols-3
+grid-cols-4
+grid-cols-12
+
+# Margin
+mx-auto
+my-auto
+mt-2
+mt-4
+mt-6
+mt-8
+mb-2
+mb-4
+mb-6
+mb-8
+ml-auto
+mr-auto
+
+# Padding
+p-2
+p-4
+p-6
+p-8
+px-4
+px-6
+px-8
+py-2
+py-4
+py-6
+py-8
+
+# Width
+w-full
+w-auto
+max-w-full
+max-w-sm
+max-w-md
+max-w-lg
+max-w-xl
+max-w-2xl
+max-w-3xl
+max-w-4xl
+max-w-5xl
+max-w-6xl
+max-w-7xl
+
+# Typography
+font-normal
+font-medium
+font-semibold
+font-bold
+text-sm
+text-base
+text-lg
+text-xl
+text-2xl
+text-3xl
+uppercase
+lowercase
+capitalize
+normal-case
+italic
+not-italic
+underline
+underline-offset-4
+line-through
+no-underline
+
+# Colors (foreground/muted)
+text-foreground
+text-muted-foreground
+text-primary
+text-secondary
+
+# Opacity
+opacity-50
+opacity-75
+opacity-90
+opacity-100
+
+# Rounded
+rounded
+rounded-md
+rounded-lg
+rounded-xl
+rounded-full
+
+# Shadow
+shadow-sm
+shadow
+shadow-md
+shadow-lg
+
+# Border
+border
+border-0
+border-2
+border-4
+
+# Display
+block
+inline-block
+inline
+hidden
+
+# Responsive variants (common)
+sm:text-center
+md:text-center
+lg:text-center
+sm:flex
+md:flex
+lg:flex
+sm:flex-col
+md:flex-col
+lg:flex-col
+sm:justify-center
+md:justify-center
+lg:justify-center
+sm:items-center
+md:items-center
+lg:items-center
+sm:max-w-2xl
+md:max-w-3xl
+lg:max-w-4xl
