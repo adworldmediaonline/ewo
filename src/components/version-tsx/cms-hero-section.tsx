@@ -113,6 +113,7 @@ export default function CmsHeroSection({ content }: CmsHeroSectionProps) {
   if (variant === 'image_only' && (imageUrl || mobileImageUrl)) {
     const desktopSrc = imageUrl ?? mobileImageUrl;
     const desktopImg = image ?? mobileImage;
+    const desktopTitle = desktopImg?.title;
     const DesktopImage = () => {
       if (!desktopSrc) return null;
       const ImageWrapper = desktopImg?.link ? Link : 'div';
@@ -120,20 +121,29 @@ export default function CmsHeroSection({ content }: CmsHeroSectionProps) {
         ? { href: desktopImg.link, className: 'block relative w-full aspect-[1920/800]' }
         : { className: 'relative w-full aspect-[1920/800]' };
       return (
-        <ImageWrapper {...imageWrapperProps}>
-          <Image
-            src={desktopSrc}
-            alt={imageAlt}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
-        </ImageWrapper>
+        <>
+          <ImageWrapper {...imageWrapperProps}>
+            <Image
+              src={desktopSrc}
+              alt={imageAlt}
+              title={desktopTitle || imageAlt}
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+            />
+          </ImageWrapper>
+          {desktopTitle && (
+            <figcaption className="absolute bottom-0 left-0 right-0 bg-black/60 px-4 py-2 text-center text-sm text-white/90">
+              {desktopTitle}
+            </figcaption>
+          )}
+        </>
       );
     };
 
     const mobileImg = mobileImage ?? image;
+    const mobileTitle = mobileImg?.title;
     const MobileImage = () => {
       if (!mobileImageUrl) return null;
       const ImageWrapper = mobileImg?.link ? Link : 'div';
@@ -141,27 +151,35 @@ export default function CmsHeroSection({ content }: CmsHeroSectionProps) {
         ? { href: mobileImg.link, className: 'block relative w-full aspect-[480/511]' }
         : { className: 'relative w-full aspect-[480/511]' };
       return (
-        <ImageWrapper {...imageWrapperProps}>
-          <Image
-            src={mobileImageUrl}
-            alt={mobileImageAlt}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
-        </ImageWrapper>
+        <>
+          <ImageWrapper {...imageWrapperProps}>
+            <Image
+              src={mobileImageUrl}
+              alt={mobileImageAlt}
+              title={mobileTitle || mobileImageAlt}
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+            />
+          </ImageWrapper>
+          {mobileTitle && (
+            <figcaption className="absolute bottom-0 left-0 right-0 bg-black/60 px-4 py-2 text-center text-sm text-white/90">
+              {mobileTitle}
+            </figcaption>
+          )}
+        </>
       );
     };
 
     return (
       <section className="relative w-full overflow-hidden">
-        <div className="hidden md:block relative w-full aspect-[1920/800]">
+        <figure className="hidden md:block relative w-full aspect-[1920/800] m-0">
           <DesktopImage />
-        </div>
-        <div className="block md:hidden relative w-full aspect-[480/511]">
+        </figure>
+        <figure className="block md:hidden relative w-full aspect-[480/511] m-0">
           <MobileImage />
-        </div>
+        </figure>
       </section>
     );
   }
@@ -169,6 +187,9 @@ export default function CmsHeroSection({ content }: CmsHeroSectionProps) {
   if (variant === 'image_content' && (imageUrl || mobileImageUrl)) {
     const desktopSrc = imageUrl ?? mobileImageUrl;
     const desktopImg = image ?? mobileImage;
+    const desktopTitle = desktopImg?.title;
+    const mobileImg = mobileImage ?? image;
+    const mobileTitle = mobileImg?.title;
 
     return (
       <section className="relative w-full overflow-hidden">
@@ -180,6 +201,7 @@ export default function CmsHeroSection({ content }: CmsHeroSectionProps) {
                 <Image
                   src={desktopSrc!}
                   alt={imageAlt}
+                  title={desktopTitle || imageAlt}
                   fill
                   priority
                   sizes="100vw"
@@ -190,6 +212,7 @@ export default function CmsHeroSection({ content }: CmsHeroSectionProps) {
               <Image
                 src={desktopSrc!}
                 alt={imageAlt}
+                title={desktopTitle || imageAlt}
                 fill
                 priority
                 sizes="100vw"
@@ -201,20 +224,23 @@ export default function CmsHeroSection({ content }: CmsHeroSectionProps) {
           <div className="absolute inset-0 z-[2] flex items-center">
             <ContentBlock />
           </div>
+          {desktopTitle && (
+            <figcaption className="absolute bottom-6 left-0 right-0 z-[2] px-6 text-center text-sm text-white/80 drop-shadow-md">
+              {desktopTitle}
+            </figcaption>
+          )}
           <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/15 to-transparent pointer-events-none z-[1]" />
         </div>
 
         {/* Mobile: portrait image + mobile content */}
         <div className="relative w-full block md:hidden">
           <div className="relative w-full aspect-[480/511]">
-            {(mobileImage ?? image)?.link ? (
-              <Link
-                href={(mobileImage ?? image)!.link!}
-                className="block relative w-full h-full"
-              >
+            {mobileImg?.link ? (
+              <Link href={mobileImg.link!} className="block relative w-full h-full">
                 <Image
                   src={mobileImageUrl!}
                   alt={mobileImageAlt}
+                  title={mobileTitle || mobileImageAlt}
                   fill
                   priority
                   sizes="100vw"
@@ -225,6 +251,7 @@ export default function CmsHeroSection({ content }: CmsHeroSectionProps) {
               <Image
                 src={mobileImageUrl!}
                 alt={mobileImageAlt}
+                title={mobileTitle || mobileImageAlt}
                 fill
                 priority
                 sizes="100vw"
@@ -233,8 +260,17 @@ export default function CmsHeroSection({ content }: CmsHeroSectionProps) {
             )}
           </div>
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 z-[1]" />
-          <div className="absolute inset-0 z-[2] flex items-end pb-8">
-            <ContentBlock h={mHeading} d={mDesc} s={mSmall} c={mCta} />
+          <div className="absolute inset-0 z-[2] flex flex-col justify-end">
+            <div className="pb-2 px-4">
+              {mobileTitle && (
+                <figcaption className="text-center text-sm text-white/80 drop-shadow-md">
+                  {mobileTitle}
+                </figcaption>
+              )}
+            </div>
+            <div className="pb-8">
+              <ContentBlock h={mHeading} d={mDesc} s={mSmall} c={mCta} />
+            </div>
           </div>
         </div>
       </section>
