@@ -14,7 +14,7 @@ export interface ImageWithMeta {
   link?: string;
 }
 
-export type CustomBlockType = 'text' | 'image' | 'button' | 'spacer';
+export type CustomBlockType = 'text' | 'image' | 'button' | 'spacer' | 'columns' | 'video';
 
 export interface CustomBlockBase {
   id: string;
@@ -45,11 +45,30 @@ export interface CustomSpacerBlock extends CustomBlockBase {
   height?: number;
 }
 
+export interface CustomColumnItem {
+  heading?: string;
+  body?: string;
+}
+
+export interface CustomColumnsBlock extends CustomBlockBase {
+  type: 'columns';
+  columnCount?: 2 | 3 | 4;
+  items: CustomColumnItem[];
+}
+
+export interface CustomVideoBlock extends CustomBlockBase {
+  type: 'video';
+  url: string;
+  title?: string;
+}
+
 export type CustomBlock =
   | CustomTextBlock
   | CustomImageBlock
   | CustomButtonBlock
-  | CustomSpacerBlock;
+  | CustomSpacerBlock
+  | CustomColumnsBlock
+  | CustomVideoBlock;
 
 export interface CustomSectionLayout {
   width?: 'full' | 'contained';
@@ -60,6 +79,14 @@ export interface CustomSectionLayout {
 export interface CustomSectionContent {
   layout?: CustomSectionLayout;
   blocks: CustomBlock[];
+}
+
+/** Category Showcase section – displays categories from DB with configurable heading/CTA */
+export interface CategoryShowcaseContent {
+  heading?: string;
+  showExploreAll?: boolean;
+  exploreAllLink?: string;
+  exploreAllLabel?: string;
 }
 
 export interface HeroSectionContent {

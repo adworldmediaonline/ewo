@@ -1,10 +1,12 @@
 import HeroBanner from './hero-banner';
 import CmsHeroSection from './cms-hero-section';
 import CmsCustomSection from './cms-custom-section';
+import CmsCategoryShowcase from './cms-category-showcase';
 import { getActivePageSections } from '@/server/page-sections';
 import type {
   HeroSectionContent,
   CustomSectionContent,
+  CategoryShowcaseContent,
 } from '@/server/page-sections';
 
 interface PageSectionsRendererProps {
@@ -19,6 +21,7 @@ export default async function PageSectionsRenderer({
 
   const heroSection = sortedSections.find((s) => s.sectionType === 'hero');
   const customSections = sortedSections.filter((s) => s.sectionType === 'custom');
+  const categoryShowcaseSections = sortedSections.filter((s) => s.sectionType === 'category_showcase');
 
   return (
     <>
@@ -27,6 +30,24 @@ export default async function PageSectionsRenderer({
       ) : (
         <HeroBanner />
       )}
+
+      {categoryShowcaseSections.length > 0 ? (
+        categoryShowcaseSections.map((section) => (
+          <CmsCategoryShowcase
+            key={section._id}
+            content={(section.content ?? {}) as unknown as CategoryShowcaseContent}
+          />
+        ))
+      ) : pageSlug === 'home' ? (
+        <CmsCategoryShowcase
+          content={{
+            heading: 'Shop by Category',
+            showExploreAll: true,
+            exploreAllLink: '/shop',
+            exploreAllLabel: 'Explore all',
+          }}
+        />
+      ) : null}
 
       {customSections.map((section) => {
         const content = (section.content ?? { blocks: [] }) as unknown as CustomSectionContent;

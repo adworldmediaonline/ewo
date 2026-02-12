@@ -1,4 +1,3 @@
-import CategoryShowcase from '@/components/version-tsx/category-showcase';
 import PageSectionsRenderer from '@/components/version-tsx/page-sections-renderer';
 import { getPageMetadata } from '@/server/page-metadata';
 import { buildPageMetadata } from '@/lib/build-page-metadata';
@@ -33,8 +32,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-
-      <CategoryShowcase />
 
       {/* About & What We Offer Section */}
       <section className="w-full bg-gradient-to-b from-gray-50 to-white py-10 md:py-14 lg:py-20">

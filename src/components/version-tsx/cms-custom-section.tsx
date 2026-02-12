@@ -40,6 +40,56 @@ export default function CmsCustomSection({ content }: CmsCustomSectionProps) {
 const blockWrapperClass = (block: CustomBlock) =>
   cn(block.className);
 
+function getVideoEmbedProps(url: string): { type: 'youtube' | 'vimeo' | 'direct'; src: string } | null {
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+
+  const youtubeMatch = trimmed.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/);
+  if (youtubeMatch) {
+    return { type: 'youtube', src: `https://www.youtube.com/embed/${youtubeMatch[1]}` };
+  }
+
+  const vimeoMatch = trimmed.match(/(?:vimeo\.com\/)(\d+)/);
+  if (vimeoMatch) {
+    return { type: 'vimeo', src: `https://player.vimeo.com/video/${vimeoMatch[1]}` };
+  }
+
+  if (/\.(mp4|webm|ogg)(\?|$)/i.test(trimmed)) {
+    return { type: 'direct', src: trimmed };
+  }
+
+  return null;
+}
+
+function VideoEmbed({ url, title }: { url: string; title?: string }) {
+  const props = getVideoEmbedProps(url);
+  if (!props) return null;
+
+  if (props.type === 'direct') {
+    return (
+      <video
+        src={props.src}
+        title={title}
+        controls
+        className="w-full aspect-video rounded-lg object-cover"
+        playsInline
+      />
+    );
+  }
+
+  return (
+    <div className="relative aspect-video w-full overflow-hidden rounded-lg">
+      <iframe
+        src={props.src}
+        title={title ?? 'Video'}
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        className="absolute inset-0 h-full w-full"
+      />
+    </div>
+  );
+}
+
 function BlockRenderer({ block }: { block: CustomBlock }) {
   const wrapperClass = blockWrapperClass(block);
 
@@ -109,6 +159,38 @@ function BlockRenderer({ block }: { block: CustomBlock }) {
           aria-hidden
         />
       );
+
+    case 'columns': {
+      const count = block.columnCount ?? 2;
+      const cols = block.items ?? [];
+      const gridClass = count === 2 ? 'grid-cols-1 md:grid-cols-2' : count === 3 ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4';
+      return (
+        <div className={cn('grid gap-6', gridClass, wrapperClass)}>
+          {Array.from({ length: count }, (_, i) => {
+            const item = cols[i] ?? {};
+            return (
+              <div key={i} className="space-y-2">
+                {item.heading && (
+                  <h3 className="text-lg font-semibold text-foreground">{item.heading}</h3>
+                )}
+                {item.body && (
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">{item.body}</p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    case 'video': {
+      if (!block.url?.trim()) return null;
+      return (
+        <div className={cn('relative w-full max-w-4xl mx-auto', wrapperClass)}>
+          <VideoEmbed url={block.url} title={block.title} />
+        </div>
+      );
+    }
 
     default:
       return null;
