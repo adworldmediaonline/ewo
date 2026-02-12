@@ -10,6 +10,8 @@ export interface ImageWithMeta {
   fileName: string;
   title: string;
   altText: string;
+  /** Optional link to navigate when image is clicked (e.g. /shop, /about) */
+  link?: string;
 }
 
 export interface HeroSectionContent {

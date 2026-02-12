@@ -65,9 +65,14 @@ export default function CmsHeroSection({ content }: CmsHeroSectionProps) {
   }
 
   if (variant === 'image_only' && imageUrl) {
+    const ImageWrapper = image?.link ? Link : 'div';
+    const imageWrapperProps = image?.link
+      ? { href: image.link, className: 'block relative w-full aspect-[1920/800] md:aspect-[1920/800]' }
+      : { className: 'relative w-full aspect-[1920/800] md:aspect-[1920/800]' };
+
     return (
       <section className="relative w-full overflow-hidden">
-        <div className="relative w-full aspect-[1920/800] md:aspect-[1920/800]">
+        <ImageWrapper {...imageWrapperProps}>
           <Image
             src={imageUrl}
             alt={imageAlt}
@@ -76,24 +81,31 @@ export default function CmsHeroSection({ content }: CmsHeroSectionProps) {
             sizes="100vw"
             className="object-cover"
           />
-        </div>
+        </ImageWrapper>
       </section>
     );
   }
 
   if (variant === 'image_content' && imageUrl) {
+    const ImageWrapper = image?.link ? Link : 'div';
+    const imageWrapperProps = image?.link
+      ? { href: image.link, className: 'block relative w-full aspect-[1920/800] md:aspect-[1920/800]' }
+      : { className: 'relative w-full aspect-[1920/800] md:aspect-[1920/800]' };
+
     return (
       <section className="relative w-full overflow-hidden">
         <div className="relative w-full">
-          <div className="relative w-full aspect-[1920/800] md:aspect-[1920/800]">
-            <Image
-              src={imageUrl}
-              alt={imageAlt}
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover"
-            />
+          <div className="relative w-full">
+            <ImageWrapper {...imageWrapperProps}>
+              <Image
+                src={imageUrl}
+                alt={imageAlt}
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover"
+              />
+            </ImageWrapper>
           </div>
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent z-[1]" />
           <div className="absolute inset-0 z-[2] flex items-center">
