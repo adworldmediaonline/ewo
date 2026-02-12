@@ -1,5 +1,5 @@
 import CategoryShowcase from '@/components/version-tsx/category-showcase';
-import HeroBanner from '@/components/version-tsx/hero-banner';
+import HeroBannerWrapper from '@/components/version-tsx/hero-banner-wrapper';
 import { getPageMetadata } from '@/server/page-metadata';
 import { buildPageMetadata } from '@/lib/build-page-metadata';
 
@@ -18,7 +18,7 @@ export async function generateMetadata() {
 export default async function HomePage() {
   return (
     <>
-      <HeroBanner />
+      <HeroBannerWrapper pageSlug="home" />
 
       {/* Hero Section Content */}
       <section className="w-full bg-white py-6 md:py-8 lg:py-10">

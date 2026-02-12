@@ -5,4 +5,5 @@ export const API_ENDPOINT = {
   PRODUCTS_RELATED: '/api/product/related-product',
   BANNER: '/api/banner/active',
   PAGE_METADATA: '/api/cms/page-metadata',
+  PAGE_SECTIONS: '/api/cms/page-sections',
 };
