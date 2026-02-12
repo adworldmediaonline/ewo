@@ -35,8 +35,8 @@ export function buildPageMetadata(
       },
       openGraph: cmsData.ogImage
         ? {
-            images: [{ url: cmsData.ogImage }],
-          }
+          images: [{ url: cmsData.ogImage }],
+        }
         : undefined,
     };
   }
