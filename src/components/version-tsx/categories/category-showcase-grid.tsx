@@ -4,13 +4,19 @@ import { getCategoriesShow } from '@/server/categories';
 import { toSlug } from '@/lib/server-data';
 import { CategoryCard, type CategoryItem } from './category-card';
 
+interface CategoryShowcaseGridProps {
+  /** Optional custom order of category IDs. Categories not in this array appear after. */
+  categoryOrder?: string[];
+}
+
 /**
  * Fetches categories from DB and renders the grid.
  * Handles DANA 60 special case (split from parent, dedicated card).
  */
-export async function CategoryShowcaseGrid() {
+export async function CategoryShowcaseGrid({ categoryOrder }: CategoryShowcaseGridProps) {
   const categories = await getCategoriesShow();
-  const processedCategories = processCategoriesForShowcase(categories);
+  const processed = processCategoriesForShowcase(categories);
+  const processedCategories = sortByCategoryOrder(processed, categoryOrder);
 
   return (
     <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 lg:grid-cols-3 xl:grid-cols-5">
@@ -105,4 +111,17 @@ function processCategoriesForShowcase(categories: CategoryItem[]): CategoryItem[
   }
 
   return processedCategories;
+}
+
+function sortByCategoryOrder(
+  categories: CategoryItem[],
+  order?: string[]
+): CategoryItem[] {
+  if (!order?.length) return categories;
+  const orderMap = new Map(order.map((id, i) => [id, i]));
+  return [...categories].sort((a, b) => {
+    const idxA = orderMap.get(a._id) ?? order.length;
+    const idxB = orderMap.get(b._id) ?? order.length;
+    return idxA - idxB;
+  });
 }

@@ -87,6 +87,8 @@ export interface CategoryShowcaseContent {
   showExploreAll?: boolean;
   exploreAllLink?: string;
   exploreAllLabel?: string;
+  /** Optional custom order of category IDs. Categories not in this array appear after, in API order. */
+  categoryOrder?: string[];
 }
 
 export interface HeroSectionContent {

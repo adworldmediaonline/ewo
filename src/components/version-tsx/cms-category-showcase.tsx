@@ -50,7 +50,7 @@ export default function CmsCategoryShowcase({ content }: CmsCategoryShowcaseProp
           )}
         </div>
 
-        <CategoryShowcaseGrid />
+        <CategoryShowcaseGrid categoryOrder={content.categoryOrder} />
       </div>
     </section>
   );
