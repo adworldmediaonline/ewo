@@ -23,13 +23,17 @@ import {
   Truck,
 } from 'lucide-react';
 import Link from 'next/link';
+import { getPageMetadata } from '@/server/page-metadata';
+import { buildPageMetadata } from '@/lib/build-page-metadata';
 
-export const metadata = {
-  title: 'Terms of Use - East West Offroad',
-  alternates: {
+export async function generateMetadata() {
+  const cmsData = await getPageMetadata('terms');
+  return buildPageMetadata('terms', cmsData, {
+    title: 'Terms of Use - East West Offroad',
+    description: 'Read the terms of use for East West Offroad products and services.',
     canonical: '/terms',
-  },
-};
+  });
+}
 
 export default function TermsPage() {
   return (

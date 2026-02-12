@@ -23,17 +23,20 @@ import {
   Truck,
 } from 'lucide-react';
 import Link from 'next/link';
+import { getPageMetadata } from '@/server/page-metadata';
+import { buildPageMetadata } from '@/lib/build-page-metadata';
 
-export const metadata = {
-  title: 'Shipping Policy | East West Offroad Products LLC – Fast & Reliable Delivery',
-  description:
-    'Explore East West Offroad\'s fast, reliable shipping policy. Learn about processing times, delivery methods, and international shipping options for off-road parts.',
-  keywords:
-    'east west offroad shipping policy, off-road parts shipping usa, dana 60 steering parts delivery, custom 4x4 fabrication shipping, usa offroad suspension delivery, heavy duty truck parts shipping, offroad accessories shipping usa, international offroad parts delivery',
-  alternates: {
+export async function generateMetadata() {
+  const cmsData = await getPageMetadata('shipping');
+  return buildPageMetadata('shipping', cmsData, {
+    title: 'Shipping Policy | East West Offroad Products LLC – Fast & Reliable Delivery',
+    description:
+      'Explore East West Offroad\'s fast, reliable shipping policy. Learn about processing times, delivery methods, and international shipping options for off-road parts.',
+    keywords:
+      'east west offroad shipping policy, off-road parts shipping usa, dana 60 steering parts delivery, custom 4x4 fabrication shipping, usa offroad suspension delivery, heavy duty truck parts shipping, offroad accessories shipping usa, international offroad parts delivery',
     canonical: '/shipping',
-  },
-};
+  });
+}
 
 export default function ShippingPage() {
   return (

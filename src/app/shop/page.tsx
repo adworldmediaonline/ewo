@@ -9,14 +9,18 @@ import {
 import ShopContentWrapper from '@/components/version-tsx/shop-content-wrapper';
 import Wrapper from '@/components/wrapper';
 import { getCategories } from '@/lib/server-data';
+import { getPageMetadata } from '@/server/page-metadata';
+import { buildPageMetadata } from '@/lib/build-page-metadata';
 
-export const metadata = {
-  title: 'EWO - Shop',
-  description: 'EWO - Shop',
-  alternates: {
+export async function generateMetadata() {
+  const cmsData = await getPageMetadata('shop');
+  return buildPageMetadata('shop', cmsData, {
+    title: 'EWO - Shop',
+    description:
+      'Browse East West Offroad\'s complete selection of off-road steering parts, DANA 60/44 components, and quality steering kits.',
     canonical: '/shop',
-  },
-};
+  });
+}
 
 export default async function ShopPage() {
   // Fetch categories on the server - same as homepage for consistency

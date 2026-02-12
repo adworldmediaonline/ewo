@@ -1,6 +1,19 @@
 import CategoryShowcase from '@/components/version-tsx/category-showcase';
 import HeroBanner from '@/components/version-tsx/hero-banner';
+import { getPageMetadata } from '@/server/page-metadata';
+import { buildPageMetadata } from '@/lib/build-page-metadata';
 
+export async function generateMetadata() {
+  const cmsData = await getPageMetadata('home');
+  return buildPageMetadata('home', cmsData, {
+    title: 'East West Off Road | Premium Automotive & Off-Road Gear USA',
+    description:
+      'Discover high-performance automotive & off-road parts at East West Offroad (EWO) USA! 🛠️ Durable, reliable, and adventure-ready gear for trucks, Jeeps & 4x4s. Shop now for exclusive deals!',
+    keywords:
+      'Automotive off-road parts USA, East West Offroad EWO, Jeep & truck accessories, Best off-road gear 2024, 4x4 performance upgrades, Durable automotive parts, Off-road suspension kits, Adventure-ready truck mods, USA-made off-road equipment, Top-rated automotive upgrades, hd crossover steering kit',
+    canonical: '/',
+  });
+}
 
 export default async function HomePage() {
   return (
