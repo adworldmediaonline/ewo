@@ -13,6 +13,12 @@ import {
   initialOrderQuantity,
 } from '@/redux/features/cartSlice';
 import { notifyError, notifySuccess } from '@/utils/toast';
+import {
+  getProductImageSrc,
+  getProductImageSrcsForGallery,
+  getProductImageAlt,
+  getVariantImageAlt,
+} from '@/lib/product-image';
 import './quick-view-modal.css';
 
 const customStyles = {
@@ -58,8 +64,6 @@ export default function QuickViewModal() {
     _id,
     sku,
     title,
-    img,
-    imageURLs,
     category,
     description,
     discount,
@@ -69,6 +73,10 @@ export default function QuickViewModal() {
     tags,
     options,
   } = productItem || {};
+
+  const img = getProductImageSrc(productItem || {});
+  const imageURLs = getProductImageSrcsForGallery(productItem || {});
+  const imageAlt = getProductImageAlt(productItem || {});
 
   const [activeImg, setActiveImg] = useState(imageURLs?.[0] || img);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -199,7 +207,7 @@ export default function QuickViewModal() {
             <div className="main-image">
               <CloudinaryImage
                 src={activeImg}
-                alt={title}
+                alt={imageAlt}
                 width={500}
                 height={500}
                 style={{
@@ -232,7 +240,7 @@ export default function QuickViewModal() {
                     >
                       <CloudinaryImage
                         src={url}
-                        alt={`${title} ${i + 1}`}
+                        alt={getVariantImageAlt(productItem || {}, i, url)}
                         width={80}
                         height={80}
                         style={{

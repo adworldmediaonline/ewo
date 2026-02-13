@@ -1,4 +1,5 @@
 'use client';
+import { getProductImageUrl, getProductImageUrls } from '@/lib/product-image';
 import {
   Accordion,
   AccordionContent,
@@ -123,8 +124,6 @@ export default function DetailsWrapper({
   const {
     sku,
     title,
-    img,
-    imageURLs,
     category,
     price,
     status,
@@ -141,6 +140,8 @@ export default function DetailsWrapper({
     children,
     parent
   } = productItem || {};
+  const img = getProductImageUrl(productItem || {});
+  const imageURLs = getProductImageUrls(productItem || {});
   const [selectedOption, setSelectedOption] = useState(null);
   const [customNotes, setCustomNotes] = useState({});
 

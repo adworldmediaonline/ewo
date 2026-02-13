@@ -57,7 +57,7 @@ export const useShopActions = () => {
       const cartProduct = {
         _id: product._id,
         title: product.title,
-        img: product.imageURLs?.[0] || product.img || '',
+        img: (product as any).image?.url ?? product.imageURLs?.[0] ?? product.img ?? '',
         finalPriceDiscount: finalPrice, // Use price from product (already includes coupon discount if active)
         orderQuantity: 1,
         quantity: product.quantity,
@@ -80,7 +80,7 @@ export const useShopActions = () => {
       const wishlistProduct = {
         _id: product._id,
         title: product.title,
-        img: product.imageURLs?.[0] || product.img || '',
+        img: (product as any).image?.url ?? product.imageURLs?.[0] ?? product.img ?? '',
         price: product.price,
         category: product.category,
         slug: product.slug,

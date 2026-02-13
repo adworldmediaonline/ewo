@@ -10,6 +10,13 @@ import { useSelector } from 'react-redux';
 import { useProductCoupon } from '@/hooks/useProductCoupon';
 import { ProductLinkIndicatorMinimal } from '@/components/ui/product-link-indicator';
 import { CldImage } from 'next-cloudinary';
+import {
+  getProductImageSrc,
+  getProductImageAlt,
+  getProductImageTitle,
+  isProductImageProxyUrl,
+} from '@/lib/product-image';
+import Image from 'next/image';
 
 // Star rating component
 const StarRating = ({
@@ -72,7 +79,9 @@ export interface RelatedProduct {
   sku: string;
   slug?: string;
   img?: string;
+  image?: { url: string; fileName?: string; title?: string; altText?: string } | null;
   imageURLs?: string[];
+  imageURLsWithMeta?: Array<{ url: string; fileName?: string; title?: string; altText?: string }>;
   price: number;
   updatedPrice?: number;
   finalPriceDiscount?: number;
@@ -119,11 +128,14 @@ export default function RelatedProductCard({
     (prd: any) => prd._id === product._id
   );
 
-  const imageUrl = product.imageURLs?.[0] || product.img;
+  const imageSrc = getProductImageSrc(product);
+  const imageAlt = getProductImageAlt(product);
+  const imageTitle = getProductImageTitle(product);
+  const useProxyForFilename = isProductImageProxyUrl(imageSrc);
   const isCloudinaryAsset =
-    typeof imageUrl === 'string' &&
-    imageUrl.startsWith('https://res.cloudinary.com/') &&
-    imageUrl.includes('/upload/');
+    typeof imageSrc === 'string' &&
+    imageSrc.startsWith('https://res.cloudinary.com/') &&
+    imageSrc.includes('/upload/');
   const averageRating =
     product.reviews && product.reviews.length > 0
       ? product.reviews.reduce((sum, review) => sum + review.rating, 0) /
@@ -236,21 +248,37 @@ export default function RelatedProductCard({
               data-noindex="true"
               data-nosnippet="true"
             >
-              {imageUrl ? (
-                <CldImage
-                  src={imageUrl}
-                  alt={product.title}
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className={`object-contain transition-transform duration-300 ${isHovered ? 'scale-105' : 'scale-100'
-                    }`}
-                  onLoad={() => setIsImageLoading(false)}
-                  preserveTransformations={isCloudinaryAsset}
-                  deliveryType={isCloudinaryAsset ? undefined : 'fetch'}
-                  loading="lazy"
-                  fetchPriority="low"
-                  data-noindex="true"
-                />
+              {imageSrc ? (
+                useProxyForFilename ? (
+                  <Image
+                    src={imageSrc}
+                    alt={imageAlt}
+                    title={imageTitle || undefined}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className={`object-contain transition-transform duration-300 ${isHovered ? 'scale-105' : 'scale-100'}`}
+                    onLoad={() => setIsImageLoading(false)}
+                    loading="lazy"
+                    fetchPriority="low"
+                    unoptimized
+                  />
+                ) : (
+                  <CldImage
+                    src={imageSrc}
+                    alt={imageAlt}
+                    title={imageTitle || undefined}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className={`object-contain transition-transform duration-300 ${isHovered ? 'scale-105' : 'scale-100'
+                      }`}
+                    onLoad={() => setIsImageLoading(false)}
+                    preserveTransformations={isCloudinaryAsset}
+                    deliveryType={isCloudinaryAsset ? undefined : 'fetch'}
+                    loading="lazy"
+                    fetchPriority="low"
+                    data-noindex="true"
+                  />
+                )
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-muted">
                   <span className="text-muted-foreground">No Image</span>
