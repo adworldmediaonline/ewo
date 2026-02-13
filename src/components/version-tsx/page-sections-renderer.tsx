@@ -19,26 +19,49 @@ export default async function PageSectionsRenderer({
   const sections = await getActivePageSections(pageSlug);
   const sortedSections = [...sections].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
-  const heroSection = sortedSections.find((s) => s.sectionType === 'hero');
-  const customSections = sortedSections.filter((s) => s.sectionType === 'custom');
-  const categoryShowcaseSections = sortedSections.filter((s) => s.sectionType === 'category_showcase');
+  const hasCategoryShowcase = sortedSections.some(
+    (s) => s.sectionType === 'category_showcase'
+  );
 
   return (
     <>
-      {heroSection?.content && Object.keys(heroSection.content).length > 0 ? (
-        <CmsHeroSection content={heroSection.content as unknown as HeroSectionContent} />
-      ) : (
-        <HeroBanner />
-      )}
+      {sortedSections.map((section) => {
+        if (section.sectionType === 'hero') {
+          if (section.content && Object.keys(section.content).length > 0) {
+            return (
+              <CmsHeroSection
+                key={section._id}
+                content={section.content as unknown as HeroSectionContent}
+              />
+            );
+          }
+          return <HeroBanner key={section._id} />;
+        }
 
-      {categoryShowcaseSections.length > 0 ? (
-        categoryShowcaseSections.map((section) => (
-          <CmsCategoryShowcase
-            key={section._id}
-            content={(section.content ?? {}) as unknown as CategoryShowcaseContent}
-          />
-        ))
-      ) : pageSlug === 'home' ? (
+        if (section.sectionType === 'category_showcase') {
+          return (
+            <CmsCategoryShowcase
+              key={section._id}
+              content={(section.content ?? {}) as unknown as CategoryShowcaseContent}
+            />
+          );
+        }
+
+        if (section.sectionType === 'custom') {
+          const content = (section.content ?? { blocks: [] }) as unknown as CustomSectionContent;
+          if (!content.blocks?.length) return null;
+          return (
+            <CmsCustomSection
+              key={section._id}
+              content={content}
+            />
+          );
+        }
+
+        return null;
+      })}
+
+      {!hasCategoryShowcase && pageSlug === 'home' ? (
         <CmsCategoryShowcase
           content={{
             heading: 'Shop by Category',
@@ -48,17 +71,6 @@ export default async function PageSectionsRenderer({
           }}
         />
       ) : null}
-
-      {customSections.map((section) => {
-        const content = (section.content ?? { blocks: [] }) as unknown as CustomSectionContent;
-        if (!content.blocks?.length) return null;
-        return (
-          <CmsCustomSection
-            key={section._id}
-            content={content}
-          />
-        );
-      })}
     </>
   );
 }
