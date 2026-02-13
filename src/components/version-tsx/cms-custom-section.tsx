@@ -1,8 +1,42 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import DOMPurify from 'isomorphic-dompurify';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { CustomSectionContent, CustomBlock } from '@/server/page-sections';
+
+/** Renders body content: HTML (rich text) or plain text */
+function BodyContent({
+  body,
+  className,
+}: {
+  body: string;
+  className?: string;
+}) {
+  if (!body?.trim()) return null;
+  const isHtml = /<[a-z][\s\S]*>/i.test(body);
+  if (isHtml) {
+    return (
+      <div
+        className={cn('prose prose-sm max-w-none text-muted-foreground', className)}
+        dangerouslySetInnerHTML={{
+          __html: DOMPurify.sanitize(body, {
+            ALLOWED_TAGS: [
+              'p', 'br', 'strong', 'b', 'em', 'i', 'u', 's', 'a', 'ul', 'ol', 'li',
+              'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'code', 'pre',
+            ],
+            ALLOWED_ATTR: ['href', 'target', 'rel'],
+          }),
+        }}
+      />
+    );
+  }
+  return (
+    <p className={cn('text-sm sm:text-base text-muted-foreground whitespace-pre-wrap', className)}>
+      {body}
+    </p>
+  );
+}
 
 interface CmsCustomSectionProps {
   content: CustomSectionContent;
@@ -94,21 +128,35 @@ function BlockRenderer({ block }: { block: CustomBlock }) {
   const wrapperClass = blockWrapperClass(block);
 
   switch (block.type) {
-    case 'text':
+    case 'text': {
+      const HeadingTag = (block.headingLevel ?? 'h2') as keyof JSX.IntrinsicElements;
+      const headingSizeClass =
+        HeadingTag === 'h1'
+          ? 'text-2xl sm:text-3xl'
+          : HeadingTag === 'h2'
+            ? 'text-xl sm:text-2xl'
+            : HeadingTag === 'h3'
+              ? 'text-lg sm:text-xl'
+              : HeadingTag === 'h4'
+                ? 'text-base sm:text-lg'
+                : HeadingTag === 'h5'
+                  ? 'text-sm sm:text-base'
+                  : 'text-sm';
       return (
         <div className={cn('space-y-2', wrapperClass)}>
           {block.heading && (
-            <h2 className="text-xl sm:text-2xl font-bold text-foreground">
+            <HeadingTag
+              className={cn(headingSizeClass, 'font-bold text-foreground')}
+            >
               {block.heading}
-            </h2>
+            </HeadingTag>
           )}
           {block.body && (
-            <p className="text-sm sm:text-base text-muted-foreground whitespace-pre-wrap">
-              {block.body}
-            </p>
+            <BodyContent body={block.body} className="text-sm sm:text-base" />
           )}
         </div>
       );
+    }
 
     case 'image':
       if (!block.image?.url) return null;
@@ -168,13 +216,30 @@ function BlockRenderer({ block }: { block: CustomBlock }) {
         <div className={cn('grid gap-6', gridClass, wrapperClass)}>
           {Array.from({ length: count }, (_, i) => {
             const item = cols[i] ?? {};
+            const ColumnHeadingTag = (item.headingLevel ?? 'h3') as keyof JSX.IntrinsicElements;
+            const columnHeadingSizeClass =
+              ColumnHeadingTag === 'h1'
+                ? 'text-2xl sm:text-3xl'
+                : ColumnHeadingTag === 'h2'
+                  ? 'text-xl sm:text-2xl'
+                  : ColumnHeadingTag === 'h3'
+                    ? 'text-lg sm:text-xl'
+                    : ColumnHeadingTag === 'h4'
+                      ? 'text-base sm:text-lg'
+                      : ColumnHeadingTag === 'h5'
+                        ? 'text-sm sm:text-base'
+                        : 'text-sm';
             return (
               <div key={i} className="space-y-2">
                 {item.heading && (
-                  <h3 className="text-lg font-semibold text-foreground">{item.heading}</h3>
+                  <ColumnHeadingTag
+                    className={cn(columnHeadingSizeClass, 'font-semibold text-foreground')}
+                  >
+                    {item.heading}
+                  </ColumnHeadingTag>
                 )}
                 {item.body && (
-                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">{item.body}</p>
+                  <BodyContent body={item.body} className="text-sm" />
                 )}
               </div>
             );
