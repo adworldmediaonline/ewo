@@ -296,7 +296,6 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
                   width={1920}
                   height={800}
                   className="w-full h-auto object-contain"
-                  style={{ aspectRatio: '1920 / 800' }}
                   sizes="100vw"
                   unoptimized
                   priority={false}
