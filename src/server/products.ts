@@ -6,7 +6,8 @@ import { API_ENDPOINT } from "./api-endpoint";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export async function getProductsShow() {
-  cacheLife("hours");
+  // Use "seconds" profile so publish status changes appear within ~1 min
+  cacheLife("seconds");
   try {
     const response = await fetch(`${API_BASE_URL}${API_ENDPOINT.PRODUCTS_SHOW}`);
     if (!response.ok) {
@@ -25,7 +26,8 @@ export async function getProductsShow() {
 
 
 export async function getProductSingle(id: string) {
-  cacheLife("hours");
+  // Use "seconds" profile so publish status changes appear within ~1 min
+  cacheLife("seconds");
   try {
     const response = await fetch(`${API_BASE_URL}${API_ENDPOINT.PRODUCTS_SINGLE}/${id}`);
     if (!response.ok) {
@@ -41,7 +43,8 @@ export async function getProductSingle(id: string) {
 }
 
 export async function getRelatedProducts(id: string) {
-  cacheLife("minutes");
+  // Use "seconds" profile so publish status changes appear within ~1 min
+  cacheLife("seconds");
   try {
     const response = await fetch(`${API_BASE_URL}${API_ENDPOINT.PRODUCTS_RELATED}/${id}`);
     if (!response.ok) {
