@@ -1,42 +1,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import DOMPurify from 'isomorphic-dompurify';
+import type React from 'react';
+import type { CustomSectionContent, CustomBlock } from '@/server/page-sections';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { CustomSectionContent, CustomBlock } from '@/server/page-sections';
-
-/** Renders body content: HTML (rich text) or plain text */
-function BodyContent({
-  body,
-  className,
-}: {
-  body: string;
-  className?: string;
-}) {
-  if (!body?.trim()) return null;
-  const isHtml = /<[a-z][\s\S]*>/i.test(body);
-  if (isHtml) {
-    return (
-      <div
-        className={cn('prose prose-sm max-w-none text-muted-foreground', className)}
-        dangerouslySetInnerHTML={{
-          __html: DOMPurify.sanitize(body, {
-            ALLOWED_TAGS: [
-              'p', 'br', 'strong', 'b', 'em', 'i', 'u', 's', 'a', 'ul', 'ol', 'li',
-              'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'code', 'pre',
-            ],
-            ALLOWED_ATTR: ['href', 'target', 'rel'],
-          }),
-        }}
-      />
-    );
-  }
-  return (
-    <p className={cn('text-sm sm:text-base text-muted-foreground whitespace-pre-wrap', className)}>
-      {body}
-    </p>
-  );
-}
+import { BodyContent } from './body-content';
 
 interface CmsCustomSectionProps {
   content: CustomSectionContent;
@@ -129,7 +97,7 @@ function BlockRenderer({ block }: { block: CustomBlock }) {
 
   switch (block.type) {
     case 'text': {
-      const HeadingTag = (block.headingLevel ?? 'h2') as keyof JSX.IntrinsicElements;
+      const HeadingTag = (block.headingLevel ?? 'h2') as keyof React.JSX.IntrinsicElements;
       const headingSizeClass =
         HeadingTag === 'h1'
           ? 'text-2xl sm:text-3xl'
@@ -216,7 +184,7 @@ function BlockRenderer({ block }: { block: CustomBlock }) {
         <div className={cn('grid gap-6', gridClass, wrapperClass)}>
           {Array.from({ length: count }, (_, i) => {
             const item = cols[i] ?? {};
-            const ColumnHeadingTag = (item.headingLevel ?? 'h3') as keyof JSX.IntrinsicElements;
+            const ColumnHeadingTag = (item.headingLevel ?? 'h3') as keyof React.JSX.IntrinsicElements;
             const columnHeadingSizeClass =
               ColumnHeadingTag === 'h1'
                 ? 'text-2xl sm:text-3xl'

@@ -69,13 +69,15 @@ function processCategoriesForShowcase(categories: CategoryItem[]): CategoryItem[
       });
 
       if (!dana60Exists) {
+        const dana60ImageUrl = 'https://res.cloudinary.com/datdyxl7o/image/upload/v1768978611/dana_60_cybdcn.webp';
         dana60Category = {
           _id: `dana-60-standalone-${parentCategory._id}`,
           parent: parentCategory.parent,
           children: [dana60Name || dana60SubcategoryName],
           status: parentCategory.status || 'Show',
           description: parentCategory.description,
-          img: 'https://res.cloudinary.com/datdyxl7o/image/upload/v1768978611/dana_60_cybdcn.webp',
+          img: dana60ImageUrl,
+          image: parentCategory.image ? { ...parentCategory.image, url: parentCategory.image.url || dana60ImageUrl } : { url: dana60ImageUrl, fileName: 'dana-60.webp', title: 'DANA 60', altText: 'DANA 60' },
           products: parentCategory.products,
           parentCategorySlug: parentCategorySlug,
           subcategorySlug: dana60Slug,
@@ -92,11 +94,13 @@ function processCategoriesForShowcase(categories: CategoryItem[]): CategoryItem[
 
       if (existingDana60Index !== -1) {
         const existingDana60 = processedCategories[existingDana60Index];
+        const dana60ImageUrl = 'https://res.cloudinary.com/datdyxl7o/image/upload/v1768978611/dana_60_cybdcn.webp';
         dana60Category = {
           ...existingDana60,
           parent: parentCategory.parent,
           children: [dana60Name || dana60SubcategoryName],
-          img: 'https://res.cloudinary.com/datdyxl7o/image/upload/v1768978611/dana_60_cybdcn.webp',
+          img: dana60ImageUrl,
+          image: existingDana60.image ? { ...existingDana60.image, url: existingDana60.image.url || dana60ImageUrl } : { url: dana60ImageUrl, fileName: 'dana-60.webp', title: 'DANA 60', altText: 'DANA 60' },
           parentCategorySlug: parentCategorySlug,
           subcategorySlug: dana60Slug,
         } as CategoryItem & { parentCategorySlug?: string; subcategorySlug?: string };
