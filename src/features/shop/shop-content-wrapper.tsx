@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
+import Image from 'next/image';
 
 import ShopEmptyState from '@/features/shop/components/shop-empty-state';
 import ShopLoadMoreTrigger from '@/features/shop/components/shop-load-more-trigger';
@@ -13,7 +14,11 @@ import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
 import { useShopProducts } from '@/features/shop/hooks/use-shop-products';
 import { useShopQueryState } from '@/features/shop/hooks/use-shop-query-state';
 import { DEFAULT_FILTERS } from '@/features/shop/shop-types';
-import { CategoryItem } from '@/lib/server-data';
+import {
+  CategoryItem,
+  toSlug,
+  type BannerDisplayScope,
+} from '@/lib/server-data';
 
 interface ShopContentWrapperProps {
   categories: CategoryItem[];
@@ -94,60 +99,69 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
 
   const showErrorState = status === 'error';
 
-  // Check if selected category matches the filter image categories
-  const shouldShowFilterImage = useMemo(() => {
-    const category = filters.category;
-    const subcategory = filters.subcategory;
+  // Resolve category banner based on selected category/subcategory and banner display config
+  const categoryBanner = useMemo(() => {
+    const categorySlug = filters.category;
+    const subcategorySlug = filters.subcategory;
 
-    // Check for steering-knuckles category
-    if (category === 'steering-knuckles') {
-      return true;
+    if (!categorySlug || !categories.length) {
+      return null;
     }
 
-    // Check for crossover-and-high-steer-kits category
-    if (category === 'crossover-and-high-steer-kits') {
-      // Show image for main category or specific subcategories
-      if (!subcategory || subcategory === '10-bolt-kits' || subcategory === 'dana-44') {
-        return true;
-      }
+    const category = categories.find(
+      (c) => toSlug(c.parent) === categorySlug
+    );
+    if (!category?.banner?.url) {
+      return null;
     }
 
-    // Check for rod-ends-heim-joints category
-    if (category === 'rod-ends-heim-joints') {
-      return true;
+    const scope: BannerDisplayScope =
+      category.bannerDisplayScope || 'all';
+    const displayChildren = category.bannerDisplayChildren || [];
+
+    const isParentView = !subcategorySlug || subcategorySlug === '';
+    const isChildInScope =
+      subcategorySlug && displayChildren.includes(subcategorySlug);
+
+    switch (scope) {
+      case 'all':
+        return category.banner;
+      case 'parent_only':
+        return isParentView ? category.banner : null;
+      case 'children_only':
+        return isChildInScope ? category.banner : null;
+      case 'parent_and_children':
+        return isParentView || isChildInScope ? category.banner : null;
+      default:
+        return category.banner;
     }
-
-    return false;
-  }, [filters.category, filters.subcategory]);
-
-  // Determine which image to show based on category
-  const filterImageSrc = useMemo(() => {
-    const category = filters.category;
-
-    if (category === 'rod-ends-heim-joints') {
-      return '/assets/1-25-inch-rod-end-kit-save-amount.webp';
-    }
-
-    // Default image for other categories
-    return '/assets/dana-44-high-steer-vs-stock-steering-comparison-kit.webp';
-  }, [filters.category]);
+  }, [
+    filters.category,
+    filters.subcategory,
+    categories,
+  ]);
 
   return (
     <>
-      {/* filter category image show here */}
-      {shouldShowFilterImage && (
+      {/* Category banner - rendered based on banner display config */}
+      {categoryBanner && (
         <div className="w-full flex items-center justify-center">
           <div className="relative w-full mx-auto">
-            <img
-              src={filterImageSrc}
-              alt="Category Filter"
+            <Image
+              src={`/api/image?url=${encodeURIComponent(categoryBanner.url)}&filename=${encodeURIComponent(categoryBanner.fileName || 'category-banner.webp')}`}
+              alt={categoryBanner.altText || categoryBanner.title || 'Category banner'}
+              title={categoryBanner.title}
+              width={1920}
+              height={800}
               className="w-full h-auto object-contain"
               style={{ aspectRatio: '1920 / 800' }}
+              sizes="100vw"
+              unoptimized
+              priority={false}
             />
           </div>
         </div>
       )}
-      {/* filter image category show here code end */}
       <div className="min-h-screen bg-background py-2 lg:py-6">
         <div className="mx-auto flex w-full max-w-7xl gap-2 lg:gap-4 px-0 md:px-4">
           <ShopSidebar

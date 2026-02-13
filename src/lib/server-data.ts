@@ -1,11 +1,31 @@
 import { unstable_cache } from 'next/cache';
 
 // Types for our data
+export interface ImageWithMeta {
+  url: string;
+  fileName?: string;
+  title?: string;
+  altText?: string;
+  link?: string;
+}
+
+export type BannerDisplayScope =
+  | 'all'
+  | 'parent_only'
+  | 'children_only'
+  | 'parent_and_children';
+
 export interface CategoryItem {
   _id: string;
   parent: string;
   description?: string;
   img?: string;
+  /** Image with metadata (fileName, title, altText) */
+  image?: ImageWithMeta;
+  /** Category banner for shop page */
+  banner?: ImageWithMeta;
+  bannerDisplayScope?: BannerDisplayScope;
+  bannerDisplayChildren?: string[];
   status?: string;
   products?: unknown[];
   children?: string[];
