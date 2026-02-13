@@ -133,11 +133,11 @@ export default function CmsHeroSection({ content }: CmsHeroSectionProps) {
               className="object-cover"
             />
           </ImageWrapper>
-          {desktopTitle && (
+          {/* {desktopTitle && (
             <figcaption className="absolute bottom-0 left-0 right-0 bg-black/60 px-4 py-2 text-center text-sm text-white/90">
               {desktopTitle}
             </figcaption>
-          )}
+          )} */}
         </>
       );
     };
@@ -163,11 +163,11 @@ export default function CmsHeroSection({ content }: CmsHeroSectionProps) {
               className="object-cover"
             />
           </ImageWrapper>
-          {mobileTitle && (
+          {/* {mobileTitle && (
             <figcaption className="absolute bottom-0 left-0 right-0 bg-black/60 px-4 py-2 text-center text-sm text-white/90">
               {mobileTitle}
             </figcaption>
-          )}
+          )} */}
         </>
       );
     };
