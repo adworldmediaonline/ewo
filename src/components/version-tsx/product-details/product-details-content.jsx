@@ -4,10 +4,20 @@ import DetailsThumbWrapper from './details-thumb-wrapper';
 import DetailsWrapper from './details-wrapper';
 import ProductVideoPlayer from './product-video-player';
 import ProductDetailsFixedBar from './product-details-fixed-bar';
+import {
+  getProductImageSrc,
+  getProductImageSrcsForGallery,
+} from '@/lib/product-image';
 
 export default function ProductDetailsContent({ productItem, children }) {
-  const { img, imageURLs, videoId, status } = productItem || {};
-  const [activeImg, setActiveImg] = useState(imageURLs?.[0] || img);
+  const mainImg = getProductImageSrc(productItem || {});
+  let imageURLs = getProductImageSrcsForGallery(productItem || {});
+  // When product has only main image (no variants), include it in gallery
+  if (imageURLs.length === 0 && mainImg) {
+    imageURLs = [mainImg];
+  }
+  const { videoId, status } = productItem || {};
+  const [activeImg, setActiveImg] = useState(imageURLs?.[0] || mainImg);
   const addToCartRef = useRef(null);
   const proceedToBuyRef = useRef(null);
 
@@ -27,6 +37,7 @@ export default function ProductDetailsContent({ productItem, children }) {
               activeImg={activeImg}
               handleImageActive={handleImageActive}
               imageURLs={imageURLs}
+              productItem={productItem}
               imgWidth={580}
               imgHeight={580}
               videoId={videoId}

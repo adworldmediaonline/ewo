@@ -6,12 +6,15 @@ async function fetchProducts() {
       process.env.NEXT_PUBLIC_API_BASE_URL ||
       'http://localhost:7000';
 
-    const response = await fetch(`${apiBaseUrl}/api/product/all`, {
-      next: { revalidate: 86400 }, // Cache for 24 hours instead of 1 hour
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await fetch(
+      `${apiBaseUrl}/api/product/all?publishStatus=published&limit=10000`,
+      {
+        next: { revalidate: 86400 }, // Cache for 24 hours
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
 
     if (!response.ok) {
       return [];
@@ -19,8 +22,11 @@ async function fetchProducts() {
 
     const data = await response.json();
 
-    // Extract products from API response
-    const products = data?.data || [];
+    // Extract products from API response - only include published products
+    const allProducts = data?.data || [];
+    const products = allProducts.filter(
+      (p) => !p.publishStatus || p.publishStatus === 'published'
+    );
 
     return products;
   } catch (error) {

@@ -41,7 +41,9 @@ const slider_setting = {
 };
 
 const NewArrivals = () => {
-  const { data: products, isError, isLoading } = useGetAllProductsQuery();
+  const { data: products, isError, isLoading } = useGetAllProductsQuery({
+  publishStatus: 'published',
+});
   // decide what to render
   let content = null;
 

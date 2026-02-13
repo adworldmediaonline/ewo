@@ -1,5 +1,6 @@
 /* Tailwind v4 base utilities injected via PostCSS */
 @import 'tailwindcss';
+@source "./cms-block-classes.txt";
 @import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));

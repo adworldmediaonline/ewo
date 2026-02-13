@@ -1,4 +1,11 @@
+'use client';
+
 import { CldImage } from 'next-cloudinary';
+import Image from 'next/image';
+
+/** Whether src is our image proxy URL (needs Next Image, not CldImage). */
+const isProxyUrl = (src) =>
+  typeof src === 'string' && src.startsWith('/api/image?');
 
 const CloudinaryImage = ({
   src,
@@ -27,6 +34,25 @@ const CloudinaryImage = ({
 
   // Don't pass loading prop if priority is true
   const loadingProp = priority ? {} : { loading };
+
+  // Proxy URLs: use Next Image so "Save Image As" gets correct filename
+  if (src && isProxyUrl(src)) {
+    return (
+      <Image
+        src={src}
+        alt={alt || ''}
+        width={width}
+        height={height}
+        sizes={sizes}
+        priority={priority}
+        className={className}
+        style={{ ...style, objectFit }}
+        loading={priority ? undefined : loading}
+        unoptimized
+        {...props}
+      />
+    );
+  }
 
   // Combine style with objectFit
   const combinedStyle = {

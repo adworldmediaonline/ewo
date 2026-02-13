@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Heart, ShoppingCart, Star, Ticket, Settings, Youtube, Play, X } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
 import { useSelector } from 'react-redux';
@@ -26,6 +27,12 @@ import { ProductLinkIndicatorMinimal } from '@/components/ui/product-link-indica
 import { CldImage } from 'next-cloudinary';
 import ProductConfigurationDialog from '@/components/version-tsx/product-configuration-dialog';
 import ProductBadges from '@/components/version-tsx/product-badges';
+import {
+  getProductImageSrc,
+  getProductImageAlt,
+  getProductImageTitle,
+  isProductImageProxyUrl,
+} from '@/lib/product-image';
 
 type TitleSegment = { kind: 'outside' | 'inside'; text: string };
 
@@ -128,7 +135,9 @@ export interface Product {
   sku: string;
   slug: string;
   img?: string;
+  image?: { url: string; fileName?: string; title?: string; altText?: string; link?: string } | null;
   imageURLs?: string[];
+  imageURLsWithMeta?: Array<{ url: string; fileName?: string; title?: string; altText?: string }>;
   price: number;
   updatedPrice?: number;
   finalPriceDiscount?: number;
@@ -219,11 +228,14 @@ export default function ProductCard({
     (prd: any) => prd._id === product._id
   );
 
-  const imageUrl = product.img;
+  const imageSrc = getProductImageSrc(product);
+  const imageAlt = getProductImageAlt(product);
+  const imageTitle = getProductImageTitle(product);
+  const useProxyForFilename = isProductImageProxyUrl(imageSrc);
   const isCloudinaryAsset =
-    typeof imageUrl === 'string' &&
-    imageUrl.startsWith('https://res.cloudinary.com/') &&
-    imageUrl.includes('/upload/');
+    typeof imageSrc === 'string' &&
+    imageSrc.startsWith('https://res.cloudinary.com/') &&
+    imageSrc.includes('/upload/');
   const shouldEagerLoad = index < 8;
   const shouldUseHighPriority = index < 4;
   const averageRating =
@@ -444,20 +456,36 @@ export default function ProductCard({
 
             {/* Product Image */}
             <div className="relative h-full w-full overflow-hidden">
-              {imageUrl ? (
-                <CldImage
-                  src={imageUrl}
-                  alt={product.title}
-                  fill
-                  className={`object-contain transition-transform duration-300 ${isHovered ? 'scale-105' : 'scale-100'
-                    }`}
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  loading={shouldEagerLoad ? 'eager' : 'lazy'}
-                  fetchPriority={shouldUseHighPriority ? 'high' : undefined}
-                  preserveTransformations={isCloudinaryAsset}
-                  deliveryType={isCloudinaryAsset ? undefined : 'fetch'}
-                  onLoad={() => setIsImageLoading(false)}
-                />
+              {imageSrc ? (
+                useProxyForFilename ? (
+                  <Image
+                    src={imageSrc}
+                    alt={imageAlt}
+                    title={imageTitle || undefined}
+                    fill
+                    className={`object-contain transition-transform duration-300 ${isHovered ? 'scale-105' : 'scale-100'}`}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    loading={shouldEagerLoad ? 'eager' : 'lazy'}
+                    fetchPriority={shouldUseHighPriority ? 'high' : undefined}
+                    onLoad={() => setIsImageLoading(false)}
+                    unoptimized
+                  />
+                ) : (
+                  <CldImage
+                    src={imageSrc}
+                    alt={imageAlt}
+                    title={imageTitle || undefined}
+                    fill
+                    className={`object-contain transition-transform duration-300 ${isHovered ? 'scale-105' : 'scale-100'
+                      }`}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    loading={shouldEagerLoad ? 'eager' : 'lazy'}
+                    fetchPriority={shouldUseHighPriority ? 'high' : undefined}
+                    preserveTransformations={isCloudinaryAsset}
+                    deliveryType={isCloudinaryAsset ? undefined : 'fetch'}
+                    onLoad={() => setIsImageLoading(false)}
+                  />
+                )
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-muted">
                   <span className="text-muted-foreground">No Image</span>

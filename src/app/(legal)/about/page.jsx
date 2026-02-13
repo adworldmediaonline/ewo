@@ -10,13 +10,18 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, Award, Shield, Target, Truck, Users } from 'lucide-react';
 import Link from 'next/link';
+import { getPageMetadata } from '@/server/page-metadata';
+import { buildPageMetadata } from '@/lib/build-page-metadata';
 
-export const metadata = {
-  title: 'About Us - East West Offroad',
-  alternates: {
+export async function generateMetadata() {
+  const cmsData = await getPageMetadata('about');
+  return buildPageMetadata('about', cmsData, {
+    title: 'About Us - East West Offroad',
+    description:
+      'Learn about East West Offroad\'s mission to deliver quality steering and suspension products at affordable prices for off-road enthusiasts.',
     canonical: '/about',
-  },
-};
+  });
+}
 
 export default function AboutPage() {
   return (

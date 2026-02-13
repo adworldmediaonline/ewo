@@ -40,10 +40,10 @@ export const generateMetadata = async (props: {
         `Shop ${product.title} at East West Off Road. Premium automotive & off-road gear.`,
       images: [
         {
-          url: product.img ?? '',
+          url: (product as any).image?.url ?? product.img ?? '',
           width: 1200,
           height: 630,
-          alt: product.title ?? '',
+          alt: (product as any).image?.altText ?? (product as any).image?.title ?? product.title ?? '',
         },
       ],
     },

@@ -10,6 +10,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+  getProductImageUrl,
+  getProductImageSrc,
+  getProductImageAlt,
+  isProductImageProxyUrl,
+} from '@/lib/product-image';
 
 // Star rating component
 const StarRating = ({
@@ -75,7 +81,9 @@ export interface Product {
   sku?: string;
   productType?: string;
   img?: string;
+  image?: { url: string; fileName?: string; title?: string; altText?: string } | null;
   imageURLs?: string[];
+  imageURLsWithMeta?: Array<{ url: string; fileName?: string; title?: string; altText?: string }>;
   price: number;
   updatedPrice?: number;
   finalPriceDiscount?: number;
@@ -114,7 +122,10 @@ export default function ProductItem({
     (prd: any) => prd._id === product._id
   );
 
-  const imageUrl = product.imageURLs?.[0] || product.img;
+  const imageUrl = getProductImageUrl(product);
+  const imageSrc = getProductImageSrc(product);
+  const imageAlt = getProductImageAlt(product);
+  const useProxyForFilename = isProductImageProxyUrl(imageSrc);
   const averageRating =
     product.reviews && product.reviews.length > 0
       ? product.reviews.reduce((sum, review) => sum + review.rating, 0) /
@@ -203,10 +214,10 @@ export default function ProductItem({
 
             {/* Product Image */}
             <div className="relative h-full w-full overflow-hidden">
-              {imageUrl ? (
+              {imageSrc ? (
                 <Image
-                  src={imageUrl}
-                  alt={product.title}
+                  src={imageSrc}
+                  alt={imageAlt}
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   className={`object-contain transition-transform duration-300 ${
@@ -214,6 +225,7 @@ export default function ProductItem({
                   }`}
                   onLoad={() => setIsImageLoading(false)}
                   priority={false}
+                  unoptimized={useProxyForFilename}
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-muted">

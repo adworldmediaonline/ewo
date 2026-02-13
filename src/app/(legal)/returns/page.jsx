@@ -21,13 +21,17 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import Link from 'next/link';
+import { getPageMetadata } from '@/server/page-metadata';
+import { buildPageMetadata } from '@/lib/build-page-metadata';
 
-export const metadata = {
-  title: 'Returns - East West Offroad',
-  alternates: {
+export async function generateMetadata() {
+  const cmsData = await getPageMetadata('returns');
+  return buildPageMetadata('returns', cmsData, {
+    title: 'Returns - East West Offroad',
+    description: 'East West Offroad returns policy and refund information.',
     canonical: '/returns',
-  },
-};
+  });
+}
 
 export default function ReturnsPage() {
   return (

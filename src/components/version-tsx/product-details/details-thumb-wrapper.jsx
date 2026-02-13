@@ -1,4 +1,10 @@
 'use client';
+import {
+  getProductImageAlt,
+  getProductImageTitle,
+  getVariantImageAlt,
+  getVariantImageTitle,
+} from '@/lib/product-image';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -14,10 +20,14 @@ const GalleryContent = ({
   activeImg,
   handleImageActive,
   imageURLs = [],
+  productItem,
   imgWidth = 580,
   imgHeight = 580,
   status,
 }) => {
+  const product = productItem || { title: '' };
+  const mainAlt = getProductImageAlt(product);
+  const mainTitle = getProductImageTitle(product);
   const thumbnailsRef = useRef(null);
   const verticalThumbnailsRef = useRef(null);
 
@@ -227,7 +237,8 @@ const GalleryContent = ({
                 >
                   <CloudinaryImage
                     src={url ?? null}
-                    alt={`Product thumbnail ${i + 1}`}
+                    alt={getVariantImageAlt(product, i, url)}
+                    title={getVariantImageTitle(product, i)}
                     width={80}
                     height={80}
                     className="w-full h-full object-cover rounded-md"
@@ -264,7 +275,7 @@ const GalleryContent = ({
                   thumbnail={activeImg}
                   width={imgWidth}
                   height={imgHeight}
-                  alt="Product main image"
+                  alt={mainAlt}
                 >
                   {({ ref, open }) => (
                     <div
@@ -285,7 +296,8 @@ const GalleryContent = ({
                       <div className="w-full h-full bg-gray-50 flex items-center justify-center p-4">
                         <CloudinaryImage
                           src={activeImg}
-                          alt="Product main image"
+                          alt={mainAlt}
+                          title={mainTitle || undefined}
                           width={imgWidth}
                           height={imgHeight}
                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px"
@@ -363,7 +375,8 @@ const GalleryContent = ({
               >
                 <CloudinaryImage
                   src={url ?? null}
-                  alt={`Product thumbnail ${i + 1}`}
+                  alt={getVariantImageAlt(product, i, url)}
+                  title={getVariantImageTitle(product, i)}
                   width={80}
                   height={80}
                   className="w-full h-full object-cover rounded-md"
@@ -398,7 +411,7 @@ const GalleryContent = ({
             thumbnail={url}
             width={imgWidth}
             height={imgHeight}
-            alt={`Product image ${i + 2}`}
+            alt={getVariantImageAlt(product, imageURLs.indexOf(url), url)}
           >
             {({ ref, open }) => (
               <div
@@ -419,6 +432,7 @@ export default function DetailsThumbWrapper({
   activeImg,
   handleImageActive,
   imageURLs = [],
+  productItem,
   imgWidth = 580,
   imgHeight = 580,
   status,
@@ -438,6 +452,7 @@ export default function DetailsThumbWrapper({
         activeImg={activeImg}
         handleImageActive={handleImageActive}
         imageURLs={imageURLs}
+        productItem={productItem}
         imgWidth={imgWidth}
         imgHeight={imgHeight}
         status={status}

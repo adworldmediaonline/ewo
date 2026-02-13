@@ -16,7 +16,9 @@ import gadget_girl from '@assets/img/product/gadget/gadget-girl.png';
 import HomeGadgetPrdLoader from '@/components/loader/home/home-gadget-prd-loader';
 
 const ProductGadgetArea = () => {
-  const { data: products, isError, isLoading } = useGetAllProductsQuery();
+  const { data: products, isError, isLoading } = useGetAllProductsQuery({
+  publishStatus: 'published',
+});
 
   // decide what to render
   let content = null;

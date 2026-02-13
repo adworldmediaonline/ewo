@@ -1,11 +1,56 @@
 import { unstable_cache } from 'next/cache';
 
 // Types for our data
+export interface ImageWithMeta {
+  url: string;
+  fileName?: string;
+  title?: string;
+  altText?: string;
+  link?: string;
+}
+
+export type BannerDisplayScope =
+  | 'all'
+  | 'parent_only'
+  | 'children_only'
+  | 'parent_and_children';
+
 export interface CategoryItem {
   _id: string;
   parent: string;
   description?: string;
   img?: string;
+  /** Image with metadata (fileName, title, altText) */
+  image?: ImageWithMeta;
+  /** Category banner for shop page */
+  banner?: ImageWithMeta;
+  bannerDisplayScope?: BannerDisplayScope;
+  bannerDisplayChildren?: string[];
+  bannerContentActive?: boolean;
+  bannerContentDisplayScope?: BannerDisplayScope;
+  bannerContentDisplayChildren?: string[];
+  bannerTitle?: string;
+  bannerDescription?: string;
+  bannerTitleClasses?: string;
+  bannerDescriptionClasses?: string;
+  /** Per-scope Tailwind classes: parent and children can have different styling */
+  bannerContentClassesByScope?: {
+    parent?: {
+      titleClasses?: string;
+      descriptionClasses?: string;
+      headingTag?: 'h1' | 'h2' | 'h3';
+      productCountClasses?: string;
+    } | null;
+    children?: Record<
+      string,
+      {
+        titleClasses?: string;
+        descriptionClasses?: string;
+        headingTag?: 'h1' | 'h2' | 'h3';
+        productCountClasses?: string;
+      }
+    >;
+  };
   status?: string;
   products?: unknown[];
   children?: string[];

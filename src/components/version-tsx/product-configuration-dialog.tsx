@@ -19,6 +19,7 @@ import {
 } from '@/redux/features/cartSlice';
 import { notifyError } from '@/utils/toast';
 import { useProductCoupon } from '@/hooks/useProductCoupon';
+import { getProductImageUrl } from '@/lib/product-image';
 import type { Product } from '@/components/version-tsx/product-card';
 
 interface ProductConfigurationDialogProps {
@@ -384,15 +385,17 @@ export default function ProductConfigurationDialog({
     const finalPrice = adjustedPrice + optionPrice;
 
     // Determine the product image to use (option image if available, otherwise original)
-    let productImage = product.img;
+    let productImage = getProductImageUrl(product);
     if (selectedConfigurations && Object.keys(selectedConfigurations).length > 0) {
       // Find the first selected option with an image (prioritize last selected)
       const configIndices = Object.keys(selectedConfigurations);
       for (let i = configIndices.length - 1; i >= 0; i--) {
         const configIndex = parseInt(configIndices[i]);
         const selectedConfig = selectedConfigurations[configIndex];
-        if (selectedConfig && selectedConfig.option && selectedConfig.option.image) {
-          productImage = selectedConfig.option.image;
+        const opt = selectedConfig?.option;
+        const optImg = opt?.image || (opt as any)?.imageWithMeta?.url;
+        if (selectedConfig && opt && optImg) {
+          productImage = optImg;
           break;
         }
       }
@@ -471,7 +474,7 @@ export default function ProductConfigurationDialog({
     const productToAdd = {
       ...product,
       // Update product image if option image is selected
-      img: productImage || product.img || product.imageURLs?.[0] || '',
+      img: productImage || getProductImageUrl(product) || '',
       finalPriceDiscount: finalPrice,
       updatedPrice: markedUpPrice,
       selectedOption,

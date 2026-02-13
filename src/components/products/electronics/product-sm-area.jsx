@@ -7,7 +7,9 @@ import ProductSmItem from './product-sm-item';
 import HomeSmPrdLoader from '@/components/loader/home/home-sm-prd-loader';
 
 const ProductSmArea = () => {
-  const { data: products, isError, isLoading } = useGetAllProductsQuery();
+  const { data: products, isError, isLoading } = useGetAllProductsQuery({
+  publishStatus: 'published',
+});
   // decide what to render
   let content = null;
 

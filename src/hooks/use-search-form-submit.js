@@ -11,10 +11,10 @@ const useSearchFormSubmit = () => {
     e.preventDefault();
 
     if (searchText) {
-      let route = `/search?searchText=${searchText}`;
+      let route = `/search?q=${encodeURIComponent(searchText)}`;
 
       if (category && category !== "Select Category") {
-        route += `&productType=${category}`;
+        route += `&productType=${encodeURIComponent(category)}`;
         setCategory("");
       }
 

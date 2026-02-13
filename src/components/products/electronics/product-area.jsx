@@ -9,7 +9,9 @@ const tabs = ['new', 'featured', 'topSellers'];
 
 const ProductArea = () => {
   const [activeTab, setActiveTab] = useState('new');
-  const { data: products, isError, isLoading } = useGetAllProductsQuery();
+  const { data: products, isError, isLoading } = useGetAllProductsQuery({
+  publishStatus: 'published',
+});
 
   // handleActiveTab
   const handleActiveTab = tab => {

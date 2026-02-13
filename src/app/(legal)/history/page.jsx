@@ -18,13 +18,17 @@ import {
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
+import { getPageMetadata } from '@/server/page-metadata';
+import { buildPageMetadata } from '@/lib/build-page-metadata';
 
-export const metadata = {
-  title: 'History - East West Offroad',
-  alternates: {
+export async function generateMetadata() {
+  const cmsData = await getPageMetadata('history');
+  return buildPageMetadata('history', cmsData, {
+    title: 'History - East West Offroad',
+    description: 'The story and history of East West Offroad.',
     canonical: '/history',
-  },
-};
+  });
+}
 
 export default function HistoryPage() {
   return (

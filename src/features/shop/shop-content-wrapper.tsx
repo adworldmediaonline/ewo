@@ -2,6 +2,9 @@
 
 import { useCallback, useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
+import Image from 'next/image';
+
+import { cn } from '@/lib/utils';
 
 import ShopEmptyState from '@/features/shop/components/shop-empty-state';
 import ShopLoadMoreTrigger from '@/features/shop/components/shop-load-more-trigger';
@@ -13,7 +16,11 @@ import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
 import { useShopProducts } from '@/features/shop/hooks/use-shop-products';
 import { useShopQueryState } from '@/features/shop/hooks/use-shop-query-state';
 import { DEFAULT_FILTERS } from '@/features/shop/shop-types';
-import { CategoryItem } from '@/lib/server-data';
+import {
+  CategoryItem,
+  toSlug,
+  type BannerDisplayScope,
+} from '@/lib/server-data';
 
 interface ShopContentWrapperProps {
   categories: CategoryItem[];
@@ -94,60 +101,223 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
 
   const showErrorState = status === 'error';
 
-  // Check if selected category matches the filter image categories
-  const shouldShowFilterImage = useMemo(() => {
-    const category = filters.category;
-    const subcategory = filters.subcategory;
+  // Resolve category banner - image scope and content scope work independently
+  const categoryBannerContext = useMemo(() => {
+    const categorySlug = filters.category;
+    const subcategorySlug = filters.subcategory;
 
-    // Check for steering-knuckles category
-    if (category === 'steering-knuckles') {
-      return true;
+    if (!categorySlug || !categories.length) {
+      return null;
     }
 
-    // Check for crossover-and-high-steer-kits category
-    if (category === 'crossover-and-high-steer-kits') {
-      // Show image for main category or specific subcategories
-      if (!subcategory || subcategory === '10-bolt-kits' || subcategory === 'dana-44') {
-        return true;
+    const category = categories.find(
+      (c) => toSlug(c.parent) === categorySlug
+    );
+    if (!category) return null;
+
+    const isParentView = !subcategorySlug || subcategorySlug === '';
+
+    // Banner IMAGE scope - independent
+    const imageScope: BannerDisplayScope =
+      category.bannerDisplayScope || 'all';
+    const imageDisplayChildren = category.bannerDisplayChildren || [];
+    const isImageChildInScope =
+      subcategorySlug && imageDisplayChildren.includes(subcategorySlug);
+
+    let showBannerImage = false;
+    if (category.banner?.url) {
+      switch (imageScope) {
+        case 'all':
+          showBannerImage = true;
+          break;
+        case 'parent_only':
+          showBannerImage = isParentView;
+          break;
+        case 'children_only':
+          showBannerImage = !!isImageChildInScope;
+          break;
+        case 'parent_and_children':
+          showBannerImage = isParentView || !!isImageChildInScope;
+          break;
+        default:
+          showBannerImage = true;
       }
     }
 
-    // Check for rod-ends-heim-joints category
-    if (category === 'rod-ends-heim-joints') {
-      return true;
+    // Banner CONTENT scope - independent
+    const contentScope: BannerDisplayScope =
+      category.bannerContentDisplayScope || 'all';
+    const contentDisplayChildren = category.bannerContentDisplayChildren || [];
+    const isContentChildInScope =
+      subcategorySlug && contentDisplayChildren.includes(subcategorySlug);
+
+    let showBannerContent = false;
+    if (category.bannerContentActive) {
+      switch (contentScope) {
+        case 'all':
+          showBannerContent = true;
+          break;
+        case 'parent_only':
+          showBannerContent = isParentView;
+          break;
+        case 'children_only':
+          showBannerContent = !!isContentChildInScope;
+          break;
+        case 'parent_and_children':
+          showBannerContent = isParentView || !!isContentChildInScope;
+          break;
+        default:
+          showBannerContent = true;
+      }
     }
 
-    return false;
-  }, [filters.category, filters.subcategory]);
+    // Render only when at least one is visible
+    if (!showBannerImage && !showBannerContent) return null;
 
-  // Determine which image to show based on category
-  const filterImageSrc = useMemo(() => {
-    const category = filters.category;
+    // Dynamic banner title: category name + product count (separate for styling)
+    const productCount = totalProducts;
+    const productLabel = productCount === 1 ? 'product' : 'products';
+    const productCountText = ` (${productCount} ${productLabel})`;
+    const categoryName = isParentView
+      ? category.parent
+      : (category.children?.find(
+          (c) => toSlug(c) === subcategorySlug
+        ) || subcategorySlug);
 
-    if (category === 'rod-ends-heim-joints') {
-      return '/assets/1-25-inch-rod-end-kit-save-amount.webp';
+    // Resolve per-scope classes and options: parent vs child, with fallbacks
+    const defaultTitleClasses = 'text-center';
+    const defaultDescClasses = 'text-center';
+    const legacyTitleClasses =
+      category.bannerTitleClasses?.trim() || defaultTitleClasses;
+    const legacyDescClasses =
+      category.bannerDescriptionClasses?.trim() || defaultDescClasses;
+
+    const scopeClasses = category.bannerContentClassesByScope;
+    const parentScope = scopeClasses?.parent;
+    const childrenScope = scopeClasses?.children ?? {};
+
+    let bannerTitleClasses: string;
+    let bannerDescriptionClasses: string;
+    let bannerHeadingTag: 'h1' | 'h2' | 'h3';
+    let bannerProductCountClasses: string;
+
+    if (isParentView) {
+      bannerTitleClasses =
+        parentScope?.titleClasses?.trim() || legacyTitleClasses;
+      bannerDescriptionClasses =
+        parentScope?.descriptionClasses?.trim() || legacyDescClasses;
+      bannerHeadingTag =
+        parentScope?.headingTag || 'h2';
+      bannerProductCountClasses =
+        parentScope?.productCountClasses?.trim() || '';
+    } else {
+      const childScope = subcategorySlug
+        ? childrenScope[subcategorySlug]
+        : undefined;
+      bannerTitleClasses =
+        childScope?.titleClasses?.trim() ||
+        parentScope?.titleClasses?.trim() ||
+        legacyTitleClasses;
+      bannerDescriptionClasses =
+        childScope?.descriptionClasses?.trim() ||
+        parentScope?.descriptionClasses?.trim() ||
+        legacyDescClasses;
+      bannerHeadingTag =
+        childScope?.headingTag ||
+        parentScope?.headingTag ||
+        'h2';
+      bannerProductCountClasses =
+        childScope?.productCountClasses?.trim() ||
+        parentScope?.productCountClasses?.trim() ||
+        '';
     }
 
-    // Default image for other categories
-    return '/assets/dana-44-high-steer-vs-stock-steering-comparison-kit.webp';
-  }, [filters.category]);
+    return {
+      banner: category.banner,
+      showBannerImage,
+      showBannerContent,
+      bannerCategoryName: showBannerContent ? categoryName : '',
+      bannerProductCountText: showBannerContent ? productCountText : '',
+      bannerDescription: category.bannerDescription || '',
+      bannerTitleClasses: bannerTitleClasses || defaultTitleClasses,
+      bannerDescriptionClasses:
+        bannerDescriptionClasses || defaultDescClasses,
+      bannerHeadingTag,
+      bannerProductCountClasses,
+    };
+  }, [
+    filters.category,
+    filters.subcategory,
+    categories,
+    totalProducts,
+  ]);
 
   return (
     <>
-      {/* filter category image show here */}
-      {shouldShowFilterImage && (
-        <div className="w-full flex items-center justify-center">
-          <div className="relative w-full mx-auto">
-            <img
-              src={filterImageSrc}
-              alt="Category Filter"
-              className="w-full h-auto object-contain"
-              style={{ aspectRatio: '1920 / 800' }}
-            />
-          </div>
+      {/* Category banner - image and content scopes work independently */}
+      {categoryBannerContext && (
+        <div className="w-full flex flex-col items-center justify-center space-y-0">
+          {categoryBannerContext.showBannerContent &&
+            categoryBannerContext.bannerCategoryName && (
+            <div className="w-full max-w-7xl mx-auto px-4 py-4">
+              {(() => {
+                const HeadingTag =
+                  categoryBannerContext.bannerHeadingTag;
+                return (
+                  <HeadingTag
+                    className={cn(
+                      'text-xl sm:text-2xl md:text-3xl font-bold text-foreground',
+                      categoryBannerContext.bannerTitleClasses
+                    )}
+                  >
+                    {categoryBannerContext.bannerCategoryName}
+                    {categoryBannerContext.bannerProductCountText && (
+                      <span
+                        className={cn(
+                          'ml-1.5 font-normal text-muted-foreground text-sm sm:text-base',
+                          categoryBannerContext.bannerProductCountClasses
+                        )}
+                      >
+                        {categoryBannerContext.bannerProductCountText}
+                      </span>
+                    )}
+                  </HeadingTag>
+                );
+              })()}
+            </div>
+          )}
+          {categoryBannerContext.showBannerImage && categoryBannerContext.banner?.url && (
+            <div className="w-full flex items-center justify-center">
+              <div className="relative w-full mx-auto">
+                <Image
+                  src={`/api/image?url=${encodeURIComponent(categoryBannerContext.banner.url)}&filename=${encodeURIComponent(categoryBannerContext.banner.fileName || 'category-banner.webp')}`}
+                  alt={categoryBannerContext.banner.altText || categoryBannerContext.banner.title || 'Category banner'}
+                  title={categoryBannerContext.banner.title}
+                  width={1920}
+                  height={800}
+                  className="w-full h-auto object-contain"
+                  sizes="100vw"
+                  unoptimized
+                  priority={false}
+                />
+              </div>
+            </div>
+          )}
+          {categoryBannerContext.showBannerContent &&
+            categoryBannerContext.bannerDescription && (
+              <div className="w-full max-w-7xl mx-auto px-4 py-4">
+                <p
+                  className={cn(
+                    'text-sm sm:text-base text-muted-foreground leading-relaxed',
+                    categoryBannerContext.bannerDescriptionClasses
+                  )}
+                >
+                  {categoryBannerContext.bannerDescription}
+                </p>
+              </div>
+            )}
         </div>
       )}
-      {/* filter image category show here code end */}
       <div className="min-h-screen bg-background py-2 lg:py-6">
         <div className="mx-auto flex w-full max-w-7xl gap-2 lg:gap-4 px-0 md:px-4">
           <ShopSidebar
