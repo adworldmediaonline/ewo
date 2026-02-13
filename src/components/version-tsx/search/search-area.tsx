@@ -46,7 +46,10 @@ export default function SearchArea() {
     isError,
     isLoading,
     error,
-  } = useGetAllProductsQuery({});
+  } = useGetAllProductsQuery({
+    publishStatus: 'published',
+    limit: 10000,
+  });
   const [sortValue, setSortValue] = useState<string>('default');
   const [perView] = useState(8);
   const [next, setNext] = useState(perView);

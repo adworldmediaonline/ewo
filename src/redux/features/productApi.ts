@@ -51,8 +51,24 @@ export const productApi = apiSlice.injectEndpoints({
           ]
           : [{ type: 'Products', id: 'LIST' }],
     }),
-    getAllProducts: builder.query({
-      query: () => `/api/product/all`,
+    getAllProducts: builder.query<
+      { data: unknown[]; pagination?: unknown },
+      { publishStatus?: string; page?: number; limit?: number } | void
+    >({
+      query: (params) => {
+        const queryParams = new URLSearchParams();
+        if (params?.publishStatus) {
+          queryParams.append('publishStatus', params.publishStatus);
+        }
+        if (params?.page !== undefined) {
+          queryParams.append('page', params.page.toString());
+        }
+        if (params?.limit !== undefined) {
+          queryParams.append('limit', params.limit.toString());
+        }
+        const queryString = queryParams.toString();
+        return queryString ? `/api/product/all?${queryString}` : '/api/product/all';
+      },
       providesTags: ['Products'],
     }),
     getOfferProducts: builder.query({

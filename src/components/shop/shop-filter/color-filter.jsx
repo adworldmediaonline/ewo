@@ -10,7 +10,9 @@ import { handleFilterSidebarClose } from '@/redux/features/shop-filter-slice';
 import ShopColorLoader from '@/components/loader/shop/color-filter-loader';
 
 const ColorFilter = ({ setCurrPage, shop_right = false }) => {
-  const { data: products, isError, isLoading } = useGetAllProductsQuery();
+  const { data: products, isError, isLoading } = useGetAllProductsQuery({
+  publishStatus: 'published',
+});
   const router = useRouter();
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
