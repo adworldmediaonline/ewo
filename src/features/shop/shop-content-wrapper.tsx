@@ -187,16 +187,49 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
           return `${childLabel} (${productCount} ${productLabel})`;
         })();
 
+    // Resolve per-scope classes: parent vs child, with fallbacks
+    const defaultTitleClasses = 'text-center';
+    const defaultDescClasses = 'text-center';
+    const legacyTitleClasses =
+      category.bannerTitleClasses?.trim() || defaultTitleClasses;
+    const legacyDescClasses =
+      category.bannerDescriptionClasses?.trim() || defaultDescClasses;
+
+    const scopeClasses = category.bannerContentClassesByScope;
+    const parentScope = scopeClasses?.parent;
+    const childrenScope = scopeClasses?.children ?? {};
+
+    let bannerTitleClasses: string;
+    let bannerDescriptionClasses: string;
+
+    if (isParentView) {
+      bannerTitleClasses =
+        parentScope?.titleClasses?.trim() || legacyTitleClasses;
+      bannerDescriptionClasses =
+        parentScope?.descriptionClasses?.trim() || legacyDescClasses;
+    } else {
+      const childScope = subcategorySlug
+        ? childrenScope[subcategorySlug]
+        : undefined;
+      bannerTitleClasses =
+        childScope?.titleClasses?.trim() ||
+        parentScope?.titleClasses?.trim() ||
+        legacyTitleClasses;
+      bannerDescriptionClasses =
+        childScope?.descriptionClasses?.trim() ||
+        parentScope?.descriptionClasses?.trim() ||
+        legacyDescClasses;
+    }
+
     return {
       banner: category.banner,
       showBannerImage,
       showBannerContent,
       bannerTitle: showBannerContent ? dynamicTitle : '',
       bannerDescription: category.bannerDescription || '',
-      bannerTitleClasses:
-        category.bannerTitleClasses?.trim() || 'text-center',
+      bannerTitleClasses: bannerTitleClasses || defaultTitleClasses,
       bannerDescriptionClasses:
-        category.bannerDescriptionClasses?.trim() || 'text-center',
+        bannerDescriptionClasses || defaultDescClasses,
     };
   }, [
     filters.category,

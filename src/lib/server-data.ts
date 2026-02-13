@@ -33,6 +33,14 @@ export interface CategoryItem {
   bannerDescription?: string;
   bannerTitleClasses?: string;
   bannerDescriptionClasses?: string;
+  /** Per-scope Tailwind classes: parent and children can have different styling */
+  bannerContentClassesByScope?: {
+    parent?: { titleClasses?: string; descriptionClasses?: string } | null;
+    children?: Record<
+      string,
+      { titleClasses?: string; descriptionClasses?: string }
+    >;
+  };
   status?: string;
   products?: unknown[];
   children?: string[];
