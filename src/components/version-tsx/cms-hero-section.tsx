@@ -116,60 +116,44 @@ export default function CmsHeroSection({ content }: CmsHeroSectionProps) {
     const desktopTitle = desktopImg?.title;
     const DesktopImage = () => {
       if (!desktopSrc) return null;
-      const ImageWrapper = desktopImg?.link ? Link : 'div';
-      const imageWrapperProps = desktopImg?.link
-        ? { href: desktopImg.link, className: 'block relative w-full aspect-[1920/800]' }
-        : { className: 'relative w-full aspect-[1920/800]' };
-      return (
-        <>
-          <ImageWrapper {...imageWrapperProps}>
-            <Image
-              src={desktopSrc}
-              alt={imageAlt}
-              title={desktopTitle || imageAlt}
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover"
-            />
-          </ImageWrapper>
-          {/* {desktopTitle && (
-            <figcaption className="absolute bottom-0 left-0 right-0 bg-black/60 px-4 py-2 text-center text-sm text-white/90">
-              {desktopTitle}
-            </figcaption>
-          )} */}
-        </>
+      const wrapperClassName = 'block relative w-full aspect-[1920/800]';
+      const imageEl = (
+        <Image
+          src={desktopSrc}
+          alt={imageAlt}
+          title={desktopTitle || imageAlt}
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
       );
+      if (desktopImg?.link) {
+        return <Link href={desktopImg.link} className={wrapperClassName}>{imageEl}</Link>;
+      }
+      return <div className={wrapperClassName}>{imageEl}</div>;
     };
 
     const mobileImg = mobileImage ?? image;
     const mobileTitle = mobileImg?.title;
     const MobileImage = () => {
       if (!mobileImageUrl) return null;
-      const ImageWrapper = mobileImg?.link ? Link : 'div';
-      const imageWrapperProps = mobileImg?.link
-        ? { href: mobileImg.link, className: 'block relative w-full aspect-[480/511]' }
-        : { className: 'relative w-full aspect-[480/511]' };
-      return (
-        <>
-          <ImageWrapper {...imageWrapperProps}>
-            <Image
-              src={mobileImageUrl}
-              alt={mobileImageAlt}
-              title={mobileTitle || mobileImageAlt}
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover"
-            />
-          </ImageWrapper>
-          {/* {mobileTitle && (
-            <figcaption className="absolute bottom-0 left-0 right-0 bg-black/60 px-4 py-2 text-center text-sm text-white/90">
-              {mobileTitle}
-            </figcaption>
-          )} */}
-        </>
+      const wrapperClassName = 'block relative w-full aspect-[480/511]';
+      const imageEl = (
+        <Image
+          src={mobileImageUrl}
+          alt={mobileImageAlt}
+          title={mobileTitle || mobileImageAlt}
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
       );
+      if (mobileImg?.link) {
+        return <Link href={mobileImg.link} className={wrapperClassName}>{imageEl}</Link>;
+      }
+      return <div className={wrapperClassName}>{imageEl}</div>;
     };
 
     return (

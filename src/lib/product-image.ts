@@ -10,13 +10,23 @@ export interface ImageWithMeta {
 }
 
 /**
+ * Product image from API - fields may be optional
+ */
+export interface ProductImageMeta {
+  url: string;
+  fileName?: string;
+  title?: string;
+  altText?: string;
+}
+
+/**
  * Product with optional image metadata
  */
 export interface ProductWithImageMeta {
   img?: string;
-  image?: ImageWithMeta | null;
-  imageURLs?: string[] | ImageWithMeta[];
-  imageURLsWithMeta?: ImageWithMeta[];
+  image?: ProductImageMeta | ImageWithMeta | null;
+  imageURLs?: string[] | (ProductImageMeta | ImageWithMeta)[];
+  imageURLsWithMeta?: (ProductImageMeta | ImageWithMeta)[];
   title: string;
 }
 

@@ -69,7 +69,7 @@ export default function SearchArea() {
   const getFilteredAndSortedProducts = (): Product[] => {
     if (!products?.data || !Array.isArray(products.data)) return [];
 
-    let filteredProducts = products.data;
+    let filteredProducts = products.data as Product[];
 
     // Apply search filter
     if (searchText) {
