@@ -11,7 +11,11 @@ import {
 
 export default function ProductDetailsContent({ productItem, children }) {
   const mainImg = getProductImageSrc(productItem || {});
-  const imageURLs = getProductImageSrcsForGallery(productItem || {});
+  let imageURLs = getProductImageSrcsForGallery(productItem || {});
+  // When product has only main image (no variants), include it in gallery
+  if (imageURLs.length === 0 && mainImg) {
+    imageURLs = [mainImg];
+  }
   const { videoId, status } = productItem || {};
   const [activeImg, setActiveImg] = useState(imageURLs?.[0] || mainImg);
   const addToCartRef = useRef(null);

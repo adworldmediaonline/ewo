@@ -76,26 +76,31 @@ export const getProductImageTitle = (product: ProductWithImageMeta): string => {
 };
 
 /**
- * Get gallery image URLs with proxy when metadata (fileName) exists.
- * Use for product details, quick-view, etc. so "Save Image As" uses correct filenames.
+ * Get gallery image URLs - always uses proxy so "Save Image As" gets correct filenames.
+ * Filename from metadata, or derived from slug/title + index.
  */
 export const getProductImageSrcsForGallery = (
   product: ProductWithImageMeta
 ): string[] => {
+  const rawUrls = getProductImageUrls(product);
   const withMeta = product.imageURLsWithMeta;
-  if (Array.isArray(withMeta) && withMeta.length > 0) {
-    return withMeta.map((item) => {
-      const url =
-        typeof item === 'object' && item?.url ? item.url : String(item);
-      if (typeof item === 'object' && item?.fileName?.trim()) {
-        const fileName = item.fileName.trim();
-        const ext = fileName.includes('.') ? '' : '.webp';
-        return `/api/image?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(fileName + ext)}`;
-      }
-      return url;
-    });
-  }
-  return getProductImageUrls(product);
+  const slug = (product as { slug?: string }).slug?.replace(/[^\w-]/g, '-');
+  const baseName =
+    slug ||
+    (product as { title?: string }).title
+      ?.replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .slice(0, 50) ||
+    'product';
+
+  return rawUrls.map((url, i) => {
+    const meta = Array.isArray(withMeta) ? withMeta[i] : null;
+    const fileName =
+      (typeof meta === 'object' && meta?.fileName?.trim()) ||
+      (i === 0 ? baseName : `${baseName}-view-${i + 1}`);
+    const ext = fileName.includes('.') ? '' : '.webp';
+    return `/api/image?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(fileName + ext)}`;
+  });
 };
 
 /**
@@ -130,4 +135,20 @@ export const getVariantImageAlt = (
     if (typeof meta === 'object' && meta?.fileName?.trim()) return meta.fileName;
   }
   return getProductImageAlt(product) + (index > 0 ? ` - view ${index + 1}` : '');
+};
+
+/**
+ * Get title (tooltip) for a variant/gallery image by index.
+ */
+export const getVariantImageTitle = (
+  product: ProductWithImageMeta,
+  index: number
+): string => {
+  const withMeta = product.imageURLsWithMeta;
+  if (Array.isArray(withMeta) && withMeta[index]) {
+    const meta = withMeta[index];
+    if (typeof meta === 'object' && meta?.title?.trim()) return meta.title;
+    if (typeof meta === 'object' && meta?.fileName?.trim()) return meta.fileName;
+  }
+  return getProductImageTitle(product) + (index > 0 ? ` - view ${index + 1}` : '');
 };
