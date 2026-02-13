@@ -274,7 +274,7 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
                     {categoryBannerContext.bannerProductCountText && (
                       <span
                         className={cn(
-                          'ml-1',
+                          'ml-1.5 font-normal text-muted-foreground text-sm sm:text-base',
                           categoryBannerContext.bannerProductCountClasses
                         )}
                       >
