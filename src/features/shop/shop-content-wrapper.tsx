@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import Image from 'next/image';
 
+import { cn } from '@/lib/utils';
+
 import ShopEmptyState from '@/features/shop/components/shop-empty-state';
 import ShopLoadMoreTrigger from '@/features/shop/components/shop-load-more-trigger';
 import ShopMobileFilters from '@/features/shop/components/shop-mobile-filters';
@@ -191,6 +193,10 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
       showBannerContent,
       bannerTitle: showBannerContent ? dynamicTitle : '',
       bannerDescription: category.bannerDescription || '',
+      bannerTitleClasses:
+        category.bannerTitleClasses?.trim() || 'text-center',
+      bannerDescriptionClasses:
+        category.bannerDescriptionClasses?.trim() || 'text-center',
     };
   }, [
     filters.category,
@@ -205,8 +211,13 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
       {categoryBannerContext && (
         <div className="w-full flex flex-col items-center justify-center space-y-0">
           {categoryBannerContext.showBannerContent && categoryBannerContext.bannerTitle && (
-            <div className="w-full max-w-7xl mx-auto px-4 py-4 text-center">
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">
+            <div className="w-full max-w-7xl mx-auto px-4 py-4">
+              <h2
+                className={cn(
+                  'text-xl sm:text-2xl md:text-3xl font-bold text-foreground',
+                  categoryBannerContext.bannerTitleClasses
+                )}
+              >
                 {categoryBannerContext.bannerTitle}
               </h2>
             </div>
@@ -231,8 +242,13 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
           )}
           {categoryBannerContext.showBannerContent &&
             categoryBannerContext.bannerDescription && (
-              <div className="w-full max-w-7xl mx-auto px-4 py-4 text-center">
-                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+              <div className="w-full max-w-7xl mx-auto px-4 py-4">
+                <p
+                  className={cn(
+                    'text-sm sm:text-base text-muted-foreground leading-relaxed',
+                    categoryBannerContext.bannerDescriptionClasses
+                  )}
+                >
                   {categoryBannerContext.bannerDescription}
                 </p>
               </div>

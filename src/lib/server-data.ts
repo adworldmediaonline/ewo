@@ -31,6 +31,8 @@ export interface CategoryItem {
   bannerContentDisplayChildren?: string[];
   bannerTitle?: string;
   bannerDescription?: string;
+  bannerTitleClasses?: string;
+  bannerDescriptionClasses?: string;
   status?: string;
   products?: unknown[];
   children?: string[];
