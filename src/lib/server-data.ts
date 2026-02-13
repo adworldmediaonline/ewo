@@ -35,10 +35,20 @@ export interface CategoryItem {
   bannerDescriptionClasses?: string;
   /** Per-scope Tailwind classes: parent and children can have different styling */
   bannerContentClassesByScope?: {
-    parent?: { titleClasses?: string; descriptionClasses?: string } | null;
+    parent?: {
+      titleClasses?: string;
+      descriptionClasses?: string;
+      headingTag?: 'h1' | 'h2' | 'h3';
+      productCountClasses?: string;
+    } | null;
     children?: Record<
       string,
-      { titleClasses?: string; descriptionClasses?: string }
+      {
+        titleClasses?: string;
+        descriptionClasses?: string;
+        headingTag?: 'h1' | 'h2' | 'h3';
+        productCountClasses?: string;
+      }
     >;
   };
   status?: string;

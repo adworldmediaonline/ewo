@@ -174,20 +174,17 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
     // Render only when at least one is visible
     if (!showBannerImage && !showBannerContent) return null;
 
-    // Dynamic banner title: reflects current view (parent or child) + product count
+    // Dynamic banner title: category name + product count (separate for styling)
     const productCount = totalProducts;
     const productLabel = productCount === 1 ? 'product' : 'products';
-    const dynamicTitle = isParentView
-      ? `${category.parent} (${productCount} ${productLabel})`
-      : (() => {
-          const childLabel =
-            category.children?.find(
-              (c) => toSlug(c) === subcategorySlug
-            ) || subcategorySlug;
-          return `${childLabel} (${productCount} ${productLabel})`;
-        })();
+    const productCountText = ` (${productCount} ${productLabel})`;
+    const categoryName = isParentView
+      ? category.parent
+      : (category.children?.find(
+          (c) => toSlug(c) === subcategorySlug
+        ) || subcategorySlug);
 
-    // Resolve per-scope classes: parent vs child, with fallbacks
+    // Resolve per-scope classes and options: parent vs child, with fallbacks
     const defaultTitleClasses = 'text-center';
     const defaultDescClasses = 'text-center';
     const legacyTitleClasses =
@@ -201,12 +198,18 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
 
     let bannerTitleClasses: string;
     let bannerDescriptionClasses: string;
+    let bannerHeadingTag: 'h1' | 'h2' | 'h3';
+    let bannerProductCountClasses: string;
 
     if (isParentView) {
       bannerTitleClasses =
         parentScope?.titleClasses?.trim() || legacyTitleClasses;
       bannerDescriptionClasses =
         parentScope?.descriptionClasses?.trim() || legacyDescClasses;
+      bannerHeadingTag =
+        parentScope?.headingTag || 'h2';
+      bannerProductCountClasses =
+        parentScope?.productCountClasses?.trim() || '';
     } else {
       const childScope = subcategorySlug
         ? childrenScope[subcategorySlug]
@@ -219,17 +222,28 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
         childScope?.descriptionClasses?.trim() ||
         parentScope?.descriptionClasses?.trim() ||
         legacyDescClasses;
+      bannerHeadingTag =
+        childScope?.headingTag ||
+        parentScope?.headingTag ||
+        'h2';
+      bannerProductCountClasses =
+        childScope?.productCountClasses?.trim() ||
+        parentScope?.productCountClasses?.trim() ||
+        '';
     }
 
     return {
       banner: category.banner,
       showBannerImage,
       showBannerContent,
-      bannerTitle: showBannerContent ? dynamicTitle : '',
+      bannerCategoryName: showBannerContent ? categoryName : '',
+      bannerProductCountText: showBannerContent ? productCountText : '',
       bannerDescription: category.bannerDescription || '',
       bannerTitleClasses: bannerTitleClasses || defaultTitleClasses,
       bannerDescriptionClasses:
         bannerDescriptionClasses || defaultDescClasses,
+      bannerHeadingTag,
+      bannerProductCountClasses,
     };
   }, [
     filters.category,
@@ -243,16 +257,33 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
       {/* Category banner - image and content scopes work independently */}
       {categoryBannerContext && (
         <div className="w-full flex flex-col items-center justify-center space-y-0">
-          {categoryBannerContext.showBannerContent && categoryBannerContext.bannerTitle && (
+          {categoryBannerContext.showBannerContent &&
+            categoryBannerContext.bannerCategoryName && (
             <div className="w-full max-w-7xl mx-auto px-4 py-4">
-              <h2
-                className={cn(
-                  'text-xl sm:text-2xl md:text-3xl font-bold text-foreground',
-                  categoryBannerContext.bannerTitleClasses
-                )}
-              >
-                {categoryBannerContext.bannerTitle}
-              </h2>
+              {(() => {
+                const HeadingTag =
+                  categoryBannerContext.bannerHeadingTag;
+                return (
+                  <HeadingTag
+                    className={cn(
+                      'text-xl sm:text-2xl md:text-3xl font-bold text-foreground',
+                      categoryBannerContext.bannerTitleClasses
+                    )}
+                  >
+                    {categoryBannerContext.bannerCategoryName}
+                    {categoryBannerContext.bannerProductCountText && (
+                      <span
+                        className={cn(
+                          'ml-1',
+                          categoryBannerContext.bannerProductCountClasses
+                        )}
+                      >
+                        {categoryBannerContext.bannerProductCountText}
+                      </span>
+                    )}
+                  </HeadingTag>
+                );
+              })()}
             </div>
           )}
           {categoryBannerContext.showBannerImage && categoryBannerContext.banner?.url && (
