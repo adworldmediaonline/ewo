@@ -100,7 +100,7 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
   const showErrorState = status === 'error';
 
   // Resolve category banner based on selected category/subcategory and banner display config
-  const categoryBanner = useMemo(() => {
+  const categoryBannerContext = useMemo(() => {
     const categorySlug = filters.category;
     const subcategorySlug = filters.subcategory;
 
@@ -123,43 +123,115 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
     const isChildInScope =
       subcategorySlug && displayChildren.includes(subcategorySlug);
 
+    let showBanner = false;
     switch (scope) {
       case 'all':
-        return category.banner;
+        showBanner = true;
+        break;
       case 'parent_only':
-        return isParentView ? category.banner : null;
+        showBanner = isParentView;
+        break;
       case 'children_only':
-        return isChildInScope ? category.banner : null;
+        showBanner = !!isChildInScope;
+        break;
       case 'parent_and_children':
-        return isParentView || isChildInScope ? category.banner : null;
+        showBanner = isParentView || !!isChildInScope;
+        break;
       default:
-        return category.banner;
+        showBanner = true;
     }
+
+    if (!showBanner) return null;
+
+    const contentScope: BannerDisplayScope =
+      category.bannerContentDisplayScope || 'all';
+    const contentDisplayChildren = category.bannerContentDisplayChildren || [];
+    const isContentChildInScope =
+      subcategorySlug && contentDisplayChildren.includes(subcategorySlug);
+
+    let showBannerContent = false;
+    if (category.bannerContentActive) {
+      switch (contentScope) {
+        case 'all':
+          showBannerContent = true;
+          break;
+        case 'parent_only':
+          showBannerContent = isParentView;
+          break;
+        case 'children_only':
+          showBannerContent = !!isContentChildInScope;
+          break;
+        case 'parent_and_children':
+          showBannerContent = isParentView || !!isContentChildInScope;
+          break;
+        default:
+          showBannerContent = true;
+      }
+    }
+
+    // Dynamic banner title: reflects current view (parent or child) + product count
+    const productCount = totalProducts;
+    const productLabel = productCount === 1 ? 'product' : 'products';
+    const dynamicTitle = isParentView
+      ? `${category.parent} (${productCount} ${productLabel})`
+      : (() => {
+          const childLabel =
+            category.children?.find(
+              (c) => toSlug(c) === subcategorySlug
+            ) || subcategorySlug;
+          return `${childLabel} (${productCount} ${productLabel})`;
+        })();
+
+    return {
+      banner: category.banner,
+      bannerContentActive: !!category.bannerContentActive,
+      showBannerContent,
+      bannerTitle: showBannerContent ? dynamicTitle : '',
+      bannerDescription: category.bannerDescription || '',
+    };
   }, [
     filters.category,
     filters.subcategory,
     categories,
+    totalProducts,
   ]);
 
   return (
     <>
       {/* Category banner - rendered based on banner display config */}
-      {categoryBanner && (
-        <div className="w-full flex items-center justify-center">
-          <div className="relative w-full mx-auto">
-            <Image
-              src={`/api/image?url=${encodeURIComponent(categoryBanner.url)}&filename=${encodeURIComponent(categoryBanner.fileName || 'category-banner.webp')}`}
-              alt={categoryBanner.altText || categoryBanner.title || 'Category banner'}
-              title={categoryBanner.title}
-              width={1920}
-              height={800}
-              className="w-full h-auto object-contain"
-              style={{ aspectRatio: '1920 / 800' }}
-              sizes="100vw"
-              unoptimized
-              priority={false}
-            />
+      {categoryBannerContext && (
+        <div className="w-full flex flex-col items-center justify-center space-y-0">
+          {categoryBannerContext.showBannerContent && (
+              <div className="w-full max-w-7xl mx-auto px-4 py-4 text-center">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">
+                  {categoryBannerContext.bannerTitle}
+                </h2>
+              </div>
+            )}
+          <div className="w-full flex items-center justify-center">
+            <div className="relative w-full mx-auto">
+              <Image
+                src={`/api/image?url=${encodeURIComponent(categoryBannerContext.banner.url)}&filename=${encodeURIComponent(categoryBannerContext.banner.fileName || 'category-banner.webp')}`}
+                alt={categoryBannerContext.banner.altText || categoryBannerContext.banner.title || 'Category banner'}
+                title={categoryBannerContext.banner.title}
+                width={1920}
+                height={800}
+                className="w-full h-auto object-contain"
+                style={{ aspectRatio: '1920 / 800' }}
+                sizes="100vw"
+                unoptimized
+                priority={false}
+              />
+            </div>
           </div>
+          {categoryBannerContext.showBannerContent &&
+            categoryBannerContext.bannerDescription && (
+              <div className="w-full max-w-7xl mx-auto px-4 py-4 text-center">
+                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                  {categoryBannerContext.bannerDescription}
+                </p>
+              </div>
+            )}
         </div>
       )}
       <div className="min-h-screen bg-background py-2 lg:py-6">

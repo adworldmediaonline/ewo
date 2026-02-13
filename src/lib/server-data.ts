@@ -26,6 +26,11 @@ export interface CategoryItem {
   banner?: ImageWithMeta;
   bannerDisplayScope?: BannerDisplayScope;
   bannerDisplayChildren?: string[];
+  bannerContentActive?: boolean;
+  bannerContentDisplayScope?: BannerDisplayScope;
+  bannerContentDisplayChildren?: string[];
+  bannerTitle?: string;
+  bannerDescription?: string;
   status?: string;
   products?: unknown[];
   children?: string[];
