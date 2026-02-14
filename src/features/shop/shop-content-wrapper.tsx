@@ -101,7 +101,8 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
 
   const showErrorState = status === 'error';
 
-  // Resolve category banner - image scope and content scope work independently
+  // Resolve category banner - image scope and content scope work independently.
+  // Supports grouped subcategories: subcategory can be comma-separated (e.g. "dana-44,10-bolt").
   const categoryBannerContext = useMemo(() => {
     const categorySlug = filters.category;
     const subcategorySlug = filters.subcategory;
@@ -115,14 +116,19 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
     );
     if (!category) return null;
 
-    const isParentView = !subcategorySlug || subcategorySlug === '';
+    // Parse subcategory: single slug or comma-separated (grouped cards)
+    const subcategorySlugs = subcategorySlug
+      ? subcategorySlug.split(',').map((s) => s.trim()).filter(Boolean)
+      : [];
+    const isParentView = subcategorySlugs.length === 0;
 
-    // Banner IMAGE scope - independent
+    // Banner IMAGE scope - show if ANY of the active subcategory slugs is in scope
     const imageScope: BannerDisplayScope =
       category.bannerDisplayScope || 'all';
     const imageDisplayChildren = category.bannerDisplayChildren || [];
     const isImageChildInScope =
-      subcategorySlug && imageDisplayChildren.includes(subcategorySlug);
+      subcategorySlugs.length > 0 &&
+      subcategorySlugs.some((slug) => imageDisplayChildren.includes(slug));
 
     let showBannerImage = false;
     if (category.banner?.url) {
@@ -144,12 +150,13 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
       }
     }
 
-    // Banner CONTENT scope - independent
+    // Banner CONTENT scope - same logic for grouped subcategories
     const contentScope: BannerDisplayScope =
       category.bannerContentDisplayScope || 'all';
     const contentDisplayChildren = category.bannerContentDisplayChildren || [];
     const isContentChildInScope =
-      subcategorySlug && contentDisplayChildren.includes(subcategorySlug);
+      subcategorySlugs.length > 0 &&
+      subcategorySlugs.some((slug) => contentDisplayChildren.includes(slug));
 
     let showBannerContent = false;
     if (category.bannerContentActive) {
@@ -178,13 +185,17 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
     const productCount = totalProducts;
     const productLabel = productCount === 1 ? 'product' : 'products';
     const productCountText = ` (${productCount} ${productLabel})`;
+
+    // Resolve display name: parent, single child, or joined child names for grouped
     const categoryName = isParentView
       ? category.parent
-      : (category.children?.find(
-          (c) => toSlug(c) === subcategorySlug
-        ) || subcategorySlug);
+      : subcategorySlugs
+          .map((slug) =>
+            category.children?.find((c) => toSlug(c) === slug) || slug
+          )
+          .join(', ');
 
-    // Resolve per-scope classes and options: parent vs child, with fallbacks
+    // Resolve per-scope classes: use first matching child slug for grouped view
     const defaultTitleClasses = 'text-center';
     const defaultDescClasses = 'text-center';
     const legacyTitleClasses =
@@ -211,9 +222,10 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
       bannerProductCountClasses =
         parentScope?.productCountClasses?.trim() || '';
     } else {
-      const childScope = subcategorySlug
-        ? childrenScope[subcategorySlug]
-        : undefined;
+      // For grouped subcategories: use first slug with scope override, else parent fallback
+      const childScope = subcategorySlugs
+        .map((slug) => childrenScope[slug])
+        .find(Boolean);
       bannerTitleClasses =
         childScope?.titleClasses?.trim() ||
         parentScope?.titleClasses?.trim() ||

@@ -101,7 +101,11 @@ const ShopMobileFilters = ({
                     <div className="ml-3 space-y-1 border-l border-border/60 pl-3">
                       {category.children.map(child => {
                         const childSlug = toSlug(child);
-                        const isActiveChild = childSlug === activeSubcategory;
+                        // Support grouped subcategory: activeSubcategory can be "slug1,slug2"
+                        const activeSlugs = activeSubcategory
+                          ? activeSubcategory.split(',').map((s) => s.trim()).filter(Boolean)
+                          : [];
+                        const isActiveChild = activeSlugs.includes(childSlug);
 
                         return (
                           <Button
