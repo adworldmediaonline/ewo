@@ -79,7 +79,7 @@ function processCategoriesForShowcase(categories: CategoryItem[]): CategoryItem[
           status: parentCategory.status || 'Show',
           description: parentCategory.description,
           img: dana60ImageUrl,
-          image: parentCategory.image ? { ...parentCategory.image, url: parentCategory.image.url || dana60ImageUrl } : { url: dana60ImageUrl, fileName: 'dana-60.webp', title: 'DANA 60', altText: 'DANA 60' },
+          image: { url: dana60ImageUrl, fileName: 'dana-60.webp', title: 'DANA 60', altText: 'DANA 60' },
           products: parentCategory.products,
           parentCategorySlug: parentCategorySlug,
           subcategorySlug: dana60Slug,
@@ -102,7 +102,7 @@ function processCategoriesForShowcase(categories: CategoryItem[]): CategoryItem[
           parent: parentCategory.parent,
           children: [dana60Name || dana60SubcategoryName],
           img: dana60ImageUrl,
-          image: existingDana60.image ? { ...existingDana60.image, url: existingDana60.image.url || dana60ImageUrl } : { url: dana60ImageUrl, fileName: 'dana-60.webp', title: 'DANA 60', altText: 'DANA 60' },
+          image: { url: dana60ImageUrl, fileName: 'dana-60.webp', title: 'DANA 60', altText: 'DANA 60' },
           parentCategorySlug: parentCategorySlug,
           subcategorySlug: dana60Slug,
         } as CategoryItem & { parentCategorySlug?: string; subcategorySlug?: string };
