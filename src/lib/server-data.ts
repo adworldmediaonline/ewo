@@ -54,6 +54,15 @@ export interface CategoryItem {
   status?: string;
   products?: unknown[];
   children?: string[];
+  /** Category Showcase display config – how child categories are grouped/split into cards */
+  showcaseGroups?: Array<{
+    children?: string[];
+    image?: { url: string; fileName?: string; title?: string; altText?: string };
+  }>;
+  /** Parent category slug – used for subcategory cards */
+  parentCategorySlug?: string;
+  /** Comma-separated subcategory slugs – used for shop link */
+  subcategorySlug?: string;
   createdAt?: string;
   updatedAt?: string;
 }
