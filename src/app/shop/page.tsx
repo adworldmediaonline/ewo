@@ -6,6 +6,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import PageSectionsRenderer from '@/components/version-tsx/page-sections-renderer';
 import ShopContentWrapper from '@/components/version-tsx/shop-content-wrapper';
 import Wrapper from '@/components/wrapper';
 import { getCategories } from '@/lib/server-data';
@@ -22,7 +23,16 @@ export async function generateMetadata() {
   });
 }
 
-export default async function ShopPage() {
+type ShopPageProps = {
+  searchParams?: Promise<{ category?: string; subcategory?: string }>;
+};
+
+export default async function ShopPage({ searchParams }: ShopPageProps) {
+  const params = await searchParams;
+  const hasCategoryFilter = Boolean(
+    params?.category?.trim() || params?.subcategory?.trim()
+  );
+
   // Fetch categories on the server - same as homepage for consistency
   const categories = await getCategories();
 
@@ -40,6 +50,8 @@ export default async function ShopPage() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
+
+        {!hasCategoryFilter && <PageSectionsRenderer pageSlug="shop" />}
 
         {/* Shop Page Header */}
         {/* <section className="w-full bg-white py-6 md:py-8 lg:py-10 mb-6 md:mb-8">
