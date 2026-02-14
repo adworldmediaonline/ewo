@@ -14,6 +14,10 @@ export interface CategoryItem {
   status?: string;
   products?: unknown[];
   children?: string[];
+  /** Parent category slug – for subcategory/grouped cards */
+  parentCategorySlug?: string;
+  /** Comma-separated subcategory slugs – for shop link (single or grouped) */
+  subcategorySlug?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -39,15 +43,15 @@ export const CategoryCard = ({ item, index = 0 }: CategoryCardProps) => {
   ) => {
     e.preventDefault();
     e.stopPropagation();
-    const parentSlug = toSlug(parent);
+    const parentSlug = item.parentCategorySlug ?? toSlug(parent);
     const childSlug = toSlug(child);
     router.push(`/shop?category=${parentSlug}&subcategory=${childSlug}`);
   };
 
-  // Check if this is a special subcategory card that needs parent+subcategory URL
-  const isSubcategoryCard = (item as any).parentCategorySlug && (item as any).subcategorySlug;
-  const href = isSubcategoryCard
-    ? `/shop?category=${(item as any).parentCategorySlug}&subcategory=${(item as any).subcategorySlug}`
+  // Subcategory/grouped card: use parent+subcategory URL (subcategorySlug can be comma-separated for grouped)
+  const hasSubcategoryLink = item.parentCategorySlug && item.subcategorySlug;
+  const href = hasSubcategoryLink
+    ? `/shop?category=${item.parentCategorySlug}&subcategory=${item.subcategorySlug}`
     : `/shop?category=${toSlug(item.parent)}`;
 
   return (
