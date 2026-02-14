@@ -1,5 +1,6 @@
 'use cache';
 
+import { cacheLife } from 'next/cache';
 import { getCategoriesShow } from '@/server/categories';
 import { toSlug } from '@/lib/server-data';
 import { CategoryCard, type CategoryItem } from './category-card';
@@ -14,6 +15,7 @@ interface CategoryShowcaseGridProps {
  * Handles DANA 60 special case (split from parent, dedicated card).
  */
 export async function CategoryShowcaseGrid({ categoryOrder }: CategoryShowcaseGridProps) {
+  cacheLife('minutes');
   const categories = await getCategoriesShow();
   const processed = processCategoriesForShowcase(categories);
   const processedCategories = sortByCategoryOrder(processed, categoryOrder);
