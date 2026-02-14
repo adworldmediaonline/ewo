@@ -68,6 +68,16 @@ export default function ProductDetailsContent({ productItem, children }) {
         </div>
       )}
 
+      {/* More Details - Renders above Related Products */}
+      {productItem?.moreDetails && productItem.moreDetails.trim() !== '' && (
+        <div className="mb-16">
+          <section
+            className="prose prose-sm max-w-none text-foreground [&_img]:rounded-lg [&_img]:max-w-full [&_img]:h-auto"
+            dangerouslySetInnerHTML={{ __html: productItem.moreDetails }}
+          />
+        </div>
+      )}
+
       {/* Related Products - Passed as children slot from parent */}
       {children}
 
