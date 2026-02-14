@@ -601,3 +601,60 @@
   padding: 0.75rem 0.875rem;
   border-radius: 0 0.25rem 0.25rem 0;
 }
+
+/* More Details rich text: column blocks (2-col, 3-col) - must match admin editor output */
+.prose [data-type="columnsBlock"],
+.prose .more-details-columns-block {
+  display: grid;
+  gap: 1.5rem;
+  padding: 0.5rem 0;
+  width: 100%;
+}
+
+.prose [data-type="columnsBlock"][data-cols="2"],
+.prose .more-details-columns-block.more-details-cols-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.prose [data-type="columnsBlock"][data-cols="3"],
+.prose .more-details-columns-block.more-details-cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 768px) {
+  .prose [data-type="columnsBlock"],
+  .prose .more-details-columns-block.more-details-cols-2,
+  .prose .more-details-columns-block.more-details-cols-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.prose [data-type="column"],
+.prose .more-details-column {
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Image float for text wrap in More Details */
+.prose .more-details-img-float-left,
+.prose [data-float="left"] {
+  float: left !important;
+  max-width: 40% !important;
+  margin: 0 1rem 1rem 0 !important;
+}
+
+.prose .more-details-img-float-right,
+.prose [data-float="right"] {
+  float: right !important;
+  max-width: 40% !important;
+  margin: 0 0 1rem 1rem !important;
+}
+
+.prose:has(.more-details-img-float-left):after,
+.prose:has(.more-details-img-float-right):after,
+.prose:has([data-float="left"]):after,
+.prose:has([data-float="right"]):after {
+  content: "";
+  display: table;
+  clear: both;
+}
