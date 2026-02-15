@@ -19,8 +19,14 @@ export interface HeaderMenuButtonProps {
 export function HeaderMenuButton({
   links,
 }: HeaderMenuButtonProps): React.ReactElement {
+  const [open, setOpen] = React.useState(false);
+
+  const handleLinkClick = React.useCallback(() => {
+    setOpen(false);
+  }, []);
+
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button
           variant="ghost"
@@ -42,6 +48,7 @@ export function HeaderMenuButton({
               key={item.href}
               href={item.href}
               className="rounded-md px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
+              onClick={handleLinkClick}
             >
               {item.label}
             </Link>
