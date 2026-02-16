@@ -18,6 +18,9 @@ export interface PageMetadata {
 }
 
 export async function getPageMetadata(slug: string): Promise<PageMetadata | null> {
+  cacheLife('weeks');
+  cacheTag('cms', 'page-metadata');
+
   if (!API_BASE_URL || !slug?.trim()) return null;
 
   try {
