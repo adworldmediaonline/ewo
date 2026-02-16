@@ -1,6 +1,6 @@
 'use cache';
 
-import { cacheLife } from 'next/cache';
+import { cacheLife, cacheTag } from 'next/cache';
 import { API_ENDPOINT } from './api-endpoint';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -127,13 +127,14 @@ export async function getActivePageSections(
   pageSlug: string
 ): Promise<PageSection[]> {
   cacheLife('hours');
+  cacheTag('cms', 'page-sections');
   if (!API_BASE_URL || !pageSlug?.trim()) return [];
 
   try {
     const normalizedSlug = pageSlug.toLowerCase().trim();
     const response = await fetch(
       `${API_BASE_URL}${API_ENDPOINT.PAGE_SECTIONS}/page/${normalizedSlug}/active`,
-      { next: { revalidate: 3600 } }
+      { next: { revalidate: 3600, tags: ['cms', 'page-sections'] } }
     );
 
     if (!response.ok) return [];

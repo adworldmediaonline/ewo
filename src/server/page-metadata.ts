@@ -1,6 +1,6 @@
 'use cache';
 
-import { cacheLife } from 'next/cache';
+import { cacheLife, cacheTag } from 'next/cache';
 import { API_ENDPOINT } from './api-endpoint';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -19,13 +19,14 @@ export interface PageMetadata {
 
 export async function getPageMetadata(slug: string): Promise<PageMetadata | null> {
   cacheLife('hours');
+  cacheTag('cms', 'page-metadata');
   if (!API_BASE_URL || !slug?.trim()) return null;
 
   try {
     const normalizedSlug = slug.toLowerCase().trim();
     const response = await fetch(
       `${API_BASE_URL}${API_ENDPOINT.PAGE_METADATA}/${normalizedSlug}`,
-      { next: { revalidate: 3600 } }
+      { next: { revalidate: 3600, tags: ['cms', 'page-metadata'] } }
     );
 
     if (!response.ok) return null;

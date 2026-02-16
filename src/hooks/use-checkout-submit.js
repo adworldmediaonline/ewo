@@ -1,5 +1,9 @@
 'use client';
-import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
+import {
+  CardNumberElement,
+  useElements,
+  useStripe,
+} from '@stripe/react-stripe-js';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -701,7 +705,7 @@ const useCheckoutSubmit = () => {
       appliedCoupons: applied_coupons,
     };
 
-    const card = elements?.getElement(CardElement);
+    const card = elements?.getElement(CardNumberElement);
 
     if (!stripe || !elements) {
       return;
