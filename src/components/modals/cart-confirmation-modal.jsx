@@ -74,7 +74,7 @@ export default function CartConfirmationModal() {
           className="bg-[#4caf50] text-white rounded-full px-5 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.2)] transition-all duration-200 min-w-[200px] max-w-[300px] h-14 flex items-center gap-3 hover:bg-[#45a049] hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)] pointer-events-auto relative"
         >
           <Link
-            href="/cart"
+            href="/checkout"
             className="flex items-center gap-3 flex-1 cursor-pointer"
             onClick={handleViewCart}
           >
@@ -105,9 +105,9 @@ export default function CartConfirmationModal() {
 
             {/* Text Content */}
             <div className="flex items-center gap-2 flex-1 min-w-0">
-              <span className="font-semibold text-base whitespace-nowrap">
+              {/* <span className="font-semibold text-base whitespace-nowrap">
                 View cart
-              </span>
+              </span> */}
               <span className="bg-white/25 px-2 py-1 rounded-xl text-sm font-medium whitespace-nowrap">
                 {totalItems} item{totalItems !== 1 ? 's' : ''}
               </span>

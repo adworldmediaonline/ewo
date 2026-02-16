@@ -13,7 +13,11 @@ import {
 import { useGetAllActiveCouponsQuery } from '@/redux/features/coupon/couponApi';
 import { load_applied_coupons } from '@/redux/features/coupon/couponSlice';
 import { Minus, Plus } from '@/svg';
-import { CardElement } from '@stripe/react-stripe-js';
+import {
+  CardNumberElement,
+  CardExpiryElement,
+  CardCvcElement,
+} from '@stripe/react-stripe-js';
 import { CldImage } from 'next-cloudinary';
 // Removed CSS module import; Tailwind-only styling
 
@@ -22,7 +26,7 @@ const isCloudinaryUrl = url =>
   url.startsWith('https://res.cloudinary.com/') &&
   url.includes('/upload/');
 
-export default function CheckoutOrderArea({ checkoutData }) {
+export default function CheckoutOrderArea({ checkoutData, variant = 'full' }) {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
 
@@ -181,7 +185,7 @@ export default function CheckoutOrderArea({ checkoutData }) {
 
     if (hasCartData || (cart_products.length === 0 && subtotal === 0)) {
       // Data is loaded (either with products or confirmed empty cart)
-      setCartDataLoaded(true);
+      queueMicrotask(() => setCartDataLoaded(true));
     }
   }, [cart_products, subtotal, totalShippingCost]);
 
@@ -328,9 +332,11 @@ export default function CheckoutOrderArea({ checkoutData }) {
   // Save discount values when they change and we're not in checkout process
   useEffect(() => {
     if (!isCheckoutSubmit && !isCheckoutSubmitting) {
-      setSavedAddressDiscount(addressDiscountAmount);
-      setSavedDiscountEligible(address_discount_eligible);
-      setSavedDiscountMessage(address_discount_message);
+      queueMicrotask(() => {
+        setSavedAddressDiscount(addressDiscountAmount);
+        setSavedDiscountEligible(address_discount_eligible);
+        setSavedDiscountMessage(address_discount_message);
+      });
     }
   }, [
     addressDiscountAmount,
@@ -412,14 +418,16 @@ export default function CheckoutOrderArea({ checkoutData }) {
       const finalWithTax =
         totalWithTaxDollars !== null ? totalWithTaxDollars : baseTotal;
 
-      setSavedOrderSummary({
-        subtotal: subtotal,
-        shipping: totalShippingCost,
-        totalCouponDiscount: total_coupon_discount,
-        appliedCoupons: applied_coupons,
-        finalTotal: baseTotal,
-        taxAmount: taxAmountDollars,
-        finalTotalWithTax: finalWithTax,
+      queueMicrotask(() => {
+        setSavedOrderSummary({
+          subtotal: subtotal,
+          shipping: totalShippingCost,
+          totalCouponDiscount: total_coupon_discount,
+          appliedCoupons: applied_coupons,
+          finalTotal: baseTotal,
+          taxAmount: taxAmountDollars,
+          finalTotalWithTax: finalWithTax,
+        });
       });
     }
   }, [
@@ -500,10 +508,11 @@ export default function CheckoutOrderArea({ checkoutData }) {
 
   // Show loading state while cart data is being loaded
   if (!cartDataLoaded) {
+    const loadingTitle = variant === 'summary' ? 'Order Summary' : 'Your Order';
     return (
       <div className="bg-card rounded-lg shadow-sm p-4 md:p-6 border border-border">
         <h3 className="text-xl font-semibold text-foreground mb-4 md:mb-6">
-          Your Order
+          {loadingTitle}
         </h3>
         <div className="flex items-center justify-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -515,400 +524,443 @@ export default function CheckoutOrderArea({ checkoutData }) {
     );
   }
 
+  const showItems = variant === 'items' || variant === 'full';
+  const showSummary = variant === 'summary' || variant === 'full';
+
   return (
     <div className="bg-card rounded-lg shadow-sm p-4 md:p-6 border border-border">
-      <h3 className="text-xl font-semibold text-foreground mb-4 md:mb-6">
-        Your Order
-      </h3>
+      {showItems && (
+        <>
+          <h3 className="text-xl font-semibold text-foreground mb-4 md:mb-6">
+            Your Order
+          </h3>
 
-      {/* Order items - no height restriction */}
-      <div className="space-y-3 sm:space-y-2 mb-4 sm:mb-4">
-        {cart_products.map(item => {
-            const imageUrl = item.img || '';
-            const isCloudImage = isCloudinaryUrl(imageUrl);
+          {/* Order items - no height restriction */}
+          <div className="space-y-3 sm:space-y-2 mb-4 sm:mb-4">
+            {cart_products.map(item => {
+              const imageUrl = item.img || '';
+              const isCloudImage = isCloudinaryUrl(imageUrl);
 
-            return (
-              <div
-                key={item._id}
-                className="flex flex-col sm:flex-row sm:items-center justify-between py-3 sm:py-2 border-b border-border last:border-0 gap-3 sm:gap-2"
-              >
-                {/* Left side: Image + Product Info */}
-                <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0 sm:max-w-[60%]">
-                  <div className="relative w-12 h-12 sm:w-16 sm:h-16 rounded overflow-hidden shrink-0 bg-muted">
-                    {imageUrl ? (
-                      <CldImage
-                        src={imageUrl}
-                        alt={item.title}
-                        fill
-                        sizes="(max-width: 640px) 48px, 64px"
-                        className="object-cover"
-                        preserveTransformations={isCloudImage}
-                        deliveryType={isCloudImage ? undefined : 'fetch'}
-                        loading="lazy"
-                        fetchPriority="low"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center text-[10px] sm:text-xs text-muted-foreground">
-                        No Image
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-foreground text-sm sm:text-xs leading-tight">
-                      {item.title}
-                    </h4>
-                    {item.selectedOption && (
-                      <p className="text-xs text-muted-foreground truncate">
-                        {item.selectedOption.title} (+$
-                        {Number(item.selectedOption.price).toFixed(2)})
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Right side: Quantity Controls + Price */}
-                <div className="flex items-center justify-between sm:justify-end space-x-2 sm:space-x-3 shrink-0 w-full sm:w-auto">
-                  {/* Compact quantity controls */}
-                  <div className="flex items-center border border-border rounded">
-                    <button
-                      type="button"
-                      onClick={() => handleDecrement(item)}
-                      className="w-6 h-6 sm:w-5 sm:h-5 flex items-center justify-center text-foreground hover:bg-muted transition-colors disabled:opacity-50"
-                      disabled={
-                        isCheckoutSubmit ||
-                        processingPayment ||
-                        item.orderQuantity <= 1
-                      }
-                    >
-                      <Minus width={10} height={10} />
-                    </button>
-                    <span className="w-8 h-6 sm:w-6 sm:h-5 flex items-center justify-center text-sm sm:text-xs font-medium">
-                      {item.orderQuantity}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => handleAddProduct(item)}
-                      className="w-6 h-6 sm:w-5 sm:h-5 flex items-center justify-center text-foreground hover:bg-muted transition-colors disabled:opacity-50"
-                      disabled={isCheckoutSubmit || processingPayment}
-                    >
-                      <Plus width={10} height={10} />
-                    </button>
-                  </div>
-
-                  {/* Price */}
-                  <div className="text-foreground font-medium text-base sm:text-sm min-w-[4rem] sm:min-w-[5rem] sm:w-[5rem] text-right whitespace-nowrap">
-                    ${(item.price * item.orderQuantity).toFixed(2)}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-      </div>
-
-      {/* Active Coupons Section - Shows "Applied Successfully" UI when coupons are active */}
-      {/* Uses same coupon check logic as product card (useProductCoupon) */}
-      {activeCouponsForCart.length > 0 && (
-        <div className="mb-6 mt-6">
-          <div className="space-y-3">
-            {activeCouponsForCart.map((coupon, index) => {
               return (
                 <div
-                  key={`${coupon.couponCode}-${index}`}
-                  className="relative overflow-hidden bg-gradient-to-r from-emerald-500 to-green-500 rounded-lg p-4 shadow-md"
+                  key={item._id}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between py-3 sm:py-2 border-b border-border last:border-0 gap-3 sm:gap-2"
                 >
-                  {/* Decorative corner */}
-                  <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-bl-full" />
-
-                  <div className="relative flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="bg-white/20 backdrop-blur-sm rounded-full p-2">
-                        <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-white uppercase tracking-wide">
-                          {coupon.couponCode}
-                        </p>
-                        <p className="text-xs text-white/90 font-medium">
-                          Applied Successfully
-                        </p>
-                      </div>
+                  {/* Left side: Image + Product Info */}
+                  <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0 sm:max-w-[60%]">
+                    <div className="relative w-12 h-12 sm:w-16 sm:h-16 rounded overflow-hidden shrink-0 bg-muted">
+                      {imageUrl ? (
+                        <CldImage
+                          src={imageUrl}
+                          alt={item.title}
+                          fill
+                          sizes="(max-width: 640px) 48px, 64px"
+                          className="object-cover"
+                          preserveTransformations={isCloudImage}
+                          deliveryType={isCloudImage ? undefined : 'fetch'}
+                          loading="lazy"
+                          fetchPriority="low"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-[10px] sm:text-xs text-muted-foreground">
+                          No Image
+                        </div>
+                      )}
                     </div>
-                    {coupon.couponPercentage > 0 && (
-                      <div className="bg-white rounded-full px-3 py-1.5">
-                        <span className="text-sm font-extrabold text-emerald-600">
-                          {coupon.couponPercentage}% OFF
-                        </span>
-                      </div>
-                    )}
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium text-foreground text-sm sm:text-xs leading-tight">
+                        {item.title}
+                      </h4>
+                      {item.selectedOption && (
+                        <p className="text-xs text-muted-foreground truncate">
+                          {item.selectedOption.title} (+$
+                          {Number(item.selectedOption.price).toFixed(2)})
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Right side: Quantity Controls + Price */}
+                  <div className="flex items-center justify-between sm:justify-end space-x-2 sm:space-x-3 shrink-0 w-full sm:w-auto">
+                    {/* Compact quantity controls */}
+                    <div className="flex items-center border border-border rounded">
+                      <button
+                        type="button"
+                        onClick={() => handleDecrement(item)}
+                        className="w-6 h-6 sm:w-5 sm:h-5 flex items-center justify-center text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+                        disabled={
+                          isCheckoutSubmit ||
+                          processingPayment ||
+                          item.orderQuantity <= 1
+                        }
+                      >
+                        <Minus width={10} height={10} />
+                      </button>
+                      <span className="w-8 h-6 sm:w-6 sm:h-5 flex items-center justify-center text-sm sm:text-xs font-medium">
+                        {item.orderQuantity}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleAddProduct(item)}
+                        className="w-6 h-6 sm:w-5 sm:h-5 flex items-center justify-center text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+                        disabled={isCheckoutSubmit || processingPayment}
+                      >
+                        <Plus width={10} height={10} />
+                      </button>
+                    </div>
+
+                    {/* Price */}
+                    <div className="text-foreground font-medium text-base sm:text-sm min-w-[4rem] sm:min-w-[5rem] sm:w-[5rem] text-right whitespace-nowrap">
+                      ${(item.price * item.orderQuantity).toFixed(2)}
+                    </div>
                   </div>
                 </div>
               );
             })}
           </div>
-        </div>
-      )}
 
-      {/* Order Summary Section - moved from billing area */}
-      <div className="border-t border-border pt-6 mt-6">
-        <h3 className="text-xl font-semibold text-foreground mb-4">
-          Order Summary
-        </h3>
+          {/* Active Coupons Section - Shows "Applied Successfully" UI when coupons are active */}
+          {/* Uses same coupon check logic as product card (useProductCoupon) */}
+          {activeCouponsForCart.length > 0 && (
+            <div className="mb-6 mt-6">
+              <div className="space-y-3">
+                {activeCouponsForCart.map((coupon, index) => {
+                  return (
+                    <div
+                      key={`${coupon.couponCode}-${index}`}
+                      className="relative overflow-hidden bg-gradient-to-r from-emerald-500 to-green-500 rounded-lg p-4 shadow-md"
+                    >
+                      {/* Decorative corner */}
+                      <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-bl-full" />
 
-        {/* Coupon Section */}
-        {/* Applied Coupons - Beautiful Banner */}
-        {displayAppliedCoupons.length > 0 && (
-          <div className="mb-6">
-            <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-              <svg className="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
-              </svg>
-              Active Coupons
-            </h4>
-            <div className="space-y-3">
-              {displayAppliedCoupons.map((coupon, index) => {
-                // Calculate discount percentage if available
-                const discountPercent = coupon.discountType === 'percentage' && coupon.discountPercentage
-                  ? coupon.discountPercentage
-                  : coupon.discount && displaySubtotal > 0
-                    ? ((coupon.discount / displaySubtotal) * 100).toFixed(1)
-                    : null;
-
-                return (
-                  <div
-                    key={coupon.couponCode || index}
-                    className="relative overflow-hidden bg-linear-to-br from-emerald-500 via-green-500 to-emerald-600 rounded-xl p-4 shadow-lg"
-                  >
-                    {/* Decorative elements */}
-                    <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-bl-full" />
-                    <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-tr-full" />
-
-                    <div className="relative flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="bg-white/20 backdrop-blur-sm rounded-full p-2">
-                          <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
+                      <div className="relative flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="bg-white/20 backdrop-blur-sm rounded-full p-2">
+                            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-white uppercase tracking-wide">
+                              {coupon.couponCode}
+                            </p>
+                            <p className="text-xs text-white/90 font-medium">
+                              Applied Successfully
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-sm font-extrabold text-white uppercase tracking-wider">
-                            {coupon.couponCode}
-                          </p>
-                          <p className="text-xs text-white/90 font-medium mt-0.5">
-                            ✓ Applied Successfully
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex flex-col items-end gap-1">
-                        {discountPercent && (
-                          <div className="bg-white rounded-full px-3 py-1.5 shadow-md">
-                            <span className="text-sm font-black text-emerald-600">
-                              {discountPercent}% OFF
+                        {coupon.couponPercentage > 0 && (
+                          <div className="bg-white rounded-full px-3 py-1.5">
+                            <span className="text-sm font-extrabold text-emerald-600">
+                              {coupon.couponPercentage}% OFF
                             </span>
                           </div>
                         )}
-                        <div className="bg-white/20 backdrop-blur-sm rounded-full px-2.5 py-0.5">
-                          <span className="text-xs font-bold text-white">
-                            Save ${Number(coupon.discount || 0).toFixed(2)}
-                          </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Order Summary Section - moved from billing area */}
+      {showSummary && (
+        <div className={showItems ? 'border-t border-border pt-6 mt-6' : 'pt-0 mt-0'}>
+          <h3 className="text-xl font-semibold text-foreground mb-4">
+            Order Summary
+          </h3>
+
+          {/* Coupon Section */}
+          {/* Applied Coupons - Beautiful Banner */}
+          {displayAppliedCoupons.length > 0 && (
+            <div className="mb-6">
+              <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                <svg className="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                </svg>
+                Active Coupons
+              </h4>
+              <div className="space-y-3">
+                {displayAppliedCoupons.map((coupon, index) => {
+                  // Calculate discount percentage if available
+                  const discountPercent = coupon.discountType === 'percentage' && coupon.discountPercentage
+                    ? coupon.discountPercentage
+                    : coupon.discount && displaySubtotal > 0
+                      ? ((coupon.discount / displaySubtotal) * 100).toFixed(1)
+                      : null;
+
+                  return (
+                    <div
+                      key={coupon.couponCode || index}
+                      className="relative overflow-hidden bg-linear-to-br from-emerald-500 via-green-500 to-emerald-600 rounded-xl p-4 shadow-lg"
+                    >
+                      {/* Decorative elements */}
+                      <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-bl-full" />
+                      <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-tr-full" />
+
+                      <div className="relative flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="bg-white/20 backdrop-blur-sm rounded-full p-2">
+                            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="text-sm font-extrabold text-white uppercase tracking-wider">
+                              {coupon.couponCode}
+                            </p>
+                            <p className="text-xs text-white/90 font-medium mt-0.5">
+                              ✓ Applied Successfully
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-end gap-1">
+                          {discountPercent && (
+                            <div className="bg-white rounded-full px-3 py-1.5 shadow-md">
+                              <span className="text-sm font-black text-emerald-600">
+                                {discountPercent}% OFF
+                              </span>
+                            </div>
+                          )}
+                          <div className="bg-white/20 backdrop-blur-sm rounded-full px-2.5 py-0.5">
+                            <span className="text-xs font-bold text-white">
+                              Save ${Number(coupon.discount || 0).toFixed(2)}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Pricing Summary */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Subtotal</span>
-            <span className="font-medium text-foreground">
-              ${(Number(displaySubtotal) || 0).toFixed(2)}
-            </span>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">
-              Shipping
-              {displayShipping === 0 && displayFinalTotalBeforeShipping >= 500 && (
-                <span className="ml-1 text-xs text-emerald-600">
-                  (Free on orders $500+)
-                </span>
-              )}
-              {displayShipping > 0 && displayFinalTotalBeforeShipping < 500 && (
-                <span className="ml-1 text-xs text-blue-600">
-                  (Free on $500+)
-                </span>
-              )}
-            </span>
-            {displayShipping === 0 && displayFinalTotalBeforeShipping >= 500 ? (
-              <span className="font-bold text-emerald-600">FREE</span>
-            ) : (
+          {/* Pricing Summary */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground">Subtotal</span>
               <span className="font-medium text-foreground">
-                ${(Number(displayShipping) || 0).toFixed(2)}
-                {discountPercentage > 0 && (
-                  <span className="ml-2 text-xs bg-green-100 text-green-600 px-1.5 py-0.5 rounded">
-                    {discountPercentage}% off
-                  </span>
-                )}
+                ${(Number(displaySubtotal) || 0).toFixed(2)}
               </span>
-            )}
-          </div>
+            </div>
 
-          {/* Multiple coupon discounts display */}
-          {Number(displayTotalCouponDiscount) > 0 && (
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">
-                Coupon Discounts
-                {displayAppliedCoupons.length > 1 && (
-                  <span className="ml-2 text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">
-                    {displayAppliedCoupons.length} coupons
+                Shipping
+                {displayShipping === 0 && displayFinalTotalBeforeShipping >= 500 && (
+                  <span className="ml-1 text-xs text-emerald-600">
+                    (Free on orders $500+)
+                  </span>
+                )}
+                {displayShipping > 0 && displayFinalTotalBeforeShipping < 500 && (
+                  <span className="ml-1 text-xs text-blue-600">
+                    (Free on $500+)
                   </span>
                 )}
               </span>
-              <span className="font-medium text-foreground">
-                -${Number(displayTotalCouponDiscount).toFixed(2)}
-              </span>
-            </div>
-          )}
-
-          {/* Address discount */}
-          {Number(displayAddressDiscount) > 0 && (
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Address Discount</span>
-              <span className="font-medium text-foreground">
-                -${Number(displayAddressDiscount).toFixed(2)}
-              </span>
-            </div>
-          )}
-
-          {/* Tax */}
-          {isTaxLoading ? (
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Tax (estimated)</span>
-              <span className="text-sm text-muted-foreground">
-                Calculating...
-              </span>
-            </div>
-          ) : tax_preview ? (
-            tax_preview.taxCollected ? (
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Tax (estimated)</span>
+              {displayShipping === 0 && displayFinalTotalBeforeShipping >= 500 ? (
+                <span className="font-bold text-emerald-600">FREE</span>
+              ) : (
                 <span className="font-medium text-foreground">
-                  ${Number(displayTaxAmount).toFixed(2)}
+                  ${(Number(displayShipping) || 0).toFixed(2)}
+                  {discountPercentage > 0 && (
+                    <span className="ml-2 text-xs bg-green-100 text-green-600 px-1.5 py-0.5 rounded">
+                      {discountPercentage}% off
+                    </span>
+                  )}
                 </span>
-              </div>
-            ) : (
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Tax</span>
-                <span className="text-sm text-muted-foreground">
-                  No tax for your location
-                </span>
-              </div>
-            )
-          ) : null}
-
-        </div>
-
-        {/* Total */}
-        <div className="border-t border-border pt-3 mt-4">
-          <div className="flex items-center justify-between">
-            <span className="text-lg font-semibold text-foreground">Total</span>
-            <span className="text-lg font-semibold text-foreground">
-              ${displayFinalTotal.toFixed(2)}
-            </span>
-          </div>
-        </div>
-
-        {/* Payment Method */}
-        <div className="mt-6">
-          <div className="space-y-4">
-            <div className="p-4 border border-border rounded-md bg-background">
-              <div className="flex items-center space-x-3 mb-3">
-                <input
-                  type="radio"
-                  id="card-payment"
-                  name="paymentMethod"
-                  value="card"
-                  defaultChecked
-                  className="text-primary focus:ring-ring"
-                />
-                <label
-                  htmlFor="card-payment"
-                  className="font-medium text-foreground"
-                >
-                  Credit / Debit Card
-                </label>
-              </div>
-
-              <div className="bg-background border border-border rounded-md p-3">
-                <CardElement
-                  options={{
-                    style: {
-                      base: {
-                        fontSize: '16px',
-                        color: '#374151',
-                        '::placeholder': {
-                          color: '#9CA3AF',
-                        },
-                      },
-                    },
-                  }}
-                />
-              </div>
-
-              {cardError && (
-                <div className="mt-2 text-sm text-destructive">{cardError}</div>
               )}
             </div>
-          </div>
-        </div>
 
-        {/* Complete Purchase Button */}
-        <div className="mt-6">
-          <button
-            type="submit"
-            disabled={!stripe || isCheckoutSubmit || processingPayment}
-            className="w-full py-3 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 font-medium"
-          >
-            {processingPayment ? (
-              <span className="flex items-center justify-center">
-                <span
-                  className="spinner-border spinner-border-sm me-2"
-                  role="status"
-                  aria-hidden="true"
-                ></span>
-                Processing Your Order...
-              </span>
-            ) : (
-              `Complete Purchase - $${displayFinalTotal.toFixed(2)}`
+            {/* Multiple coupon discounts display */}
+            {Number(displayTotalCouponDiscount) > 0 && (
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">
+                  Coupon Discounts
+                  {displayAppliedCoupons.length > 1 && (
+                    <span className="ml-2 text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">
+                      {displayAppliedCoupons.length} coupons
+                    </span>
+                  )}
+                </span>
+                <span className="font-medium text-foreground">
+                  -${Number(displayTotalCouponDiscount).toFixed(2)}
+                </span>
+              </div>
             )}
-          </button>
+
+            {/* Address discount */}
+            {Number(displayAddressDiscount) > 0 && (
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Address Discount</span>
+                <span className="font-medium text-foreground">
+                  -${Number(displayAddressDiscount).toFixed(2)}
+                </span>
+              </div>
+            )}
+
+            {/* Tax */}
+            {isTaxLoading ? (
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Tax (estimated)</span>
+                <span className="text-sm text-muted-foreground">
+                  Calculating...
+                </span>
+              </div>
+            ) : tax_preview ? (
+              tax_preview.taxCollected ? (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Tax (estimated)</span>
+                  <span className="font-medium text-foreground">
+                    ${Number(displayTaxAmount).toFixed(2)}
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Tax</span>
+                  <span className="text-sm text-muted-foreground">
+                    No tax for your location
+                  </span>
+                </div>
+              )
+            ) : null}
+
+          </div>
+
+          {/* Total */}
+          <div className="border-t border-border pt-3 mt-4">
+            <div className="flex items-center justify-between">
+              <span className="text-lg font-semibold text-foreground">Total</span>
+              <span className="text-lg font-semibold text-foreground">
+                ${displayFinalTotal.toFixed(2)}
+              </span>
+            </div>
+          </div>
+
+          {/* Payment Method */}
+          <div className="mt-6">
+            <div className="space-y-4">
+              <div className="p-4 border border-border rounded-md bg-background">
+                <div className="flex items-center space-x-3 mb-3">
+                  <input
+                    type="radio"
+                    id="card-payment"
+                    name="paymentMethod"
+                    value="card"
+                    defaultChecked
+                    className="text-primary focus:ring-ring"
+                  />
+                  <label
+                    htmlFor="card-payment"
+                    className="font-medium text-foreground"
+                  >
+                    Credit / Debit Card
+                  </label>
+                </div>
+
+                <div className="bg-background border border-border rounded-md p-3 space-y-3">
+                  <div className="min-w-0 w-full">
+                    <CardNumberElement
+                      options={{
+                        style: {
+                          base: {
+                            fontSize: '16px',
+                            color: '#374151',
+                            '::placeholder': {
+                              color: '#9CA3AF',
+                            },
+                          },
+                        },
+                      }}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="min-w-0">
+                      <CardExpiryElement
+                        options={{
+                          style: {
+                            base: {
+                              fontSize: '16px',
+                              color: '#374151',
+                              '::placeholder': {
+                                color: '#9CA3AF',
+                              },
+                            },
+                          },
+                        }}
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <CardCvcElement
+                        options={{
+                          style: {
+                            base: {
+                              fontSize: '16px',
+                              color: '#374151',
+                              '::placeholder': {
+                                color: '#9CA3AF',
+                              },
+                            },
+                          },
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {cardError && (
+                  <div className="mt-2 text-sm text-destructive">{cardError}</div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Complete Purchase Button */}
+          <div className="mt-6">
+            <button
+              type="submit"
+              disabled={!stripe || isCheckoutSubmit || processingPayment}
+              className="w-full py-3 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 font-medium"
+            >
+              {processingPayment ? (
+                <span className="flex items-center justify-center">
+                  <span
+                    className="spinner-border spinner-border-sm me-2"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
+                  Processing Your Order...
+                </span>
+              ) : (
+                `Complete Purchase - $${displayFinalTotal.toFixed(2)}`
+              )}
+            </button>
+          </div>
+
+          {/* Address discount eligibility message */}
+          {displayDiscountEligible === false && (
+            <div className="mt-4 p-3 bg-muted rounded-md">
+              <p className="text-sm text-muted-foreground">
+                {displayDiscountMessage ||
+                  'Address discount not applicable for this order.'}
+              </p>
+            </div>
+          )}
+
+          {displayDiscountEligible === true && (
+            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
+              <p className="text-sm text-green-700">
+                {displayDiscountMessage ||
+                  `Great! You're eligible for an address-based discount.`}
+              </p>
+            </div>
+          )}
         </div>
-
-        {/* Address discount eligibility message */}
-        {displayDiscountEligible === false && (
-          <div className="mt-4 p-3 bg-muted rounded-md">
-            <p className="text-sm text-muted-foreground">
-              {displayDiscountMessage ||
-                'Address discount not applicable for this order.'}
-            </p>
-          </div>
-        )}
-
-        {displayDiscountEligible === true && (
-          <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
-            <p className="text-sm text-green-700">
-              {displayDiscountMessage ||
-                `Great! You're eligible for an address-based discount.`}
-            </p>
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 }

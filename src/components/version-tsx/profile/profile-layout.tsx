@@ -98,7 +98,7 @@ const ProfileLayout: React.FC<ProfileLayoutProps> = ({
           </div>
         </div>
         <Button variant="outline" size="sm" className="w-full" asChild>
-          <Link href="/shop">
+          <Link href="/shop" onClick={() => setSidebarOpen(false)}>
             <ShoppingCart className="w-4 h-4 mr-2" />
             Continue Shopping
           </Link>
@@ -155,7 +155,7 @@ const ProfileLayout: React.FC<ProfileLayoutProps> = ({
           className="w-full justify-start text-muted-foreground hover:text-foreground"
           asChild
         >
-          <Link href="/">
+          <Link href="/" onClick={() => setSidebarOpen(false)}>
             <Home className="w-4 h-4 mr-2" />
             Back to Home
           </Link>
