@@ -18,15 +18,12 @@ export interface PageMetadata {
 }
 
 export async function getPageMetadata(slug: string): Promise<PageMetadata | null> {
-  cacheLife('hours');
-  cacheTag('cms', 'page-metadata');
   if (!API_BASE_URL || !slug?.trim()) return null;
 
   try {
     const normalizedSlug = slug.toLowerCase().trim();
     const response = await fetch(
       `${API_BASE_URL}${API_ENDPOINT.PAGE_METADATA}/${normalizedSlug}`,
-      { next: { revalidate: 3600, tags: ['cms', 'page-metadata'] } }
     );
 
     if (!response.ok) return null;
