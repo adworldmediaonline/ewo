@@ -200,30 +200,30 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
 
 
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  State <span className="text-destructive">*</span>
-                </label>
-                <input
-                  {...register('state', {
-                    required: 'State is required!',
-                    onChange: e => {
-                      handleStateChange(e);
-                    },
-                  })}
-                  name="state"
-                  id="state"
-                  type="text"
-                  placeholder="Enter state name"
-                  className={cn(
-                    'w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring',
-                    errors?.state && 'border-destructive'
-                  )}
-                />
-                <ErrorMsg msg={errors?.state?.message} />
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">
+                Street address <span className="text-destructive">*</span>
+              </label>
+              <input
+                {...register('address', {
+                  required: `Address is required!`,
+                  onChange: e => {
+                    handleAddressChange(e);
+                  },
+                })}
+                name="address"
+                id="address"
+                type="text"
+                placeholder="House number and street name"
+                className={cn(
+                  'w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring',
+                  errors?.address && 'border-destructive'
+                )}
+              />
+              <ErrorMsg msg={errors?.address?.message} />
+            </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
                   City <span className="text-destructive">*</span>
@@ -249,6 +249,29 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
+                  State <span className="text-destructive">*</span>
+                </label>
+                <input
+                  {...register('state', {
+                    required: 'State is required!',
+                    onChange: e => {
+                      handleStateChange(e);
+                    },
+                  })}
+                  name="state"
+                  id="state"
+                  type="text"
+                  placeholder="Enter state name"
+                  className={cn(
+                    'w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring',
+                    errors?.state && 'border-destructive'
+                  )}
+                />
+                <ErrorMsg msg={errors?.state?.message} />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
                   ZIP Code <span className="text-destructive">*</span>
                 </label>
                 <input
@@ -262,30 +285,13 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
                   id="zipCode"
                   type="text"
                   placeholder="Enter ZIP code"
-                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                  className={cn(
+                    'w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring',
+                    errors?.zipCode && 'border-destructive'
+                  )}
                 />
                 <ErrorMsg msg={errors?.zipCode?.message} />
               </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Street address <span className="text-destructive">*</span>
-              </label>
-              <input
-                {...register('address', {
-                  required: `Address is required!`,
-                  onChange: e => {
-                    handleAddressChange(e);
-                  },
-                })}
-                name="address"
-                id="address"
-                type="text"
-                placeholder="House number and street name"
-                className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              />
-              <ErrorMsg msg={errors?.address?.message} />
             </div>
 
             <div>
