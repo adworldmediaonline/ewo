@@ -3,7 +3,61 @@
 // import { cache } from "react";
 import { cacheLife } from "next/cache";
 import { API_ENDPOINT } from "./api-endpoint";
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+export interface PaginatedProductsResponse {
+  data: unknown[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalProducts: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
+}
+
+/** Server-side fetch for initial shop products (SSR). No cache for fresh data. */
+export async function getPaginatedProductsServer(
+  params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    category?: string;
+    subcategory?: string;
+    sortBy?: string;
+    sortOrder?: string;
+  } = {}
+): Promise<PaginatedProductsResponse | null> {
+  if (!API_BASE_URL?.trim()) return null;
+
+  try {
+    const searchParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== "") {
+        searchParams.append(key, String(value));
+      }
+    });
+    const url = `${API_BASE_URL}/api/product/paginated?${searchParams.toString()}`;
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return null;
+    const json = await response.json();
+    if (!json?.success || !Array.isArray(json?.data)) return null;
+    return {
+      data: json.data,
+      pagination: json.pagination ?? {
+        currentPage: 1,
+        totalPages: 1,
+        totalProducts: json.data.length,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching paginated products:", error);
+    return null;
+  }
+}
 
 export async function getProductsShow() {
   // Use "seconds" profile so publish status changes appear within ~1 min

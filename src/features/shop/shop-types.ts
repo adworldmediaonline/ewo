@@ -1,6 +1,6 @@
 import type { Product as ProductCardProduct } from '@/components/version-tsx/product-card';
 
-export const SHOP_PAGE_SIZE = 8;
+export const SHOP_PAGE_SIZE = 12;
 
 export type SortDirection = 'asc' | 'desc';
 

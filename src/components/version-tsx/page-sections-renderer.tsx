@@ -7,16 +7,20 @@ import type {
   HeroSectionContent,
   CustomSectionContent,
   CategoryShowcaseContent,
+  PageSection,
 } from '@/server/page-sections';
 
 interface PageSectionsRendererProps {
   pageSlug?: string;
+  /** Pre-fetched sections; when provided, skips internal fetch (for parallel loading) */
+  sections?: PageSection[];
 }
 
 export default async function PageSectionsRenderer({
   pageSlug = 'home',
+  sections: sectionsProp,
 }: PageSectionsRendererProps) {
-  const sections = await getActivePageSections(pageSlug);
+  const sections = sectionsProp ?? (await getActivePageSections(pageSlug));
   const sortedSections = [...sections].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
   const hasCategoryShowcase = sortedSections.some(

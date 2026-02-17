@@ -1,6 +1,5 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { forwardRef } from 'react';
 
@@ -11,8 +10,13 @@ interface ShopLoadMoreTriggerProps {
   hasProducts: boolean;
 }
 
+/**
+ * Infinite scroll sentinel. The ref is attached to a div that triggers
+ * onLoadMore when scrolled into view (via useInView in parent).
+ * No button - pure infinite scroll.
+ */
 const ShopLoadMoreTrigger = forwardRef<HTMLDivElement, ShopLoadMoreTriggerProps>(
-  ({ canFetchMore, isLoadingMore, onLoadMore, hasProducts }, ref) => {
+  ({ canFetchMore, isLoadingMore, hasProducts }, ref) => {
     if (!hasProducts) {
       return null;
     }
@@ -26,9 +30,8 @@ const ShopLoadMoreTrigger = forwardRef<HTMLDivElement, ShopLoadMoreTriggerProps>
               <span>Loading more products...</span>
             </div>
           ) : (
-            <Button variant="outline" onClick={onLoadMore}>
-              Load More Products
-            </Button>
+            /* Invisible sentinel - parent useInView triggers fetch when this scrolls into view */
+            <div className="h-20 w-full" aria-hidden="true" />
           )
         ) : (
           <p className="text-sm text-muted-foreground">
