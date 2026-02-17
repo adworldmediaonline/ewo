@@ -4,10 +4,14 @@ import Link from 'next/link';
 import { getActiveBanners } from '@/server/banner';
 import { ArrowRight } from 'lucide-react';
 
-export default async function HeroBanner() {
-  const banners = await getActiveBanners();
+interface HeroBannerProps {
+  /** Pre-fetched banners; when provided, skips internal fetch (for parallel loading) */
+  banners?: unknown[];
+}
 
-  const banner = banners.length > 0 ? banners[0] : null;
+export default async function HeroBanner({ banners: bannersProp }: HeroBannerProps = {}) {
+  const banners = bannersProp ?? (await getActiveBanners());
+  const banner = Array.isArray(banners) && banners.length > 0 ? banners[0] : null;
 
   const BannerContent = () => {
     if (!banner) return null;

@@ -10,9 +10,11 @@ const DEFAULT_EXPLORE_LINK = '/shop';
 
 interface CmsCategoryShowcaseProps {
   content: CategoryShowcaseContent;
+  /** Pre-fetched categories; when provided, skips internal fetch (for parallel loading) */
+  categories?: unknown[];
 }
 
-export default function CmsCategoryShowcase({ content }: CmsCategoryShowcaseProps) {
+export default function CmsCategoryShowcase({ content, categories }: CmsCategoryShowcaseProps) {
   const heading = content.heading?.trim() || DEFAULT_HEADING;
   const showExploreAll = content.showExploreAll ?? true;
   const exploreAllLink = content.exploreAllLink?.trim() || DEFAULT_EXPLORE_LINK;
@@ -50,7 +52,7 @@ export default function CmsCategoryShowcase({ content }: CmsCategoryShowcaseProp
           )}
         </div>
 
-        <CategoryShowcaseGrid categoryOrder={content.categoryOrder} />
+        <CategoryShowcaseGrid categoryOrder={content.categoryOrder} categories={categories} />
       </div>
     </section>
   );

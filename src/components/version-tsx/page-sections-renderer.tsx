@@ -14,11 +14,17 @@ interface PageSectionsRendererProps {
   pageSlug?: string;
   /** Pre-fetched sections; when provided, skips internal fetch (for parallel loading) */
   sections?: PageSection[];
+  /** Pre-fetched banners for HeroBanner (when no CMS hero content) */
+  banners?: unknown[];
+  /** Pre-fetched categories for CategoryShowcase */
+  categories?: unknown[];
 }
 
 export default async function PageSectionsRenderer({
   pageSlug = 'home',
   sections: sectionsProp,
+  banners: bannersProp,
+  categories: categoriesProp,
 }: PageSectionsRendererProps) {
   const sections = sectionsProp ?? (await getActivePageSections(pageSlug));
   const sortedSections = [...sections].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
@@ -39,7 +45,7 @@ export default async function PageSectionsRenderer({
               />
             );
           }
-          return <HeroBanner key={section._id} />;
+          return <HeroBanner key={section._id} banners={bannersProp} />;
         }
 
         if (section.sectionType === 'category_showcase') {
@@ -47,6 +53,7 @@ export default async function PageSectionsRenderer({
             <CmsCategoryShowcase
               key={section._id}
               content={(section.content ?? {}) as unknown as CategoryShowcaseContent}
+              categories={categoriesProp}
             />
           );
         }
@@ -73,6 +80,7 @@ export default async function PageSectionsRenderer({
             exploreAllLink: '/shop',
             exploreAllLabel: 'Explore all',
           }}
+          categories={categoriesProp}
         />
       ) : null}
     </>
