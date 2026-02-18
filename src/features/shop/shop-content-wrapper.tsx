@@ -16,6 +16,7 @@ import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
 import { useShopProducts } from '@/features/shop/hooks/use-shop-products';
 import { useShopQueryState } from '@/features/shop/hooks/use-shop-query-state';
 import { DEFAULT_FILTERS } from '@/features/shop/shop-types';
+import type { ShopPagination, ShopProduct } from '@/features/shop/shop-types';
 import {
   CategoryItem,
   toSlug,
@@ -24,9 +25,17 @@ import {
 
 interface ShopContentWrapperProps {
   categories: CategoryItem[];
+  /** SSR initial products for instant first paint */
+  initialProducts?: ShopProduct[];
+  /** SSR initial pagination */
+  initialPagination?: ShopPagination | null;
 }
 
-const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
+const ShopContentWrapper = ({
+  categories,
+  initialProducts = [],
+  initialPagination = null,
+}: ShopContentWrapperProps) => {
   const {
     filters,
     setSearch,
@@ -49,7 +58,7 @@ const ShopContentWrapper = ({ categories }: ShopContentWrapperProps) => {
     reset: resetProducts,
     refresh,
     canFetchMore,
-  } = useShopProducts(filters);
+  } = useShopProducts(filters, { initialProducts, initialPagination });
 
   const { handleAddToCart, handleAddToWishlist } = useShopActions();
 

@@ -8,15 +8,19 @@ import { CategoryCard, type CategoryItem } from './category-card';
 interface CategoryShowcaseGridProps {
   /** Optional custom order of category IDs. Categories not in this array appear after. */
   categoryOrder?: string[];
+  /** Pre-fetched categories; when provided, skips internal fetch (for parallel loading) */
+  categories?: unknown[];
 }
 
 /**
  * Fetches categories from DB and renders the grid.
  * Uses showcaseGroups from each category (configured in Admin) for grouping/splitting.
  */
-export async function CategoryShowcaseGrid({ categoryOrder }: CategoryShowcaseGridProps) {
+export async function CategoryShowcaseGrid({ categoryOrder, categories: categoriesProp }: CategoryShowcaseGridProps) {
   cacheLife('minutes');
-  const categories = await getCategoriesShow();
+  const categories = Array.isArray(categoriesProp)
+    ? (categoriesProp as CategoryItem[])
+    : await getCategoriesShow();
   const processed = processCategoriesForShowcase(categories);
   const processedCategories = sortByCategoryOrder(processed, categoryOrder);
 

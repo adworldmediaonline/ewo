@@ -20,12 +20,40 @@ const toQueryArgs = (filters: ShopFiltersState, page: number): ShopQueryArgs => 
   limit: SHOP_PAGE_SIZE,
 });
 
-export const useShopProducts = (filters: ShopFiltersState) => {
+const filtersMatchDefault = (f: ShopFiltersState) =>
+  f.search === '' &&
+  f.category === '' &&
+  f.subcategory === '' &&
+  f.sortBy === 'skuArrangementOrderNo' &&
+  f.sortOrder === 'asc';
+
+export interface UseShopProductsOptions {
+  initialProducts?: ShopProduct[];
+  initialPagination?: ShopPagination | null;
+}
+
+export const useShopProducts = (
+  filters: ShopFiltersState,
+  options: UseShopProductsOptions = {}
+) => {
+  const { initialProducts = [], initialPagination = null } = options;
+
+  const hasInitialData =
+    initialProducts.length > 0 || (initialPagination && initialPagination.totalProducts > 0);
+  const useInitialForDefault =
+    hasInitialData && filtersMatchDefault(filters);
+
   const [{ data: items, pagination }, setResult] = useState<{
     data: ShopProduct[];
     pagination: ShopPagination | null;
-  }>({ data: [], pagination: null });
-  const [status, setStatus] = useState<Status>('idle');
+  }>(() =>
+    useInitialForDefault
+      ? { data: initialProducts, pagination: initialPagination }
+      : { data: [], pagination: null }
+  );
+  const [status, setStatus] = useState<Status>(
+    useInitialForDefault ? 'success' : 'idle'
+  );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [reloadKey, setReloadKey] = useState(0);
@@ -33,6 +61,7 @@ export const useShopProducts = (filters: ShopFiltersState) => {
   const isMountedRef = useRef(true);
   const pendingResetRef = useRef(false);
   const currentFetchRef = useRef<string | null>(null);
+  const usedInitialRef = useRef(useInitialForDefault);
 
   const [fetchProducts] = useLazyGetPaginatedProductsQuery();
 
@@ -61,7 +90,15 @@ export const useShopProducts = (filters: ShopFiltersState) => {
     pendingResetRef.current = true;
     currentFetchRef.current = null;
     setPage(1);
-    setResult({ data: [], pagination: null });
+    const shouldUseInitial =
+      hasInitialData && filtersMatchDefault(filtersSnapshot);
+    setResult(
+      shouldUseInitial
+        ? { data: initialProducts, pagination: initialPagination }
+        : { data: [], pagination: null }
+    );
+    setStatus(shouldUseInitial ? 'success' : 'idle');
+    usedInitialRef.current = shouldUseInitial;
   }, [filtersKey]);
 
   useEffect(() => {
@@ -69,6 +106,16 @@ export const useShopProducts = (filters: ShopFiltersState) => {
 
     const loadProducts = async () => {
       const isInitialPage = page === 1;
+
+      // Skip fetch when we have SSR initial data and filters match default
+      if (
+        isInitialPage &&
+        usedInitialRef.current &&
+        filtersMatchDefault(filtersSnapshot)
+      ) {
+        pendingResetRef.current = false; // Allow load-more to proceed
+        return;
+      }
 
       if (pendingResetRef.current) {
         if (!isInitialPage) {
