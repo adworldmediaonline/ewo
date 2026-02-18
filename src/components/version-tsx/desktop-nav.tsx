@@ -11,39 +11,25 @@ import {
 } from '@/components/ui/navigation-menu';
 import Link from 'next/link';
 import * as React from 'react';
-import { CategoryItem as MenuCategoryItem } from './shop-menu-content';
 import ShopMenuMegaContent from './shop-menu-mega-content';
 import { usePathname } from 'next/navigation';
-import { toSlug } from '@/lib/server-data';
-import { useRouter } from 'next/navigation';
+import type { CategoryItem } from '@/lib/server-data';
+
 export interface DesktopNavProps {
-  // pathname: string;
-  categories: MenuCategoryItem[];
+  categories: CategoryItem[];
 }
 
 export default function DesktopNav({
   categories,
 }: DesktopNavProps): React.ReactElement {
   const pathname = usePathname();
-  const router = useRouter();
   const visibleCategories = React.useMemo(
     () =>
       (categories || []).filter(
-        c => (c.products?.length ?? 0) > 0 && c.status === 'Show'
+        (c) => (c.products?.length ?? 0) > 0 && c.status === 'Show'
       ),
     [categories]
   );
-
-  function handleCategoryRoute(title: string): void {
-    const slug = toSlug(title);
-    router.push(`/shop?category=${slug}`);
-  }
-
-  function handleChildCategoryRoute(parent: string, child: string): void {
-    const parentSlug = toSlug(parent);
-    const childSlug = toSlug(child);
-    router.push(`/shop?category=${parentSlug}&subcategory=${childSlug}`);
-  }
 
   return (
     <nav aria-label="Primary" className="hidden md:flex items-center gap-2">
@@ -66,12 +52,7 @@ export default function DesktopNav({
               Shop
             </NavigationMenuTrigger>
             <NavigationMenuContent className="w-[min(95vw,64rem)] md:w-5xl p-5 rounded-xl border border-border bg-popover text-popover-foreground shadow-xl">
-              {/* Toggle between two styles by swapping components */}
-              <ShopMenuMegaContent
-                categories={visibleCategories}
-                onSelectCategory={handleCategoryRoute}
-                onSelectSubcategory={handleChildCategoryRoute}
-              />
+              <ShopMenuMegaContent categories={visibleCategories} />
             </NavigationMenuContent>
           </NavigationMenuItem>
         </NavigationMenuList>
