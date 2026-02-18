@@ -27,6 +27,7 @@ import { ProductLinkIndicatorMinimal } from '@/components/ui/product-link-indica
 import { CldImage } from 'next-cloudinary';
 import ProductConfigurationDialog from '@/components/version-tsx/product-configuration-dialog';
 import ProductBadges from '@/components/version-tsx/product-badges';
+import { useAddToCartAnimation } from '@/context/add-to-cart-animation-context';
 import {
   getProductImageSrc,
   getProductImageAlt,
@@ -191,6 +192,8 @@ export default function ProductCard({
   const [isConfigDialogOpen, setIsConfigDialogOpen] = React.useState(false);
   const [isVideoModalOpen, setIsVideoModalOpen] = React.useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = React.useState(false);
+  const imageContainerRef = React.useRef<HTMLDivElement>(null);
+  const addToCartAnimation = useAddToCartAnimation();
 
   // Check if product has configurations
   const hasConfigurations = React.useMemo(() => {
@@ -302,6 +305,17 @@ export default function ProductCard({
     // No discount is applied to options - they're added at full price
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
     const finalPrice = discountedBasePrice + optionPrice;
+
+    // Trigger flying animation before adding to cart (Shop page only)
+    if (addToCartAnimation && imageSrc) {
+      const sourceRect = imageContainerRef.current?.getBoundingClientRect();
+      if (sourceRect) {
+        addToCartAnimation.triggerAddToCartAnimation(
+          { _id: product._id, img: imageSrc, title: product.title },
+          sourceRect
+        );
+      }
+    }
 
     // Pass product with calculated final price
     onAddToCart?.(
@@ -455,7 +469,10 @@ export default function ProductCard({
             )}
 
             {/* Product Image */}
-            <div className="relative h-full w-full overflow-hidden">
+            <div
+              ref={imageContainerRef}
+              className="relative h-full w-full overflow-hidden"
+            >
               {imageSrc ? (
                 useProxyForFilename ? (
                   <Image
