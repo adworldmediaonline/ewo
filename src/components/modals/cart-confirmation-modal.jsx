@@ -73,7 +73,7 @@ export default function CartConfirmationModal() {
             {cart_products.length > 0 && (
               <div
                 ref={imageContainerRef}
-                className="shrink-0 relative w-14 h-10 flex items-end justify-start"
+                className="shrink-0 relative w-20 h-8 flex items-center justify-start"
               >
                 <AnimatePresence mode="popLayout" initial={false}>
                   {cart_products.slice(-3).map((product, index) => {
@@ -91,8 +91,8 @@ export default function CartConfirmationModal() {
                         initial={{ opacity: 0, x: 40 }}
                         animate={{
                           opacity: isNewest ? 1 : 0.6,
-                          x: index * 10,
-                          y: -index * 4,
+                          x: index * 8,
+                          y: 0,
                         }}
                         exit={{ opacity: 0, x: -40 }}
                         transition={{
