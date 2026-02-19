@@ -2,7 +2,7 @@
 import { useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 
-// import ProductModal from '@/components/common/product-modal';
+import { AddToCartAnimationProvider } from '@/context/add-to-cart-animation-context';
 import CartConfirmationModal from '@/components/modals/cart-confirmation-modal';
 
 import {
@@ -47,11 +47,12 @@ const Wrapper = ({ children }: WrapperProps) => {
   }, [dispatch]);
 
   return (
-    <div id="wrapper">
-      {children}
-      <CartConfirmationModal />
-      {/* {productItem && <ProductModal />} */}
-    </div>
+    <AddToCartAnimationProvider>
+      <div id="wrapper">
+        {children}
+        <CartConfirmationModal />
+      </div>
+    </AddToCartAnimationProvider>
   );
 };
 

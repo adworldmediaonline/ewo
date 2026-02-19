@@ -1,43 +1,35 @@
 'use client';
-import { hideCartConfirmation } from '@/redux/features/cartSlice';
-import { useCallback, useEffect, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
+import { usePathname } from 'next/navigation';
+import { AnimatePresence, motion } from 'framer-motion';
 
+import { useAddToCartAnimation } from '@/context/add-to-cart-animation-context';
 import Image from 'next/image';
 import Link from 'next/link';
 
 export default function CartConfirmationModal() {
-  const dispatch = useDispatch();
   const modalRef = useRef(null);
+  const imageContainerRef = useRef(null);
+  const pathname = usePathname();
+  const addToCartAnimation = useAddToCartAnimation();
 
-  const { cart_products, showCartConfirmation, lastAddedProduct } = useSelector(
-    state => state.cart
-  );
+  useEffect(() => {
+    addToCartAnimation?.registerTargetRef(imageContainerRef);
+  }, [addToCartAnimation]);
 
-  const handleClose = useCallback(() => {
-    dispatch(hideCartConfirmation());
-  }, [dispatch]);
+  const { cart_products } = useSelector(state => state.cart);
 
-  const handleViewCart = useCallback(() => {
-    dispatch(hideCartConfirmation());
-  }, [dispatch]);
+  // Only show on Shop page; remain visible while cart has items (no close/hide)
+  const isShopPage = pathname === '/shop';
+  const hasItems = cart_products.length > 0;
 
   const totalItems = cart_products.reduce(
     (total, item) => total + item.orderQuantity,
     0
   );
 
-  const handleKeyDown = useCallback(
-    e => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        handleViewCart();
-      }
-    },
-    [handleViewCart]
-  );
-
-  if (!showCartConfirmation) {
+  if (!isShopPage || !hasItems) {
     return null;
   }
 
@@ -76,30 +68,56 @@ export default function CartConfirmationModal() {
           <Link
             href="/checkout"
             className="flex items-center gap-3 flex-1 cursor-pointer"
-            onClick={handleViewCart}
           >
-            {/* Product Images - Inside the bar on the left */}
+            {/* Product Images - Stacked, with enter/exit animations */}
             {cart_products.length > 0 && (
-              <div className="shrink-0 relative w-12 h-8 flex items-center justify-start">
-                {cart_products.slice(-3).map((product, index) => (
-                  <div
-                    key={`${product._id}-${index}`}
-                    className="absolute w-8 h-8 rounded-full overflow-hidden bg-white flex items-center justify-center shadow-sm border border-gray-200"
-                    style={{
-                      zIndex: cart_products.length - index,
-                      transform: `translateX(${index * -8}px)`,
-                      opacity: index === cart_products.slice(-3).length - 1 ? 1 : 0.6,
-                    }}
-                  >
-                    <Image
-                      src={product.img}
-                      alt={product.title || 'Product'}
-                      width={32}
-                      height={32}
-                      className="w-full h-full object-cover rounded-full"
-                    />
-                  </div>
-                ))}
+              <div
+                ref={imageContainerRef}
+                className="shrink-0 relative w-20 h-8 flex items-center justify-start"
+              >
+                <AnimatePresence mode="popLayout" initial={false}>
+                  {cart_products.slice(-3).map((product, index) => {
+                    const startIndex = Math.max(
+                      0,
+                      cart_products.length - 3
+                    );
+                    const uniqueKey = `cart-item-${startIndex + index}`;
+                    const isNewest =
+                      index === cart_products.slice(-3).length - 1;
+                    return (
+                      <motion.div
+                        key={uniqueKey}
+                        layout
+                        initial={{ opacity: 0, x: 40 }}
+                        animate={{
+                          opacity: isNewest ? 1 : 0.6,
+                          x: index * 8,
+                          y: 0,
+                        }}
+                        exit={{ opacity: 0, x: -40 }}
+                        transition={{
+                          type: 'tween',
+                          duration: 0.25,
+                          ease: [0.25, 0.46, 0.45, 0.94],
+                        }}
+                        className="absolute w-8 h-8 rounded-full overflow-hidden bg-white flex items-center justify-center shadow-sm border border-gray-200"
+                        style={{
+                          zIndex: index + 1,
+                          left: 0,
+                        }}
+                      >
+                        <Image
+                          src={product.img}
+                          alt={product.title || 'Product'}
+                          width={32}
+                          height={32}
+                          className="w-full h-full object-cover rounded-full"
+                          unoptimized
+                        />
+                      </motion.div>
+                    );
+                  })}
+                </AnimatePresence>
               </div>
             )}
 
@@ -113,9 +131,9 @@ export default function CartConfirmationModal() {
               </span>
             </div>
 
-            {/* Arrow */}
-            <div className="shrink-0 flex items-center justify-center w-6 h-6 opacity-80">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            {/* Arrow - inside circle with darker background */}
+            <div className="shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-[#45a849] text-white">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                 <path
                   d="M9 18L15 12L9 6"
                   stroke="currentColor"
@@ -126,24 +144,6 @@ export default function CartConfirmationModal() {
               </svg>
             </div>
           </Link>
-
-          {/* Close Button */}
-          <button
-            onClick={handleClose}
-            className="shrink-0 w-6 h-6 flex items-center justify-center opacity-80 hover:opacity-100 transition-opacity rounded-full hover:bg-white/20"
-            aria-label="Close cart confirmation"
-            type="button"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M18 6L6 18M6 6L18 18"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
         </div>
       </div>
     </>
