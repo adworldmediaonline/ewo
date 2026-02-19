@@ -34,7 +34,10 @@ export default async function HeaderV2() {
             <div className="flex h-16 md:h-28 items-center justify-between gap-2 md:gap-4">
               <div className="flex items-center gap-2 md:gap-3 min-w-0">
                 <div className="md:hidden">
-                  <HeaderMenuButton links={PRIMARY_LINKS} />
+                  <HeaderMenuButton
+                    links={PRIMARY_LINKS}
+                    categories={categories || []}
+                  />
                 </div>
                 <HeaderBrand />
               </div>
