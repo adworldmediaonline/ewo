@@ -36,7 +36,7 @@ const useCheckoutSubmit = () => {
 
   const { tax_preview } = useSelector(state => state.order);
   const { total, setTotal } = useCartInfo();
-  const { displayTotal } = useCartSummary();
+  const { displayTotal, effectiveShippingCost } = useCartSummary();
 
   const [cartTotal, setCartTotal] = useState('');
   const [isCheckoutSubmit, setIsCheckoutSubmit] = useState(false);
@@ -114,7 +114,8 @@ const useCheckoutSubmit = () => {
           state: stateVal?.trim(),
           zipCode: zipCode?.trim(),
           country: country?.trim(),
-          shippingCost: 0,
+          shippingCost: Number(effectiveShippingCost) || 0,
+          discountAmount: Number(discountAmount ?? 0) || 0,
         },
       }).catch(() => {
         dispatch(set_tax_preview(null));
@@ -134,6 +135,8 @@ const useCheckoutSubmit = () => {
     processingPayment,
     calculateTax,
     dispatch,
+    effectiveShippingCost,
+    discountAmount,
   ]);
 
   useEffect(() => {
@@ -195,7 +198,7 @@ const useCheckoutSubmit = () => {
       }
 
       const response = await createPaymentIntent({
-        price: parseInt(Math.max(0, cartTotal), 10),
+        price: Math.max(0, parseFloat(cartTotal) || 0),
         email: orderData.email,
         cart: cart_products,
         orderData: orderPayload,
@@ -276,6 +279,8 @@ const useCheckoutSubmit = () => {
       subTotal: rawSubTotal,
       totalAmount: finalTotalAmount,
       discount: discountAmount ?? 0,
+      shippingCost: Number(effectiveShippingCost) || 0,
+      discountAmount: Number(discountAmount ?? 0) || 0,
       ...(couponCode && discountAmount > 0 && {
         appliedCoupon: {
           couponCode,
