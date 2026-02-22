@@ -57,19 +57,8 @@ export const useAuthCheck = () => {
     // Actions
     logout,
 
-    // Legacy compatibility
     userInfo: authState.userInfo,
   };
 };
 
-// Legacy hook for backward compatibility
-export default function useLegacyAuthCheck() {
-  const dispatch = useDispatch();
-  const authState = useSelector(state => state.auth);
-
-  useEffect(() => {
-    dispatch(initializeAuth());
-  }, [dispatch]);
-
-  return authState;
-}
+export default useAuthCheck;

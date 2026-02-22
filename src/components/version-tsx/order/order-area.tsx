@@ -302,8 +302,8 @@ export default function OrderArea({ orderId }: { orderId: string }) {
     status,
     email,
     firstTimeDiscount,
-    appliedCoupons = [], // Enhanced: Multiple coupons support
-    appliedCoupon, // Legacy: Single coupon support
+    appliedCoupons = [],
+    appliedCoupon,
     paymentIntent, // Payment intent data for Transaction ID and Currency
     shippingDetails, // Shipping details with estimatedDelivery
   } = order.order;
@@ -343,7 +343,6 @@ export default function OrderArea({ orderId }: { orderId: string }) {
     appliedCoupon &&
     (appliedCoupon.discount > 0 || appliedCoupon.discountAmount > 0)
   ) {
-    // Legacy single coupon support
     couponDiscounts = appliedCoupon.discount || appliedCoupon.discountAmount;
     couponDisplayText = `${appliedCoupon.couponCode} (${appliedCoupon.title})`;
   }

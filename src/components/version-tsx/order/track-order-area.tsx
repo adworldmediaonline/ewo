@@ -202,7 +202,6 @@ export default function TrackOrderArea({ orderId }: { orderId: string }) {
     appliedCoupon &&
     (appliedCoupon.discount > 0 || appliedCoupon.discountAmount > 0)
   ) {
-    // Legacy single coupon support
     couponDiscounts = appliedCoupon.discount || appliedCoupon.discountAmount;
     couponDisplayText = `${appliedCoupon.couponCode} (${appliedCoupon.title})`;
   }
@@ -279,7 +278,6 @@ export default function TrackOrderArea({ orderId }: { orderId: string }) {
       }]
       : [];
 
-  // Legacy fields for backward compatibility
   const trackingUrl = shippingDetails?.trackingUrl;
   const trackingNumber = shippingDetails?.trackingNumber;
   const carrier = shippingDetails?.carrier || 'Standard Shipping';

@@ -2,7 +2,6 @@ import { apiSlice } from '../../api/apiSlice';
 import {
   setSession,
   updateUser,
-  userLoggedIn,
   userLoggedOut,
 } from './authSlice';
 
@@ -107,35 +106,6 @@ export const authApi = apiSlice.injectEndpoints({
     getUserProfile: builder.query({
       query: () => '/api/user/profile',
       providesTags: ['User'],
-    }),
-
-    // Legacy authentication endpoints (for backward compatibility)
-    legacySignIn: builder.mutation({
-      query: credentials => ({
-        url: '/api/user/login',
-        method: 'POST',
-        body: credentials,
-      }),
-      invalidatesTags: ['Auth'],
-      async onQueryStarted(_, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          if (data?.accessToken && data?.user) {
-            dispatch(userLoggedIn(data));
-          }
-        } catch (error) {
-          console.error('Legacy sign in failed:', error);
-        }
-      },
-    }),
-
-    legacySignUp: builder.mutation({
-      query: userData => ({
-        url: '/api/user/register',
-        method: 'POST',
-        body: userData,
-      }),
-      invalidatesTags: ['Auth'],
     }),
 
     // Check authentication status
