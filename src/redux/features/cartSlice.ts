@@ -144,11 +144,24 @@ export const cartSlice = createSlice({
     },
     remove_product: (
       state,
-      { payload }: PayloadAction<{ id: string; title: string }>
+      {
+        payload,
+      }: PayloadAction<{
+        id: string;
+        title: string;
+        selectedOption?: SelectedOption;
+      }>
     ) => {
-      state.cart_products = state.cart_products.filter(
-        (item: CartProduct) => item._id !== payload.id
-      );
+      const targetId = payload.selectedOption
+        ? `${payload.id}-option-${payload.selectedOption.title}`
+        : payload.id;
+
+      state.cart_products = state.cart_products.filter((item: CartProduct) => {
+        const itemId = item.selectedOption
+          ? `${item._id}-option-${item.selectedOption.title}`
+          : item._id;
+        return itemId !== targetId;
+      });
 
       setLocalStorage('cart_products', state.cart_products);
 

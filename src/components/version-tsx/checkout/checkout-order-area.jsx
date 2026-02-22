@@ -2,35 +2,34 @@
 
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import useCartInfo from '@/hooks/use-cart-info';
+import { useCartSummary } from '@/hooks/use-cart-summary';
+import { useCartActions } from '@/hooks/use-cart-actions';
 import { useCouponAutoApply } from '@/hooks/use-coupon-auto-apply';
 import { saveUserRemoved } from '@/lib/coupon-user-removed';
-import { getStoreShippingSettings } from '@/lib/store-api';
+import { getStoreCouponSettings } from '@/lib/store-api';
 import {
-  add_cart_product,
   applyCoupon,
   get_cart_products,
-  quantityDecrement,
   removeCoupon,
 } from '@/redux/features/cartSlice';
-import { Minus, Plus } from '@/svg';
 import { CouponSection } from './coupon-section';
 import {
   CardNumberElement,
   CardExpiryElement,
   CardCvcElement,
 } from '@stripe/react-stripe-js';
-import { CldImage } from 'next-cloudinary';
-
-const isCloudinaryUrl = url =>
-  typeof url === 'string' &&
-  url.startsWith('https://res.cloudinary.com/') &&
-  url.includes('/upload/');
+import {
+  AutoApplySavingsBanner,
+  CartItemCard,
+  FreeShippingProgressBanner,
+  getCartItemLineTotal,
+  getCartItemProductHref,
+} from '@/components/version-tsx/cart';
 
 export default function CheckoutOrderArea({ checkoutData, variant = 'full' }) {
   const dispatch = useDispatch();
-
   const [cartDataLoaded, setCartDataLoaded] = useState(false);
+  const [hideCouponSection, setHideCouponSection] = useState(false);
 
   const {
     cartTotal = 0,
@@ -43,22 +42,19 @@ export default function CheckoutOrderArea({ checkoutData, variant = 'full' }) {
   } = checkoutData;
 
   const { cart_products, couponCode, discountAmount, isAutoApplied } = useSelector(state => state.cart);
-  const { total, subtotal, quantity } = useCartInfo();
+  const summary = useCartSummary();
+  const { handleIncrement, handleDecrement, handleRemove } = useCartActions();
   const { retryAutoApply } = useCouponAutoApply();
-  const { isCheckoutSubmitting } = useSelector(state => state.order);
-  const [freeShippingThreshold, setFreeShippingThreshold] = useState(null);
 
-  const subtotalAfterDiscount = Math.max(0, subtotal - discountAmount);
-  const qualifiesForFreeShipping =
-    freeShippingThreshold != null &&
-    freeShippingThreshold > 0 &&
-    subtotalAfterDiscount >= freeShippingThreshold;
-  const gapToFreeShipping =
-    freeShippingThreshold != null &&
-    freeShippingThreshold > 0 &&
-    subtotalAfterDiscount < freeShippingThreshold
-      ? Math.ceil(freeShippingThreshold - subtotalAfterDiscount)
-      : null;
+  const taxAmountDollars = tax_preview?.taxCollected
+    ? (tax_preview.tax ?? 0) / 100
+    : 0;
+  const totalWithTaxDollars = tax_preview?.taxCollected
+    ? (tax_preview.total ?? 0) / 100
+    : null;
+
+  const displayFinalTotal =
+    totalWithTaxDollars !== null ? totalWithTaxDollars : Number(cartTotal) || summary.displayTotal;
 
   useEffect(() => {
     dispatch(get_cart_products());
@@ -81,29 +77,14 @@ export default function CheckoutOrderArea({ checkoutData, variant = 'full' }) {
   }, [cartDataLoaded]);
 
   useEffect(() => {
-    getStoreShippingSettings()
-      .then((s) => setFreeShippingThreshold(s.freeShippingThreshold))
-      .catch(() => setFreeShippingThreshold(null));
+    getStoreCouponSettings()
+      .then((settings) => {
+        const autoApplyOn =
+          settings.autoApply && settings.autoApplyStrategy !== 'customer_choice';
+        setHideCouponSection(!!autoApplyOn);
+      })
+      .catch(() => setHideCouponSection(false));
   }, []);
-
-  const taxAmountDollars = tax_preview?.taxCollected
-    ? (tax_preview.tax ?? 0) / 100
-    : 0;
-  const totalWithTaxDollars = tax_preview?.taxCollected
-    ? (tax_preview.total ?? 0) / 100
-    : null;
-
-  const displaySubtotal = subtotal;
-  const displayFinalTotal =
-    totalWithTaxDollars !== null ? totalWithTaxDollars : Number(cartTotal) || total;
-
-  const handleAddProduct = product => {
-    dispatch(add_cart_product(product));
-  };
-
-  const handleDecrement = product => {
-    dispatch(quantityDecrement(product));
-  };
 
   if (!cartDataLoaded) {
     const loadingTitle = variant === 'summary' ? 'Order Summary' : 'Your Order';
@@ -124,6 +105,8 @@ export default function CheckoutOrderArea({ checkoutData, variant = 'full' }) {
 
   const showItems = variant === 'items' || variant === 'full';
   const showSummary = variant === 'summary' || variant === 'full';
+  const items = Array.isArray(cart_products) ? cart_products : [];
+  const isDisabled = isCheckoutSubmit || processingPayment;
 
   return (
     <div className="bg-card rounded-lg shadow-sm p-4 md:p-6 border border-border">
@@ -133,83 +116,20 @@ export default function CheckoutOrderArea({ checkoutData, variant = 'full' }) {
             Your Order
           </h3>
 
-          <div className="space-y-3 sm:space-y-2 mb-4 sm:mb-4">
-            {cart_products.map(item => {
-              const imageUrl = item.img || '';
-              const isCloudImage = isCloudinaryUrl(imageUrl);
-
-              return (
-                <div
-                  key={item._id}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between py-3 sm:py-2 border-b border-border last:border-0 gap-3 sm:gap-2"
-                >
-                  <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0 sm:max-w-[60%]">
-                    <div className="relative w-12 h-12 sm:w-16 sm:h-16 rounded overflow-hidden shrink-0 bg-muted">
-                      {imageUrl ? (
-                        <CldImage
-                          src={imageUrl}
-                          alt={item.title}
-                          fill
-                          sizes="(max-width: 640px) 48px, 64px"
-                          className="object-cover"
-                          preserveTransformations={isCloudImage}
-                          deliveryType={isCloudImage ? undefined : 'fetch'}
-                          loading="lazy"
-                          fetchPriority="low"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center text-[10px] sm:text-xs text-muted-foreground">
-                          No Image
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-foreground text-sm sm:text-xs leading-tight">
-                        {item.title}
-                      </h4>
-                      {item.selectedOption && (
-                        <p className="text-xs text-muted-foreground truncate">
-                          {item.selectedOption.title} (+$
-                          {Number(item.selectedOption.price).toFixed(2)})
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between sm:justify-end space-x-2 sm:space-x-3 shrink-0 w-full sm:w-auto">
-                    <div className="flex items-center border border-border rounded">
-                      <button
-                        type="button"
-                        onClick={() => handleDecrement(item)}
-                        className="w-6 h-6 sm:w-5 sm:h-5 flex items-center justify-center text-foreground hover:bg-muted transition-colors disabled:opacity-50"
-                        disabled={
-                          isCheckoutSubmit ||
-                          processingPayment ||
-                          item.orderQuantity <= 1
-                        }
-                      >
-                        <Minus width={10} height={10} />
-                      </button>
-                      <span className="w-8 h-6 sm:w-6 sm:h-5 flex items-center justify-center text-sm sm:text-xs font-medium">
-                        {item.orderQuantity}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => handleAddProduct(item)}
-                        className="w-6 h-6 sm:w-5 sm:h-5 flex items-center justify-center text-foreground hover:bg-muted transition-colors disabled:opacity-50"
-                        disabled={isCheckoutSubmit || processingPayment}
-                      >
-                        <Plus width={10} height={10} />
-                      </button>
-                    </div>
-
-                    <div className="text-foreground font-medium text-base sm:text-sm min-w-[4rem] sm:min-w-[5rem] sm:w-[5rem] text-right whitespace-nowrap">
-                      ${(item.price * item.orderQuantity).toFixed(2)}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+          <div className="space-y-3 mb-4">
+            {items.map((item, idx) => (
+              <CartItemCard
+                key={`${item._id}-${item.selectedOption?.title ?? ''}-${idx}`}
+                item={item}
+                lineTotal={getCartItemLineTotal(item)}
+                onIncrement={handleIncrement}
+                onDecrement={handleDecrement}
+                onRemove={handleRemove}
+                productHref={getCartItemProductHref}
+                variant="compact"
+                disabled={isDisabled}
+              />
+            ))}
           </div>
         </>
       )}
@@ -221,16 +141,39 @@ export default function CheckoutOrderArea({ checkoutData, variant = 'full' }) {
           </h3>
 
           <div className="space-y-3">
+            {((summary.isAutoApplied && summary.discountAmount > 0 && summary.autoApplyPercent > 0) ||
+              (summary.productLevelSavings > 0 && summary.productLevelPercent > 0)) && (
+              <AutoApplySavingsBanner
+                percent={
+                  summary.productLevelSavings > 0
+                    ? summary.productLevelPercent
+                    : summary.autoApplyPercent
+                }
+                couponCode={summary.appliedCouponCode ?? summary.couponCode}
+              />
+            )}
+
+            {summary.gapToFreeShipping != null &&
+              summary.gapToFreeShipping > 0 &&
+              summary.freeShippingThreshold != null &&
+              summary.freeShippingThreshold > 0 && (
+                <FreeShippingProgressBanner
+                  progressPercent={summary.progressPercent}
+                  gapToFreeShipping={summary.gapToFreeShipping}
+                />
+              )}
+
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">Subtotal</span>
               <span className="font-medium text-foreground">
-                ${(Number(displaySubtotal) || 0).toFixed(2)}
+                ${(Number(summary.subtotal) || 0).toFixed(2)}
               </span>
             </div>
 
+            {!hideCouponSection && (
             <CouponSection
-              subtotal={subtotal}
-              items={cart_products.map((i) => ({
+              subtotal={summary.subtotal}
+              items={items.map((i) => ({
                 productId: i._id,
                 quantity: i.orderQuantity,
                 unitPrice: Number(i.finalPriceDiscount || i.price || 0),
@@ -240,18 +183,19 @@ export default function CheckoutOrderArea({ checkoutData, variant = 'full' }) {
               appliedCode={couponCode}
               appliedAmount={discountAmount}
               onRemove={() => {
-                saveUserRemoved(quantity, subtotal);
+                saveUserRemoved(summary.quantity, summary.subtotal);
                 dispatch(removeCoupon());
               }}
               onRetryAutoApply={retryAutoApply}
             />
+            )}
 
             {couponCode && discountAmount > 0 &&
               (isAutoApplied ? (
                 <div className="flex items-center justify-between text-green-600 dark:text-green-400">
                   <span className="font-medium">
-                    {subtotal > 0
-                      ? `${Math.round((discountAmount / subtotal) * 100)}% OFF applied`
+                    {summary.subtotal > 0
+                      ? `${Math.round((discountAmount / summary.subtotal) * 100)}% OFF applied`
                       : 'Discount applied'}
                   </span>
                 </div>
@@ -262,17 +206,20 @@ export default function CheckoutOrderArea({ checkoutData, variant = 'full' }) {
                 </div>
               ))}
 
-            {qualifiesForFreeShipping && (
+            {summary.effectiveShippingCost > 0 && (
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Shipping</span>
+                <span className="font-medium text-foreground">
+                  ${summary.effectiveShippingCost.toFixed(2)}
+                </span>
+              </div>
+            )}
+
+            {summary.qualifiesForFreeShipping && (
               <div className="flex items-center justify-between text-sm text-green-600 dark:text-green-400">
                 <span>Shipping</span>
                 <span>Free</span>
               </div>
-            )}
-
-            {gapToFreeShipping != null && gapToFreeShipping > 0 && (
-              <p className="text-muted-foreground text-xs">
-                Add ${gapToFreeShipping} more for free shipping
-              </p>
             )}
 
             {isTaxLoading ? (

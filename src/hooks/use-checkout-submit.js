@@ -24,6 +24,7 @@ import {
 import { notifyError, notifySuccess } from '@/utils/toast';
 import { authClient } from '../lib/authClient';
 import useCartInfo from './use-cart-info';
+import { useCartSummary } from './use-cart-summary';
 
 const useCheckoutSubmit = () => {
   const { data: session } = authClient.useSession();
@@ -35,6 +36,7 @@ const useCheckoutSubmit = () => {
 
   const { tax_preview } = useSelector(state => state.order);
   const { total, setTotal } = useCartInfo();
+  const { displayTotal } = useCartSummary();
 
   const [cartTotal, setCartTotal] = useState('');
   const [isCheckoutSubmit, setIsCheckoutSubmit] = useState(false);
@@ -141,8 +143,8 @@ const useCheckoutSubmit = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    setCartTotal(Number(total).toFixed(2));
-  }, [total]);
+    setCartTotal(Number(displayTotal).toFixed(2));
+  }, [displayTotal]);
 
   const calculateTotals = () => {
     if (

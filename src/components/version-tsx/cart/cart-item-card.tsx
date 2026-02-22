@@ -15,6 +15,10 @@ export interface CartItemCardProps {
   onRemove: (item: CartItemType) => void;
   productHref: (item: CartItemType) => string;
   onProductClick?: () => void;
+  /** Compact layout for checkout (smaller image, tighter spacing) */
+  variant?: 'default' | 'compact';
+  /** When true, disable quantity/remove (e.g. during payment) */
+  disabled?: boolean;
 }
 
 export function CartItemCard({
@@ -25,16 +29,25 @@ export function CartItemCard({
   onRemove,
   productHref,
   onProductClick,
+  variant = 'default',
+  disabled = false,
 }: CartItemCardProps) {
   const imageUrl = item.img;
   const isCloudinaryImage = isCloudinaryUrl(imageUrl);
   const href = productHref(item);
+  const isCompact = variant === 'compact';
 
   return (
-    <div className="group flex gap-4 rounded-xl border border-border/50 bg-card p-3 shadow-sm transition-shadow hover:shadow-md">
+    <div
+      className={`group flex gap-3 rounded-xl border border-border/50 bg-card shadow-sm transition-shadow hover:shadow-md ${
+        isCompact ? 'p-2' : 'gap-4 p-3'
+      }`}
+    >
       <Link
         href={href}
-        className="relative size-20 shrink-0 overflow-hidden rounded-lg bg-muted ring-1 ring-border/40"
+        className={`relative shrink-0 overflow-hidden rounded-lg bg-muted ring-1 ring-border/40 ${
+          isCompact ? 'size-12 sm:size-16' : 'size-20'
+        }`}
         aria-label={item.title}
         onClick={onProductClick}
       >
@@ -107,7 +120,7 @@ export function CartItemCard({
         </div>
       </div>
       <div className="shrink-0 text-right">
-        <span className="text-base font-bold tabular-nums text-foreground">
+        <span className={`font-bold tabular-nums text-foreground ${isCompact ? 'text-sm' : 'text-base'}`}>
           ${lineTotal}
         </span>
       </div>

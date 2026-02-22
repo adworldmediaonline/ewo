@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import {
   Sheet,
   SheetContent,
@@ -10,11 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import useCartInfo from '@/hooks/use-cart-info';
 import { useCartSummary } from '@/hooks/use-cart-summary';
-import {
-  add_cart_product,
-  quantityDecrement,
-  remove_product,
-} from '@/redux/features/cartSlice';
+import { useCartActions } from '@/hooks/use-cart-actions';
 import {
   CartDrawerHeader,
   CartEmptyState,
@@ -34,38 +30,14 @@ type CartDrawerProps = {
 };
 
 export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
-  const dispatch = useDispatch();
   const { cart_products } = useSelector(
     (s: { cart: { cart_products: CartItemType[] } }) => s.cart
   );
   const { quantity } = useCartInfo();
   const summary = useCartSummary();
+  const { handleIncrement, handleDecrement, handleRemove } = useCartActions();
 
   const items = Array.isArray(cart_products) ? cart_products : [];
-
-  const handleIncrement = (item: CartItemType) => {
-    dispatch(
-      add_cart_product({
-        ...item,
-        finalPriceDiscount: item.finalPriceDiscount ?? item.price,
-        sku: item.sku ?? item._id,
-      } as Parameters<typeof add_cart_product>[0])
-    );
-  };
-
-  const handleDecrement = (item: CartItemType) => {
-    dispatch(
-      quantityDecrement({
-        ...item,
-        finalPriceDiscount: item.finalPriceDiscount ?? item.price,
-        sku: item.sku ?? item._id,
-      } as Parameters<typeof quantityDecrement>[0])
-    );
-  };
-
-  const handleRemove = (item: CartItemType) => {
-    dispatch(remove_product({ title: item.title, id: item._id }));
-  };
 
   const closeDrawer = () => onOpenChange(false);
 
@@ -111,16 +83,6 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
                 couponCode={summary.appliedCouponCode ?? summary.couponCode}
               />
             )}
-            <OrderSummaryCard
-              subtotal={summary.subtotal}
-              discountAmount={summary.discountAmount}
-              couponCode={summary.couponCode}
-              effectiveShippingCost={summary.effectiveShippingCost}
-              qualifiesForFreeShipping={summary.qualifiesForFreeShipping}
-              displayTotal={summary.displayTotal}
-              isAutoApplied={summary.isAutoApplied}
-            />
-
             {summary.gapToFreeShipping != null &&
               summary.gapToFreeShipping > 0 &&
               summary.freeShippingThreshold != null &&
@@ -130,6 +92,15 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
                   gapToFreeShipping={summary.gapToFreeShipping}
                 />
               )}
+            <OrderSummaryCard
+              subtotal={summary.subtotal}
+              discountAmount={summary.discountAmount}
+              couponCode={summary.couponCode}
+              effectiveShippingCost={summary.effectiveShippingCost}
+              qualifiesForFreeShipping={summary.qualifiesForFreeShipping}
+              displayTotal={summary.displayTotal}
+              isAutoApplied={summary.isAutoApplied}
+            />
 
             <Button
               asChild

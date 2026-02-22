@@ -31,6 +31,18 @@ export default function CartCheckout() {
         </div>
       )}
 
+      {summary.gapToFreeShipping != null &&
+        summary.gapToFreeShipping > 0 &&
+        summary.freeShippingThreshold != null &&
+        summary.freeShippingThreshold > 0 && (
+          <div className="mb-4">
+            <FreeShippingProgressBanner
+              progressPercent={summary.progressPercent}
+              gapToFreeShipping={summary.gapToFreeShipping}
+            />
+          </div>
+        )}
+
       <OrderSummaryCard
         variant="inline"
         subtotal={summary.subtotal}
@@ -41,15 +53,6 @@ export default function CartCheckout() {
         displayTotal={summary.displayTotal}
         isAutoApplied={summary.isAutoApplied}
       />
-
-      {summary.gapToFreeShipping != null && summary.gapToFreeShipping > 0 && (
-        <div className="mt-4">
-          <FreeShippingProgressBanner
-            progressPercent={summary.progressPercent}
-            gapToFreeShipping={summary.gapToFreeShipping}
-          />
-        </div>
-      )}
 
       <div className="mt-6">
         <Link

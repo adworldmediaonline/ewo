@@ -1,15 +1,19 @@
 'use client';
 
-import Link from 'next/link';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import store from '@/redux/store';
-import useCartInfo from '@/hooks/use-cart-info';
 import { clearCart } from '@/redux/features/cartSlice';
-
+import { useCartActions } from '@/hooks/use-cart-actions';
+import {
+  CartEmptyState,
+  CartItemCard,
+  getCartItemLineTotal,
+  getCartItemProductHref,
+} from '@/components/version-tsx/cart';
+import type { CartItemType } from '@/components/version-tsx/cart';
 import CartCheckout from './cart-checkout';
-import CartItem from './cart-item';
 
 import {
   Breadcrumb,
@@ -34,24 +38,13 @@ import {
 
 type RootState = ReturnType<typeof store.getState>;
 
-interface CartProduct {
-  _id: string;
-  title: string;
-  img: string;
-  price?: number | string;
-  finalPriceDiscount: number | string;
-  orderQuantity: number;
-  quantity?: number;
-  discount?: number | string;
-  slug?: string;
-  shipping?: { price?: number };
-  selectedOption?: { title: string };
-}
-
 export default function CartArea() {
   const { cart_products } = useSelector((state: RootState) => state.cart);
   const dispatch = useDispatch();
   const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
+  const { handleIncrement, handleDecrement, handleRemove } = useCartActions();
+
+  const items = Array.isArray(cart_products) ? (cart_products as CartItemType[]) : [];
 
   const handleClearCart = () => {
     dispatch(clearCart());
@@ -75,38 +68,14 @@ export default function CartArea() {
       </div>
 
       <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
-        {cart_products.length === 0 ? (
+        {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 h-[400px]">
-            <div className="flex flex-col items-center justify-center w-full max-w-md">
-              <div className="bg-gray-100 rounded-full p-6 mb-6 flex items-center justify-center">
-                <svg
-                  width="80"
-                  height="80"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="9" cy="21" r="1"></circle>
-                  <circle cx="20" cy="21" r="1"></circle>
-                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                </svg>
-              </div>
-              <h2 className="text-2xl font-bold text-center mb-2">
-                Your Cart is Empty
-              </h2>
-              <p className="text-gray-600 text-center mb-6">
-                Looks like you haven&apos;t added anything to your cart yet.
-              </p>
-              <Link
-                href="/shop"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background px-4 py-2"
-              >
-                Continue Shopping
-              </Link>
-            </div>
+            <CartEmptyState
+              browseHref="/shop"
+              title="Your Cart is Empty"
+              description="Looks like you haven't added anything to your cart yet."
+              ctaText="Continue Shopping"
+            />
           </div>
         ) : (
           <div>
@@ -170,8 +139,16 @@ export default function CartArea() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
                 <div className="space-y-4">
-                  {cart_products.map((item: CartProduct, i: number) => (
-                    <CartItem key={i} product={item} />
+                  {items.map((item, idx) => (
+                    <CartItemCard
+                      key={`${item._id}-${item.selectedOption?.title ?? ''}-${idx}`}
+                      item={item}
+                      lineTotal={getCartItemLineTotal(item)}
+                      onIncrement={handleIncrement}
+                      onDecrement={handleDecrement}
+                      onRemove={handleRemove}
+                      productHref={getCartItemProductHref}
+                    />
                   ))}
                 </div>
               </div>
