@@ -62,7 +62,7 @@ const useCheckoutSubmit = () => {
     formState: { errors },
   } = useForm({
     mode: 'onSubmit',
-    reValidateMode: 'onSubmit',
+    reValidateMode: 'onChange',
     shouldFocusError: true,
     defaultValues: {
       firstName: '',

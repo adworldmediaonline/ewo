@@ -86,6 +86,7 @@ export function CartItemCard({
         <div className="mt-2.5 flex flex-wrap items-center gap-2">
           <div className="flex items-center overflow-hidden rounded-lg border border-border/60 bg-muted/30">
             <Button
+              type="button"
               variant="ghost"
               size="icon-xs"
               onClick={() => onDecrement(item)}
@@ -99,6 +100,7 @@ export function CartItemCard({
               {item.orderQuantity}
             </span>
             <Button
+              type="button"
               variant="ghost"
               size="icon-xs"
               onClick={() => onIncrement(item)}
@@ -109,6 +111,7 @@ export function CartItemCard({
             </Button>
           </div>
           <Button
+            type="button"
             variant="ghost"
             size="icon-xs"
             onClick={() => onRemove(item)}
