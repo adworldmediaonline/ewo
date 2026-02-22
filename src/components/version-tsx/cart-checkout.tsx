@@ -2,7 +2,11 @@
 
 import Link from 'next/link';
 import { useCartSummary } from '@/hooks/use-cart-summary';
-import { OrderSummaryCard, FreeShippingProgressBanner } from '@/components/version-tsx/cart';
+import {
+  OrderSummaryCard,
+  FreeShippingProgressBanner,
+  AutoApplySavingsBanner,
+} from '@/components/version-tsx/cart';
 
 export default function CartCheckout() {
   const summary = useCartSummary();
@@ -13,6 +17,20 @@ export default function CartCheckout() {
         <h3 className="text-xl font-bold">Order Summary</h3>
       </div>
 
+      {((summary.isAutoApplied && summary.discountAmount > 0 && summary.autoApplyPercent > 0) ||
+        (summary.productLevelSavings > 0 && summary.productLevelPercent > 0)) && (
+        <div className="mb-4">
+          <AutoApplySavingsBanner
+            percent={
+              summary.productLevelSavings > 0
+                ? summary.productLevelPercent
+                : summary.autoApplyPercent
+            }
+            couponCode={summary.appliedCouponCode ?? summary.couponCode}
+          />
+        </div>
+      )}
+
       <OrderSummaryCard
         variant="inline"
         subtotal={summary.subtotal}
@@ -22,7 +40,6 @@ export default function CartCheckout() {
         qualifiesForFreeShipping={summary.qualifiesForFreeShipping}
         displayTotal={summary.displayTotal}
         isAutoApplied={summary.isAutoApplied}
-        autoApplyPercent={summary.autoApplyPercent}
       />
 
       {summary.gapToFreeShipping != null && summary.gapToFreeShipping > 0 && (

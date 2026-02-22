@@ -24,6 +24,23 @@ export function useCartSummary(): CartSummary & { quantity: number } {
   const [freeShippingThreshold, setFreeShippingThreshold] = useState<number | null>(null);
 
   const items = Array.isArray(cart_products) ? cart_products : [];
+  const productLevelSavings = items.reduce((sum, item) => {
+    const base = Number(item.basePrice ?? item.finalPriceDiscount ?? item.price ?? 0);
+    const final = Number(item.finalPriceDiscount ?? item.price ?? 0);
+    const qty = Number(item.orderQuantity ?? 0);
+    if (base > final && qty > 0) {
+      return sum + (base - final) * qty;
+    }
+    return sum;
+  }, 0);
+  const originalSubtotal = subtotal + productLevelSavings;
+  const productLevelPercent =
+    originalSubtotal > 0 && productLevelSavings > 0
+      ? Math.round((productLevelSavings / originalSubtotal) * 100)
+      : 0;
+  const appliedCouponCode =
+    items.find((i) => i.appliedCouponCode)?.appliedCouponCode ?? couponCode;
+
   const shippingFromCart = items.reduce(
     (sum, item) =>
       sum + (Number(item.shipping?.price ?? 0) * Number(item.orderQuantity || 0)),
@@ -65,6 +82,9 @@ export function useCartSummary(): CartSummary & { quantity: number } {
     couponCode,
     isAutoApplied,
     autoApplyPercent,
+    productLevelSavings,
+    productLevelPercent,
+    appliedCouponCode,
     shippingFromCart,
     qualifiesForFreeShipping,
     effectiveShippingCost,

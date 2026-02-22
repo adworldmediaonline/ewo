@@ -20,6 +20,7 @@ interface CartProduct {
   selectedOption?: SelectedOption;
   basePrice?: number;
   shipping?: { price?: number };
+  appliedCouponCode?: string;
 }
 
 interface LastAddedProduct {

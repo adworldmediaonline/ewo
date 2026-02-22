@@ -8,9 +8,8 @@ export interface OrderSummaryCardProps {
   qualifiesForFreeShipping: boolean;
   displayTotal: number;
   currencySymbol?: string;
-  /** When true, discount was auto-applied - show "X% OFF applied" instead of discount line */
+  /** When true, discount was auto-applied - hide discount line (shown in AutoApplySavingsBanner) */
   isAutoApplied?: boolean;
-  autoApplyPercent?: number;
   /** When true, renders without card wrapper (for inline use in cart page, etc.) */
   variant?: 'card' | 'inline';
 }
@@ -24,7 +23,6 @@ export function OrderSummaryCard({
   displayTotal,
   currencySymbol = '$',
   isAutoApplied = false,
-  autoApplyPercent = 0,
   variant = 'card',
 }: OrderSummaryCardProps) {
   const content = (
@@ -36,25 +34,16 @@ export function OrderSummaryCard({
             {currencySymbol}{subtotal.toFixed(2)}
           </span>
         </div>
-        {discountAmount > 0 &&
-          (isAutoApplied ? (
-            <div className="flex items-center justify-between text-emerald-600 dark:text-emerald-400">
-              <span className="text-sm font-medium">
-                {autoApplyPercent > 0
-                  ? `${autoApplyPercent}% OFF applied`
-                  : 'Discount applied'}
-              </span>
-            </div>
-          ) : (
-            <div className="flex items-center justify-between text-emerald-600 dark:text-emerald-400">
-              <span className="text-sm font-medium">
-                Discount{couponCode ? ` (${couponCode})` : ''}
-              </span>
-              <span className="text-sm font-bold tabular-nums">
-                -{currencySymbol}{discountAmount.toFixed(2)}
-              </span>
-            </div>
-          ))}
+        {discountAmount > 0 && !isAutoApplied && (
+          <div className="flex items-center justify-between text-emerald-600 dark:text-emerald-400">
+            <span className="text-sm font-medium">
+              Discount{couponCode ? ` (${couponCode})` : ''}
+            </span>
+            <span className="text-sm font-bold tabular-nums">
+              -{currencySymbol}{discountAmount.toFixed(2)}
+            </span>
+          </div>
+        )}
         {effectiveShippingCost > 0 && (
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Shipping</span>

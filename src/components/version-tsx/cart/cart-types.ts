@@ -13,6 +13,10 @@ export interface CartItemType {
   orderQuantity: number;
   selectedOption?: { title: string; price: number };
   shipping?: { price?: number };
+  /** Original price before product-level discount (for savings display) */
+  basePrice?: number;
+  /** Coupon code applied at product level (when auto apply) */
+  appliedCouponCode?: string;
 }
 
 /**
@@ -25,6 +29,11 @@ export interface CartSummary {
   couponCode: string | null;
   isAutoApplied: boolean;
   autoApplyPercent: number;
+  /** Savings from product-level discount (when auto apply adds discounted prices) */
+  productLevelSavings: number;
+  productLevelPercent: number;
+  /** Coupon code applied (from cart state or product-level) */
+  appliedCouponCode: string | null | undefined;
   shippingFromCart: number;
   qualifiesForFreeShipping: boolean;
   effectiveShippingCost: number;

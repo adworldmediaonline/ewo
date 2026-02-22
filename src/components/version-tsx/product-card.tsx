@@ -223,7 +223,7 @@ export default function ProductCard({
 
   // Get coupon information for this product (when auto-apply is enabled)
   const baseUnitPrice = Number(product.finalPriceDiscount || product.price || 0);
-  const { hasCoupon, couponPercentage } = useProductCoupon(product._id, baseUnitPrice);
+  const { hasCoupon, couponPercentage, couponCode } = useProductCoupon(product._id, baseUnitPrice);
 
   const isAddedToCart = cart_products.some(
     (prd: any) => prd._id === product._id
@@ -318,11 +318,17 @@ export default function ProductCard({
       }
     }
 
-    // Pass product with calculated final price
-    onAddToCart?.(
-      { ...product, finalPriceDiscount: finalPrice },
-      selectedOption
-    );
+    // Pass product with calculated final price. When hasCoupon, include basePrice and appliedCouponCode
+    // so the cart can show savings and coupon name.
+    const productToAdd = hasCoupon
+      ? {
+          ...product,
+          finalPriceDiscount: finalPrice,
+          basePrice: Number(basePrice),
+          appliedCouponCode: couponCode ?? undefined,
+        }
+      : { ...product, finalPriceDiscount: finalPrice };
+    onAddToCart?.(productToAdd, selectedOption);
   };
 
   const handleChooseOptions = (e: React.MouseEvent) => {

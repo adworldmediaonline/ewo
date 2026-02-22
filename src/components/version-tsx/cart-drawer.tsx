@@ -21,6 +21,7 @@ import {
   CartItemCard,
   OrderSummaryCard,
   FreeShippingProgressBanner,
+  AutoApplySavingsBanner,
   getCartItemLineTotal,
   getCartItemProductHref,
 } from '@/components/version-tsx/cart';
@@ -99,6 +100,17 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
 
         {items.length > 0 && (
           <SheetFooter className="flex-col gap-4 border-t border-border/60 bg-muted/20 px-5 py-5">
+            {((summary.isAutoApplied && summary.discountAmount > 0 && summary.autoApplyPercent > 0) ||
+              (summary.productLevelSavings > 0 && summary.productLevelPercent > 0)) && (
+              <AutoApplySavingsBanner
+                percent={
+                  summary.productLevelSavings > 0
+                    ? summary.productLevelPercent
+                    : summary.autoApplyPercent
+                }
+                couponCode={summary.appliedCouponCode ?? summary.couponCode}
+              />
+            )}
             <OrderSummaryCard
               subtotal={summary.subtotal}
               discountAmount={summary.discountAmount}
@@ -107,7 +119,6 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
               qualifiesForFreeShipping={summary.qualifiesForFreeShipping}
               displayTotal={summary.displayTotal}
               isAutoApplied={summary.isAutoApplied}
-              autoApplyPercent={summary.autoApplyPercent}
             />
 
             {summary.gapToFreeShipping != null &&

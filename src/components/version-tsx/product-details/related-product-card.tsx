@@ -175,11 +175,11 @@ export default function RelatedProductCard({
       finalPrice = finalPrice * (1 - couponPercentage / 100);
     }
 
-    // Pass product with updated finalPriceDiscount
-    onAddToCart?.({
-      ...product,
-      finalPriceDiscount: finalPrice,
-    });
+    // Pass product with updated finalPriceDiscount. Include basePrice when hasCoupon for cart savings display.
+    const productToAdd = hasCoupon
+      ? { ...product, finalPriceDiscount: finalPrice, basePrice: Number(basePrice) }
+      : { ...product, finalPriceDiscount: finalPrice };
+    onAddToCart?.(productToAdd);
   };
 
   const handleAddToWishlist = (e: React.MouseEvent) => {

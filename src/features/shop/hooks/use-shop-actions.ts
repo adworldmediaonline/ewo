@@ -65,7 +65,8 @@ export const useShopActions = () => {
         shipping: product.shipping || { price: 0 },
         sku: product.sku,
         selectedOption: selectedOption, // Store selected option details
-        basePrice: Number(product.finalPriceDiscount || product.price || 0), // Store original base price for reference
+        basePrice: Number((product as { basePrice?: number }).basePrice ?? product.finalPriceDiscount ?? product.price ?? 0), // Original price (for product-level discount display)
+        appliedCouponCode: (product as { appliedCouponCode?: string }).appliedCouponCode,
       };
 
       dispatch(add_cart_product(cartProduct));

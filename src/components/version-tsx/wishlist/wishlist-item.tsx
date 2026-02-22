@@ -184,6 +184,7 @@ export default function WishlistItem({
       sku: prd.sku || prd._id,
       shipping: prd.shipping || { price: 0 },
       selectedOption: selectedOption || undefined,
+      ...(hasCoupon && { basePrice: Number(basePrice) }),
     };
     dispatch(add_cart_product(cartProduct));
   };
