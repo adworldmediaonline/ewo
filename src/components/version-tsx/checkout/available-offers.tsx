@@ -14,6 +14,8 @@ type AvailableOffersProps = {
   changeMode?: boolean;
   customerEmail?: string | null;
   customerReferralCode?: string | null;
+  /** When changed, refetches offers (e.g. on visibility change for admin updates). */
+  refetchKey?: number;
 };
 
 export function AvailableOffers({
@@ -24,6 +26,7 @@ export function AvailableOffers({
   changeMode = false,
   customerEmail,
   customerReferralCode,
+  refetchKey,
 }: AvailableOffersProps) {
   const [offers, setOffers] = useState<AvailableOffer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -61,7 +64,7 @@ export function AvailableOffers({
     return () => {
       cancelled = true;
     };
-  }, [subtotal, items, customerEmail, customerReferralCode]);
+  }, [subtotal, items, customerEmail, customerReferralCode, refetchKey]);
 
   const handleApply = async (offer: AvailableOffer) => {
     if (appliedCode && !changeMode) return;

@@ -18,10 +18,12 @@ export interface UseProductCouponResult {
  * Returns coupon info for a product when auto-apply is enabled.
  * When auto-apply is ON: fetches best offer for this product and returns discounted price.
  * When auto-apply is OFF: returns no coupon (prices display at full).
+ * Refetches when refetchKey changes (e.g. from useRefetchOnVisibility for admin updates).
  */
 export function useProductCoupon(
   productId: string,
-  unitPrice: number
+  unitPrice: number,
+  refetchKey?: number
 ): UseProductCouponResult {
   const [result, setResult] = useState<UseProductCouponResult>({
     hasCoupon: false,
@@ -117,7 +119,7 @@ export function useProductCoupon(
     return () => {
       cancelled = true;
     };
-  }, [productId, unitPrice]);
+  }, [productId, unitPrice, refetchKey]);
 
   return result;
 }

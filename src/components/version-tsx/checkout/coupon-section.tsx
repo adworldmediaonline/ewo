@@ -23,6 +23,8 @@ type CouponSectionProps = {
   label?: string;
   customerEmail?: string | null;
   customerReferralCode?: string | null;
+  /** When changed, refetches available offers (e.g. on visibility change for admin updates). */
+  refetchKey?: number;
 };
 
 export function CouponSection({
@@ -36,6 +38,7 @@ export function CouponSection({
   label = 'Coupon code',
   customerEmail,
   customerReferralCode,
+  refetchKey,
 }: CouponSectionProps) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -158,6 +161,7 @@ export function CouponSection({
             changeMode
             customerEmail={customerEmail}
             customerReferralCode={customerReferralCode}
+            refetchKey={refetchKey}
           />
           <div className="space-y-2 min-w-0">
             <p className="text-muted-foreground shrink-0 text-sm font-medium">

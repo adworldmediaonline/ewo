@@ -19,6 +19,7 @@ import {
 } from '@/redux/features/cartSlice';
 import { notifyError } from '@/utils/toast';
 import { useProductCoupon } from '@/hooks/useProductCoupon';
+import { useRefetchOnVisibility } from '@/hooks/use-refetch-on-visibility';
 import { getProductImageUrl } from '@/lib/product-image';
 import type { Product } from '@/components/version-tsx/product-card';
 
@@ -62,7 +63,12 @@ export default function ProductConfigurationDialog({
 
   // Check if coupon is active for this product (when auto-apply is enabled)
   const baseUnitPrice = Number(product.finalPriceDiscount || product.price || 0);
-  const { hasCoupon, couponPercentage } = useProductCoupon(product._id, baseUnitPrice);
+  const couponRefetchKey = useRefetchOnVisibility();
+  const { hasCoupon, couponPercentage } = useProductCoupon(
+    product._id,
+    baseUnitPrice,
+    couponRefetchKey
+  );
   const [selectedOption, setSelectedOption] = useState<any>(null);
   const [customNotes, setCustomNotes] = useState<{
     [configIndex: number]: string;

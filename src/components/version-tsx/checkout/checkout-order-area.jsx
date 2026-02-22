@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useCartSummary } from '@/hooks/use-cart-summary';
 import { useCartActions } from '@/hooks/use-cart-actions';
 import { useCouponAutoApply } from '@/hooks/use-coupon-auto-apply';
+import { useRefetchOnVisibility } from '@/hooks/use-refetch-on-visibility';
 import { saveUserRemoved } from '@/lib/coupon-user-removed';
 import { getStoreCouponSettings } from '@/lib/store-api';
 import {
@@ -45,6 +46,7 @@ export default function CheckoutOrderArea({ checkoutData, variant = 'full' }) {
   const summary = useCartSummary();
   const { handleIncrement, handleDecrement, handleRemove } = useCartActions();
   const { retryAutoApply } = useCouponAutoApply();
+  const couponRefetchKey = useRefetchOnVisibility();
 
   const taxAmountDollars = tax_preview?.taxCollected
     ? (tax_preview.tax ?? 0) / 100
@@ -84,7 +86,7 @@ export default function CheckoutOrderArea({ checkoutData, variant = 'full' }) {
         setHideCouponSection(!!autoApplyOn);
       })
       .catch(() => setHideCouponSection(false));
-  }, []);
+  }, [couponRefetchKey]);
 
   if (!cartDataLoaded) {
     const loadingTitle = variant === 'summary' ? 'Order Summary' : 'Your Order';
@@ -187,6 +189,7 @@ export default function CheckoutOrderArea({ checkoutData, variant = 'full' }) {
                 dispatch(removeCoupon());
               }}
               onRetryAutoApply={retryAutoApply}
+              refetchKey={couponRefetchKey}
             />
             )}
 

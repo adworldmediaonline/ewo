@@ -36,6 +36,7 @@ import { add_to_compare } from '@/redux/features/compareSlice';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { notifyError, notifySuccess } from '@/utils/toast';
 import { useProductCoupon } from '@/hooks/useProductCoupon';
+import { useRefetchOnVisibility } from '@/hooks/use-refetch-on-visibility';
 import {
   BarChart3,
   CheckCircle,
@@ -145,7 +146,12 @@ export default function DetailsWrapper({
 
   // Check if coupon is active for this product (when auto-apply is enabled)
   const baseUnitPrice = Number(productItem?.finalPriceDiscount || productItem?.price || 0);
-  const { hasCoupon, couponPercentage } = useProductCoupon(productItem?._id || '', baseUnitPrice);
+  const couponRefetchKey = useRefetchOnVisibility();
+  const { hasCoupon, couponPercentage } = useProductCoupon(
+    productItem?._id || '',
+    baseUnitPrice,
+    couponRefetchKey
+  );
 
   // Initialize selectedConfigurations with preselected options from backend
   const [selectedConfigurations, setSelectedConfigurations] = useState(() => {

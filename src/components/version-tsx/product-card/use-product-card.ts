@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useProductCoupon } from '@/hooks/useProductCoupon';
+import { useRefetchOnVisibility } from '@/hooks/use-refetch-on-visibility';
 import {
   getProductImageSrc,
   getProductImageAlt,
@@ -57,9 +58,11 @@ export function useProductCard({
   const { wishlist } = useSelector((state: { wishlist: { wishlist: unknown[] } }) => state.wishlist);
 
   const baseUnitPrice = Number(product.finalPriceDiscount || product.price || 0);
+  const couponRefetchKey = useRefetchOnVisibility();
   const { hasCoupon, couponPercentage, couponCode } = useProductCoupon(
     product._id,
-    baseUnitPrice
+    baseUnitPrice,
+    couponRefetchKey
   );
 
   const cartItem = (cart_products as { _id: string; orderQuantity?: number; selectedOption?: { title: string } }[]).find(
