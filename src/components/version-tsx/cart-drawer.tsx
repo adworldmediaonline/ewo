@@ -34,7 +34,7 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
     (s: { cart: { cart_products: CartItemType[] } }) => s.cart
   );
   const { quantity } = useCartInfo();
-  const summary = useCartSummary();
+  const summary = useCartSummary({ refetchWhen: open });
   const { handleIncrement, handleDecrement, handleRemove } = useCartActions();
 
   const items = Array.isArray(cart_products) ? cart_products : [];

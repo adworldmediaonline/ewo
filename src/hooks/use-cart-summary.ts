@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import useCartInfo from '@/hooks/use-cart-info';
 import { getStoreShippingSettings } from '@/lib/store-api';
@@ -13,11 +13,20 @@ type CartState = {
   isAutoApplied: boolean;
 };
 
+export type UseCartSummaryOptions = {
+  /** When true, refetch shipping settings (e.g. when cart drawer opens). Ensures threshold updates from admin are reflected immediately. */
+  refetchWhen?: boolean;
+};
+
 /**
  * Computes cart summary: subtotal, shipping, discount, total, free-shipping state.
  * Reusable across cart drawer, cart page, checkout order summary.
+ * Refetches shipping threshold when refetchWhen becomes true and on window focus for instant admin updates.
  */
-export function useCartSummary(): CartSummary & { quantity: number } {
+export function useCartSummary(
+  options?: UseCartSummaryOptions
+): CartSummary & { quantity: number } {
+  const { refetchWhen } = options ?? {};
   const { subtotal, total, quantity } = useCartInfo();
   const { cart_products, couponCode, discountAmount, isAutoApplied } =
     useSelector((s: { cart: CartState }) => s.cart);
@@ -64,11 +73,33 @@ export function useCartSummary(): CartSummary & { quantity: number } {
       ? Math.min(100, Math.round((subtotalAfterDiscount / freeShippingThreshold) * 100))
       : 0;
 
-  useEffect(() => {
+  const fetchShippingSettings = useCallback(() => {
     getStoreShippingSettings()
       .then((s) => setFreeShippingThreshold(s.freeShippingThreshold))
       .catch(() => setFreeShippingThreshold(null));
   }, []);
+
+  useEffect(() => {
+    fetchShippingSettings();
+  }, [fetchShippingSettings]);
+
+  const prevRefetchWhen = useRef(false);
+  useEffect(() => {
+    if (refetchWhen && !prevRefetchWhen.current) {
+      fetchShippingSettings();
+    }
+    prevRefetchWhen.current = refetchWhen ?? false;
+  }, [refetchWhen, fetchShippingSettings]);
+
+  useEffect(() => {
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchShippingSettings();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange);
+  }, [fetchShippingSettings]);
 
   const autoApplyPercent =
     isAutoApplied && subtotal > 0 && discountAmount > 0
