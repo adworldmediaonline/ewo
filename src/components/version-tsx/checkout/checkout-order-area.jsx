@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useCartSummary } from '@/hooks/use-cart-summary';
 import { useCartActions } from '@/hooks/use-cart-actions';
@@ -19,6 +19,7 @@ import {
   CardExpiryElement,
   CardCvcElement,
 } from '@stripe/react-stripe-js';
+import { CreditCard, Lock } from 'lucide-react';
 import {
   AutoApplySavingsBanner,
   CartItemCard,
@@ -47,6 +48,9 @@ export default function CheckoutOrderArea({ checkoutData, variant = 'full' }) {
   const { handleIncrement, handleDecrement, handleRemove } = useCartActions();
   const { retryAutoApply } = useCouponAutoApply();
   const couponRefetchKey = useRefetchOnVisibility();
+
+  const cardExpiryRef = useRef(null);
+  const cardCvcRef = useRef(null);
 
   const taxAmountDollars = tax_preview?.taxCollected
     ? (tax_preview.tax ?? 0) / 100
@@ -261,78 +265,127 @@ export default function CheckoutOrderArea({ checkoutData, variant = 'full' }) {
           </div>
 
           <div className="mt-6">
-            <div className="space-y-4">
-              <div className="p-4 border border-border rounded-md bg-background">
-                <div className="flex items-center space-x-3 mb-3">
-                  <input
-                    type="radio"
-                    id="card-payment"
-                    name="paymentMethod"
-                    value="card"
-                    defaultChecked
-                    className="text-primary focus:ring-ring"
-                  />
-                  <label
-                    htmlFor="card-payment"
-                    className="font-medium text-foreground"
-                  >
-                    Credit / Debit Card
-                  </label>
+            <h3 className="text-sm font-semibold text-foreground mb-3">
+              Payment method
+            </h3>
+            <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+              <label
+                htmlFor="card-payment"
+                className="flex cursor-pointer items-center gap-4 p-4 transition-colors hover:bg-muted/30"
+              >
+                <input
+                  type="radio"
+                  id="card-payment"
+                  name="paymentMethod"
+                  value="card"
+                  defaultChecked
+                  className="h-4 w-4 shrink-0 border-border text-primary focus:ring-2 focus:ring-primary/20 focus:ring-offset-2"
+                />
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted/50">
+                  <CreditCard className="size-5 text-muted-foreground" />
                 </div>
+                <div className="min-w-0 flex-1">
+                  <span className="font-medium text-foreground">
+                    Credit or debit card
+                  </span>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    Visa, Mastercard, American Express, Discover
+                  </p>
+                </div>
+              </label>
 
-                <div className="bg-background border border-border rounded-md p-3 space-y-3">
-                  <div className="min-w-0 w-full">
-                    <CardNumberElement
-                      options={{
-                        style: {
-                          base: {
-                            fontSize: '16px',
-                            color: '#374151',
-                            '::placeholder': {
-                              color: '#9CA3AF',
-                            },
-                          },
-                        },
-                      }}
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="min-w-0">
-                      <CardExpiryElement
+              <div className="border-t border-border bg-muted/20 px-4 py-4 sm:px-5 sm:py-5">
+                <div className="space-y-4">
+                  <div>
+                    <label className="mb-1.5 block text-sm font-medium text-foreground">
+                      Card number
+                    </label>
+                    <div className="rounded-lg border border-input bg-background px-3 py-2.5 shadow-xs transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/10">
+                      <CardNumberElement
                         options={{
                           style: {
                             base: {
                               fontSize: '16px',
-                              color: '#374151',
+                              color: 'hsl(var(--foreground))',
                               '::placeholder': {
-                                color: '#9CA3AF',
+                                color: 'hsl(var(--muted-foreground))',
                               },
                             },
                           },
+                        }}
+                        onChange={(e) => {
+                          if (e.complete && cardExpiryRef.current) {
+                            cardExpiryRef.current.focus();
+                          }
                         }}
                       />
                     </div>
-                    <div className="min-w-0">
-                      <CardCvcElement
-                        options={{
-                          style: {
-                            base: {
-                              fontSize: '16px',
-                              color: '#374151',
-                              '::placeholder': {
-                                color: '#9CA3AF',
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="mb-1.5 block text-sm font-medium text-foreground">
+                        Expiry date
+                      </label>
+                      <div className="rounded-lg border border-input bg-background px-3 py-2.5 shadow-xs transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/10">
+                        <CardExpiryElement
+                          options={{
+                            style: {
+                              base: {
+                                fontSize: '16px',
+                                color: 'hsl(var(--foreground))',
+                                '::placeholder': {
+                                  color: 'hsl(var(--muted-foreground))',
+                                },
                               },
                             },
-                          },
-                        }}
-                      />
+                          }}
+                          onReady={(el) => {
+                            cardExpiryRef.current = el;
+                          }}
+                          onChange={(e) => {
+                            if (e.complete && cardCvcRef.current) {
+                              cardCvcRef.current.focus();
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="mb-1.5 block text-sm font-medium text-foreground">
+                        CVC
+                      </label>
+                      <div className="rounded-lg border border-input bg-background px-3 py-2.5 shadow-xs transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/10">
+                        <CardCvcElement
+                          options={{
+                            style: {
+                              base: {
+                                fontSize: '16px',
+                                color: 'hsl(var(--foreground))',
+                                '::placeholder': {
+                                  color: 'hsl(var(--muted-foreground))',
+                                },
+                              },
+                            },
+                          }}
+                          onReady={(el) => {
+                            cardCvcRef.current = el;
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {cardError && (
-                  <div className="mt-2 text-sm text-destructive">{cardError}</div>
+                  <div className="mt-3 flex items-center gap-2 text-sm text-destructive">
+                    {cardError}
+                  </div>
                 )}
+
+                <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
+                  <Lock className="size-3.5 shrink-0" />
+                  <span>Your payment details are encrypted and secured by Stripe</span>
+                </div>
               </div>
             </div>
           </div>
