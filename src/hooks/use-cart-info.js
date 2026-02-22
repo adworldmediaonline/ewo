@@ -5,11 +5,8 @@ import { useSelector } from 'react-redux';
 const useCartInfo = () => {
   const [quantity, setQuantity] = useState(0);
   const [total, setTotal] = useState(0);
-  const [totalWithShipping, setTotalWithShipping] = useState(0);
   const [subtotal, setSubtotal] = useState(0);
-  const { cart_products, totalShippingCost } = useSelector(
-    state => state.cart
-  );
+  const { cart_products, discountAmount } = useSelector(state => state.cart);
 
   useEffect(() => {
     const cart = cart_products.reduce(
@@ -27,19 +24,14 @@ const useCartInfo = () => {
       }
     );
 
-    // Set subtotal
     setSubtotal(cart.total);
     setQuantity(cart.quantity);
-
-    // Calculate final total (subtotal only, no discounts)
-    setTotal(cart.total);
-    setTotalWithShipping(cart.total + totalShippingCost);
-  }, [cart_products, totalShippingCost]);
+    setTotal(Math.max(0, cart.total - (discountAmount ?? 0)));
+  }, [cart_products, discountAmount]);
 
   return {
     quantity,
     total,
-    totalWithShipping,
     subtotal,
     setTotal,
   };

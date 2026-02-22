@@ -1,38 +1,21 @@
 'use client';
-import useCartInfo from '@/hooks/use-cart-info';
 import { authClient } from '@/lib/authClient';
-import { reset_address_discount } from '@/redux/features/order/orderSlice';
 import { cn } from '@/lib/utils';
 
 import { Country } from 'country-state-city';
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Controller } from 'react-hook-form';
 import ErrorMsg from '../../common/error-msg';
 import { SearchableSelect } from '@/components/ui/searchable-select';
 
 const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData }) => {
-  const { data: session } = authClient.useSession();
   const user = {};
   const { isCheckoutSubmitting } = useSelector(state => state.order);
-  const dispatch = useDispatch();
 
   const {
-    stripe,
-    isCheckoutSubmit,
-    processingPayment,
-    cardError,
     register: checkoutRegister,
   } = checkoutData;
-
-  const { totalShippingCost, addressDiscountAmount } = useSelector(
-    state => state.cart
-  );
-
-  const { total } = useCartInfo();
-
-  // Enhanced multiple coupon state - get coupon discount from coupon state like cart dropdown
-  const { total_coupon_discount } = useSelector(state => state.coupon);
 
   const countries = Country.getAllCountries();
   const defaultCountry = countries.find(country => country.isoCode === 'US');
@@ -55,14 +38,9 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
     const countryCode = e.target.value;
     if (!countryCode) return;
 
-    dispatch(reset_address_discount());
-
     const country = countries.find(c => c.isoCode === countryCode);
 
-    // Update state immediately
     setSelectedCountry(country);
-
-    // Update form values immediately
     setValue('country', countryCode);
   };
 
@@ -70,7 +48,6 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
     if (isCheckoutSubmitting) return;
 
     const stateValue = e.target.value;
-    dispatch(reset_address_discount());
     setValue('state', stateValue);
   };
 
@@ -78,7 +55,6 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
     if (isCheckoutSubmitting) return;
 
     const cityValue = e.target.value;
-    dispatch(reset_address_discount());
     setValue('city', cityValue);
   };
 
@@ -86,7 +62,6 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
     if (isCheckoutSubmitting) return;
 
     const address = e.target.value;
-    dispatch(reset_address_discount());
     setValue('address', address);
   };
 
@@ -94,24 +69,7 @@ const CheckoutBillingArea = ({ register, errors, setValue, control, checkoutData
     if (isCheckoutSubmitting) return;
 
     const zipCode = e.target.value;
-    dispatch(reset_address_discount());
     setValue('zipCode', zipCode);
-  };
-
-  // Calculate final total with all discounts - Simplified to match cart dropdown logic
-  const calculateFinalTotal = () => {
-    // Use the same logic as cart dropdown for consistency
-    // total already includes first-time discount, so use it directly
-    const baseTotal = Number(total) || 0;
-    const shipping = Number(totalShippingCost) || 0;
-    const couponDiscount = Number(total_coupon_discount) || 0;
-    const addressDiscount = Number(addressDiscountAmount) || 0;
-
-    // Calculate: Base Total + Shipping - Coupon Discounts - Address Discount
-    const finalTotal = baseTotal + shipping - couponDiscount - addressDiscount;
-
-    // Ensure total doesn't go below 0
-    return Math.max(0, finalTotal);
   };
 
   return (

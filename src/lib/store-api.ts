@@ -1,0 +1,217 @@
+/**
+ * Storefront API - coupons, shipping settings.
+ * Aligned with reference project patterns.
+ */
+
+const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? '';
+
+export type CouponBehaviorSettings = {
+  autoApply: boolean;
+  autoApplyStrategy: 'best_savings' | 'first_created' | 'highest_percentage' | 'customer_choice';
+  showToastOnApply: boolean;
+};
+
+export type ShippingSettings = {
+  freeShippingThreshold: number | null;
+};
+
+/** Raw coupon from ewo backend */
+export type RawCoupon = {
+  _id: string;
+  couponCode: string;
+  title?: string;
+  description?: string;
+  discountType: string;
+  discountPercentage?: number;
+  discountAmount?: number;
+  minimumAmount?: number;
+  applicableType?: string;
+  applicableProducts?: Array<{ _id: string }>;
+  status?: string;
+  allowAutoApply?: boolean;
+  createdAt?: string;
+};
+
+/** Normalized offer for UI (matches reference project shape) */
+export type AvailableOffer = {
+  code: string;
+  type: 'percentage' | 'fixed';
+  value: number;
+  minOrderAmount: number | null;
+  discountAmount: number;
+  description: string;
+  allowAutoApply?: boolean;
+  createdAt?: string | null;
+  locked?: boolean;
+};
+
+/** Pick best offer by strategy for auto-apply */
+export function pickBestOffer(
+  offers: AvailableOffer[],
+  strategy: 'best_savings' | 'first_created' | 'highest_percentage'
+): AvailableOffer | null {
+  const applicable = offers.filter((o) => !o.locked && (o.allowAutoApply !== false));
+  if (applicable.length === 0) return null;
+
+  if (strategy === 'best_savings') {
+    return applicable.reduce((best, o) =>
+      o.discountAmount > best.discountAmount ? o : best
+    );
+  }
+  if (strategy === 'first_created') {
+    return applicable.reduce((oldest, o) => {
+      const oDate = o.createdAt ? new Date(o.createdAt).getTime() : 0;
+      const oldestDate = oldest.createdAt ? new Date(oldest.createdAt).getTime() : 0;
+      return oDate < oldestDate ? o : oldest;
+    });
+  }
+  if (strategy === 'highest_percentage') {
+    const withPct = applicable.filter((o) => o.type === 'percentage');
+    if (withPct.length > 0) {
+      return withPct.reduce((best, o) => (o.value > best.value ? o : best));
+    }
+    return applicable.reduce((best, o) =>
+      o.discountAmount > best.discountAmount ? o : best
+    );
+  }
+  return applicable[0];
+}
+
+export type ValidateDiscountResult =
+  | { valid: true; discountAmount: number; message?: string }
+  | { valid: false; message: string };
+
+export async function getStoreCouponSettings(): Promise<CouponBehaviorSettings> {
+  const res = await fetch(`${apiUrl}/api/store/settings/coupon`, {
+    cache: 'no-store',
+  });
+  if (!res.ok) throw new Error('Failed to fetch coupon settings');
+  return res.json();
+}
+
+export async function getStoreShippingSettings(): Promise<ShippingSettings> {
+  const res = await fetch(`${apiUrl}/api/store/settings/shipping`, {
+    cache: 'no-store',
+  });
+  if (!res.ok) return { freeShippingThreshold: null };
+  return res.json();
+}
+
+export async function getActiveCoupons(): Promise<RawCoupon[]> {
+  const res = await fetch(`${apiUrl}/api/coupon/active`, {
+    cache: 'no-store',
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message ?? 'Failed to fetch coupons');
+  return Array.isArray(data?.data) ? data.data : [];
+}
+
+/**
+ * Map cart items to format expected by ewo backend validate endpoint.
+ */
+function toCartItemsForValidate(
+  items: Array<{ productId?: string; _id?: string; quantity: number; unitPrice: number; title?: string }>
+) {
+  return items.map((i) => ({
+    productId: i.productId ?? i._id,
+    _id: i.productId ?? i._id,
+    orderQuantity: i.quantity,
+    finalPriceDiscount: i.unitPrice,
+    price: i.unitPrice,
+    title: i.title ?? '',
+  }));
+}
+
+export async function validateStoreDiscount(
+  code: string,
+  subtotal: number,
+  items: Array<{ productId: string; quantity: number; unitPrice: number; title?: string }>,
+  _options?: { customerEmail?: string; customerReferralCode?: string }
+): Promise<ValidateDiscountResult> {
+  const cartItems = toCartItemsForValidate(
+    items.map((i) => ({
+      productId: i.productId,
+      _id: i.productId,
+      quantity: i.quantity,
+      unitPrice: i.unitPrice,
+      title: i.title,
+    }))
+  );
+
+  const res = await fetch(`${apiUrl}/api/coupon/validate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      couponCode: code.trim().toUpperCase(),
+      cartItems,
+      cartTotal: subtotal,
+      cartSubtotal: subtotal,
+    }),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    return {
+      valid: false,
+      message: data.message ?? 'Invalid coupon',
+    };
+  }
+
+  if (data.success && data.data?.discount != null) {
+    return {
+      valid: true,
+      discountAmount: data.data.discount,
+      message: data.message,
+    };
+  }
+
+  return {
+    valid: false,
+    message: data.message ?? 'Invalid coupon',
+  };
+}
+
+/**
+ * Get available offers for cart - filters active coupons that apply to cart items.
+ * Returns normalized format for UI components.
+ */
+export async function getAvailableOffers(
+  subtotal: number,
+  items: Array<{ productId: string; quantity: number; unitPrice: number }>,
+  _options?: { customerEmail?: string; customerReferralCode?: string }
+): Promise<AvailableOffer[]> {
+  const coupons = await getActiveCoupons();
+  const productIds = new Set(items.map((i) => i.productId));
+
+  const applicable = coupons.filter((c) => {
+    if (c.status !== 'active') return false;
+    if (c.applicableType === 'all') return true;
+    if (c.applicableType === 'product' && c.applicableProducts?.length) {
+      return c.applicableProducts.some((p) =>
+        productIds.has(typeof p === 'object' ? (p as { _id: string })._id : String(p))
+      );
+    }
+    return true;
+  });
+
+  return applicable.map((c): AvailableOffer => {
+    const type = c.discountType === 'fixed_amount' ? 'fixed' : 'percentage';
+    const value = type === 'percentage' ? (c.discountPercentage ?? 0) : (c.discountAmount ?? 0);
+    const discountAmount =
+      type === 'percentage'
+        ? Math.round(subtotal * (value / 100) * 100) / 100
+        : Math.min(value, subtotal);
+
+    return {
+      code: c.couponCode,
+      type,
+      value,
+      minOrderAmount: c.minimumAmount ?? null,
+      discountAmount,
+      description: c.title ?? c.description ?? c.couponCode,
+      allowAutoApply: c.allowAutoApply ?? true,
+      createdAt: c.createdAt ?? null,
+    };
+  });
+}

@@ -138,14 +138,6 @@ export default async function HeroBanner({ banners: bannersProp }: HeroBannerPro
                   >
                     20% OFF ON ALL OFF-ROAD PARTS
                   </p>
-                  <p
-                    style={{
-                      color: '#ffffff',
-                    }}
-                    className="text-sm uppercase md:text-base lg:text-lg leading-relaxed font-medium animate-pulse-glow-yellow"
-                  >
-                    Free Shipping On Order above $500
-                  </p>
                 </div>
 
                 {/* CTA Button */}

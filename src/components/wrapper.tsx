@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 
 import { AddToCartAnimationProvider } from '@/context/add-to-cart-animation-context';
 import CartConfirmationModal from '@/components/modals/cart-confirmation-modal';
+import { useCouponAutoApply } from '@/hooks/use-coupon-auto-apply';
 
 import {
   get_cart_products,
@@ -17,9 +18,10 @@ interface WrapperProps {
 }
 
 const Wrapper = ({ children }: WrapperProps) => {
-  // const { productItem } = useSelector((state: any) => state.productModal);
   const dispatch = useDispatch();
   const hasInitialized = useRef(false);
+
+  useCouponAutoApply();
 
   useEffect(() => {
     // Defer Redux initialization to reduce Total Blocking Time
