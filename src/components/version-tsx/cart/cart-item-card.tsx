@@ -72,7 +72,7 @@ export function CartItemCard({
       <div className="min-w-0 flex-1">
         <Link
           href={href}
-          className="font-semibold text-foreground line-clamp-2 transition-colors hover:text-primary"
+          className="font-semibold text-foreground transition-colors hover:text-primary"
           onClick={onProductClick}
         >
           {item.title}
