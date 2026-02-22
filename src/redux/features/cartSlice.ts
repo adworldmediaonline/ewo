@@ -37,6 +37,8 @@ interface CartState {
   lastAddedProduct: LastAddedProduct | null;
   couponCode: string | null;
   discountAmount: number;
+  /** When true, discount was auto-applied (show "X% OFF applied" instead of discount line) */
+  isAutoApplied: boolean;
 }
 
 const initialState: CartState = {
@@ -47,6 +49,7 @@ const initialState: CartState = {
   lastAddedProduct: null,
   couponCode: null,
   discountAmount: 0,
+  isAutoApplied: false,
 };
 
 export const cartSlice = createSlice({
@@ -187,19 +190,28 @@ export const cartSlice = createSlice({
       state.lastAddedProduct = null;
       state.couponCode = null;
       state.discountAmount = 0;
+      state.isAutoApplied = false;
 
       setLocalStorage('cart_products', state.cart_products);
     },
     applyCoupon: (
       state,
-      { payload }: PayloadAction<{ code: string; discountAmount: number }>
+      {
+        payload,
+      }: PayloadAction<{
+        code: string;
+        discountAmount: number;
+        isAutoApplied?: boolean;
+      }>
     ) => {
       state.couponCode = payload.code;
       state.discountAmount = payload.discountAmount;
+      state.isAutoApplied = payload.isAutoApplied ?? false;
     },
     removeCoupon: state => {
       state.couponCode = null;
       state.discountAmount = 0;
+      state.isAutoApplied = false;
     },
     openCartMini: state => {
       state.cartMiniOpen = true;

@@ -143,8 +143,9 @@ export default function DetailsWrapper({
   const [selectedOption, setSelectedOption] = useState(null);
   const [customNotes, setCustomNotes] = useState({});
 
-  // Check if coupon is active for this product
-  const { hasCoupon, couponPercentage } = useProductCoupon(productItem?._id || '');
+  // Check if coupon is active for this product (when auto-apply is enabled)
+  const baseUnitPrice = Number(productItem?.finalPriceDiscount || productItem?.price || 0);
+  const { hasCoupon, couponPercentage } = useProductCoupon(productItem?._id || '', baseUnitPrice);
 
   // Initialize selectedConfigurations with preselected options from backend
   const [selectedConfigurations, setSelectedConfigurations] = useState(() => {

@@ -60,8 +60,9 @@ export default function ProductConfigurationDialog({
   const dispatch = useDispatch();
   const { cart_products, orderQuantity } = useSelector((state: any) => state.cart);
 
-  // Check if coupon is active for this product
-  const { hasCoupon, couponPercentage } = useProductCoupon(product._id);
+  // Check if coupon is active for this product (when auto-apply is enabled)
+  const baseUnitPrice = Number(product.finalPriceDiscount || product.price || 0);
+  const { hasCoupon, couponPercentage } = useProductCoupon(product._id, baseUnitPrice);
   const [selectedOption, setSelectedOption] = useState<any>(null);
   const [customNotes, setCustomNotes] = useState<{
     [configIndex: number]: string;

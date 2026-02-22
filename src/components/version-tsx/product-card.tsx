@@ -221,8 +221,9 @@ export default function ProductCard({
   const { cart_products } = useSelector((state: any) => state.cart);
   const { wishlist } = useSelector((state: any) => state.wishlist);
 
-  // Get coupon information for this product
-  const { hasCoupon, couponPercentage } = useProductCoupon(product._id);
+  // Get coupon information for this product (when auto-apply is enabled)
+  const baseUnitPrice = Number(product.finalPriceDiscount || product.price || 0);
+  const { hasCoupon, couponPercentage } = useProductCoupon(product._id, baseUnitPrice);
 
   const isAddedToCart = cart_products.some(
     (prd: any) => prd._id === product._id

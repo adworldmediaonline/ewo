@@ -115,8 +115,9 @@ export default function WishlistItem({
     return hasValidConfigs;
   }, [productConfigurations]);
 
-  // Check if coupon is active for this product
-  const { hasCoupon, couponPercentage } = useProductCoupon(_id);
+  // Check if coupon is active for this product (when auto-apply is enabled)
+  const baseUnitPrice = Number(finalPriceDiscount || price || 0);
+  const { hasCoupon, couponPercentage } = useProductCoupon(_id, baseUnitPrice);
 
   // Calculate final selling price (bold) - finalPriceDiscount after coupon discount
   const calculateFinalPrice = () => {

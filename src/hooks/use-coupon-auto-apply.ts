@@ -86,6 +86,7 @@ export function useCouponAutoApply() {
                 applyCoupon({
                   code: best.code.trim().toUpperCase(),
                   discountAmount: validationResult.discountAmount,
+                  isAutoApplied: true,
                 })
               );
               if (settings.showToastOnApply) {

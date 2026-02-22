@@ -42,7 +42,7 @@ export default function CheckoutOrderArea({ checkoutData, variant = 'full' }) {
     isTaxLoading,
   } = checkoutData;
 
-  const { cart_products, couponCode, discountAmount } = useSelector(state => state.cart);
+  const { cart_products, couponCode, discountAmount, isAutoApplied } = useSelector(state => state.cart);
   const { total, subtotal, quantity } = useCartInfo();
   const { retryAutoApply } = useCouponAutoApply();
   const { isCheckoutSubmitting } = useSelector(state => state.order);
@@ -246,12 +246,21 @@ export default function CheckoutOrderArea({ checkoutData, variant = 'full' }) {
               onRetryAutoApply={retryAutoApply}
             />
 
-            {couponCode && discountAmount > 0 && (
-              <div className="flex items-center justify-between text-green-600 dark:text-green-400">
-                <span>Discount ({couponCode})</span>
-                <span className="font-medium">-${discountAmount.toFixed(2)}</span>
-              </div>
-            )}
+            {couponCode && discountAmount > 0 &&
+              (isAutoApplied ? (
+                <div className="flex items-center justify-between text-green-600 dark:text-green-400">
+                  <span className="font-medium">
+                    {subtotal > 0
+                      ? `${Math.round((discountAmount / subtotal) * 100)}% OFF applied`
+                      : 'Discount applied'}
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between text-green-600 dark:text-green-400">
+                  <span>Discount ({couponCode})</span>
+                  <span className="font-medium">-${discountAmount.toFixed(2)}</span>
+                </div>
+              ))}
 
             {qualifiesForFreeShipping && (
               <div className="flex items-center justify-between text-sm text-green-600 dark:text-green-400">
