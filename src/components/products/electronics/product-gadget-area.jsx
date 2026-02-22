@@ -6,7 +6,8 @@ import { EffectFade, Pagination } from 'swiper/modules';
 import Link from 'next/link';
 // internal
 import { ArrowRight } from '@/svg';
-import ProductItem from './product-item';
+import { ProductCard } from '@/components/version-tsx/product-card';
+import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
 import PrdCategoryList from './prd-category-list';
 import ErrorMsg from '@/components/common/error-msg';
 import b_bg_1 from '@assets/img/product/gadget/gadget-banner-1.jpg';
@@ -16,6 +17,7 @@ import gadget_girl from '@assets/img/product/gadget/gadget-girl.png';
 import HomeGadgetPrdLoader from '@/components/loader/home/home-gadget-prd-loader';
 
 const ProductGadgetArea = () => {
+  const { handleAddToCart, handleAddToWishlist } = useShopActions();
   const { data: products, isError, isLoading } = useGetAllProductsQuery({
   publishStatus: 'published',
 });
@@ -40,7 +42,11 @@ const ProductGadgetArea = () => {
 
     content = product_items.map((prd, i) => (
       <div key={i} className="col-xl-4 col-sm-6">
-        <ProductItem product={prd} />
+        <ProductCard
+          product={prd}
+          onAddToCart={handleAddToCart}
+          onAddToWishlist={handleAddToWishlist}
+        />
       </div>
     ));
   }

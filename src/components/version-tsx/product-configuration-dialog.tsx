@@ -474,6 +474,7 @@ export default function ProductConfigurationDialog({
 
     const productToAdd = {
       ...product,
+      sku: product.sku ?? product._id ?? '',
       // Update product image if option image is selected
       img: productImage || getProductImageUrl(product) || '',
       finalPriceDiscount: finalPrice,

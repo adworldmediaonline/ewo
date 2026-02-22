@@ -1,6 +1,14 @@
-import type { Product as ProductCardProduct } from '@/components/version-tsx/product-card';
+import type { Product, ProductBase } from '@/types/product';
 
 export const SHOP_PAGE_SIZE = 12;
+
+/** Product shape acceptable for add-to-cart (includes computed fields from ProductCard) */
+export type AddToCartProduct = ProductBase & {
+  finalPriceDiscount?: number;
+  basePrice?: number;
+  appliedCouponCode?: string;
+  options?: Array<{ title: string; price: number }>;
+};
 
 export type SortDirection = 'asc' | 'desc';
 
@@ -25,7 +33,7 @@ export interface ShopPagination {
   hasPrevPage: boolean;
 }
 
-export type ShopProduct = ProductCardProduct;
+export type ShopProduct = Product;
 
 export interface ShopProductsResult {
   data: ShopProduct[];

@@ -4,7 +4,8 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Scrollbar } from 'swiper/modules';
 // internal
 import { useGetProductTypeQuery } from '@/redux/features/productApi';
-import ProductSliderItem from './product-slider-item';
+import { ProductCard } from '@/components/version-tsx/product-card';
+import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
 import ErrorMsg from '@/components/common/error-msg';
 import { HomeTwoPopularPrdLoader } from '@/components/loader';
 
@@ -45,6 +46,7 @@ const slider_setting = {
 };
 
 const PopularProducts = () => {
+  const { handleAddToCart, handleAddToWishlist } = useShopActions();
   const {
     data: products,
     isError,
@@ -72,7 +74,11 @@ const PopularProducts = () => {
       >
         {product_items.map(item => (
           <SwiperSlide key={item._id}>
-            <ProductSliderItem product={item} />
+            <ProductCard
+              product={item}
+              onAddToCart={handleAddToCart}
+              onAddToWishlist={handleAddToWishlist}
+            />
           </SwiperSlide>
         ))}
       </Swiper>

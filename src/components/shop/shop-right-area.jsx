@@ -1,6 +1,9 @@
+'use client';
+
 import React, { useState } from 'react';
 import Pagination from '@/ui/Pagination';
-import ProductItem from '../version-tsx/product-details/product-item';
+import { ProductCard } from '@/components/version-tsx/product-card';
+import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
 import CategoryFilter from './shop-filter/category-filter';
 import ColorFilter from './shop-filter/color-filter';
 import PriceFilter from './shop-filter/price-filter';
@@ -15,6 +18,7 @@ import ResetButton from './shop-filter/reset-button';
 const ShopRightArea = ({ all_products, products, otherProps, right_side }) => {
   const { priceFilterValues, selectHandleFilter, currPage, setCurrPage } =
     otherProps;
+  const { handleAddToCart, handleAddToWishlist } = useShopActions();
   const [filteredRows, setFilteredRows] = useState(products);
   const [pageStart, setPageStart] = useState(0);
   const [countOfPage, setCountOfPage] = useState(12);
@@ -75,7 +79,11 @@ const ShopRightArea = ({ all_products, products, otherProps, right_side }) => {
                                 key={item._id}
                                 className="col-xl-4 col-md-6 col-sm-6"
                               >
-                                <ProductItem product={item} />
+                                <ProductCard
+                                  product={item}
+                                  onAddToCart={handleAddToCart}
+                                  onAddToWishlist={handleAddToWishlist}
+                                />
                               </div>
                             ))}
                         </div>

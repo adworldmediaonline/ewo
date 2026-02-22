@@ -1,6 +1,7 @@
 'use client';
 import React, { useEffect, useRef, useState } from "react";
-import ProductItem from "./product-item";
+import { ProductCard } from '@/components/version-tsx/product-card';
+import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
 import ErrorMsg from "@/components/common/error-msg";
 import { useGetProductTypeQuery } from "@/redux/features/productApi";
 import { HomeThreePrdTwoLoader } from "@/components/loader";
@@ -119,7 +120,11 @@ const ProductAreaTwo = () => {
         <div className="row">
           {product_items.map((prd) => (
             <div key={prd._id} className="col-lg-3 col-md-4 col-sm-6">
-              <ProductItem product={prd} />
+              <ProductCard
+                product={prd}
+                onAddToCart={handleAddToCart}
+                onAddToWishlist={handleAddToWishlist}
+              />
             </div>
           ))}
         </div>

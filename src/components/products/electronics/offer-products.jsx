@@ -4,7 +4,8 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination } from 'swiper/modules';
 import Link from 'next/link';
 // internal
-import ProductItem from './product-item';
+import { ProductCard } from '@/components/version-tsx/product-card';
+import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
 import { useGetOfferProductsQuery } from '@/redux/features/productApi';
 import { ArrowRightLong } from '@/svg';
 import ErrorMsg from '@/components/common/error-msg';
@@ -38,6 +39,7 @@ const sliderSetting = {
 };
 
 const OfferProducts = () => {
+  const { handleAddToCart, handleAddToWishlist } = useShopActions();
   const {
     data: products,
     isError,
@@ -65,7 +67,11 @@ const OfferProducts = () => {
       >
         {product_items.map((item, i) => (
           <SwiperSlide key={i}>
-            <ProductItem product={item} offer_style={true} />
+            <ProductCard
+              product={item}
+              onAddToCart={handleAddToCart}
+              onAddToWishlist={handleAddToWishlist}
+            />
           </SwiperSlide>
         ))}
 

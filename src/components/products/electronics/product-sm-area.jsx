@@ -3,10 +3,12 @@ import React from 'react';
 // internal
 import { useGetAllProductsQuery } from '@/redux/features/productApi';
 import ErrorMsg from '@/components/common/error-msg';
-import ProductSmItem from './product-sm-item';
+import { ProductCard } from '@/components/version-tsx/product-card';
+import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
 import HomeSmPrdLoader from '@/components/loader/home/home-sm-prd-loader';
 
 const ProductSmArea = () => {
+  const { handleAddToCart, handleAddToWishlist } = useShopActions();
   const { data: products, isError, isLoading } = useGetAllProductsQuery({
   publishStatus: 'published',
 });
@@ -44,7 +46,13 @@ const ProductSmArea = () => {
             </div>
             <div className="tp-product-sm-wrapper mr-20">
               {discount_prd.map(item => (
-                <ProductSmItem key={item._id} product={item} />
+                <ProductCard
+                  key={item._id}
+                  product={item}
+                  layout="horizontal"
+                  onAddToCart={handleAddToCart}
+                  onAddToWishlist={handleAddToWishlist}
+                />
               ))}
             </div>
           </div>
@@ -63,7 +71,13 @@ const ProductSmArea = () => {
             </div>
             <div className="tp-product-sm-wrapper mr-20">
               {featured_prd.map(item => (
-                <ProductSmItem key={item._id} product={item} />
+                <ProductCard
+                  key={item._id}
+                  product={item}
+                  layout="horizontal"
+                  onAddToCart={handleAddToCart}
+                  onAddToWishlist={handleAddToWishlist}
+                />
               ))}
             </div>
           </div>
@@ -82,7 +96,13 @@ const ProductSmArea = () => {
             </div>
             <div className="tp-product-sm-wrapper mr-20">
               {selling_prd.map(item => (
-                <ProductSmItem key={item._id} product={item} />
+                <ProductCard
+                  key={item._id}
+                  product={item}
+                  layout="horizontal"
+                  onAddToCart={handleAddToCart}
+                  onAddToWishlist={handleAddToWishlist}
+                />
               ))}
             </div>
           </div>

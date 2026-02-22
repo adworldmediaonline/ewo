@@ -6,7 +6,8 @@ import { Navigation, Pagination } from 'swiper/modules';
 import { useGetAllProductsQuery } from '@/redux/features/productApi';
 import { NextArr, PrevArr } from '@/svg';
 import ErrorMsg from '@/components/common/error-msg';
-import ProductItem from './product-item';
+import { ProductCard } from '@/components/version-tsx/product-card';
+import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
 import HomeNewArrivalPrdLoader from '@/components/loader/home/home-newArrival-prd-loader';
 
 // slider setting
@@ -41,6 +42,7 @@ const slider_setting = {
 };
 
 const NewArrivals = () => {
+  const { handleAddToCart, handleAddToWishlist } = useShopActions();
   const { data: products, isError, isLoading } = useGetAllProductsQuery({
   publishStatus: 'published',
 });
@@ -70,7 +72,11 @@ const NewArrivals = () => {
       >
         {product_items.map(item => (
           <SwiperSlide key={item._id}>
-            <ProductItem product={item} />
+            <ProductCard
+              product={item}
+              onAddToCart={handleAddToCart}
+              onAddToWishlist={handleAddToWishlist}
+            />
           </SwiperSlide>
         ))}
       </Swiper>

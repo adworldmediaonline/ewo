@@ -8,7 +8,8 @@ import special_thumb from '@assets/img/product/special/big/special-big-1.jpg';
 import { ArrowNextSm, ArrowPrevSm, PlusTwo } from '@/svg';
 import { useGetAllProductsQuery } from '@/redux/features/productApi';
 import ErrorMsg from '@/components/common/error-msg';
-import ProductItem from './product-item';
+import { ProductCard } from '@/components/version-tsx/product-card';
+import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
 import { HomeThreeTrendingPrdLoader } from '@/components/loader';
 
 // slider setting
@@ -27,6 +28,7 @@ const sliderSetting = {
 };
 
 const TrendingSpecialPrd = () => {
+  const { handleAddToCart, handleAddToWishlist } = useShopActions();
   const { data: products, isError, isLoading } = useGetAllProductsQuery({
   publishStatus: 'published',
 });
@@ -53,7 +55,11 @@ const TrendingSpecialPrd = () => {
       >
         {product_items.map(item => (
           <SwiperSlide key={item._id} className="tp-special-item grey-bg-9">
-            <ProductItem product={item} prdCenter={true} />
+            <ProductCard
+              product={item}
+              onAddToCart={handleAddToCart}
+              onAddToWishlist={handleAddToWishlist}
+            />
           </SwiperSlide>
         ))}
       </Swiper>

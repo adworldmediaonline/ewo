@@ -1,7 +1,8 @@
 'use client';
 import React, { useState } from 'react';
 import { useGetAllProductsQuery } from '@/redux/features/productApi';
-import ProductItem from './product-item';
+import { ProductCard } from '@/components/version-tsx/product-card';
+import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
 import ErrorMsg from '@/components/common/error-msg';
 import HomePrdLoader from '@/components/loader/home/home-prd-loader';
 
@@ -9,6 +10,7 @@ const tabs = ['new', 'featured', 'topSellers'];
 
 const ProductArea = () => {
   const [activeTab, setActiveTab] = useState('new');
+  const { handleAddToCart, handleAddToWishlist } = useShopActions();
   const { data: products, isError, isLoading } = useGetAllProductsQuery({
   publishStatus: 'published',
 });
@@ -62,7 +64,11 @@ const ProductArea = () => {
 
     content = filteredProducts.map((prd, i) => (
       <div key={i} className="col-xl-3 col-lg-3 col-sm-6">
-        <ProductItem product={prd} />
+        <ProductCard
+          product={prd}
+          onAddToCart={handleAddToCart}
+          onAddToWishlist={handleAddToWishlist}
+        />
       </div>
     ));
   }

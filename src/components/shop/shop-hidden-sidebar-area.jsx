@@ -1,12 +1,16 @@
+'use client';
+
 import React, { useState } from 'react';
 import Pagination from '@/ui/Pagination';
-import ProductItem from '../version-tsx/product-details/product-item';
+import { ProductCard } from '@/components/version-tsx/product-card';
+import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
 import ShopListItem from './shop-list-item';
 import ShopTopLeft from './shop-top-left';
 import ShopTopRight from './shop-top-right';
 
 const ShopHiddenSidebarArea = ({ all_products, products, otherProps }) => {
   const { currPage, setCurrPage, selectHandleFilter } = otherProps;
+  const { handleAddToCart, handleAddToWishlist } = useShopActions();
   const [filteredRows, setFilteredRows] = useState(products);
   const [pageStart, setPageStart] = useState(0);
   const [countOfPage, setCountOfPage] = useState(12);
@@ -63,7 +67,11 @@ const ShopHiddenSidebarArea = ({ all_products, products, otherProps }) => {
                                 key={item._id}
                                 className="col-xl-3 col-lg-4 col-md-6 col-sm-6"
                               >
-                                <ProductItem product={item} />
+                                <ProductCard
+                                  product={item}
+                                  onAddToCart={handleAddToCart}
+                                  onAddToWishlist={handleAddToWishlist}
+                                />
                               </div>
                             ))}
                         </div>

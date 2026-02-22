@@ -1,7 +1,11 @@
-import ProductItem, { Product } from './product-item';
+'use client';
+
+import ProductCard from '@/components/version-tsx/product-card';
+import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
+import type { ProductBase } from '@/types/product';
 
 interface SearchResultsProps {
-  products: Product[];
+  products: ProductBase[];
   currentPage: number;
   onLoadMore: () => void;
   canLoadMore: boolean;
@@ -13,6 +17,8 @@ export default function SearchResults({
   onLoadMore,
   canLoadMore,
 }: SearchResultsProps) {
+  const { handleAddToCart, handleAddToWishlist } = useShopActions();
+
   if (products.length === 0) {
     return null;
   }
@@ -23,7 +29,14 @@ export default function SearchResults({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {products.slice(0, currentPage).map(product => (
           <div key={product._id} className="group">
-            <ProductItem product={product} />
+            <ProductCard
+              product={product}
+              variant="search"
+              showCategory
+              showSku
+              onAddToCart={handleAddToCart}
+              onAddToWishlist={handleAddToWishlist}
+            />
           </div>
         ))}
       </div>
