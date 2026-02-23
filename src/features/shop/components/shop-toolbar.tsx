@@ -96,7 +96,7 @@ const ShopToolbar = ({
       </div>
 
       {/* Desktop: Bordered strip with Filters label, search, sort, count, clear */}
-      <div className="hidden sm:block rounded-lg border border-border bg-muted/30 px-4 py-3">
+      <div className="hidden sm:block rounded-lg border border-border bg-muted/20 px-4 py-3 shadow-sm">
         <div className="flex items-center gap-4">
           {/* Filters label */}
           <div className="flex shrink-0 items-center gap-1.5 text-sm font-medium text-foreground">

@@ -371,7 +371,7 @@ const ShopContentWrapper = ({
         </div>
 
         {/* Sidebar + content aligned on same horizontal top line */}
-        <div className="flex w-full items-start gap-2 lg:gap-4">
+        <div className="flex w-full items-start gap-4 lg:gap-8">
           <ShopSidebar
             categories={categories}
             activeCategory={filters.category}
