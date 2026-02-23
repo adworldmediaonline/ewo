@@ -2,8 +2,6 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { CategoryItem, toSlug } from '@/lib/server-data';
 
@@ -46,26 +44,9 @@ const ShopSidebar = ({
   }
 
   return (
-    <aside className="hidden w-64 flex-shrink-0 lg:block">
+    <aside className="hidden w-64 shrink-0 lg:block">
       <div className="sticky top-24 space-y-4">
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-semibold text-foreground">Filters</p>
-          {hasActiveFilters && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onReset}
-              className="h-8 px-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-            >
-              Clear ({activeFiltersCount})
-            </Button>
-          )}
-        </div>
-
-        <Separator />
-
-        <ScrollArea className="h-[calc(100vh-200px)] max-h-[600px] pr-2">
-          <div className="space-y-2 pb-4">
+        <div className="space-y-2 pb-4">
             {categories.map(category => {
               const categorySlug = toSlug(category.parent);
               const isActiveCategory = categorySlug === activeCategory;
@@ -117,8 +98,7 @@ const ShopSidebar = ({
                 </div>
               );
             })}
-          </div>
-        </ScrollArea>
+        </div>
       </div>
     </aside>
   );

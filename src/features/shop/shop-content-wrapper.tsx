@@ -340,7 +340,38 @@ const ShopContentWrapper = ({
         </div>
       )}
       <div className="min-h-screen bg-background py-2 lg:py-6">
-        <div className="flex w-full gap-2 lg:gap-4">
+        {/* Full-width toolbar above category filter and content */}
+        <div className="w-full mb-4 lg:mb-6">
+          <ShopToolbar
+            initialSearch={filters.search}
+            onSearchCommit={value => {
+              void setSearch(value);
+            }}
+            sortKey={sortKey}
+            onSortChange={handleSortChange}
+            hasActiveFilters={hasActiveFilters}
+            activeFiltersCount={activeFiltersCount}
+            onClearFilters={handleClearFilters}
+            totalProducts={totalProducts}
+          />
+        </div>
+
+        {/* Mobile: Filters button between toolbar and grid */}
+        <div className="mb-3 lg:hidden">
+          <ShopMobileFilters
+            categories={categories}
+            activeCategory={filters.category}
+            activeSubcategory={filters.subcategory}
+            onToggleCategory={toggleCategory}
+            onToggleSubcategory={toggleSubcategory}
+            onReset={handleClearFilters}
+            activeFiltersCount={activeFiltersCount}
+            hasActiveFilters={hasActiveFilters}
+          />
+        </div>
+
+        {/* Sidebar + content aligned on same horizontal top line */}
+        <div className="flex w-full items-start gap-2 lg:gap-4">
           <ShopSidebar
             categories={categories}
             activeCategory={filters.category}
@@ -353,51 +384,6 @@ const ShopContentWrapper = ({
           />
 
           <section className="min-w-0 flex-1 space-y-6">
-            {/* Mobile: Single row with Filters + Toolbar */}
-            <div className="flex items-start gap-2 lg:hidden">
-              <ShopMobileFilters
-                categories={categories}
-                activeCategory={filters.category}
-                activeSubcategory={filters.subcategory}
-                onToggleCategory={toggleCategory}
-                onToggleSubcategory={toggleSubcategory}
-                onReset={handleClearFilters}
-                activeFiltersCount={activeFiltersCount}
-                hasActiveFilters={hasActiveFilters}
-              />
-
-              <div className="flex-1 min-w-0">
-                <ShopToolbar
-                  initialSearch={filters.search}
-                  onSearchCommit={value => {
-                    void setSearch(value);
-                  }}
-                  sortKey={sortKey}
-                  onSortChange={handleSortChange}
-                  hasActiveFilters={hasActiveFilters}
-                  activeFiltersCount={activeFiltersCount}
-                  onClearFilters={handleClearFilters}
-                  totalProducts={totalProducts}
-                />
-              </div>
-            </div>
-
-            {/* Desktop: Toolbar only (sidebar has filters) */}
-            <div className="hidden lg:block">
-              <ShopToolbar
-                initialSearch={filters.search}
-                onSearchCommit={value => {
-                  void setSearch(value);
-                }}
-                sortKey={sortKey}
-                onSortChange={handleSortChange}
-                hasActiveFilters={hasActiveFilters}
-                activeFiltersCount={activeFiltersCount}
-                onClearFilters={handleClearFilters}
-                totalProducts={totalProducts}
-              />
-            </div>
-
             {showErrorState ? (
               <ShopEmptyState
                 variant="error"
