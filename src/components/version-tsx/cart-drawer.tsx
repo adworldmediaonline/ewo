@@ -54,6 +54,26 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
             <CartEmptyState onBrowseClick={closeDrawer} />
           ) : (
             <div className="space-y-3">
+              {((summary.isAutoApplied && summary.discountAmount > 0 && summary.autoApplyPercent > 0) ||
+                (summary.productLevelSavings > 0 && summary.productLevelPercent > 0)) && (
+                <AutoApplySavingsBanner
+                  percent={
+                    summary.productLevelSavings > 0
+                      ? summary.productLevelPercent
+                      : summary.autoApplyPercent
+                  }
+                  couponCode={summary.appliedCouponCode ?? summary.couponCode}
+                />
+              )}
+              {summary.gapToFreeShipping != null &&
+                summary.gapToFreeShipping > 0 &&
+                summary.freeShippingThreshold != null &&
+                summary.freeShippingThreshold > 0 && (
+                  <FreeShippingProgressBanner
+                    progressPercent={summary.progressPercent}
+                    gapToFreeShipping={summary.gapToFreeShipping}
+                  />
+                )}
               {items.map((item, idx) => (
                 <CartItemCard
                   key={`${item._id}-${idx}`}
@@ -72,27 +92,8 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
 
         {items.length > 0 && (
           <SheetFooter className="flex-col gap-4 border-t border-border/60 bg-muted/20 px-5 py-5">
-            {((summary.isAutoApplied && summary.discountAmount > 0 && summary.autoApplyPercent > 0) ||
-              (summary.productLevelSavings > 0 && summary.productLevelPercent > 0)) && (
-              <AutoApplySavingsBanner
-                percent={
-                  summary.productLevelSavings > 0
-                    ? summary.productLevelPercent
-                    : summary.autoApplyPercent
-                }
-                couponCode={summary.appliedCouponCode ?? summary.couponCode}
-              />
-            )}
-            {summary.gapToFreeShipping != null &&
-              summary.gapToFreeShipping > 0 &&
-              summary.freeShippingThreshold != null &&
-              summary.freeShippingThreshold > 0 && (
-                <FreeShippingProgressBanner
-                  progressPercent={summary.progressPercent}
-                  gapToFreeShipping={summary.gapToFreeShipping}
-                />
-              )}
             <OrderSummaryCard
+              variant="sidebar"
               subtotal={summary.subtotal}
               discountAmount={summary.discountAmount}
               couponCode={summary.couponCode}

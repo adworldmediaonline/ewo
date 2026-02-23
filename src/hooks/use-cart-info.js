@@ -12,9 +12,11 @@ const useCartInfo = () => {
     const cart = cart_products.reduce(
       (cartTotal, cartItem) => {
         const { finalPriceDiscount, orderQuantity } = cartItem;
-        const itemTotal = Number(finalPriceDiscount || 0) * orderQuantity;
+        const qty = Number(orderQuantity) || 0;
+        const unitPrice = Number(finalPriceDiscount || 0);
+        const itemTotal = Math.round(unitPrice * qty * 100) / 100;
         cartTotal.total += itemTotal;
-        cartTotal.quantity += orderQuantity;
+        cartTotal.quantity += qty;
 
         return cartTotal;
       },
@@ -24,9 +26,10 @@ const useCartInfo = () => {
       }
     );
 
-    setSubtotal(cart.total);
+    const roundedSubtotal = Math.round(cart.total * 100) / 100;
+    setSubtotal(roundedSubtotal);
     setQuantity(cart.quantity);
-    setTotal(Math.max(0, cart.total - (discountAmount ?? 0)));
+    setTotal(Math.max(0, roundedSubtotal - (discountAmount ?? 0)));
   }, [cart_products, discountAmount]);
 
   return {
