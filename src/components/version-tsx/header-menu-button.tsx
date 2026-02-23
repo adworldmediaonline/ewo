@@ -117,7 +117,7 @@ export function HeaderMenuButton({
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex min-h-[44px] items-center rounded-lg px-3 py-3 text-base font-medium transition-colors active:scale-[0.98] ${
+                  className={`flex min-h-[48px] items-center rounded-lg px-3 py-3 text-base font-medium transition-colors duration-200 active:scale-[0.98] ${
                     isActive
                       ? 'bg-accent text-accent-foreground'
                       : 'text-foreground hover:bg-muted/80'
@@ -132,12 +132,12 @@ export function HeaderMenuButton({
           </div>
 
           {/* Shop by Category */}
-          <div className="shrink-0 border-t px-2 py-3">
-            <h3 className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          <div className="shrink-0 border-t border-border/80 px-2 py-4">
+            <h3 className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Shop by Category
             </h3>
             {processedCategories.length > 0 ? (
-              <ul className="space-y-0.5" role="list">
+              <ul className="space-y-1" role="list">
                 {processedCategories.map((item) => {
                   const hasSubcategoryLink =
                     item.parentCategorySlug && item.subcategorySlug;
@@ -151,14 +151,14 @@ export function HeaderMenuButton({
                     <li key={item._id}>
                       <Link
                         href={href}
-                        className="flex min-h-[44px] items-center justify-between gap-2 rounded-lg px-3 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted/80 active:scale-[0.98]"
+                        className="flex min-h-[48px] items-center justify-between gap-2 rounded-lg px-3 py-3 text-sm font-medium text-foreground transition-colors duration-200 hover:bg-muted/80 active:scale-[0.98]"
                         onClick={handleLinkClick}
+                        aria-label={`Browse ${item.parent}`}
                       >
-                        <span className="min-w-0 flex-1 truncate">
+                        <span className="min-w-0 flex-1 whitespace-normal wrap-break-word text-left">
                           {item.parent}
                           {childLabels.length > 0 && (
                             <span className="ml-1 text-muted-foreground">
-                              {' '}
                               · {childLabels.join(', ')}
                             </span>
                           )}
@@ -172,14 +172,25 @@ export function HeaderMenuButton({
                   );
                 })}
               </ul>
-            ) : null}
+            ) : (
+              <div className="space-y-1 px-3">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-12 animate-pulse rounded-lg bg-muted/60"
+                    aria-hidden
+                  />
+                ))}
+              </div>
+            )}
             <Link
               href="/shop"
-              className="mt-2 flex min-h-[44px] items-center gap-1 rounded-lg px-3 py-2.5 text-sm font-medium text-primary hover:bg-primary/10"
+              className="mt-3 flex min-h-[48px] items-center justify-between gap-2 rounded-lg px-3 py-3 text-sm font-medium text-primary transition-colors hover:bg-primary/10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
               onClick={handleLinkClick}
+              aria-label="Explore all categories"
             >
               Explore all
-              <ChevronRight className="h-4 w-4" aria-hidden />
+              <ChevronRight className="h-4 w-4 shrink-0" aria-hidden />
             </Link>
           </div>
         </nav>

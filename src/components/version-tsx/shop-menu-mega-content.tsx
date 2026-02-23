@@ -22,23 +22,28 @@ export default function ShopMenuMegaContent({
 
   return (
     <div
-      className="max-h-[min(80vh,28rem)] overflow-y-auto"
+      className="max-h-[min(85vh,32rem)] overflow-y-auto overflow-x-hidden"
       role="menu"
       aria-label="Shop categories"
     >
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 lg:grid-cols-3 xl:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 md:gap-5 lg:grid-cols-4 xl:grid-cols-5">
         {processed.map((item, index) => (
-          <CategoryCard key={item._id} item={item} index={index} />
+          <CategoryCard
+            key={item._id}
+            item={item}
+            index={index}
+            variant="mega"
+          />
         ))}
       </div>
       <div className="mt-4 pt-4 border-t border-border">
         <Link
           href="/shop"
-          className="inline-flex items-center text-sm font-medium text-primary hover:underline"
+          className="inline-flex min-h-[44px] items-center py-3 text-sm font-medium text-primary transition-colors hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none rounded-md px-1 -ml-1"
           aria-label="Explore all categories"
         >
           Explore all
-          <ArrowRight className="ml-1 h-4 w-4" />
+          <ArrowRight className="ml-1 h-4 w-4 shrink-0" />
         </Link>
       </div>
     </div>

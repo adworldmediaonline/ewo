@@ -24,8 +24,14 @@ export interface CategoryItem {
 interface CategoryCardProps {
   item: CategoryItem;
   index?: number;
+  /** "mega" for compact layout in header dropdown; "showcase" for homepage */
+  variant?: 'mega' | 'showcase';
 }
-export const CategoryCard = ({ item, index = 0 }: CategoryCardProps) => {
+export const CategoryCard = ({
+  item,
+  index = 0,
+  variant = 'showcase',
+}: CategoryCardProps) => {
   const router = useRouter();
   const imageUrl = item.image?.url || item.img;
   const imageAlt = item.image?.altText || item.image?.title || item.parent;
@@ -54,18 +60,25 @@ export const CategoryCard = ({ item, index = 0 }: CategoryCardProps) => {
     ? `/shop?category=${item.parentCategorySlug}&subcategory=${item.subcategorySlug}`
     : `/shop?category=${toSlug(item.parent)}`;
 
+  const isMega = variant === 'mega';
+
   return (
-    <div className="group flex flex-col overflow-hidden rounded-lg sm:rounded-xl border border-border bg-card text-left shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring h-full">
+    <div className="group flex flex-col overflow-hidden rounded-lg sm:rounded-xl border border-border bg-card text-left shadow-sm transition-all duration-200 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring h-full">
       {/* Main category link - covers the image and title area */}
       <div></div>
       <Link
-        // scroll={true}
         href={href}
         className="flex-1 flex flex-col"
         aria-label={`Browse ${item.parent}`}
       >
         {/* Image section */}
-        <div className="relative h-32 sm:h-40 md:h-48 lg:h-56 w-full shrink-0">
+        <div
+          className={`relative w-full shrink-0 ${
+            isMega
+              ? 'h-24 sm:h-28 md:h-32 lg:h-36'
+              : 'h-32 sm:h-40 md:h-48 lg:h-56'
+          }`}
+        >
           {hasImage ? (
             <div className="relative h-full w-full p-1.5 sm:p-2">
               <Image
@@ -86,8 +99,20 @@ export const CategoryCard = ({ item, index = 0 }: CategoryCardProps) => {
         </div>
 
         {/* Unified text section with dark background - covers entire remaining area */}
-        <div className="bg-linear-to-t from-black/80 via-black/60 to-transparent px-2 sm:px-4 md:px-5 py-2.5 sm:py-4 md:py-5 text-center flex flex-col justify-end flex-1">
-          <h3 className="text-white text-sm sm:text-lg md:text-xl font-semibold tracking-tight mb-2 sm:mb-3 line-clamp-2">
+        <div
+          className={`bg-linear-to-t from-black/80 via-black/60 to-transparent text-center flex flex-col justify-end flex-1 ${
+            isMega
+              ? 'px-2 sm:px-3 py-2 sm:py-2.5'
+              : 'px-2 sm:px-4 md:px-5 py-2.5 sm:py-4 md:py-5'
+          }`}
+        >
+          <h3
+            className={`text-white font-semibold tracking-tight line-clamp-2 ${
+              isMega
+                ? 'text-xs sm:text-sm mb-1 sm:mb-2'
+                : 'text-sm sm:text-lg md:text-xl mb-2 sm:mb-3'
+            }`}
+          >
             {item.parent}
           </h3>
 
@@ -106,7 +131,9 @@ export const CategoryCard = ({ item, index = 0 }: CategoryCardProps) => {
                       handleSubcategoryClick(e as any, item.parent, child);
                     }
                   }}
-                  className="inline-flex cursor-pointer items-center rounded-full bg-white/90 px-2 py-0.5 text-[10px] sm:text-xs font-medium text-foreground hover:bg-white"
+                  className={`inline-flex cursor-pointer items-center rounded-full bg-white/90 px-2 py-0.5 font-medium text-foreground hover:bg-white ${
+                    isMega ? 'text-[9px] sm:text-[10px]' : 'text-[10px] sm:text-xs'
+                  }`}
                 >
                   {child}
                 </span>
