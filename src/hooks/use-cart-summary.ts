@@ -3,7 +3,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import useCartInfo from '@/hooks/use-cart-info';
-import { getStoreShippingSettings } from '@/lib/store-api';
+import {
+  getStoreShippingSettings,
+  type ShippingDiscountTier,
+} from '@/lib/store-api';
 import type { CartItemType, CartSummary } from '@/components/version-tsx/cart/cart-types';
 
 type CartState = {
@@ -30,7 +33,12 @@ export function useCartSummary(
   const { subtotal, total, quantity } = useCartInfo();
   const { cart_products, couponCode, discountAmount, isAutoApplied } =
     useSelector((s: { cart: CartState }) => s.cart);
-  const [freeShippingThreshold, setFreeShippingThreshold] = useState<number | null>(null);
+  const [shippingSettings, setShippingSettings] = useState<{
+    freeShippingThreshold: number | null;
+    shippingDiscountTiers: ShippingDiscountTier[];
+  }>({ freeShippingThreshold: null, shippingDiscountTiers: [] });
+  const freeShippingThreshold = shippingSettings.freeShippingThreshold;
+  const shippingDiscountTiers = shippingSettings.shippingDiscountTiers ?? [];
 
   const items = Array.isArray(cart_products) ? cart_products : [];
   const productLevelSavings = items.reduce((sum, item) => {
@@ -60,7 +68,31 @@ export function useCartSummary(
     freeShippingThreshold != null &&
     freeShippingThreshold > 0 &&
     subtotalAfterDiscount >= freeShippingThreshold;
-  const effectiveShippingCost = qualifiesForFreeShipping ? 0 : shippingFromCart;
+
+  let effectiveShippingCost: number;
+  let shippingDiscountPercent: number | null = null;
+  if (qualifiesForFreeShipping) {
+    effectiveShippingCost = 0;
+  } else if (
+    Array.isArray(shippingDiscountTiers) &&
+    shippingDiscountTiers.length > 0 &&
+    quantity > 0
+  ) {
+    const sorted = [...shippingDiscountTiers].sort(
+      (a, b) => b.minItems - a.minItems
+    );
+    const tier = sorted.find((t) => quantity >= t.minItems);
+    if (tier) {
+      shippingDiscountPercent = tier.discountPercent;
+      const discounted =
+        shippingFromCart * (1 - tier.discountPercent / 100);
+      effectiveShippingCost = Math.round(discounted * 100) / 100;
+    } else {
+      effectiveShippingCost = shippingFromCart;
+    }
+  } else {
+    effectiveShippingCost = shippingFromCart;
+  }
   const displayTotal = subtotalAfterDiscount + effectiveShippingCost;
   const gapToFreeShipping =
     freeShippingThreshold != null &&
@@ -75,8 +107,18 @@ export function useCartSummary(
 
   const fetchShippingSettings = useCallback(() => {
     getStoreShippingSettings()
-      .then((s) => setFreeShippingThreshold(s.freeShippingThreshold))
-      .catch(() => setFreeShippingThreshold(null));
+      .then((s) =>
+        setShippingSettings({
+          freeShippingThreshold: s.freeShippingThreshold ?? null,
+          shippingDiscountTiers: s.shippingDiscountTiers ?? [],
+        })
+      )
+      .catch(() =>
+        setShippingSettings({
+          freeShippingThreshold: null,
+          shippingDiscountTiers: [],
+        })
+      );
   }, []);
 
   useEffect(() => {
@@ -124,5 +166,6 @@ export function useCartSummary(
     freeShippingThreshold,
     progressPercent,
     quantity,
+    shippingDiscountPercent,
   };
 }

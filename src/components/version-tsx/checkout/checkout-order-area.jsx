@@ -23,7 +23,7 @@ import { CreditCard, Lock } from 'lucide-react';
 import {
   AutoApplySavingsBanner,
   CartItemCard,
-  FreeShippingProgressBanner,
+  ShippingBenefitsBanner,
   getCartItemLineTotal,
   getCartItemProductHref,
 } from '@/components/version-tsx/cart';
@@ -159,15 +159,17 @@ export default function CheckoutOrderArea({ checkoutData, variant = 'full' }) {
               />
             )}
 
-            {summary.gapToFreeShipping != null &&
-              summary.gapToFreeShipping > 0 &&
-              summary.freeShippingThreshold != null &&
-              summary.freeShippingThreshold > 0 && (
-                <FreeShippingProgressBanner
-                  progressPercent={summary.progressPercent}
-                  gapToFreeShipping={summary.gapToFreeShipping}
-                />
-              )}
+            {(summary.qualifiesForFreeShipping ||
+              summary.gapToFreeShipping != null ||
+              (summary.shippingDiscountPercent != null && summary.shippingDiscountPercent > 0)) && (
+              <ShippingBenefitsBanner
+                qualifiesForFreeShipping={summary.qualifiesForFreeShipping}
+                progressPercent={summary.progressPercent}
+                gapToFreeShipping={summary.gapToFreeShipping ?? undefined}
+                shippingDiscountPercent={summary.shippingDiscountPercent}
+                itemCount={summary.quantity}
+              />
+            )}
 
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">Subtotal</span>
@@ -215,7 +217,14 @@ export default function CheckoutOrderArea({ checkoutData, variant = 'full' }) {
 
             {summary.effectiveShippingCost > 0 && (
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Shipping</span>
+                <span className="text-muted-foreground">
+                  Shipping
+                  {summary.shippingDiscountPercent != null && summary.shippingDiscountPercent > 0 && (
+                    <span className="text-emerald-600 dark:text-emerald-400 ml-1.5 font-medium">
+                      ({summary.shippingDiscountPercent}% off)
+                    </span>
+                  )}
+                </span>
                 <span className="font-medium text-foreground">
                   ${summary.effectiveShippingCost.toFixed(2)}
                 </span>

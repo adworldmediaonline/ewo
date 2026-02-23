@@ -16,7 +16,7 @@ import {
   CartEmptyState,
   CartItemCard,
   OrderSummaryCard,
-  FreeShippingProgressBanner,
+  ShippingBenefitsBanner,
   AutoApplySavingsBanner,
   getCartItemLineTotal,
   getCartItemProductHref,
@@ -65,15 +65,17 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
                   couponCode={summary.appliedCouponCode ?? summary.couponCode}
                 />
               )}
-              {summary.gapToFreeShipping != null &&
-                summary.gapToFreeShipping > 0 &&
-                summary.freeShippingThreshold != null &&
-                summary.freeShippingThreshold > 0 && (
-                  <FreeShippingProgressBanner
-                    progressPercent={summary.progressPercent}
-                    gapToFreeShipping={summary.gapToFreeShipping}
-                  />
-                )}
+              {(summary.qualifiesForFreeShipping ||
+                summary.gapToFreeShipping != null ||
+                (summary.shippingDiscountPercent != null && summary.shippingDiscountPercent > 0)) && (
+                <ShippingBenefitsBanner
+                  qualifiesForFreeShipping={summary.qualifiesForFreeShipping}
+                  progressPercent={summary.progressPercent}
+                  gapToFreeShipping={summary.gapToFreeShipping ?? undefined}
+                  shippingDiscountPercent={summary.shippingDiscountPercent}
+                  itemCount={summary.quantity}
+                />
+              )}
               {items.map((item, idx) => (
                 <CartItemCard
                   key={`${item._id}-${idx}`}
@@ -101,6 +103,7 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
               qualifiesForFreeShipping={summary.qualifiesForFreeShipping}
               displayTotal={summary.displayTotal}
               isAutoApplied={summary.isAutoApplied}
+              shippingDiscountPercent={summary.shippingDiscountPercent}
             />
 
             <Button

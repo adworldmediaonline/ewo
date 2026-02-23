@@ -11,8 +11,14 @@ export type CouponBehaviorSettings = {
   showToastOnApply: boolean;
 };
 
+export type ShippingDiscountTier = {
+  minItems: number;
+  discountPercent: number;
+};
+
 export type ShippingSettings = {
   freeShippingThreshold: number | null;
+  shippingDiscountTiers?: ShippingDiscountTier[];
 };
 
 /** Raw coupon from ewo backend */
@@ -93,7 +99,7 @@ export async function getStoreShippingSettings(): Promise<ShippingSettings> {
   const res = await fetch(`${apiUrl}/api/store/settings/shipping`, {
     cache: 'no-store',
   });
-  if (!res.ok) return { freeShippingThreshold: null };
+  if (!res.ok) return { freeShippingThreshold: null, shippingDiscountTiers: [] };
   return res.json();
 }
 

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useCartSummary } from '@/hooks/use-cart-summary';
 import {
   OrderSummaryCard,
-  FreeShippingProgressBanner,
+  ShippingBenefitsBanner,
   AutoApplySavingsBanner,
 } from '@/components/version-tsx/cart';
 
@@ -31,17 +31,19 @@ export default function CartCheckout() {
         </div>
       )}
 
-      {summary.gapToFreeShipping != null &&
-        summary.gapToFreeShipping > 0 &&
-        summary.freeShippingThreshold != null &&
-        summary.freeShippingThreshold > 0 && (
-          <div className="mb-4">
-            <FreeShippingProgressBanner
-              progressPercent={summary.progressPercent}
-              gapToFreeShipping={summary.gapToFreeShipping}
-            />
-          </div>
-        )}
+      {(summary.qualifiesForFreeShipping ||
+        summary.gapToFreeShipping != null ||
+        (summary.shippingDiscountPercent != null && summary.shippingDiscountPercent > 0)) && (
+        <div className="mb-4">
+          <ShippingBenefitsBanner
+            qualifiesForFreeShipping={summary.qualifiesForFreeShipping}
+            progressPercent={summary.progressPercent}
+            gapToFreeShipping={summary.gapToFreeShipping ?? undefined}
+            shippingDiscountPercent={summary.shippingDiscountPercent}
+            itemCount={summary.quantity}
+          />
+        </div>
+      )}
 
       <OrderSummaryCard
         variant="inline"
@@ -52,6 +54,7 @@ export default function CartCheckout() {
         qualifiesForFreeShipping={summary.qualifiesForFreeShipping}
         displayTotal={summary.displayTotal}
         isAutoApplied={summary.isAutoApplied}
+        shippingDiscountPercent={summary.shippingDiscountPercent}
       />
 
       <div className="mt-6">

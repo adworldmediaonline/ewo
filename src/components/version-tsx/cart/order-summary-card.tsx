@@ -12,6 +12,8 @@ export interface OrderSummaryCardProps {
   isAutoApplied?: boolean;
   /** When true, renders without card wrapper (for inline use in cart page, etc.) */
   variant?: 'card' | 'inline' | 'sidebar';
+  /** When a shipping tier discount is applied (e.g. 50) - shows "50% off" next to shipping */
+  shippingDiscountPercent?: number | null;
 }
 
 export function OrderSummaryCard({
@@ -24,6 +26,7 @@ export function OrderSummaryCard({
   currencySymbol = '$',
   isAutoApplied = false,
   variant = 'card',
+  shippingDiscountPercent,
 }: OrderSummaryCardProps) {
   const isSidebar = variant === 'sidebar';
 
@@ -55,7 +58,14 @@ export function OrderSummaryCard({
       )}
       {effectiveShippingCost > 0 && (
         <div className={lineItemClass}>
-          <span className={labelClass}>Shipping</span>
+          <span className={labelClass}>
+            Shipping
+            {shippingDiscountPercent != null && shippingDiscountPercent > 0 && (
+              <span className="text-emerald-600 dark:text-emerald-400 ml-1.5 font-medium">
+                ({shippingDiscountPercent}% off)
+              </span>
+            )}
+          </span>
           <span className={valueClass}>
             {currencySymbol}{effectiveShippingCost.toFixed(2)}
           </span>

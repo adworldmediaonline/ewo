@@ -41,4 +41,6 @@ export interface CartSummary {
   gapToFreeShipping: number | null;
   freeShippingThreshold: number | null;
   progressPercent: number;
+  /** When a shipping discount tier is applied (e.g. 50) */
+  shippingDiscountPercent: number | null;
 }
