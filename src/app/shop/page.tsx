@@ -53,7 +53,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
 
   return (
     <Wrapper>
-      <div className="container mx-auto px-4 py-6 md:py-8">
+      <div className="container mx-auto px-3 py-6 md:px-6 md:py-8">
         <Breadcrumb className="mb-4 md:mb-6">
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -75,9 +75,6 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
           initialProducts={initialProducts as any[]}
           initialPagination={initialPagination}
         />
-
-
-
       </div>
     </Wrapper>
   );

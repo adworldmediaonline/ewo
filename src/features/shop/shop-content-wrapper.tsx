@@ -280,7 +280,7 @@ const ShopContentWrapper = ({
         <div className="w-full flex flex-col items-center justify-center space-y-0">
           {categoryBannerContext.showBannerContent &&
             categoryBannerContext.bannerCategoryName && (
-            <div className="w-full max-w-7xl mx-auto px-4 py-4">
+            <div className="container mx-auto px-3 py-4 md:px-6">
               {(() => {
                 const HeadingTag =
                   categoryBannerContext.bannerHeadingTag;
@@ -326,7 +326,7 @@ const ShopContentWrapper = ({
           )}
           {categoryBannerContext.showBannerContent &&
             categoryBannerContext.bannerDescription && (
-              <div className="w-full max-w-7xl mx-auto px-4 py-4">
+              <div className="container mx-auto px-3 py-4 md:px-6">
                 <p
                   className={cn(
                     'text-sm sm:text-base text-muted-foreground leading-relaxed',
@@ -340,7 +340,38 @@ const ShopContentWrapper = ({
         </div>
       )}
       <div className="min-h-screen bg-background py-2 lg:py-6">
-        <div className="mx-auto flex w-full max-w-7xl gap-2 lg:gap-4 px-0 md:px-4">
+        {/* Full-width toolbar above category filter and content */}
+        <div className="w-full mb-4 lg:mb-6">
+          <ShopToolbar
+            initialSearch={filters.search}
+            onSearchCommit={value => {
+              void setSearch(value);
+            }}
+            sortKey={sortKey}
+            onSortChange={handleSortChange}
+            hasActiveFilters={hasActiveFilters}
+            activeFiltersCount={activeFiltersCount}
+            onClearFilters={handleClearFilters}
+            totalProducts={totalProducts}
+          />
+        </div>
+
+        {/* Mobile: Filters button between toolbar and grid */}
+        <div className="mb-3 lg:hidden">
+          <ShopMobileFilters
+            categories={categories}
+            activeCategory={filters.category}
+            activeSubcategory={filters.subcategory}
+            onToggleCategory={toggleCategory}
+            onToggleSubcategory={toggleSubcategory}
+            onReset={handleClearFilters}
+            activeFiltersCount={activeFiltersCount}
+            hasActiveFilters={hasActiveFilters}
+          />
+        </div>
+
+        {/* Sidebar + content aligned on same horizontal top line */}
+        <div className="flex w-full items-start gap-4 lg:gap-8">
           <ShopSidebar
             categories={categories}
             activeCategory={filters.category}
@@ -352,52 +383,7 @@ const ShopContentWrapper = ({
             activeFiltersCount={activeFiltersCount}
           />
 
-          <section className="flex-1 space-y-6">
-            {/* Mobile: Single row with Filters + Toolbar */}
-            <div className="flex items-start gap-2 lg:hidden">
-              <ShopMobileFilters
-                categories={categories}
-                activeCategory={filters.category}
-                activeSubcategory={filters.subcategory}
-                onToggleCategory={toggleCategory}
-                onToggleSubcategory={toggleSubcategory}
-                onReset={handleClearFilters}
-                activeFiltersCount={activeFiltersCount}
-                hasActiveFilters={hasActiveFilters}
-              />
-
-              <div className="flex-1 min-w-0">
-                <ShopToolbar
-                  initialSearch={filters.search}
-                  onSearchCommit={value => {
-                    void setSearch(value);
-                  }}
-                  sortKey={sortKey}
-                  onSortChange={handleSortChange}
-                  hasActiveFilters={hasActiveFilters}
-                  activeFiltersCount={activeFiltersCount}
-                  onClearFilters={handleClearFilters}
-                  totalProducts={totalProducts}
-                />
-              </div>
-            </div>
-
-            {/* Desktop: Toolbar only (sidebar has filters) */}
-            <div className="hidden lg:block">
-              <ShopToolbar
-                initialSearch={filters.search}
-                onSearchCommit={value => {
-                  void setSearch(value);
-                }}
-                sortKey={sortKey}
-                onSortChange={handleSortChange}
-                hasActiveFilters={hasActiveFilters}
-                activeFiltersCount={activeFiltersCount}
-                onClearFilters={handleClearFilters}
-                totalProducts={totalProducts}
-              />
-            </div>
-
+          <section className="min-w-0 flex-1 space-y-6">
             {showErrorState ? (
               <ShopEmptyState
                 variant="error"

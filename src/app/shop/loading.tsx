@@ -13,7 +13,7 @@ import Wrapper from '@/components/wrapper';
 export default function ShopLoading() {
   return (
     <Wrapper>
-      <div className="container mx-auto px-4 py-6 md:py-8">
+      <div className="container mx-auto px-3 py-6 md:px-6 md:py-8">
         {/* Breadcrumb skeleton */}
         <Breadcrumb className="mb-4 md:mb-6">
           <BreadcrumbList>
@@ -26,35 +26,33 @@ export default function ShopLoading() {
           </BreadcrumbList>
         </Breadcrumb>
 
-        <div className="mx-auto flex w-full max-w-7xl gap-2 lg:gap-4 px-0 md:px-4 py-2 lg:py-6">
-          {/* Sidebar skeleton - hidden on mobile */}
-          <aside className="hidden lg:block w-56 shrink-0 space-y-4">
-            <Skeleton className="h-6 w-24" />
-            <div className="space-y-2">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <Skeleton key={i} className="h-8 w-full" />
-              ))}
-            </div>
-          </aside>
+        <div className="py-2 lg:py-6">
+          {/* Toolbar skeleton - full width above */}
+          <div className="mb-4 lg:mb-6">
+            <Skeleton className="h-12 w-full rounded-lg" />
+          </div>
 
-          <section className="flex-1 space-y-6 min-w-0">
-            {/* Toolbar skeleton */}
-            <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
-              <Skeleton className="h-10 w-full sm:w-64" />
-              <Skeleton className="h-10 w-36" />
-            </div>
-
-            {/* Product grid skeleton - 12 cards to match initial page size */}
-            <div
-              className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-3 lg:grid-cols-3 xl:grid-cols-4"
-              role="status"
-              aria-label="Loading products"
-            >
-              {Array.from({ length: 12 }).map((_, i) => (
-                <ProductCardSkeleton key={i} />
+          <div className="flex w-full items-start gap-4 lg:gap-8">
+            {/* Sidebar skeleton - hidden on mobile */}
+            <aside className="hidden lg:block w-56 shrink-0 self-start border-r border-border pr-6 space-y-1">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <Skeleton key={i} className="h-9 w-full rounded-md" />
               ))}
-            </div>
-          </section>
+            </aside>
+
+            <section className="flex-1 space-y-6 min-w-0">
+              {/* Product grid skeleton - 12 cards to match initial page size */}
+              <div
+                className="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4 xl:gap-6"
+                role="status"
+                aria-label="Loading products"
+              >
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <ProductCardSkeleton key={i} />
+                ))}
+              </div>
+            </section>
+          </div>
         </div>
       </div>
     </Wrapper>
