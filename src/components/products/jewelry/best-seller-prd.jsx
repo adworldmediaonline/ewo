@@ -3,7 +3,8 @@ import React from 'react';
 import { Scrollbar } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 // internal
-import ProductItem from './product-item';
+import { ProductCard } from '@/components/version-tsx/product-card';
+import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
 import ErrorMsg from '@/components/common/error-msg';
 import { useGetProductTypeQuery } from '@/redux/features/productApi';
 import { HomeTwoBestSellPrdPrdLoader } from '@/components/loader';
@@ -39,6 +40,7 @@ const slider_setting = {
 }
 
 const BestSellerPrd = () => {
+  const { handleAddToCart, handleAddToWishlist } = useShopActions();
   const { data: products, isError, isLoading } =
     useGetProductTypeQuery({ type: 'jewelry', query: `topSeller=true` });
   // decide what to render
@@ -63,7 +65,11 @@ const BestSellerPrd = () => {
       <Swiper {...slider_setting} modules={[Scrollbar]} className="tp-best-slider-active swiper-container mb-10">
         {product_items.map(item => (
           <SwiperSlide key={item._id} className="tp-best-item-4">
-            <ProductItem product={item} />
+            <ProductCard
+              product={item}
+              onAddToCart={handleAddToCart}
+              onAddToWishlist={handleAddToWishlist}
+            />
           </SwiperSlide>
         ))}
       </Swiper>

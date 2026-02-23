@@ -19,7 +19,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import CartDropdown from './cart-dropdown';
+import { CartDrawer } from './cart-drawer';
 
 export interface HeaderActionsProps {
   showBadges?: boolean;
@@ -32,6 +32,7 @@ export function HeaderActions({
   const { data: session } = authClient.useSession();
   const [isPendingSignOut, startTransition] = React.useTransition();
   const [authDialogOpen, setAuthDialogOpen] = React.useState(false);
+  const [cartOpen, setCartOpen] = React.useState(false);
   const _dispatch = useDispatch();
   const { quantity } = useCartInfo();
   const wishlist: unknown[] = useSelector(
@@ -85,20 +86,20 @@ export function HeaderActions({
           )}
         </Link>
 
-        <CartDropdown>
-          <button
-            aria-label="Cart"
-            className="relative inline-flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-full border border-border bg-background text-foreground hover:bg-accent"
-            type="button"
-          >
-            <ShoppingCart className="h-4 w-4 md:h-4 md:w-4" />
-            {showBadges && quantity > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-primary px-0.5 text-[9px] font-semibold text-primary-foreground">
-                {quantity}
-              </span>
-            )}
-          </button>
-        </CartDropdown>
+        <button
+          aria-label="Cart"
+          className="relative inline-flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-full border border-border bg-background text-foreground hover:bg-accent"
+          type="button"
+          onClick={() => setCartOpen(true)}
+        >
+          <ShoppingCart className="h-4 w-4 md:h-4 md:w-4" />
+          {showBadges && quantity > 0 && (
+            <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-primary px-0.5 text-[9px] font-semibold text-primary-foreground">
+              {quantity}
+            </span>
+          )}
+        </button>
+        <CartDrawer open={cartOpen} onOpenChange={setCartOpen} />
 
         {/* {isPending ? (
           <div className="flex items-center space-x-2">

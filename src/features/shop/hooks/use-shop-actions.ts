@@ -8,7 +8,8 @@ import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { notifyError, notifySuccess } from '@/utils/toast';
 import { useProductCoupon } from '@/hooks/useProductCoupon';
 
-import type { ShopProduct } from '../shop-types';
+import type { ShopProduct, AddToCartProduct } from '../shop-types';
+import type { ProductBase } from '@/types/product';
 
 interface SelectedOption {
   title: string;
@@ -20,7 +21,7 @@ export const useShopActions = () => {
   const { cart_products } = useSelector((state: any) => state.cart);
 
   const handleAddToCart = useCallback(
-    (product: ShopProduct, selectedOption?: SelectedOption) => {
+    (product: AddToCartProduct, selectedOption?: SelectedOption) => {
       if (product.options && product.options.length > 0 && !selectedOption) {
         notifyError(
           'Please select an option before adding the product to your cart.'
@@ -63,9 +64,10 @@ export const useShopActions = () => {
         quantity: product.quantity,
         slug: product.slug,
         shipping: product.shipping || { price: 0 },
-        sku: product.sku,
+        sku: product.sku ?? product._id ?? '',
         selectedOption: selectedOption, // Store selected option details
-        basePrice: Number(product.finalPriceDiscount || product.price || 0), // Store original base price for reference
+        basePrice: Number((product as { basePrice?: number }).basePrice ?? product.finalPriceDiscount ?? product.price ?? 0), // Original price (for product-level discount display)
+        appliedCouponCode: (product as { appliedCouponCode?: string }).appliedCouponCode,
       };
 
       dispatch(add_cart_product(cartProduct));
@@ -76,7 +78,7 @@ export const useShopActions = () => {
   );
 
   const handleAddToWishlist = useCallback(
-    (product: ShopProduct) => {
+    (product: ProductBase | ShopProduct) => {
       const wishlistProduct = {
         _id: product._id,
         title: product.title,

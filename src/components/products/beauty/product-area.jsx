@@ -3,12 +3,14 @@ import React from 'react';
 import Link from 'next/link';
 // internal
 import { ArrowRightSmTwo } from '@/svg';
-import ProductItem from './product-item';
+import { ProductCard } from '@/components/version-tsx/product-card';
+import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
 import ErrorMsg from '@/components/common/error-msg';
 import { useGetProductTypeQuery } from '@/redux/features/productApi';
 import { HomeThreePrdLoader } from '@/components/loader';
 
 const ProductArea = () => {
+  const { handleAddToCart, handleAddToWishlist } = useShopActions();
   const { data: products, isError, isLoading } =
     useGetProductTypeQuery({ type: 'beauty', query: `topSellers=true` });
   // decide what to render
@@ -29,7 +31,11 @@ const ProductArea = () => {
     const product_items = products.data.slice(0, 8);
     content = product_items.map((prd) => (
       <div key={prd._id} className="col-lg-3 col-md-4 col-sm-6">
-        <ProductItem product={prd} />
+        <ProductCard
+          product={prd}
+          onAddToCart={handleAddToCart}
+          onAddToWishlist={handleAddToWishlist}
+        />
       </div>
     ))
   }

@@ -1,63 +1,20 @@
 'use client';
-import Link from 'next/link';
-import { useState, useMemo } from 'react';
+
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useGetAllActiveCouponsQuery } from '@/redux/features/coupon/couponApi';
-// Define CartProduct and CartState types locally (from cartSlice.ts)
-interface SelectedOption {
-  title: string;
-}
 
-interface CartProduct {
-  _id: string;
-  title: string;
-  img: string;
-  price: number | string;
-  finalPriceDiscount: number | string;
-  orderQuantity: number;
-  quantity?: number;
-  discount?: number | string;
-  slug?: string;
-  shipping?: { price?: number };
-  selectedOption?: SelectedOption;
-}
-
-interface FirstTimeDiscountState {
-  isEligible: boolean;
-  isApplied: boolean;
-  percentage: number;
-  showCelebration?: boolean;
-}
-
-interface LastAddedProduct {
-  title: string;
-  img: string;
-  selectedOption?: SelectedOption;
-  orderQuantity: number;
-}
-
-interface CartState {
-  cart_products: CartProduct[];
-  orderQuantity: number;
-  cartMiniOpen: boolean;
-  totalShippingCost: number;
-  shippingDiscount: number;
-  firstTimeDiscount: FirstTimeDiscountState;
-  showCartConfirmation: boolean;
-  lastAddedProduct: LastAddedProduct | null;
-}
-
-// RootState type for useSelector
 import store from '@/redux/store';
-type RootState = ReturnType<typeof store.getState>;
-// internal
-import useCartInfo from '@/hooks/use-cart-info';
 import { clearCart } from '@/redux/features/cartSlice';
-
+import { useCartActions } from '@/hooks/use-cart-actions';
+import {
+  CartEmptyState,
+  CartItemCard,
+  getCartItemLineTotal,
+  getCartItemProductHref,
+} from '@/components/version-tsx/cart';
+import type { CartItemType } from '@/components/version-tsx/cart';
 import CartCheckout from './cart-checkout';
-import CartItem from './cart-item';
 
-// Import shadcn Breadcrumb components
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -67,7 +24,6 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 
-// Import shadcn Alert Dialog components
 import {
   AlertDialog,
   AlertDialogAction,
@@ -80,84 +36,15 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 
+type RootState = ReturnType<typeof store.getState>;
+
 export default function CartArea() {
-  const { cart_products } = useSelector(
-    (state: RootState) => state.cart as CartState
-  );
+  const { cart_products } = useSelector((state: RootState) => state.cart);
   const dispatch = useDispatch();
   const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
+  const { handleIncrement, handleDecrement, handleRemove } = useCartActions();
 
-  // Fetch all active coupons from backend (same logic as product card)
-  const {
-    data: activeCouponsData,
-    isLoading: couponsLoading,
-    isError: couponsError,
-  } = useGetAllActiveCouponsQuery({});
-
-  // Check for active coupons for products in cart (same logic as product card)
-  // Collect unique coupons that apply to products in the cart
-  const activeCouponsForCart = useMemo(() => {
-    if (!activeCouponsData?.success || !activeCouponsData?.data || cart_products.length === 0) {
-      return [];
-    }
-
-    const coupons = activeCouponsData.data;
-    const applicableCoupons: Array<{
-      couponCode: string;
-      couponPercentage: number;
-      couponTitle: string | null;
-      appliesToAll: boolean;
-    }> = [];
-
-    // Check each coupon to see if it applies to any product in cart
-    for (const coupon of coupons) {
-      if (coupon.status !== 'active') continue;
-
-      // Check if coupon applies to products
-      if (coupon.applicableType === 'product' || coupon.applicableType === 'all') {
-        // If it's an "all" type coupon, it applies to all products
-        if (coupon.applicableType === 'all') {
-          applicableCoupons.push({
-            couponCode: coupon.couponCode || '',
-            couponPercentage: coupon.discountPercentage || 0,
-            couponTitle: coupon.title || null,
-            appliesToAll: true,
-          });
-          continue;
-        }
-
-        // For product-specific coupons, check if any cart product is in the applicable list
-        if (
-          coupon.applicableProducts &&
-          Array.isArray(coupon.applicableProducts) &&
-          coupon.applicableProducts.length > 0
-        ) {
-          const appliesToCart = cart_products.some((item: CartProduct) =>
-            coupon.applicableProducts.some(
-              (product: any) => product._id === item._id || product === item._id
-            )
-          );
-
-          if (appliesToCart) {
-            applicableCoupons.push({
-              couponCode: coupon.couponCode || '',
-              couponPercentage: coupon.discountPercentage || 0,
-              couponTitle: coupon.title || null,
-              appliesToAll: false,
-            });
-          }
-        }
-      }
-    }
-
-    // Remove duplicates (same coupon code)
-    const uniqueCoupons = applicableCoupons.filter(
-      (coupon, index, self) =>
-        index === self.findIndex((c) => c.couponCode === coupon.couponCode)
-    );
-
-    return uniqueCoupons;
-  }, [activeCouponsData, cart_products]);
+  const items = Array.isArray(cart_products) ? (cart_products as CartItemType[]) : [];
 
   const handleClearCart = () => {
     dispatch(clearCart());
@@ -181,42 +68,17 @@ export default function CartArea() {
       </div>
 
       <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
-        {cart_products.length === 0 ? (
+        {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 h-[400px]">
-            <div className="flex flex-col items-center justify-center w-full max-w-md">
-              <div className="bg-gray-100 rounded-full p-6 mb-6 flex items-center justify-center">
-                <svg
-                  width="80"
-                  height="80"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="9" cy="21" r="1"></circle>
-                  <circle cx="20" cy="21" r="1"></circle>
-                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                </svg>
-              </div>
-              <h2 className="text-2xl font-bold text-center mb-2">
-                Your Cart is Empty
-              </h2>
-              <p className="text-gray-600 text-center mb-6">
-                Looks like you haven't added anything to your cart yet.
-              </p>
-              <Link
-                href="/shop"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background px-4 py-2"
-              >
-                Continue Shopping
-              </Link>
-            </div>
+            <CartEmptyState
+              browseHref="/shop"
+              title="Your Cart is Empty"
+              description="Looks like you haven't added anything to your cart yet."
+              ctaText="Continue Shopping"
+            />
           </div>
         ) : (
           <div>
-            {/* Simple Header */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 pb-4 border-b">
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold">
@@ -274,62 +136,23 @@ export default function CartArea() {
               </AlertDialog>
             </div>
 
-            {/* Active Coupons Section - Shows "Applied Successfully" UI when coupons are active */}
-            {/* Uses same coupon check logic as product card (useProductCoupon) */}
-            {activeCouponsForCart.length > 0 && (
-              <div className="mb-6">
-                <div className="space-y-3">
-                  {activeCouponsForCart.map((coupon, index: number) => {
-                    return (
-                      <div
-                        key={`${coupon.couponCode}-${index}`}
-                        className="relative overflow-hidden bg-gradient-to-r from-emerald-500 to-green-500 rounded-lg p-4 shadow-md"
-                      >
-                        {/* Decorative corner */}
-                        <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-bl-full" />
-
-                        <div className="relative flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="bg-white/20 backdrop-blur-sm rounded-full p-2">
-                              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              </svg>
-                            </div>
-                            <div>
-                              <p className="text-sm font-bold text-white uppercase tracking-wide">
-                                {coupon.couponCode}
-                              </p>
-                              <p className="text-xs text-white/90 font-medium">
-                                Applied Successfully
-                              </p>
-                            </div>
-                          </div>
-                          {coupon.couponPercentage > 0 && (
-                            <div className="bg-white rounded-full px-3 py-1.5">
-                              <span className="text-sm font-extrabold text-emerald-600">
-                                {coupon.couponPercentage}% OFF
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Cart Items */}
               <div className="lg:col-span-2">
                 <div className="space-y-4">
-                  {cart_products.map((item: CartProduct, i: number) => (
-                    <CartItem key={i} product={item} />
+                  {items.map((item, idx) => (
+                    <CartItemCard
+                      key={`${item._id}-${item.selectedOption?.title ?? ''}-${idx}`}
+                      item={item}
+                      lineTotal={getCartItemLineTotal(item)}
+                      onIncrement={handleIncrement}
+                      onDecrement={handleDecrement}
+                      onRemove={handleRemove}
+                      productHref={getCartItemProductHref}
+                    />
                   ))}
                 </div>
               </div>
 
-              {/* Cart Checkout */}
               <div className="lg:col-span-1">
                 <CartCheckout />
               </div>

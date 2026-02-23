@@ -78,9 +78,6 @@ export default function CheckoutArea() {
     errors,
     setValue,
     control,
-    handleCouponCode,
-    couponRef,
-    couponApplyMsg,
     paymentSuccessful,
   } = checkoutData;
   const { cart_products } = useSelector(state => state.cart);

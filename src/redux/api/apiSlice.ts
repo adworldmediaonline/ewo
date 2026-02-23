@@ -165,7 +165,6 @@ export const apiSlice = createApi({
   }),
   tagTypes: [
     'Products',
-    'Coupon',
     'Product',
     'RelatedProducts',
     'UserOrder',

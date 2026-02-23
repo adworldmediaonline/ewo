@@ -3,7 +3,8 @@ import ErrorMsg from '@/components/common/error-msg';
 import { HomeTwoPrdLoader } from '@/components/loader';
 import { useGetProductTypeQuery } from '@/redux/features/productApi';
 import { useEffect, useRef, useState } from 'react';
-import ProductItem from './product-item';
+import { ProductCard } from '@/components/version-tsx/product-card';
+import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
 
 // tabs
 const tabs = ['All Collection', 'Bracelets', 'Necklaces', 'Earrings'];
@@ -107,7 +108,11 @@ const ProductArea = () => {
         <div className="row">
           {product_items.map(prd => (
             <div key={prd._id} className="col-xl-3 col-lg-4 col-sm-6">
-              <ProductItem product={prd} />
+              <ProductCard
+                product={prd}
+                onAddToCart={handleAddToCart}
+                onAddToWishlist={handleAddToWishlist}
+              />
             </div>
           ))}
         </div>

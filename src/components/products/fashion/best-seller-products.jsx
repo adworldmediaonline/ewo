@@ -3,12 +3,14 @@ import React from 'react';
 import Link from 'next/link';
 // internal
 import { TextShapeLine } from '@/svg';
-import ProductItem from '../../version-tsx/product-details/product-item';
+import { ProductCard } from '@/components/version-tsx/product-card';
+import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
 import ErrorMsg from '@/components/common/error-msg';
 import { useGetProductTypeQuery } from '@/redux/features/productApi';
 import { HomeTwoBestSellPrdPrdLoader } from '@/components/loader';
 
 const BestSellerProducts = () => {
+  const { handleAddToCart, handleAddToWishlist } = useShopActions();
   const {
     data: products,
     isError,
@@ -30,7 +32,11 @@ const BestSellerProducts = () => {
     const product_items = products.data.slice(0, 4);
     content = product_items.map(prd => (
       <div key={prd._id} className="col-xl-3 col-lg-4 col-md-6 col-sm-6">
-        <ProductItem product={prd} />
+        <ProductCard
+          product={prd}
+          onAddToCart={handleAddToCart}
+          onAddToWishlist={handleAddToWishlist}
+        />
       </div>
     ));
   }

@@ -4,31 +4,16 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useGetRelatedProductsQuery } from '@/redux/features/productApi';
 import { ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
-import { useDispatch } from 'react-redux';
-import RelatedProductCard from './related-product-card';
+import ProductCard from '@/components/version-tsx/product-card';
+import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
 
 const RelatedProducts = ({ id }) => {
   const { data: products, isError, isLoading } = useGetRelatedProductsQuery(id);
-  const dispatch = useDispatch();
+  const { handleAddToCart, handleAddToWishlist } = useShopActions();
 
   // Filter out the current product and limit to 4 related products
   const relatedProducts =
     products?.data?.filter(p => p._id !== id).slice(0, 4) || [];
-
-  // Cart and Wishlist handlers
-  const handleAddToCart = product => {
-    // Import and dispatch cart action
-    import('@/redux/features/cartSlice').then(({ add_cart_product }) => {
-      dispatch(add_cart_product(product));
-    });
-  };
-
-  const handleAddToWishlist = product => {
-    // Import and dispatch wishlist action
-    import('@/redux/features/wishlist-slice').then(({ add_to_wishlist }) => {
-      dispatch(add_to_wishlist(product));
-    });
-  };
 
   if (isLoading) {
     return (
@@ -109,9 +94,11 @@ const RelatedProducts = ({ id }) => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {relatedProducts.map(product => (
-          <RelatedProductCard
+          <ProductCard
             key={product._id}
             product={product}
+            variant="related"
+            seo={{ nofollow: true, lowPriority: true }}
             onAddToCart={handleAddToCart}
             onAddToWishlist={handleAddToWishlist}
           />

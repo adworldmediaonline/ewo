@@ -5,12 +5,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useGetRelatedProductsQuery } from '@/redux/features/productApi';
 import { ChevronLeft, ChevronRight, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
-import { useDispatch } from 'react-redux';
-import { useCallback, useRef } from 'react';
+import { useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Autoplay } from 'swiper/modules';
 import type { Swiper as SwiperType } from 'swiper';
-import RelatedProductCard from './related-product-card';
+import ProductCard from '@/components/version-tsx/product-card';
+import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
 
 // Import Swiper styles
 import 'swiper/css';
@@ -23,31 +23,12 @@ interface RelatedProductsSliderProps {
 
 const RelatedProductsSlider = ({ id }: RelatedProductsSliderProps) => {
   const { data: products, isError, isLoading } = useGetRelatedProductsQuery(id);
-  const dispatch = useDispatch();
   const swiperRef = useRef<SwiperType | null>(null);
+  const { handleAddToCart, handleAddToWishlist } = useShopActions();
 
   // Filter out the current product and limit to 8 related products
   const relatedProducts =
     products?.data?.filter((p: any) => p._id !== id).slice(0, 8) || [];
-
-  // Cart and Wishlist handlers
-  const handleAddToCart = useCallback(
-    (product: any) => {
-      import('@/redux/features/cartSlice').then(({ add_cart_product }) => {
-        dispatch(add_cart_product(product));
-      });
-    },
-    [dispatch]
-  );
-
-  const handleAddToWishlist = useCallback(
-    (product: any) => {
-      import('@/redux/features/wishlist-slice').then(({ add_to_wishlist }) => {
-        dispatch(add_to_wishlist(product));
-      });
-    },
-    [dispatch]
-  );
 
   const handlePrevSlide = () => {
     swiperRef.current?.slidePrev();
@@ -214,8 +195,10 @@ const RelatedProductsSlider = ({ id }: RelatedProductsSliderProps) => {
           {relatedProducts.map((product: any) => (
             <SwiperSlide key={product._id} className="h-auto">
               <div className="h-full">
-                <RelatedProductCard
+                <ProductCard
                   product={product}
+                  variant="related"
+                  seo={{ nofollow: true, lowPriority: true }}
                   onAddToCart={handleAddToCart}
                   onAddToWishlist={handleAddToWishlist}
                 />

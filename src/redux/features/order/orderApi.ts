@@ -1,9 +1,5 @@
 import { apiSlice } from '../../api/apiSlice';
-import {
-  set_address_discount_eligible,
-  set_client_secret,
-  set_tax_preview,
-} from './orderSlice';
+import { set_client_secret, set_tax_preview } from './orderSlice';
 
 export const authApi = apiSlice.injectEndpoints({
   overrideExisting: true,
@@ -62,25 +58,6 @@ export const authApi = apiSlice.injectEndpoints({
         } catch (err) { }
       },
     }),
-    // checkAddressDiscount
-    checkAddressDiscount: builder.mutation({
-      query: data => ({
-        url: 'api/order/check-address-discount',
-        method: 'POST',
-        body: data,
-      }),
-
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
-        try {
-          const result = await queryFulfilled;
-          if (result.data) {
-            dispatch(set_address_discount_eligible(result.data.eligible));
-          }
-        } catch (err) {
-          dispatch(set_address_discount_eligible(false));
-        }
-      },
-    }),
     // saveOrder
     saveOrder: builder.mutation({
       query: data => ({
@@ -93,8 +70,6 @@ export const authApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
           if (result) {
-            localStorage.removeItem('couponInfo');
-            localStorage.removeItem('appliedCoupon');
             localStorage.removeItem('cart_products');
             localStorage.removeItem('shipping_info');
           }
@@ -124,5 +99,4 @@ export const {
   useSaveOrderMutation,
   useGetUserOrderByIdQuery,
   useGetUserOrdersQuery,
-  useCheckAddressDiscountMutation,
 } = authApi;

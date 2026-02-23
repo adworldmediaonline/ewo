@@ -2,13 +2,14 @@
 
 import ProductCard from '@/components/version-tsx/product-card';
 import ProductSkeleton from '@/components/version-tsx/product-skeleton';
-import type { ShopProduct } from '../shop-types';
+import type { AddToCartProduct, ShopProduct } from '../shop-types';
+import type { ProductBase } from '@/types/product';
 
 interface ShopProductGridProps {
   products: ShopProduct[];
   isLoading: boolean;
-  onAddToCart: (product: ShopProduct, selectedOption?: any) => void;
-  onAddToWishlist: (product: ShopProduct) => void;
+  onAddToCart: (product: AddToCartProduct, selectedOption?: { title: string; price: number }) => void;
+  onAddToWishlist: (product: ProductBase | ShopProduct) => void;
 }
 
 const PLACEHOLDER_COUNT = 8;

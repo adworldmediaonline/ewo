@@ -9,7 +9,6 @@ const initialState = {
   session: undefined,
   isAuthenticated: false,
   isLoading: false,
-  // Legacy support
   userInfo: undefined,
 };
 
@@ -17,17 +16,6 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    // Legacy actions for backward compatibility
-    userLoggedIn: (state, { payload }) => {
-      state.accessToken = payload.accessToken;
-      state.user = payload.user;
-      state.userInfo = payload;
-      state.isAuthenticated = true;
-
-      // Store in cookies for legacy support
-      Cookies.set('userInfo', JSON.stringify(payload));
-    },
-
     userLoggedOut: state => {
       state.accessToken = undefined;
       state.user = undefined;
@@ -48,13 +36,11 @@ const authSlice = createSlice({
       state.isAuthenticated = !!payload;
       state.isLoading = false;
 
-      // Update legacy fields for backward compatibility
       if (payload?.user) {
         state.userInfo = {
-          accessToken: payload.session?.id, // Use session ID as access token
+          accessToken: payload.session?.id,
           user: payload.user,
         };
-        // Store in cookies for legacy support
         Cookies.set('userInfo', JSON.stringify(state.userInfo));
       }
     },
@@ -92,7 +78,6 @@ const authSlice = createSlice({
 
     // Initialize auth state from stored data
     initializeAuth: state => {
-      // Try to restore from cookies (legacy support)
       const storedUserInfo = Cookies.get('userInfo');
       if (storedUserInfo) {
         try {
@@ -118,7 +103,6 @@ const authSlice = createSlice({
 });
 
 export const {
-  userLoggedIn,
   userLoggedOut,
   setSession,
   setLoading,

@@ -2,12 +2,12 @@
 
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useDispatch } from 'react-redux';
-import { useCallback, useRef } from 'react';
+import { useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Autoplay } from 'swiper/modules';
 import type { Swiper as SwiperType } from 'swiper';
-import RelatedProductCard from './related-product-card';
+import ProductCard from '@/components/version-tsx/product-card';
+import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
 
 // Import Swiper styles
 import 'swiper/css';
@@ -27,27 +27,8 @@ export default function RelatedProductsClient({
   products,
   currentProductId,
 }: RelatedProductsClientProps) {
-  const dispatch = useDispatch();
   const swiperRef = useRef<SwiperType | null>(null);
-
-  // Cart and Wishlist handlers
-  const handleAddToCart = useCallback(
-    (product: any) => {
-      import('@/redux/features/cartSlice').then(({ add_cart_product }) => {
-        dispatch(add_cart_product(product));
-      });
-    },
-    [dispatch]
-  );
-
-  const handleAddToWishlist = useCallback(
-    (product: any) => {
-      import('@/redux/features/wishlist-slice').then(({ add_to_wishlist }) => {
-        dispatch(add_to_wishlist(product));
-      });
-    },
-    [dispatch]
-  );
+  const { handleAddToCart, handleAddToWishlist } = useShopActions();
 
   const handlePrevSlide = () => {
     swiperRef.current?.slidePrev();
@@ -149,8 +130,10 @@ export default function RelatedProductsClient({
           {products.map((product: any) => (
             <SwiperSlide key={product._id} className="h-auto">
               <div className="h-full">
-                <RelatedProductCard
+                <ProductCard
                   product={product}
+                  variant="related"
+                  seo={{ nofollow: true, lowPriority: true }}
                   onAddToCart={handleAddToCart}
                   onAddToWishlist={handleAddToWishlist}
                 />

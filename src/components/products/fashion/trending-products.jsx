@@ -5,7 +5,8 @@ import { Pagination } from 'swiper/modules';
 // internal
 import { ArrowRightLong, TextShapeLine } from '@/svg';
 import { useGetProductTypeQuery } from '@/redux/features/productApi';
-import ProductItem from '../../version-tsx/product-details/product-item';
+import { ProductCard } from '@/components/version-tsx/product-card';
+import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
 import ErrorMsg from '@/components/common/error-msg';
 import trending_banner from '@assets/img/product/trending/banner/trending-banner.jpg';
 import { HomeTwoNewPrdPrdLoader } from '@/components/loader';
@@ -36,6 +37,7 @@ const slider_setting = {
 };
 
 const TrendingProducts = () => {
+  const { handleAddToCart, handleAddToWishlist } = useShopActions();
   const {
     data: products,
     isError,
@@ -64,7 +66,11 @@ const TrendingProducts = () => {
         {product_items.map(item => {
           return (
             <SwiperSlide key={item._id} className="tp-trending-item">
-              <ProductItem product={item} style_2={true} />
+              <ProductCard
+                product={item}
+                onAddToCart={handleAddToCart}
+                onAddToWishlist={handleAddToWishlist}
+              />
             </SwiperSlide>
           );
         })}

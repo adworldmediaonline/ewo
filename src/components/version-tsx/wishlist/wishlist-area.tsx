@@ -1,4 +1,5 @@
 'use client';
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,11 +12,32 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, Heart, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
-import { useSelector } from 'react-redux';
-import WishlistItem from './wishlist-item';
+import { useDispatch, useSelector } from 'react-redux';
+import { quantityDecrement } from '@/redux/features/cartSlice';
+import { remove_wishlist_product } from '@/redux/features/wishlist-slice';
+import ProductCard from '@/components/version-tsx/product-card';
+import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
 
 export default function WishlistArea() {
   const { wishlist } = useSelector((state: any) => state.wishlist);
+  const dispatch = useDispatch();
+  const { handleAddToCart, handleAddToWishlist } = useShopActions();
+
+  const handleDecrementFromCart = (product: any) => {
+    const cartProduct = {
+      ...product,
+      orderQuantity: 1,
+      quantity: product.quantity || 1,
+      sku: product.sku ?? product._id ?? '',
+      shipping: product.shipping || { price: 0 },
+      selectedOption: product.selectedOption,
+    };
+    dispatch(quantityDecrement(cartProduct));
+  };
+
+  const handleRemoveFromWishlist = ({ id, title }: { id: string; title: string }) => {
+    dispatch(remove_wishlist_product({ id, title }));
+  };
 
   return (
     <section className="py-8 lg:py-12">
@@ -93,7 +115,17 @@ export default function WishlistArea() {
                   <CardContent className="p-0">
                     <div className="divide-y divide-border px-4 sm:px-6">
                       {wishlist.map((item: any, i: number) => (
-                        <WishlistItem key={i} product={item} />
+                        <div key={i} className="py-4 first:pt-4 last:pb-4">
+                          <ProductCard
+                            product={item}
+                            variant="wishlist"
+                            layout="horizontal"
+                            onAddToCart={handleAddToCart}
+                            onAddToWishlist={handleAddToWishlist}
+                            onDecrementFromCart={handleDecrementFromCart}
+                            onRemoveFromWishlist={handleRemoveFromWishlist}
+                          />
+                        </div>
                       ))}
                     </div>
                   </CardContent>

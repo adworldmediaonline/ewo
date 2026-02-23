@@ -132,12 +132,11 @@ const SearchableSelect = React.forwardRef<
                     value={`${option.label} ${option.value}`}
                     keywords={[option.label, option.value]}
                     onSelect={currentValue => {
-                      // Find the option by matching against the combined value format
                       const selectedOption = options.find(
                         opt => `${opt.label} ${opt.value}` === currentValue
                       );
                       if (selectedOption) {
-                        onValueChange(selectedOption.value === value ? '' : selectedOption.value);
+                        onValueChange(selectedOption.value);
                       }
                       setOpen(false);
                     }}

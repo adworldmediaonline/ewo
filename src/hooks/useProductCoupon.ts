@@ -1,95 +1,125 @@
 'use client';
 
-import { useGetAllActiveCouponsQuery } from '@/redux/features/coupon/couponApi';
-import { useMemo } from 'react';
+import { useEffect, useState } from 'react';
+import {
+  getStoreCouponSettings,
+  getAvailableOffers,
+  pickBestOffer,
+} from '@/lib/store-api';
 
-interface CouponInfo {
+export interface UseProductCouponResult {
   hasCoupon: boolean;
-  couponPercentage: number | null;
+  couponPercentage: number;
   couponCode: string | null;
-  couponTitle: string | null;
+  discountedPrice: number | null;
 }
 
 /**
- * Hook to check if a product has an applicable coupon and get coupon details
- * @param productId - The product ID to check for applicable coupons
- * @returns CouponInfo object with coupon details
+ * Returns coupon info for a product when auto-apply is enabled.
+ * When auto-apply is ON: fetches best offer for this product and returns discounted price.
+ * When auto-apply is OFF: returns no coupon (prices display at full).
+ * Refetches when refetchKey changes (e.g. from useRefetchOnVisibility for admin updates).
  */
-export const useProductCoupon = (productId: string): CouponInfo => {
-  const { data: activeCouponsData, isLoading, isError } = useGetAllActiveCouponsQuery({});
+export function useProductCoupon(
+  productId: string,
+  unitPrice: number,
+  refetchKey?: number
+): UseProductCouponResult {
+  const [result, setResult] = useState<UseProductCouponResult>({
+    hasCoupon: false,
+    couponPercentage: 0,
+    couponCode: null,
+    discountedPrice: null,
+  });
 
-  const couponInfo = useMemo<CouponInfo>(() => {
-    // Default state: no coupon
-    const noCoupon: CouponInfo = {
-      hasCoupon: false,
-      couponPercentage: null,
-      couponCode: null,
-      couponTitle: null,
-    };
-
-    // Return early if loading, error, or no data
-    if (isLoading || isError || !activeCouponsData?.success || !activeCouponsData?.data) {
-      return noCoupon;
+  useEffect(() => {
+    if (!productId || unitPrice <= 0) {
+      setResult({
+        hasCoupon: false,
+        couponPercentage: 0,
+        couponCode: null,
+        discountedPrice: null,
+      });
+      return;
     }
 
-    const coupons = activeCouponsData.data;
+    let cancelled = false;
 
-    // Find the first active coupon that applies to this product
-    for (const coupon of coupons) {
-      // Check if coupon is active
-      if (coupon.status !== 'active') continue;
-
-      // Check if coupon applies to products
-      if (coupon.applicableType === 'product' || coupon.applicableType === 'all') {
-        // If it's an "all" type coupon, it applies to all products
-        if (coupon.applicableType === 'all') {
-          return {
-            hasCoupon: true,
-            couponPercentage: coupon.discountPercentage || null,
-            couponCode: coupon.couponCode || null,
-            couponTitle: coupon.title || null,
-          };
-        }
-
-        // For product-specific coupons, check if this product is in the applicable list
+    getStoreCouponSettings()
+      .then((settings) => {
+        if (cancelled) return;
         if (
-          coupon.applicableProducts &&
-          Array.isArray(coupon.applicableProducts) &&
-          coupon.applicableProducts.length > 0
+          !settings.autoApply ||
+          settings.autoApplyStrategy === 'customer_choice'
         ) {
-          const isApplicable = coupon.applicableProducts.some(
-            (product: any) => product._id === productId || product === productId
-          );
-
-          if (isApplicable) {
-            return {
-              hasCoupon: true,
-              couponPercentage: coupon.discountPercentage || null,
-              couponCode: coupon.couponCode || null,
-              couponTitle: coupon.title || null,
-            };
-          }
+          setResult({
+            hasCoupon: false,
+            couponPercentage: 0,
+            couponCode: null,
+            discountedPrice: null,
+          });
+          return;
         }
-      }
 
-      // Check category-based coupons
-      if (coupon.applicableType === 'category' && coupon.applicableCategories?.length > 0) {
-        // Note: We would need the product's category to check this
-        // For now, we skip category-based coupons in product cards
-        continue;
-      }
+        const subtotal = unitPrice;
+        const items = [
+          {
+            productId,
+            quantity: 1,
+            unitPrice,
+          },
+        ];
 
-      // Check brand-based coupons
-      if (coupon.applicableType === 'brand' && coupon.applicableBrands?.length > 0) {
-        // Note: We would need the product's brand to check this
-        // For now, we skip brand-based coupons in product cards
-        continue;
-      }
-    }
+        return getAvailableOffers(subtotal, items).then((offers) => {
+          if (cancelled) return;
+          const strategy = settings.autoApplyStrategy;
+          const best =
+            strategy === 'customer_choice'
+              ? null
+              : pickBestOffer(offers, strategy);
 
-    return noCoupon;
-  }, [activeCouponsData, isLoading, isError, productId]);
+          if (!best || best.discountAmount <= 0) {
+            setResult({
+              hasCoupon: false,
+              couponPercentage: 0,
+              couponCode: null,
+              discountedPrice: null,
+            });
+            return;
+          }
 
-  return couponInfo;
-};
+          const discountedPrice = Math.max(
+            0,
+            Math.round((unitPrice - best.discountAmount) * 100) / 100
+          );
+          const couponPercentage =
+            unitPrice > 0
+              ? Math.round((best.discountAmount / unitPrice) * 100)
+              : 0;
 
+          setResult({
+            hasCoupon: true,
+            couponPercentage,
+            couponCode: best.code,
+            discountedPrice,
+          });
+        });
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setResult({
+            hasCoupon: false,
+            couponPercentage: 0,
+            couponCode: null,
+            discountedPrice: null,
+          });
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [productId, unitPrice, refetchKey]);
+
+  return result;
+}

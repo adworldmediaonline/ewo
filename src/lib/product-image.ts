@@ -67,6 +67,14 @@ export const isProductImageProxyUrl = (src: string): boolean => {
 };
 
 /**
+ * Whether the URL is a Cloudinary CDN URL (use CldImage with preserveTransformations).
+ */
+export const isCloudinaryUrl = (url?: string): boolean =>
+  typeof url === 'string' &&
+  url.startsWith('https://res.cloudinary.com/') &&
+  url.includes('/upload/');
+
+/**
  * Get main product image alt text for accessibility and SEO.
  * Uses product.image.altText when available, else product.image.title, else product.title.
  * Avoids random Cloudinary filenames.

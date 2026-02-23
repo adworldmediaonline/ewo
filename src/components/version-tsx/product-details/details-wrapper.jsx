@@ -36,6 +36,7 @@ import { add_to_compare } from '@/redux/features/compareSlice';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { notifyError, notifySuccess } from '@/utils/toast';
 import { useProductCoupon } from '@/hooks/useProductCoupon';
+import { useRefetchOnVisibility } from '@/hooks/use-refetch-on-visibility';
 import {
   BarChart3,
   CheckCircle,
@@ -63,8 +64,6 @@ import ProductQuantity from './product-quantity';
 import ReviewForm from './review-form';
 import ReviewItem from './review-item';
 import ProductConfigurations from './product-configurations';
-// import FreeShippingBadge from '@/components/version-tsx/free-shipping-badge';
-import freeShippingImage from '../../../../public/assets/free-shipping-1.webp';
 
 // Custom Rating Component
 const ProductRating = ({ rating, reviewCount }) => {
@@ -145,8 +144,14 @@ export default function DetailsWrapper({
   const [selectedOption, setSelectedOption] = useState(null);
   const [customNotes, setCustomNotes] = useState({});
 
-  // Check if coupon is active for this product
-  const { hasCoupon, couponPercentage } = useProductCoupon(productItem?._id || '');
+  // Check if coupon is active for this product (when auto-apply is enabled)
+  const baseUnitPrice = Number(productItem?.finalPriceDiscount || productItem?.price || 0);
+  const couponRefetchKey = useRefetchOnVisibility();
+  const { hasCoupon, couponPercentage } = useProductCoupon(
+    productItem?._id || '',
+    baseUnitPrice,
+    couponRefetchKey
+  );
 
   // Initialize selectedConfigurations with preselected options from backend
   const [selectedConfigurations, setSelectedConfigurations] = useState(() => {
@@ -1066,17 +1071,6 @@ export default function DetailsWrapper({
           calculated at checkout.
         </p>
 
-        {/* Free Shipping Badge - Only show if final price is $500 or more */}
-        {Number(calculateFinalPrice()) >= 500 && (
-          <div className="pt-2 relative overflow-hidden">
-            <Image
-              src={freeShippingImage}
-              alt="Free Shipping on orders over $500"
-              className="object-contain w-auto h-[110px]"
-              priority={false}
-            />
-          </div>
-        )}
       </div>
 
       {/* Color Options */}

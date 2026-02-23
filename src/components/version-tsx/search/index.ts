@@ -1,4 +1,3 @@
-export { default as ProductItem } from './product-item';
 export { default as SearchArea } from './search-area';
 export { default as SearchControls } from './search-controls';
 export { default as SearchEmptyState } from './search-empty-state';
