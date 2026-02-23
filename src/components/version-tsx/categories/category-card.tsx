@@ -26,11 +26,14 @@ interface CategoryCardProps {
   index?: number;
   /** "mega" for compact layout in header dropdown; "showcase" for homepage */
   variant?: 'mega' | 'showcase';
+  /** Called when subcategory tag is clicked (e.g. to close mobile sheet) */
+  onNavigate?: () => void;
 }
 export const CategoryCard = ({
   item,
   index = 0,
   variant = 'showcase',
+  onNavigate,
 }: CategoryCardProps) => {
   const router = useRouter();
   const imageUrl = item.image?.url || item.img;
@@ -52,6 +55,7 @@ export const CategoryCard = ({
     const parentSlug = item.parentCategorySlug ?? toSlug(parent);
     const childSlug = toSlug(child);
     router.push(`/shop?category=${parentSlug}&subcategory=${childSlug}`);
+    onNavigate?.();
   };
 
   // Subcategory/grouped card: use parent+subcategory URL (subcategorySlug can be comma-separated for grouped)

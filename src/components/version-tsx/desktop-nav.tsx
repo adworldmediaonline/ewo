@@ -18,7 +18,14 @@ export interface DesktopNavProps {
   categories: CategoryItem[];
 }
 
-const HOVER_CLOSE_DELAY_MS = 300;
+const HOVER_CLOSE_DELAY_MS = 350;
+const HOVER_ZONE_SELECTOR = '[data-shop-hover-zone]';
+
+function isWithinHoverZone(target: EventTarget | null): boolean {
+  if (!target || !(target instanceof Node)) return false;
+  const el = target as HTMLElement;
+  return el.closest?.(HOVER_ZONE_SELECTOR) != null;
+}
 
 export default function DesktopNav({
   categories,
@@ -47,24 +54,35 @@ export default function DesktopNav({
     setShopOpen(true);
   }, [clearCloseTimer]);
 
-  const handleTriggerLeave = React.useCallback(() => {
-    scheduleClose();
-  }, [scheduleClose]);
+  const handleTriggerLeave = React.useCallback(
+    (e: React.PointerEvent) => {
+      if (isWithinHoverZone(e.relatedTarget)) return;
+      scheduleClose();
+    },
+    [scheduleClose]
+  );
 
   const handleContentEnter = React.useCallback(() => {
     clearCloseTimer();
   }, [clearCloseTimer]);
 
-  const handleContentLeave = React.useCallback(() => {
-    scheduleClose();
-  }, [scheduleClose]);
+  const handleContentLeave = React.useCallback(
+    (e: React.PointerEvent) => {
+      if (isWithinHoverZone(e.relatedTarget)) return;
+      scheduleClose();
+    },
+    [scheduleClose]
+  );
 
-  const handleOpenChange = React.useCallback((open: boolean) => {
-    if (!open) {
-      clearCloseTimer();
-      setShopOpen(false);
-    }
-  }, [clearCloseTimer]);
+  const handleOpenChange = React.useCallback(
+    (open: boolean) => {
+      if (!open) {
+        clearCloseTimer();
+        setShopOpen(false);
+      }
+    },
+    [clearCloseTimer]
+  );
 
   React.useEffect(() => () => clearCloseTimer(), [clearCloseTimer]);
 
@@ -94,9 +112,8 @@ export default function DesktopNav({
       </Link>
       {/* Shop by Category - Popover opens on hover */}
       <div
-        className={cn('relative', shopOpen && 'pb-3')}
-        onMouseEnter={handleTriggerEnter}
-        onMouseLeave={handleTriggerLeave}
+        data-shop-hover-zone
+        className="relative flex items-center py-1.5"
         onPointerEnter={handleTriggerEnter}
         onPointerLeave={handleTriggerLeave}
       >
@@ -118,13 +135,12 @@ export default function DesktopNav({
           />
         </PopoverTrigger>
         <PopoverContent
+          data-shop-hover-zone
           align="center"
           sideOffset={0}
           collisionPadding={16}
           onPointerEnter={handleContentEnter}
           onPointerLeave={handleContentLeave}
-          onMouseEnter={handleContentEnter}
-          onMouseLeave={handleContentLeave}
           onOpenAutoFocus={(e) => e.preventDefault()}
           className={cn(
             'relative w-[min(calc(100vw-2rem),64rem)] max-w-[calc(100vw-2rem)]',

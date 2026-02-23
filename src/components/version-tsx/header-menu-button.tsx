@@ -8,22 +8,23 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { ChevronRight, Menu } from 'lucide-react';
+import { ArrowRight, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
 import { processCategoriesForShowcase } from '@/lib/process-categories-for-showcase';
 import type { CategoryItem } from '@/lib/server-data';
 import { API_ENDPOINT } from '@/server/api-endpoint';
+import { CategoryCard } from './categories/category-card';
 
 export interface HeaderMenuButtonProps {
   links: { href: string; label: string }[];
   categories?: CategoryItem[];
 }
 
-/** Use all Show categories – API already returns only Show; match homepage behavior */
+/** Match desktop: Show categories with products */
 const visibleCategoriesFilter = (c: CategoryItem) =>
-  (c.status === 'Show' || !c.status);
+  (c.products?.length ?? 0) > 0 && (c.status === 'Show' || !c.status);
 
 const fetchCategoriesClient = async (): Promise<CategoryItem[]> => {
   const base = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
@@ -51,6 +52,15 @@ export function HeaderMenuButton({
   const pathname = usePathname();
 
   const handleLinkClick = React.useCallback(() => {
+    setOpen(false);
+  }, []);
+
+  // Close sheet when route changes (e.g. after main nav or category link click)
+  React.useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
+  const handleCategorySectionClick = React.useCallback(() => {
     setOpen(false);
   }, []);
 
@@ -131,66 +141,52 @@ export function HeaderMenuButton({
             })}
           </div>
 
-          {/* Shop by Category */}
-          <div className="shrink-0 border-t border-border/80 px-2 py-4">
-            <h3 className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          {/* Shop by Category - same design as desktop dropdown with images */}
+          <div
+            className="shrink-0 border-t border-border/80 px-3 py-4"
+            onClick={handleCategorySectionClick}
+          >
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Shop by Category
             </h3>
             {processedCategories.length > 0 ? (
-              <ul className="space-y-1" role="list">
-                {processedCategories.map((item) => {
-                  const hasSubcategoryLink =
-                    item.parentCategorySlug && item.subcategorySlug;
-                  const href = hasSubcategoryLink
-                    ? `/shop?category=${item.parentCategorySlug}&subcategory=${item.subcategorySlug}`
-                    : `/shop?category=${item.parentCategorySlug ?? ''}`;
-                  const childLabels = Array.isArray(item.children)
-                    ? item.children.slice(0, 3)
-                    : [];
-                  return (
-                    <li key={item._id}>
-                      <Link
-                        href={href}
-                        className="flex min-h-[48px] items-center justify-between gap-2 rounded-lg px-3 py-3 text-sm font-medium text-foreground transition-colors duration-200 hover:bg-muted/80 active:scale-[0.98]"
-                        onClick={handleLinkClick}
-                        aria-label={`Browse ${item.parent}`}
-                      >
-                        <span className="min-w-0 flex-1 whitespace-normal wrap-break-word text-left">
-                          {item.parent}
-                          {childLabels.length > 0 && (
-                            <span className="ml-1 text-muted-foreground">
-                              · {childLabels.join(', ')}
-                            </span>
-                          )}
-                        </span>
-                        <ChevronRight
-                          className="h-4 w-4 shrink-0 text-muted-foreground"
-                          aria-hidden
-                        />
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
+              <div
+                className="grid min-w-0 grid-cols-2 gap-2 sm:gap-3"
+                role="list"
+                aria-label="Shop categories"
+              >
+                {processedCategories.map((item, index) => (
+                  <CategoryCard
+                    key={item._id}
+                    item={item}
+                    index={index}
+                    variant="mega"
+                    onNavigate={handleCategorySectionClick}
+                  />
+                ))}
+              </div>
             ) : (
-              <div className="space-y-1 px-3">
-                {Array.from({ length: 4 }).map((_, i) => (
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                {Array.from({ length: 6 }).map((_, i) => (
                   <div
                     key={i}
-                    className="h-12 animate-pulse rounded-lg bg-muted/60"
+                    className="flex flex-col overflow-hidden rounded-lg border border-border bg-muted/40"
                     aria-hidden
-                  />
+                  >
+                    <div className="aspect-[4/3] animate-pulse bg-muted/60" />
+                    <div className="h-6 animate-pulse bg-muted/40" />
+                  </div>
                 ))}
               </div>
             )}
             <Link
               href="/shop"
-              className="mt-3 flex min-h-[48px] items-center justify-between gap-2 rounded-lg px-3 py-3 text-sm font-medium text-primary transition-colors hover:bg-primary/10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+              className="mt-4 flex min-h-[44px] items-center gap-2 rounded-lg px-3 py-3 text-sm font-medium text-primary transition-colors hover:bg-primary/10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
               onClick={handleLinkClick}
               aria-label="Explore all categories"
             >
               Explore all
-              <ChevronRight className="h-4 w-4 shrink-0" aria-hidden />
+              <ArrowRight className="h-4 w-4 shrink-0" aria-hidden />
             </Link>
           </div>
         </nav>
