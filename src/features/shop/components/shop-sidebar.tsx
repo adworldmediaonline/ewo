@@ -30,8 +30,8 @@ const ShopSidebar = ({
   }
 
   return (
-    <aside className="hidden w-56 shrink-0 self-start border-r border-border pr-6 lg:block">
-      <div className="sticky top-24 py-1">
+    <aside className="hidden w-56 shrink-0 self-start border-r border-border pr-6 lg:block lg:sticky lg:top-[10rem]">
+      <div className="py-1">
         <nav className="space-y-0.5" aria-label="Product categories">
           {categories.map((category) => {
             const categorySlug = toSlug(category.parent);
