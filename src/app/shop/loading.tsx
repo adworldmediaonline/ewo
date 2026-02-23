@@ -13,7 +13,7 @@ import Wrapper from '@/components/wrapper';
 export default function ShopLoading() {
   return (
     <Wrapper>
-      <div className="container mx-auto px-4 py-6 md:py-8">
+      <div className="container mx-auto px-3 py-6 md:px-6 md:py-8">
         {/* Breadcrumb skeleton */}
         <Breadcrumb className="mb-4 md:mb-6">
           <BreadcrumbList>
@@ -26,7 +26,7 @@ export default function ShopLoading() {
           </BreadcrumbList>
         </Breadcrumb>
 
-        <div className="mx-auto flex w-full max-w-7xl gap-2 lg:gap-4 px-0 md:px-4 py-2 lg:py-6">
+        <div className="flex w-full gap-2 lg:gap-4 py-2 lg:py-6">
           {/* Sidebar skeleton - hidden on mobile */}
           <aside className="hidden lg:block w-56 shrink-0 space-y-4">
             <Skeleton className="h-6 w-24" />
