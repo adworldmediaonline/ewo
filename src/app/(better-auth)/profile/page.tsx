@@ -32,13 +32,13 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!isPending && session) {
       if (!session) {
-        router.push('/sign-in');
+        router.push('/');
       } else if (session.user.role === 'admin') {
-        router.push('/sign-in');
+        router.push('/');
       } else if (session.user.role === 'super-admin') {
-        router.push('/sign-in');
+        router.push('/');
       } else if (session.user.role !== 'user') {
-        router.push('/sign-in');
+        router.push('/');
       }
     }
   }, [session, isPending, router]);
