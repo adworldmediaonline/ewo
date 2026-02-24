@@ -36,6 +36,7 @@ import { add_to_compare } from '@/redux/features/compareSlice';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { notifyError, notifySuccess } from '@/utils/toast';
 import { getProductDisplayPrices, resolveCartItemPrice } from '@/lib/product-price';
+import { getCartItemId } from '@/lib/cart-item-id';
 import {
   BarChart3,
   CheckCircle,
@@ -340,7 +341,11 @@ export default function DetailsWrapper({
 
   // finalPriceDiscount is single source of truth. Marked = original base. Final = after discounts.
   const calculateFinalPrice = () => {
-    let basePrice = Number(finalPriceDiscount ?? 0);
+    const productFinal = Number(finalPriceDiscount ?? 0);
+    const productMarked = Number(productItem?.displayMarkedPrice ?? finalPriceDiscount ?? 0);
+    const hasDiscount = productItem?.hasDisplayDiscount ?? false;
+
+    let basePrice = productFinal;
 
     const configResult = getSelectedConfigurationPrice();
     const configFixedPrice = configResult.fixedPrice || 0;
@@ -348,6 +353,11 @@ export default function DetailsWrapper({
 
     if (configFixedPrice > 0) {
       basePrice = configFixedPrice;
+      // Apply product discount to config price when product has discount (e.g. coupon)
+      if (hasDiscount && productMarked > 0) {
+        const discountRatio = productFinal / productMarked;
+        basePrice = configFixedPrice * discountRatio;
+      }
     }
 
     const adjustedPrice = applyPercentageAdjustments(basePrice, percentageAdjustments);
@@ -356,8 +366,8 @@ export default function DetailsWrapper({
   };
 
   const calculateMarkedUpPrice = () => {
-    const originalBase = Number(productItem?.displayMarkedPrice ?? finalPriceDiscount ?? 0);
-    let basePrice = originalBase;
+    const productMarked = Number(productItem?.displayMarkedPrice ?? finalPriceDiscount ?? 0);
+    let basePrice = productMarked;
 
     const configResult = getSelectedConfigurationPrice();
     const configFixedPrice = configResult.fixedPrice || 0;
@@ -422,28 +432,37 @@ export default function DetailsWrapper({
       return;
     }
 
-    // Check if product already exists in cart (regardless of option)
-    const existingProduct = cart_products.find(item => item._id === prd._id);
+    const newItemIdentity = {
+      _id: prd._id,
+      selectedOption,
+      selectedConfigurations,
+      customNotes,
+    };
 
-    // If product exists, check if option has changed
+    // Find existing by full identity (same config) - for merging
+    const existingProduct = cart_products.find(
+      item => getCartItemId(item) === getCartItemId(newItemIdentity)
+    );
+
+    // Find any existing with same _id (for replacement when config changed)
+    const existingWithSameId = cart_products.find(item => item._id === prd._id);
+
+    // If product exists with same _id but different config, we need to replace it
     const optionChanged =
-      existingProduct &&
-      JSON.stringify(existingProduct.selectedOption) !==
+      existingWithSameId &&
+      JSON.stringify(existingWithSameId.selectedOption) !==
       JSON.stringify(selectedOption);
 
-    // Check if configuration has changed
     const configurationChanged =
-      existingProduct &&
+      existingWithSameId &&
       configurationsChanged(
-        existingProduct.selectedConfigurations,
+        existingWithSameId.selectedConfigurations,
         selectedConfigurations
       );
 
-    // If either option or configuration changed, we need to update the cart item
     const productChanged = optionChanged || configurationChanged;
 
-    // Get current quantity from existing product
-    const currentQty = existingProduct ? existingProduct.orderQuantity : 0;
+    const currentQty = existingProduct ? existingProduct.orderQuantity : (existingWithSameId ? existingWithSameId.orderQuantity : 0);
 
     // Determine final quantity:
     // - If configuration changed: RESET to current orderQuantity (fresh start)
@@ -470,19 +489,20 @@ export default function DetailsWrapper({
       return;
     }
 
-    // If option or configuration changed, remove the existing product first
-    if (productChanged) {
+    // If option or configuration changed, remove the existing cart item first
+    if (productChanged && existingWithSameId) {
       dispatch(
         update_product_option({
-          id: existingProduct._id,
-          title: existingProduct.title,
+          id: existingWithSameId._id,
+          selectedOption: existingWithSameId.selectedOption,
+          selectedConfigurations: existingWithSameId.selectedConfigurations,
+          customNotes: existingWithSameId.customNotes,
         })
       );
 
       // Reset order quantity based on what changed
       if (configurationChanged) {
         // Configuration changed: Reset to current orderQuantity (already set above)
-        // No need to increment - use the current selector value
       } else {
         // Only option changed: Keep existing quantity
         dispatch(initialOrderQuantity());
@@ -494,6 +514,7 @@ export default function DetailsWrapper({
     //
     // SIMPLE PRICE CALCULATION - Always start fresh from original product price
     const markedUpPrice = Number(prd.displayMarkedPrice ?? prd.finalPriceDiscount ?? 0);
+    const hasDiscount = prd.hasDisplayDiscount ?? false;
 
     // Step 1: Determine base price - sum all selected configuration option prices
     let basePrice = Number(prd.finalPriceDiscount ?? 0);
@@ -506,6 +527,11 @@ export default function DetailsWrapper({
     // If configuration has fixed price, use it instead of base price
     if (configFixedPrice > 0) {
       basePrice = configFixedPrice;
+      // Apply product discount to config price when product has discount (e.g. coupon)
+      if (hasDiscount && markedUpPrice > 0) {
+        const discountRatio = Number(prd.finalPriceDiscount ?? 0) / markedUpPrice;
+        basePrice = configFixedPrice * discountRatio;
+      }
     }
 
     // Product is pre-enriched - finalPriceDiscount includes coupon when auto-apply
@@ -652,24 +678,33 @@ export default function DetailsWrapper({
       return;
     }
 
-    const existingProduct = cart_products.find(item => item._id === prd._id);
+    const newItemIdentity = {
+      _id: prd._id,
+      selectedOption,
+      selectedConfigurations,
+      customNotes,
+    };
+
+    const existingProduct = cart_products.find(
+      item => getCartItemId(item) === getCartItemId(newItemIdentity)
+    );
+    const existingWithSameId = cart_products.find(item => item._id === prd._id);
+
     const optionChanged =
-      existingProduct &&
-      JSON.stringify(existingProduct.selectedOption) !==
+      existingWithSameId &&
+      JSON.stringify(existingWithSameId.selectedOption) !==
       JSON.stringify(selectedOption);
 
-    // Check if configuration has changed
     const configurationChanged =
-      existingProduct &&
+      existingWithSameId &&
       configurationsChanged(
-        existingProduct.selectedConfigurations,
+        existingWithSameId.selectedConfigurations,
         selectedConfigurations
       );
 
-    // If either option or configuration changed, we need to update the cart item
     const productChanged = optionChanged || configurationChanged;
 
-    const currentQty = existingProduct ? existingProduct.orderQuantity : 0;
+    const currentQty = existingProduct ? existingProduct.orderQuantity : (existingWithSameId ? existingWithSameId.orderQuantity : 0);
 
     // Determine final quantity:
     // - If configuration changed: RESET to current orderQuantity (fresh start)
@@ -689,26 +724,25 @@ export default function DetailsWrapper({
 
     if (prd.quantity && finalQuantity > prd.quantity) {
       notifyError(
-        `Sorry, only ${prd.quantity} items available. ${existingProduct ? `You already have ${currentQty} in your cart.` : ''
+        `Sorry, only ${prd.quantity} items available. ${existingWithSameId ? `You already have ${currentQty} in your cart.` : ''
         }`
       );
       return;
     }
 
-    if (productChanged) {
+    if (productChanged && existingWithSameId) {
       dispatch(
         update_product_option({
-          id: existingProduct._id,
-          title: existingProduct.title,
+          id: existingWithSameId._id,
+          selectedOption: existingWithSameId.selectedOption,
+          selectedConfigurations: existingWithSameId.selectedConfigurations,
+          customNotes: existingWithSameId.customNotes,
         })
       );
 
-      // Reset order quantity based on what changed
       if (configurationChanged) {
-        // Configuration changed: Reset to current orderQuantity (already set above)
-        // No need to increment - use the current selector value
+        // Reset to current orderQuantity
       } else {
-        // Only option changed: Keep existing quantity
         dispatch(initialOrderQuantity());
         for (let i = 1; i < currentQty; i++) {
           dispatch(increment());
@@ -718,6 +752,7 @@ export default function DetailsWrapper({
 
     // SIMPLE PRICE CALCULATION - Always start fresh from original product price
     const markedUpPrice = Number(prd.displayMarkedPrice ?? prd.finalPriceDiscount ?? 0);
+    const hasDiscount = prd.hasDisplayDiscount ?? false;
 
     // Step 1: Determine base price - sum all selected configuration option prices
     let basePrice = Number(prd.finalPriceDiscount ?? 0);
@@ -730,6 +765,11 @@ export default function DetailsWrapper({
     // If configuration has fixed price, use it instead of base price
     if (configFixedPrice > 0) {
       basePrice = configFixedPrice;
+      // Apply product discount to config price when product has discount (e.g. coupon)
+      if (hasDiscount && markedUpPrice > 0) {
+        const discountRatio = Number(prd.finalPriceDiscount ?? 0) / markedUpPrice;
+        basePrice = configFixedPrice * discountRatio;
+      }
     }
 
     // Product is pre-enriched - finalPriceDiscount includes coupon when auto-apply
@@ -1092,9 +1132,7 @@ export default function DetailsWrapper({
               config => !config.enableCustomNote && config.options && config.options.length > 0
             ) && (
                 <ProductConfigurations
-                  configurations={productConfigurations.filter(
-                    config => !config.enableCustomNote
-                  )}
+                  configurations={productConfigurations}
                   onConfigurationChange={(configIndex, optionIndex, option) => {
                     // Update selected configurations state
                     setSelectedConfigurations(prev => ({
