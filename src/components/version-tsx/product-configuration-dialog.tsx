@@ -253,31 +253,28 @@ export default function ProductConfigurationDialog({
     return finalPrice.toFixed(2);
   }, [getSelectedConfigurationPrice, applyPercentageAdjustments, selectedOption, product.finalPriceDiscount, product.price, hasCoupon, couponPercentage]);
 
-  // Calculate marked up price (strikethrough) - original price before discount
+  // Marked price = original base (price/updatedPrice) before product/coupon discounts
   const calculateMarkedUpPrice = useCallback(() => {
-    // Get base price (original price, not discounted)
-    let basePrice = Number(product.finalPriceDiscount || product.price);
+    const originalBase = Number(product.price ?? product.updatedPrice ?? product.finalPriceDiscount ?? 0);
+    let basePrice = originalBase;
 
-    // Get configuration prices and percentage adjustments
     const configResult = getSelectedConfigurationPrice();
     const configFixedPrice = configResult.fixedPrice || 0;
     const percentageAdjustments = configResult.percentageAdjustments || [];
 
-    // If configuration has fixed price, use it instead of base price
     if (configFixedPrice > 0) {
       basePrice = configFixedPrice;
     }
 
-    // Apply percentage adjustments to base price (before coupon)
-    let adjustedPrice = applyPercentageAdjustments(Number(basePrice), percentageAdjustments);
-
-    // Add option price to the adjusted base price (no discount)
-    // The marked price shows the original price before discount is applied
+    const adjustedPrice = applyPercentageAdjustments(Number(basePrice), percentageAdjustments);
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    const markedPrice = adjustedPrice + optionPrice;
+    return (adjustedPrice + optionPrice).toFixed(2);
+  }, [getSelectedConfigurationPrice, applyPercentageAdjustments, selectedOption, product.price, product.updatedPrice, product.finalPriceDiscount]);
 
-    return markedPrice.toFixed(2);
-  }, [getSelectedConfigurationPrice, applyPercentageAdjustments, selectedOption, product.finalPriceDiscount, product.price]);
+  const hasProductDiscount =
+    Number(product.finalPriceDiscount ?? 0) > 0 &&
+    Number(product.finalPriceDiscount ?? 0) < Number(product.price ?? 0);
+  const showMarkedPrice = hasProductDiscount || (hasCoupon && couponPercentage);
 
   // Helper function to compare configurations
   const configurationsChanged = useCallback(
@@ -604,14 +601,16 @@ export default function ProductConfigurationDialog({
 
           <Separator />
 
-          {/* Price Display */}
+          {/* Price Display - finalPriceDiscount is single source of truth */}
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground">Price</p>
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-lg text-muted-foreground line-through">
-                  ${calculateMarkedUpPrice()}
-                </span>
+                {showMarkedPrice && (
+                  <span className="text-lg text-muted-foreground line-through">
+                    ${calculateMarkedUpPrice()}
+                  </span>
+                )}
                 <span className="text-2xl font-bold text-primary">
                   ${calculateFinalPrice()}
                 </span>

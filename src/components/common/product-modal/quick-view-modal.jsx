@@ -68,6 +68,8 @@ export default function QuickViewModal() {
     description,
     discount,
     price,
+    updatedPrice,
+    finalPriceDiscount,
     status,
     reviews,
     tags,
@@ -99,15 +101,23 @@ export default function QuickViewModal() {
     }
   }, [reviews]);
 
+  // finalPriceDiscount is single source of truth; marked = original base
   const calculateFinalPrice = () => {
-    const basePrice = Number(price);
-    const discountedPrice =
-      discount > 0
-        ? basePrice - (basePrice * Number(discount)) / 100
-        : basePrice;
+    const mainPrice = Number(finalPriceDiscount ?? price ?? 0);
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    return (discountedPrice + optionPrice).toFixed(2);
+    return (mainPrice + optionPrice).toFixed(2);
   };
+
+  const calculateMarkedPrice = () => {
+    const originalBase = Number(price ?? updatedPrice ?? finalPriceDiscount ?? 0);
+    const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+    return (originalBase + optionPrice).toFixed(2);
+  };
+
+  const hasProductDiscount =
+    Number(finalPriceDiscount ?? 0) > 0 &&
+    Number(finalPriceDiscount ?? 0) < Number(price ?? 0);
+  const showMarkedPrice = hasProductDiscount;
 
   const handleOptionChange = e => {
     const optionIndex = e.target.value;
@@ -137,16 +147,16 @@ export default function QuickViewModal() {
       return;
     }
 
-    // Calculate total price with selected option
-    const basePrice = Number(prd.finalPriceDiscount || 0);
+    // finalPriceDiscount is single source of truth
+    const mainPrice = Number(prd.finalPriceDiscount ?? prd.price ?? 0);
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    const totalPrice = basePrice + optionPrice;
+    const totalPrice = mainPrice + optionPrice;
 
     const productToAdd = {
       ...prd,
-      finalPriceDiscount: totalPrice, // Include option price (this is the price field we use)
+      finalPriceDiscount: totalPrice,
       selectedOption,
-      basePrice: basePrice, // Store original base price for reference
+      basePrice: mainPrice,
     };
 
     dispatch(add_cart_product(productToAdd));
@@ -300,13 +310,14 @@ export default function QuickViewModal() {
               </div>
 
               <div className="price-section">
-                {discount > 0 ? (
+                {showMarkedPrice ? (
                   <div className="price-with-discount">
                     <span className="current-price">
                       ${calculateFinalPrice()}
                     </span>
-                    <span className="original-price">${price?.toFixed(2)}</span>
-                    <span className="discount-badge">{discount}% OFF</span>
+                    <span className="original-price line-through">
+                      ${calculateMarkedPrice()}
+                    </span>
                   </div>
                 ) : (
                   <span className="current-price">

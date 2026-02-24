@@ -170,7 +170,7 @@ export default function TrackOrderArea({ orderId }: { orderId: string }) {
   const orderTime = dayjs(createdAt).format('h:mm A');
   const subtotal = cart.reduce(
     (sum: number, item: any) =>
-      sum + Number(item.finalPriceDiscount || 0) * item.orderQuantity,
+      sum + Number(item.finalPriceDiscount ?? item.price ?? 0) * (item.orderQuantity ?? 1),
     0
   );
 
@@ -762,7 +762,7 @@ export default function TrackOrderArea({ orderId }: { orderId: string }) {
                     </div>
                     {item.orderQuantity > 1 && (
                       <div className="text-xs text-muted-foreground">
-                        ${Number(item.finalPriceDiscount || 0).toFixed(2)} each
+                        ${Number(item.finalPriceDiscount ?? item.price ?? 0).toFixed(2)} each
                       </div>
                     )}
                   </div>
