@@ -36,6 +36,8 @@ export interface UseProductCardResult {
   hasCoupon: boolean;
   couponPercentage: number;
   couponCode: string | null;
+  couponReady: boolean;
+  hasProductDiscount: boolean;
   hasConfigurations: boolean;
   imageSrc: string;
   imageAlt: string;
