@@ -37,7 +37,11 @@ export const productApi = apiSlice.injectEndpoints({
             params.append(key, value.toString());
           }
         });
-        return `/api/product/paginated?${params.toString()}`;
+        // Use Next.js API route for enriched products (display prices, no flicker)
+        const path = `/api/shop/products?${params.toString()}`;
+        const base =
+          typeof window !== 'undefined' ? window.location.origin : '';
+        return base ? `${base}${path}` : path;
       },
       keepUnusedDataFor: 5,
       providesTags: (result, _error, _arg) =>

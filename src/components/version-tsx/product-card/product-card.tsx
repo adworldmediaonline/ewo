@@ -78,6 +78,7 @@ export function ProductCard({
     couponReady,
     hasProductDiscount,
     hasConfigurations,
+    hasEnrichedPrices,
     imageSrc,
     imageAlt,
     imageTitle,
@@ -112,15 +113,21 @@ export function ProductCard({
       return;
     }
 
-    const basePrice = hasProductDiscount
-      ? Number(product.finalPriceDiscount)
-      : Number(product.finalPriceDiscount || product.price);
-    let discountedBasePrice = basePrice;
-    if (couponReady && hasCoupon && couponPercentage) {
-      discountedBasePrice = basePrice * (1 - couponPercentage / 100);
+    let finalPrice: number;
+    if (hasEnrichedPrices && typeof product.displayPrice === 'number') {
+      const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+      finalPrice = product.displayPrice + optionPrice;
+    } else {
+      const basePrice = hasProductDiscount
+        ? Number(product.finalPriceDiscount)
+        : Number(product.finalPriceDiscount || product.price);
+      let discountedBasePrice = basePrice;
+      if (couponReady && hasCoupon && couponPercentage) {
+        discountedBasePrice = basePrice * (1 - couponPercentage / 100);
+      }
+      const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+      finalPrice = discountedBasePrice + optionPrice;
     }
-    const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    const finalPrice = discountedBasePrice + optionPrice;
 
     if (addToCartAnimation && imageSrc && variant === 'shop') {
       const sourceRect = imageContainerRef.current?.getBoundingClientRect();
@@ -132,14 +139,21 @@ export function ProductCard({
       }
     }
 
-    const productToAdd = hasCoupon
-      ? {
-          ...product,
-          finalPriceDiscount: finalPrice,
-          basePrice: Number(basePrice),
-          appliedCouponCode: couponCode ?? undefined,
-        }
-      : { ...product, finalPriceDiscount: finalPrice };
+    const basePriceForCart =
+      hasEnrichedPrices
+        ? Number(product.displayPrice ?? product.finalPriceDiscount ?? product.price)
+        : hasProductDiscount
+          ? Number(product.finalPriceDiscount)
+          : Number(product.finalPriceDiscount || product.price);
+    const productToAdd =
+      hasCoupon
+        ? {
+            ...product,
+            finalPriceDiscount: finalPrice,
+            basePrice: basePriceForCart,
+            appliedCouponCode: couponCode ?? undefined,
+          }
+        : { ...product, finalPriceDiscount: finalPrice };
     onAddToCart?.(productToAdd as never, selectedOption ?? undefined);
   };
 
@@ -173,15 +187,21 @@ export function ProductCard({
   const handleDecrementFromCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const basePrice = hasProductDiscount
-      ? Number(product.finalPriceDiscount)
-      : Number(product.finalPriceDiscount || product.price);
-    let discountedBasePrice = basePrice;
-    if (couponReady && hasCoupon && couponPercentage) {
-      discountedBasePrice = basePrice * (1 - couponPercentage / 100);
+    let finalPrice: number;
+    if (hasEnrichedPrices && typeof product.displayPrice === 'number') {
+      const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+      finalPrice = product.displayPrice + optionPrice;
+    } else {
+      const basePrice = hasProductDiscount
+        ? Number(product.finalPriceDiscount)
+        : Number(product.finalPriceDiscount || product.price);
+      let discountedBasePrice = basePrice;
+      if (couponReady && hasCoupon && couponPercentage) {
+        discountedBasePrice = basePrice * (1 - couponPercentage / 100);
+      }
+      const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+      finalPrice = discountedBasePrice + optionPrice;
     }
-    const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    const finalPrice = discountedBasePrice + optionPrice;
     const productToDecrement = {
       ...product,
       finalPriceDiscount: finalPrice,
@@ -266,9 +286,11 @@ export function ProductCard({
         finalPrice={finalPrice}
         markedPrice={markedPrice}
         showMarkedPrice={
-          (hasProductDiscount ||
-            (couponReady && hasCoupon && couponPercentage > 0)) &&
-          markedPrice !== finalPrice
+          hasEnrichedPrices
+            ? (product.hasDisplayDiscount ?? false) && markedPrice !== finalPrice
+            : (hasProductDiscount ||
+                (couponReady && hasCoupon && couponPercentage > 0)) &&
+              markedPrice !== finalPrice
         }
       />
 

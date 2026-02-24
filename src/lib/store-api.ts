@@ -181,8 +181,9 @@ export async function validateStoreDiscount(
 /**
  * Build offers for a single product from pre-fetched coupons (sync).
  * Used by getCouponMapForProducts for batched pre-fetch.
+ * Exported for server-side enrichment.
  */
-function buildOffersForProduct(
+export function buildOffersForProduct(
   coupons: RawCoupon[],
   productId: string,
   unitPrice: number

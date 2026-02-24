@@ -2,11 +2,10 @@
 
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { useShopCoupon } from '@/context/shop-coupon-context';
 import { useProductCoupon } from '@/hooks/useProductCoupon';
 import { useRefetchOnVisibility } from '@/hooks/use-refetch-on-visibility';
 import {
-  getProductImageSrc,
+  getProductImageSrcForDisplay,
   getProductImageAlt,
   getProductImageTitle,
   isProductImageProxyUrl,
@@ -50,6 +49,8 @@ export interface UseProductCardResult {
   averageRating: number;
   calculateFinalPrice: (option?: SelectedOption | null) => string;
   calculateMarkedPrice: (option?: SelectedOption | null) => string;
+  /** True when product has pre-computed display prices (from server enrichment) */
+  hasEnrichedPrices: boolean;
 }
 
 export function useProductCard({
@@ -63,25 +64,33 @@ export function useProductCard({
   const baseUnitPrice = Number(product.finalPriceDiscount || product.price || 0);
   const couponRefetchKey = useRefetchOnVisibility();
 
-  /** Pre-fetched coupon from Shop context (available immediately, no flicker) */
-  const shopCoupon = useShopCoupon(product._id);
+  /** Pre-computed display prices from server enrichment (Shop page) - skip coupon logic */
+  const hasEnrichedPrices =
+    typeof product.displayPrice === 'number' &&
+    (product.displayMarkedPrice === undefined ||
+      typeof product.displayMarkedPrice === 'number');
+
+  /** Per-product coupon fetch - only when not enriched (wishlist, search, related) */
   const fallbackCoupon = useProductCoupon(
     product._id,
     baseUnitPrice,
     couponRefetchKey
   );
 
-  const hasCoupon = shopCoupon?.hasCoupon ?? fallbackCoupon.hasCoupon;
-  const couponPercentage = shopCoupon?.couponPercentage ?? fallbackCoupon.couponPercentage;
-  const couponCode = shopCoupon?.couponCode ?? fallbackCoupon.couponCode;
-  const couponReady = shopCoupon !== null ? true : fallbackCoupon.couponReady;
+  const hasCoupon = hasEnrichedPrices ? false : fallbackCoupon.hasCoupon;
+  const couponPercentage = hasEnrichedPrices ? 0 : fallbackCoupon.couponPercentage;
+  const couponCode = hasEnrichedPrices ? null : fallbackCoupon.couponCode;
+  const couponReady = hasEnrichedPrices ? true : fallbackCoupon.couponReady;
 
-  /** Product-level discount from backend: finalPriceDiscount < price */
+  /** Product-level discount from backend: finalPriceDiscount < price. When enriched, use hasDisplayDiscount. */
   const hasProductDiscount = useMemo(() => {
+    if (typeof product.hasDisplayDiscount === 'boolean') {
+      return product.hasDisplayDiscount;
+    }
     const priceVal = Number(product.price ?? 0);
     const discountVal = Number(product.finalPriceDiscount ?? 0);
     return discountVal > 0 && discountVal < priceVal;
-  }, [product.price, product.finalPriceDiscount]);
+  }, [product.price, product.finalPriceDiscount, product.hasDisplayDiscount]);
 
   const cartItem = (cart_products as { _id: string; orderQuantity?: number; selectedOption?: { title: string } }[]).find(
     (prd) => {
@@ -108,7 +117,7 @@ export function useProductCard({
     );
   }, [product.productConfigurations]);
 
-  const imageSrc = getProductImageSrc(product);
+  const imageSrc = getProductImageSrcForDisplay(product);
   const imageAlt = getProductImageAlt(product);
   const imageTitle = getProductImageTitle(product);
   const useProxyForFilename = isProductImageProxyUrl(imageSrc);
@@ -126,6 +135,10 @@ export function useProductCard({
       : 0;
 
   const calculateFinalPrice = (opt?: SelectedOption | null) => {
+    if (hasEnrichedPrices && typeof product.displayPrice === 'number') {
+      const optionPrice = (opt ?? selectedOption) ? Number((opt ?? selectedOption)!.price) : 0;
+      return (product.displayPrice + optionPrice).toFixed(2);
+    }
     const basePrice = hasProductDiscount
       ? Number(product.finalPriceDiscount)
       : Number(product.finalPriceDiscount || product.price);
@@ -139,6 +152,10 @@ export function useProductCard({
   };
 
   const calculateMarkedPrice = (opt?: SelectedOption | null) => {
+    if (hasEnrichedPrices && typeof product.displayMarkedPrice === 'number') {
+      const optionPrice = (opt ?? selectedOption) ? Number((opt ?? selectedOption)!.price) : 0;
+      return (product.displayMarkedPrice + optionPrice).toFixed(2);
+    }
     const originalPrice = hasProductDiscount
       ? Number(product.price ?? product.updatedPrice ?? 0)
       : Number(product.finalPriceDiscount || product.price);
@@ -166,5 +183,6 @@ export function useProductCard({
     averageRating,
     calculateFinalPrice,
     calculateMarkedPrice,
+    hasEnrichedPrices,
   };
 }

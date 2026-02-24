@@ -60,6 +60,22 @@ export const getProductImageSrc = (product: ProductWithImageMeta): string => {
 };
 
 /**
+ * Get image src for display in product cards.
+ * Returns direct Cloudinary CDN URL when possible for faster loading (no proxy hop).
+ * Falls back to proxy for non-Cloudinary URLs.
+ */
+export const getProductImageSrcForDisplay = (
+  product: ProductWithImageMeta
+): string => {
+  const url = getProductImageUrl(product);
+  if (!url) return '';
+  if (isCloudinaryUrl(url)) {
+    return url;
+  }
+  return getProductImageSrc(product);
+};
+
+/**
  * Whether the image src is a proxy URL (needs different component than CldImage).
  */
 export const isProductImageProxyUrl = (src: string): boolean => {
