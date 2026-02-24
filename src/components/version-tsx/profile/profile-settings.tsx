@@ -7,11 +7,9 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -30,14 +28,8 @@ import { z } from 'zod';
 
 const changePasswordSchema = z
   .object({
-    currentPassword: z.string().min(6, 'Password must be at least 6 characters'),
-    newPassword: z
-      .string()
-      .min(8, 'Password must be at least 8 characters')
-      .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-        'Must contain uppercase, lowercase, and number'
-      ),
+    currentPassword: z.string().min(1, 'Current password is required'),
+    newPassword: z.string().min(8, 'Password must be at least 8 characters'),
     confirmPassword: z.string(),
     revokeOtherSessions: z.boolean().optional(),
   })
@@ -86,24 +78,45 @@ const ProfileSettings: React.FC = () => {
   const isChanging = form.formState.isSubmitting;
 
   async function onSubmit(values: ChangePasswordFormValues) {
-    const { error } = await authClient.changePassword({
-      currentPassword: values.currentPassword.trim(),
-      newPassword: values.newPassword.trim(),
-      revokeOtherSessions: values.revokeOtherSessions ?? false,
-    });
+    const timeoutMs = 15_000;
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Request timed out')), timeoutMs)
+    );
 
-    if (error) {
-      notifyError(error.message ?? 'Failed to change password');
-      return;
+    try {
+      const changePromise = authClient.changePassword({
+        currentPassword: values.currentPassword.trim(),
+        newPassword: values.newPassword.trim(),
+        revokeOtherSessions: values.revokeOtherSessions ?? false,
+      });
+
+      const { error } = await Promise.race([changePromise, timeoutPromise]);
+
+      if (error) {
+        const msg =
+          error.message ??
+          (error.status ? `Request failed (${error.status})` : null) ??
+          'Failed to change password';
+        notifyError(msg);
+        return;
+      }
+
+      notifySuccess('Password changed successfully');
+      form.reset({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+        revokeOtherSessions: false,
+      });
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message === 'Request timed out'
+            ? 'Request timed out. Please try again.'
+            : err.message
+          : 'Failed to change password';
+      notifyError(message);
     }
-
-    notifySuccess('Password changed successfully');
-    form.reset({
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
-      revokeOtherSessions: false,
-    });
   }
 
   return (
