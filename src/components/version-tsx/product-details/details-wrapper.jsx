@@ -542,6 +542,12 @@ export default function DetailsWrapper({
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
     const finalPrice = adjustedPrice + optionPrice;
 
+    // basePriceForCart = marked price (for discount badge). When config: marked = configFixedPrice + optionPrice before discount
+    const basePriceForCart =
+      configFixedPrice > 0
+        ? applyPercentageAdjustments(configFixedPrice, percentageAdjustments) + optionPrice
+        : markedUpPrice + optionPrice;
+
     // Determine the product image to use (option image if available, otherwise original)
     let productImage = prd.img;
     if (selectedConfigurations && Object.keys(selectedConfigurations).length > 0) {
@@ -638,7 +644,7 @@ export default function DetailsWrapper({
       finalPriceDiscount: finalPrice,
       updatedPrice: markedUpPrice,
       selectedOption,
-      basePrice: basePrice, // Store base price (configuration price or original)
+      basePrice: basePriceForCart, // Store marked price for discount badge
       // Replace productConfigurations with updated version that has correct isSelected flags
       productConfigurations: updatedProductConfigurations || prd.productConfigurations,
       selectedConfigurations: Object.keys(selectedConfigurations).length > 0
@@ -780,6 +786,12 @@ export default function DetailsWrapper({
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
     const finalPrice = adjustedPrice + optionPrice;
 
+    // basePriceForCart = marked price (for discount badge). When config: marked = configFixedPrice + optionPrice before discount
+    const basePriceForCart =
+      configFixedPrice > 0
+        ? applyPercentageAdjustments(configFixedPrice, percentageAdjustments) + optionPrice
+        : markedUpPrice + optionPrice;
+
     // Determine the product image to use (option image if available, otherwise original)
     let productImage = prd.img;
     if (selectedConfigurations && Object.keys(selectedConfigurations).length > 0) {
@@ -876,7 +888,7 @@ export default function DetailsWrapper({
       finalPriceDiscount: finalPrice,
       updatedPrice: markedUpPrice,
       selectedOption,
-      basePrice: basePrice, // Store base price (configuration price or original)
+      basePrice: basePriceForCart, // Store marked price for discount badge
       // Replace productConfigurations with updated version that has correct isSelected flags
       productConfigurations: updatedProductConfigurations || prd.productConfigurations,
       selectedConfigurations: Object.keys(selectedConfigurations).length > 0

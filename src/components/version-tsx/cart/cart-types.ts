@@ -24,6 +24,8 @@ export interface CartItemType {
   basePrice?: number;
   /** Coupon code applied at product level (when auto apply) */
   appliedCouponCode?: string;
+  /** Coupon percentage when auto-applied (for badge display) */
+  appliedCouponPercentage?: number;
 }
 
 /**
@@ -41,6 +43,8 @@ export interface CartSummary {
   productLevelPercent: number;
   /** Coupon code applied (from cart state or product-level) */
   appliedCouponCode: string | null | undefined;
+  /** Coupon percentage when available (for badge display) */
+  appliedCouponPercentage: number | null;
   shippingFromCart: number;
   qualifiesForFreeShipping: boolean;
   effectiveShippingCost: number;

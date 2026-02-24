@@ -22,9 +22,10 @@ export default function CartCheckout() {
         <div className="mb-4">
           <AutoApplySavingsBanner
             percent={
-              summary.productLevelSavings > 0
+              summary.appliedCouponPercentage ??
+              (summary.productLevelSavings > 0
                 ? summary.productLevelPercent
-                : summary.autoApplyPercent
+                : summary.autoApplyPercent)
             }
             couponCode={summary.appliedCouponCode ?? summary.couponCode}
           />

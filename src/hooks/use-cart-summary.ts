@@ -57,6 +57,8 @@ export function useCartSummary(
       : 0;
   const appliedCouponCode =
     items.find((i) => i.appliedCouponCode)?.appliedCouponCode ?? couponCode;
+  const appliedCouponPercentage =
+    items.find((i) => i.appliedCouponPercentage != null)?.appliedCouponPercentage ?? null;
 
   const shippingFromCart = items.reduce(
     (sum, item) =>
@@ -158,6 +160,7 @@ export function useCartSummary(
     productLevelSavings,
     productLevelPercent,
     appliedCouponCode,
+    appliedCouponPercentage,
     shippingFromCart,
     qualifiesForFreeShipping,
     effectiveShippingCost,

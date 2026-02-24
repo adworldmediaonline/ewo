@@ -151,9 +151,10 @@ export default function CheckoutOrderArea({ checkoutData, variant = 'full' }) {
               (summary.productLevelSavings > 0 && summary.productLevelPercent > 0)) && (
               <AutoApplySavingsBanner
                 percent={
-                  summary.productLevelSavings > 0
+                  summary.appliedCouponPercentage ??
+                  (summary.productLevelSavings > 0
                     ? summary.productLevelPercent
-                    : summary.autoApplyPercent
+                    : summary.autoApplyPercent)
                 }
                 couponCode={summary.appliedCouponCode ?? summary.couponCode}
               />
