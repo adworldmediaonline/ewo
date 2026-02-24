@@ -17,6 +17,7 @@ import { ProductCardImage } from './product-card-image';
 import { ProductCardInfo } from './product-card-info';
 import { ProductCardPrice } from './product-card-price';
 import { ProductCardActions } from './product-card-actions';
+import { resolveCartItemPrice } from '@/lib/product-price';
 import { useProductCard } from './use-product-card';
 
 export type ProductCardVariant = 'shop' | 'related' | 'search' | 'wishlist';
@@ -72,13 +73,8 @@ export function ProductCard({
   const {
     isAddedToCart,
     isAddedToWishlist,
-    hasCoupon,
-    couponPercentage,
-    couponCode,
-    couponReady,
     hasProductDiscount,
     hasConfigurations,
-    hasEnrichedPrices,
     imageSrc,
     imageAlt,
     imageTitle,
@@ -90,6 +86,7 @@ export function ProductCard({
     cartQuantity,
     calculateFinalPrice,
     calculateMarkedPrice,
+    showMarkedPrice,
   } = useProductCard({
     product: productWithOptions,
     selectedOption,
@@ -113,21 +110,8 @@ export function ProductCard({
       return;
     }
 
-    let finalPrice: number;
-    if (hasEnrichedPrices && typeof product.displayPrice === 'number') {
-      const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-      finalPrice = product.displayPrice + optionPrice;
-    } else {
-      const basePrice = hasProductDiscount
-        ? Number(product.finalPriceDiscount)
-        : Number(product.finalPriceDiscount || product.price);
-      let discountedBasePrice = basePrice;
-      if (couponReady && hasCoupon && couponPercentage) {
-        discountedBasePrice = basePrice * (1 - couponPercentage / 100);
-      }
-      const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-      finalPrice = discountedBasePrice + optionPrice;
-    }
+    const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+    const finalPrice = resolveCartItemPrice(product, optionPrice);
 
     if (addToCartAnimation && imageSrc && variant === 'shop') {
       const sourceRect = imageContainerRef.current?.getBoundingClientRect();
@@ -139,21 +123,11 @@ export function ProductCard({
       }
     }
 
-    const basePriceForCart =
-      hasEnrichedPrices
-        ? Number(product.displayPrice ?? product.finalPriceDiscount ?? product.price)
-        : hasProductDiscount
-          ? Number(product.finalPriceDiscount)
-          : Number(product.finalPriceDiscount || product.price);
-    const productToAdd =
-      hasCoupon
-        ? {
-            ...product,
-            finalPriceDiscount: finalPrice,
-            basePrice: basePriceForCart,
-            appliedCouponCode: couponCode ?? undefined,
-          }
-        : { ...product, finalPriceDiscount: finalPrice };
+    const productToAdd = {
+      ...product,
+      finalPriceDiscount: finalPrice,
+      basePrice: Number(product.displayMarkedPrice ?? product.finalPriceDiscount ?? 0),
+    };
     onAddToCart?.(productToAdd as never, selectedOption ?? undefined);
   };
 
@@ -187,21 +161,8 @@ export function ProductCard({
   const handleDecrementFromCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    let finalPrice: number;
-    if (hasEnrichedPrices && typeof product.displayPrice === 'number') {
-      const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-      finalPrice = product.displayPrice + optionPrice;
-    } else {
-      const basePrice = hasProductDiscount
-        ? Number(product.finalPriceDiscount)
-        : Number(product.finalPriceDiscount || product.price);
-      let discountedBasePrice = basePrice;
-      if (couponReady && hasCoupon && couponPercentage) {
-        discountedBasePrice = basePrice * (1 - couponPercentage / 100);
-      }
-      const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-      finalPrice = discountedBasePrice + optionPrice;
-    }
+    const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+    const finalPrice = resolveCartItemPrice(product, optionPrice);
     const productToDecrement = {
       ...product,
       finalPriceDiscount: finalPrice,
@@ -257,7 +218,7 @@ export function ProductCard({
       onVideoClick={videoId ? handleVideoClick : undefined}
       showQuickActions={!!onAddToWishlist || !!onAddToCart}
       hideQuickActionsOnMobile={variant === 'shop'}
-      quickActionsTop={hasCoupon && couponPercentage ? 'top-8' : 'top-2'}
+      quickActionsTop="top-2"
       onAddToWishlist={handleAddToWishlist}
       onAddToCart={handleAddToCart}
       isAddedToWishlist={isAddedToWishlist}
@@ -285,13 +246,7 @@ export function ProductCard({
       <ProductCardPrice
         finalPrice={finalPrice}
         markedPrice={markedPrice}
-        showMarkedPrice={
-          hasEnrichedPrices
-            ? (product.hasDisplayDiscount ?? false) && markedPrice !== finalPrice
-            : (hasProductDiscount ||
-                (couponReady && hasCoupon && couponPercentage > 0)) &&
-              markedPrice !== finalPrice
-        }
+        showMarkedPrice={showMarkedPrice}
       />
 
         <ProductCardActions

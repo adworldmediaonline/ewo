@@ -42,8 +42,8 @@ export function useCartSummary(
 
   const items = Array.isArray(cart_products) ? cart_products : [];
   const productLevelSavings = items.reduce((sum, item) => {
-    const base = Number(item.basePrice ?? item.finalPriceDiscount ?? item.price ?? 0);
-    const final = Number(item.finalPriceDiscount ?? item.price ?? 0);
+    const base = Number(item.basePrice ?? item.finalPriceDiscount ?? 0);
+    const final = Number(item.finalPriceDiscount ?? 0);
     const qty = Number(item.orderQuantity ?? 0);
     if (base > final && qty > 0) {
       return sum + (base - final) * qty;

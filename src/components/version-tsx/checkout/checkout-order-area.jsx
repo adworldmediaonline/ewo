@@ -184,7 +184,7 @@ export default function CheckoutOrderArea({ checkoutData, variant = 'full' }) {
               items={items.map((i) => ({
                 productId: i._id,
                 quantity: i.orderQuantity,
-                unitPrice: Number(i.finalPriceDiscount || i.price || 0),
+                unitPrice: Number(i.finalPriceDiscount ?? 0),
                 title: i.title,
               }))}
               onApplied={(amount, code) => dispatch(applyCoupon({ code, discountAmount: amount }))}

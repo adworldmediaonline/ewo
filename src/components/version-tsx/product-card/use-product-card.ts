@@ -2,8 +2,10 @@
 
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { useProductCoupon } from '@/hooks/useProductCoupon';
-import { useRefetchOnVisibility } from '@/hooks/use-refetch-on-visibility';
+import {
+  getProductDisplayPrices,
+  resolveCartItemPrice,
+} from '@/lib/product-price';
 import {
   getProductImageSrcForDisplay,
   getProductImageAlt,
@@ -33,10 +35,6 @@ export interface UseProductCardResult {
   isAddedToCart: boolean;
   cartQuantity: number;
   isAddedToWishlist: boolean;
-  hasCoupon: boolean;
-  couponPercentage: number;
-  couponCode: string | null;
-  couponReady: boolean;
   hasProductDiscount: boolean;
   hasConfigurations: boolean;
   imageSrc: string;
@@ -49,8 +47,7 @@ export interface UseProductCardResult {
   averageRating: number;
   calculateFinalPrice: (option?: SelectedOption | null) => string;
   calculateMarkedPrice: (option?: SelectedOption | null) => string;
-  /** True when product has pre-computed display prices (from server enrichment) */
-  hasEnrichedPrices: boolean;
+  showMarkedPrice: boolean;
 }
 
 export function useProductCard({
@@ -61,36 +58,13 @@ export function useProductCard({
   const { cart_products } = useSelector((state: { cart: { cart_products: unknown[] } }) => state.cart);
   const { wishlist } = useSelector((state: { wishlist: { wishlist: unknown[] } }) => state.wishlist);
 
-  const baseUnitPrice = Number(product.finalPriceDiscount || product.price || 0);
-  const couponRefetchKey = useRefetchOnVisibility();
-
-  /** Pre-computed display prices from server enrichment (Shop page) - skip coupon logic */
-  const hasEnrichedPrices =
-    typeof product.displayPrice === 'number' &&
-    (product.displayMarkedPrice === undefined ||
-      typeof product.displayMarkedPrice === 'number');
-
-  /** Per-product coupon fetch - only when not enriched (wishlist, search, related) */
-  const fallbackCoupon = useProductCoupon(
-    product._id,
-    baseUnitPrice,
-    couponRefetchKey
+  const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+  const displayPrices = useMemo(
+    () => getProductDisplayPrices(product, { optionPrice }),
+    [product, optionPrice]
   );
 
-  const hasCoupon = hasEnrichedPrices ? false : fallbackCoupon.hasCoupon;
-  const couponPercentage = hasEnrichedPrices ? 0 : fallbackCoupon.couponPercentage;
-  const couponCode = hasEnrichedPrices ? null : fallbackCoupon.couponCode;
-  const couponReady = hasEnrichedPrices ? true : fallbackCoupon.couponReady;
-
-  /** Product-level discount from backend: finalPriceDiscount < price. When enriched, use hasDisplayDiscount. */
-  const hasProductDiscount = useMemo(() => {
-    if (typeof product.hasDisplayDiscount === 'boolean') {
-      return product.hasDisplayDiscount;
-    }
-    const priceVal = Number(product.price ?? 0);
-    const discountVal = Number(product.finalPriceDiscount ?? 0);
-    return discountVal > 0 && discountVal < priceVal;
-  }, [product.price, product.finalPriceDiscount, product.hasDisplayDiscount]);
+  const hasProductDiscount = product.hasDisplayDiscount ?? false;
 
   const cartItem = (cart_products as { _id: string; orderQuantity?: number; selectedOption?: { title: string } }[]).find(
     (prd) => {
@@ -135,42 +109,21 @@ export function useProductCard({
       : 0;
 
   const calculateFinalPrice = (opt?: SelectedOption | null) => {
-    if (hasEnrichedPrices && typeof product.displayPrice === 'number') {
-      const optionPrice = (opt ?? selectedOption) ? Number((opt ?? selectedOption)!.price) : 0;
-      return (product.displayPrice + optionPrice).toFixed(2);
-    }
-    const basePrice = hasProductDiscount
-      ? Number(product.finalPriceDiscount)
-      : Number(product.finalPriceDiscount || product.price);
-    let discountedBasePrice = basePrice;
-    if (couponReady && hasCoupon && couponPercentage) {
-      discountedBasePrice = basePrice * (1 - couponPercentage / 100);
-    }
-    const optionPrice = (opt ?? selectedOption) ? Number((opt ?? selectedOption)!.price) : 0;
-    const finalPrice = discountedBasePrice + optionPrice;
-    return finalPrice.toFixed(2);
+    const optPrice = (opt ?? selectedOption) ? Number((opt ?? selectedOption)!.price) : 0;
+    const prices = getProductDisplayPrices(product, { optionPrice: optPrice });
+    return prices.finalPrice.toFixed(2);
   };
 
   const calculateMarkedPrice = (opt?: SelectedOption | null) => {
-    if (hasEnrichedPrices && typeof product.displayMarkedPrice === 'number') {
-      const optionPrice = (opt ?? selectedOption) ? Number((opt ?? selectedOption)!.price) : 0;
-      return (product.displayMarkedPrice + optionPrice).toFixed(2);
-    }
-    const originalPrice = hasProductDiscount
-      ? Number(product.price ?? product.updatedPrice ?? 0)
-      : Number(product.finalPriceDiscount || product.price);
-    const optionPrice = (opt ?? selectedOption) ? Number((opt ?? selectedOption)!.price) : 0;
-    return (originalPrice + optionPrice).toFixed(2);
+    const optPrice = (opt ?? selectedOption) ? Number((opt ?? selectedOption)!.price) : 0;
+    const prices = getProductDisplayPrices(product, { optionPrice: optPrice });
+    return (prices.markedPrice ?? prices.finalPrice).toFixed(2);
   };
 
   return {
     isAddedToCart,
     cartQuantity,
     isAddedToWishlist,
-    hasCoupon,
-    couponPercentage,
-    couponCode,
-    couponReady,
     hasProductDiscount,
     hasConfigurations,
     imageSrc,
@@ -183,6 +136,6 @@ export function useProductCard({
     averageRating,
     calculateFinalPrice,
     calculateMarkedPrice,
-    hasEnrichedPrices,
+    showMarkedPrice: displayPrices.showMarkedPrice,
   };
 }

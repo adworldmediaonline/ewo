@@ -1,14 +1,11 @@
 /**
  * Shared product pricing logic.
- * finalPriceDiscount is the single source of truth.
- * Marked price = original base price. Final price = price after all discounts.
+ * finalPriceDiscount is the ONLY field for final selling price. Do not use price.
+ * Marked price = displayMarkedPrice when provided by enrichment (for strikethrough).
  */
 
 export interface ProductPriceInput {
-  price?: number;
-  updatedPrice?: number;
   finalPriceDiscount?: number;
-  displayPrice?: number;
   displayMarkedPrice?: number;
   hasDisplayDiscount?: boolean;
 }
@@ -24,61 +21,43 @@ export interface ProductDisplayPrices {
 
 /**
  * Get display prices for a product.
- * Uses displayPrice/displayMarkedPrice when present (from server enrichment).
- * Otherwise computes from finalPriceDiscount (single source of truth).
+ * Uses finalPriceDiscount only for final price. Do not use price field.
+ * Uses displayMarkedPrice when provided (from server enrichment) for marked price.
  */
 export function getProductDisplayPrices(
   product: ProductPriceInput,
-  options?: {
-    optionPrice?: number;
-    couponPercentage?: number;
-  }
+  options?: { optionPrice?: number }
 ): ProductDisplayPrices {
   const optionPrice = options?.optionPrice ?? 0;
-  const couponPercentage = options?.couponPercentage ?? 0;
 
-  // Pre-computed from server enrichment
-  if (
-    typeof product.displayPrice === "number" &&
-    product.displayPrice >= 0
-  ) {
-    const finalPrice = product.displayPrice + optionPrice;
-    const markedPrice =
-      typeof product.displayMarkedPrice === "number"
-        ? product.displayMarkedPrice + optionPrice
-        : undefined;
-    const showMarkedPrice =
-      (product.hasDisplayDiscount ?? false) && markedPrice != null && markedPrice > finalPrice;
+  // Final price = finalPriceDiscount only (enrichment sets this including coupon when auto-apply)
+  const mainPrice = Number(product.finalPriceDiscount ?? 0);
+  const finalPrice = mainPrice + optionPrice;
+
+  // Free products: no marked price, no coupon display
+  if (finalPrice === 0) {
     return {
-      finalPrice,
-      markedPrice: showMarkedPrice ? markedPrice : undefined,
-      showMarkedPrice,
+      finalPrice: 0,
+      markedPrice: undefined,
+      showMarkedPrice: false,
     };
   }
 
-  // Fallback: compute from finalPriceDiscount (single source of truth)
-  const mainPrice = Number(product.finalPriceDiscount ?? product.price ?? 0);
-  const originalBasePrice = Number(
-    product.price ?? product.updatedPrice ?? mainPrice
-  );
+  // Marked price = displayMarkedPrice when enrichment provides it (for strikethrough)
+  const markedPrice =
+    typeof product.displayMarkedPrice === "number"
+      ? product.displayMarkedPrice + optionPrice
+      : undefined;
 
-  let finalPrice = mainPrice;
-  if (couponPercentage > 0) {
-    finalPrice = Math.round(mainPrice * (1 - couponPercentage / 100) * 100) / 100;
-  }
-  finalPrice += optionPrice;
-
-  const hasProductDiscount = mainPrice > 0 && mainPrice < originalBasePrice;
-  const hasCouponDiscount = couponPercentage > 0;
-  const showMarkedPrice = hasProductDiscount || hasCouponDiscount;
-  const markedPrice = showMarkedPrice
-    ? originalBasePrice + optionPrice
-    : undefined;
+  const showMarkedPrice =
+    (product.hasDisplayDiscount ?? false) &&
+    markedPrice != null &&
+    markedPrice > finalPrice;
 
   return {
     finalPrice,
-    markedPrice: markedPrice != null && markedPrice > finalPrice ? markedPrice : undefined,
-    showMarkedPrice: showMarkedPrice && (markedPrice == null || markedPrice > finalPrice),
+    markedPrice: showMarkedPrice ? markedPrice : undefined,
+    showMarkedPrice,
   };
 }
 
@@ -87,4 +66,16 @@ export function getProductDisplayPrices(
  */
 export function formatPrice(value: number): string {
   return value.toFixed(2);
+}
+
+/**
+ * Resolve unit price for cart item. Uses finalPriceDiscount only.
+ * Add optionPrice when product has selected option.
+ */
+export function resolveCartItemPrice(
+  product: { finalPriceDiscount?: number },
+  optionPrice = 0
+): number {
+  const base = Number(product.finalPriceDiscount ?? 0);
+  return Math.round((base + optionPrice) * 100) / 100;
 }
