@@ -1,5 +1,7 @@
 'use client';
 
+import { add_cart_product } from '@/redux/features/cartSlice';
+import { notifySuccess } from '@/utils/toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import dayjs from 'dayjs';
@@ -7,12 +9,15 @@ import {
   CreditCard,
   DollarSign,
   Eye,
+  ExternalLink,
   Package,
+  RotateCcw,
   ShoppingCart,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import React from 'react';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import OrderStatusBadge from './order-status-badge';
 
 interface OrderCardProps {
@@ -20,8 +25,42 @@ interface OrderCardProps {
 }
 
 const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
+  const dispatch = useDispatch();
+  const [isReordering, setIsReordering] = useState(false);
+
+  const handleReorder = async () => {
+    if (!order.cart?.length) return;
+    setIsReordering(true);
+    let addedCount = 0;
+    for (const item of order.cart) {
+      const qty = item.orderQuantity || 1;
+      const cartProduct = {
+        _id: item._id,
+        title: item.title || `Product`,
+        img: item.img || '',
+        finalPriceDiscount: Number(item.finalPriceDiscount || 0),
+        orderQuantity: 1,
+        quantity: item.quantity || 999,
+        slug: item.slug || item._id,
+        shipping: item.shipping || { price: 0 },
+        sku: item.sku ?? item._id ?? '',
+        selectedOption: item.selectedOption,
+      };
+      for (let i = 0; i < qty; i++) {
+        dispatch(add_cart_product(cartProduct));
+        addedCount++;
+      }
+    }
+    setIsReordering(false);
+    notifySuccess(`Added ${addedCount} item${addedCount !== 1 ? 's' : ''} to cart`);
+  };
   const orderDate = dayjs(order.createdAt).format('MMM D, YYYY');
   const orderTime = dayjs(order.createdAt).format('h:mm A');
+
+  const trackingUrl =
+    order.shippingDetails?.trackingUrl ||
+    order.shippingDetails?.carriers?.[0]?.trackingUrl;
+  const hasTracking = Boolean(trackingUrl);
 
   return (
     <Card className="hover:shadow-md transition-shadow duration-200">
@@ -46,20 +85,54 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
             {/* Order Status and Actions - Mobile Optimized */}
             <div className="flex flex-col items-end gap-2 flex-shrink-0">
               <OrderStatusBadge status={order.status} />
-              <Button
-                asChild
-                size="sm"
-                variant="outline"
-                className="text-xs px-2 py-1 h-8"
-              >
-                <Link
-                  href={`/order/${order._id}`}
-                  className="flex items-center gap-1"
+              <div className="flex flex-wrap items-center gap-1">
+                {order.cart?.length > 0 && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-xs px-2 py-1 h-8"
+                    onClick={handleReorder}
+                    disabled={isReordering}
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                    <span className="hidden sm:inline">
+                      {isReordering ? 'Adding...' : 'Reorder'}
+                    </span>
+                  </Button>
+                )}
+                {hasTracking && (
+                  <Button
+                    asChild
+                    size="sm"
+                    variant="outline"
+                    className="text-xs px-2 py-1 h-8"
+                  >
+                    <a
+                      href={trackingUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      <span className="hidden sm:inline">Track</span>
+                    </a>
+                  </Button>
+                )}
+                <Button
+                  asChild
+                  size="sm"
+                  variant="outline"
+                  className="text-xs px-2 py-1 h-8"
                 >
-                  <Eye className="w-3 h-3" />
-                  <span className="hidden sm:inline">View</span>
-                </Link>
-              </Button>
+                  <Link
+                    href={`/order/${order._id}`}
+                    className="flex items-center gap-1"
+                  >
+                    <Eye className="w-3 h-3" />
+                    <span className="hidden sm:inline">View</span>
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
 

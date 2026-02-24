@@ -10,6 +10,8 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import {
+  ChevronLeft,
+  Heart,
   Home,
   Menu,
   Package,
@@ -62,6 +64,12 @@ const ProfileLayout: React.FC<ProfileLayoutProps> = ({
       label: 'Settings',
       icon: Settings,
       description: 'Security and preferences',
+    },
+    {
+      id: 'wishlist',
+      label: 'Wishlist',
+      icon: Heart,
+      description: 'Your saved items',
     },
   ];
 
@@ -210,6 +218,13 @@ const ProfileLayout: React.FC<ProfileLayoutProps> = ({
         {/* Main Content */}
         <main className="flex-1 min-w-0">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+            <Link
+              href="/shop"
+              className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Back to shop
+            </Link>
             {children}
           </div>
         </main>

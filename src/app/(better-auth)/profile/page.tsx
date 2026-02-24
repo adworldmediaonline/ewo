@@ -2,16 +2,18 @@
 
 import { Button } from '@/components/ui/button';
 import { authClient } from '@/lib/authClient';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useQueryState } from 'nuqs';
 
 import {
   ProfileDetails,
   ProfileLayout,
+  ProfileLoadingState,
   ProfileOrdersSection,
   ProfileOrderStats,
   ProfileSettings,
+  ProfileWishlist,
 } from '@/components/version-tsx/profile';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -24,7 +26,7 @@ export default function DashboardPage() {
     defaultValue: 'overview',
     parse: value => {
       // Validate tab value to prevent invalid states
-      const validTabs = ['overview', 'orders', 'profile', 'settings'];
+      const validTabs = ['overview', 'orders', 'profile', 'settings', 'wishlist'];
       return validTabs.includes(value) ? value : 'overview';
     },
   });
@@ -44,20 +46,12 @@ export default function DashboardPage() {
   }, [session, isPending, router]);
 
   if (isPending) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader2 className="animate-spin" />
-      </div>
-    );
+    return <ProfileLoadingState />;
   }
 
   // Show loading while redirecting
   if (!session || !session.user) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader2 className="animate-spin" />
-      </div>
-    );
+    return <ProfileLoadingState />;
   }
 
   const renderTabContent = () => {
@@ -146,6 +140,21 @@ export default function DashboardPage() {
               </p>
             </div>
             <ProfileSettings />
+          </div>
+        );
+
+      case 'wishlist':
+        return (
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground mb-2">
+                My Wishlist
+              </h1>
+              <p className="text-lg text-muted-foreground">
+                Your saved items and favorites
+              </p>
+            </div>
+            <ProfileWishlist />
           </div>
         );
 

@@ -12,8 +12,17 @@ import {
 import { useGetUserOrdersQuery } from '@/redux/features/order/orderApi';
 import { AlertTriangle, ArrowRight, Package } from 'lucide-react';
 import Link from 'next/link';
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import OrderCard from './order-card';
+
+const ORDER_STATUS_FILTERS = [
+  { value: 'all', label: 'All' },
+  { value: 'pending', label: 'Pending' },
+  { value: 'processing', label: 'Processing' },
+  { value: 'shipped', label: 'Shipped' },
+  { value: 'delivered', label: 'Delivered' },
+  { value: 'cancel', label: 'Cancelled' },
+] as const;
 
 interface ProfileOrdersSectionProps {
   userId?: string;
@@ -26,6 +35,8 @@ const ProfileOrdersSection: React.FC<ProfileOrdersSectionProps> = ({
   maxOrders = 5,
   showViewAllButton = true,
 }) => {
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+
   // Fetch user orders
   const {
     data: ordersData,
@@ -36,7 +47,17 @@ const ProfileOrdersSection: React.FC<ProfileOrdersSectionProps> = ({
     refetchOnMountOrArgChange: true,
   });
 
-  const orders = ordersData?.orders || [];
+  const allOrders = ordersData?.orders || [];
+
+  const filteredOrders = useMemo(() => {
+    if (statusFilter === 'all') return allOrders;
+    return allOrders.filter(
+      (o: { status?: string }) =>
+        String(o.status || '').toLowerCase() === statusFilter.toLowerCase()
+    );
+  }, [allOrders, statusFilter]);
+
+  const orders = filteredOrders;
 
   // Loading state
   if (ordersLoading) {
@@ -101,8 +122,8 @@ const ProfileOrdersSection: React.FC<ProfileOrdersSectionProps> = ({
     );
   }
 
-  // Empty state
-  if (!orders || orders.length === 0) {
+  // Empty state - no orders at all (before filter)
+  if (!allOrders || allOrders.length === 0) {
     return (
       <Card>
         <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
@@ -140,38 +161,71 @@ const ProfileOrdersSection: React.FC<ProfileOrdersSectionProps> = ({
     );
   }
 
-  // Orders display
+  // Orders display (with optional filter - may show "no matches" when filtered)
   return (
     <Card>
       <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
-        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-          <Package className="w-5 h-5 text-primary" />
-          Recent Orders
-        </CardTitle>
-        <CardDescription className="text-sm">
-          Track your order status and view order details
-        </CardDescription>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <Package className="w-5 h-5 text-primary" />
+              Recent Orders
+            </CardTitle>
+            <CardDescription className="text-sm">
+              Track your order status and view order details
+            </CardDescription>
+          </div>
+          <div className="flex flex-wrap gap-1">
+            {ORDER_STATUS_FILTERS.map(({ value, label }) => (
+              <Button
+                key={value}
+                variant={statusFilter === value ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setStatusFilter(value)}
+                className="text-xs"
+              >
+                {label}
+              </Button>
+            ))}
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-        <div className="space-y-3 sm:space-y-4">
-          {orders.slice(0, maxOrders).map((order: any) => (
-            <OrderCard key={order._id} order={order} />
-          ))}
+        {orders.length === 0 ? (
+          <div className="text-center py-8 sm:py-12">
+            <p className="text-sm text-muted-foreground">
+              No orders match the selected filter.
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-4"
+              onClick={() => setStatusFilter('all')}
+            >
+              Clear filter
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-3 sm:space-y-4">
+            {orders.slice(0, maxOrders).map((order: any) => (
+              <OrderCard key={order._id} order={order} />
+            ))}
 
-          {showViewAllButton && orders.length > maxOrders && (
-            <div className="text-center pt-4">
-              <Button variant="outline" asChild className="w-full sm:w-auto">
-                <Link
-                  href="/orders"
-                  className="flex items-center justify-center gap-2"
-                >
-                  View All Orders ({orders.length})
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </Button>
-            </div>
-          )}
-        </div>
+            {showViewAllButton && orders.length > maxOrders && (
+              <div className="text-center pt-4">
+                <Button variant="outline" asChild className="w-full sm:w-auto">
+                  <Link
+                    href="/orders"
+                    className="flex items-center justify-center gap-2"
+                  >
+                    View All Orders ({orders.length})
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
