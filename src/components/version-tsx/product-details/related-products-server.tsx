@@ -1,4 +1,5 @@
 import { getRelatedProducts } from '@/server/products';
+import { enrichProductsWithDisplayPrices } from '@/server/enrich-products';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
@@ -16,7 +17,8 @@ interface RelatedProductsServerProps {
 export default async function RelatedProductsServer({
   productId,
 }: RelatedProductsServerProps) {
-  const relatedProducts = await getRelatedProducts(productId);
+  const raw = await getRelatedProducts(productId);
+  const relatedProducts = await enrichProductsWithDisplayPrices(raw);
 
   // Empty state
   if (relatedProducts.length === 0) {

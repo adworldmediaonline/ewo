@@ -35,8 +35,7 @@ import {
 import { add_to_compare } from '@/redux/features/compareSlice';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { notifyError, notifySuccess } from '@/utils/toast';
-import { useProductCoupon } from '@/hooks/useProductCoupon';
-import { useRefetchOnVisibility } from '@/hooks/use-refetch-on-visibility';
+import { getProductDisplayPrices, resolveCartItemPrice } from '@/lib/product-price';
 import {
   BarChart3,
   CheckCircle,
@@ -144,14 +143,7 @@ export default function DetailsWrapper({
   const [selectedOption, setSelectedOption] = useState(null);
   const [customNotes, setCustomNotes] = useState({});
 
-  // Check if coupon is active for this product (when auto-apply is enabled)
-  const baseUnitPrice = Number(productItem?.finalPriceDiscount || productItem?.price || 0);
-  const couponRefetchKey = useRefetchOnVisibility();
-  const { hasCoupon, couponPercentage } = useProductCoupon(
-    productItem?._id || '',
-    baseUnitPrice,
-    couponRefetchKey
-  );
+  // Product is pre-enriched in getProductSingle - finalPriceDiscount includes coupon when auto-apply
 
   // Initialize selectedConfigurations with preselected options from backend
   const [selectedConfigurations, setSelectedConfigurations] = useState(() => {
@@ -348,8 +340,7 @@ export default function DetailsWrapper({
 
   // finalPriceDiscount is single source of truth. Marked = original base. Final = after discounts.
   const calculateFinalPrice = () => {
-    // Main price from backend (product/category discounts already applied)
-    let basePrice = Number(finalPriceDiscount ?? price ?? 0);
+    let basePrice = Number(finalPriceDiscount ?? 0);
 
     const configResult = getSelectedConfigurationPrice();
     const configFixedPrice = configResult.fixedPrice || 0;
@@ -359,19 +350,13 @@ export default function DetailsWrapper({
       basePrice = configFixedPrice;
     }
 
-    let discountedBasePrice = basePrice;
-    if (hasCoupon && couponPercentage) {
-      discountedBasePrice = basePrice * (1 - couponPercentage / 100);
-    }
-
-    const adjustedPrice = applyPercentageAdjustments(discountedBasePrice, percentageAdjustments);
+    const adjustedPrice = applyPercentageAdjustments(basePrice, percentageAdjustments);
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
     return (adjustedPrice + optionPrice).toFixed(2);
   };
 
-  // Marked price = original base (before product/coupon discounts)
   const calculateMarkedUpPrice = () => {
-    const originalBase = Number(price ?? updatedPrice ?? finalPriceDiscount ?? 0);
+    const originalBase = Number(productItem?.displayMarkedPrice ?? finalPriceDiscount ?? 0);
     let basePrice = originalBase;
 
     const configResult = getSelectedConfigurationPrice();
@@ -387,9 +372,8 @@ export default function DetailsWrapper({
     return (adjustedPrice + optionPrice).toFixed(2);
   };
 
-  // Show marked price when: product discount (finalPriceDiscount < price) OR coupon applies
-  const hasProductDiscount = Number(finalPriceDiscount ?? 0) > 0 && Number(finalPriceDiscount ?? 0) < Number(price ?? 0);
-  const showMarkedPrice = hasProductDiscount || (hasCoupon && couponPercentage);
+  const hasProductDiscount = productItem?.hasDisplayDiscount ?? false;
+  const showMarkedPrice = hasProductDiscount;
 
   // Handle option selection
   const handleOptionChange = e => {
@@ -509,12 +493,10 @@ export default function DetailsWrapper({
     }
     //
     // SIMPLE PRICE CALCULATION - Always start fresh from original product price
-    const originalProductPrice = Number(prd.price || 0);
-    const markedUpPrice = prd.updatedPrice || originalProductPrice;
+    const markedUpPrice = Number(prd.displayMarkedPrice ?? prd.finalPriceDiscount ?? 0);
 
     // Step 1: Determine base price - sum all selected configuration option prices
-    // Get base price (original price, not discounted)
-    let basePrice = Number(prd.finalPriceDiscount || originalProductPrice);
+    let basePrice = Number(prd.finalPriceDiscount ?? 0);
 
     // Get configuration prices and percentage adjustments
     const configResult = getSelectedConfigurationPrice();
@@ -526,14 +508,8 @@ export default function DetailsWrapper({
       basePrice = configFixedPrice;
     }
 
-    // Step 2: Apply coupon discount to base price FIRST (if coupon is active)
-    let discountedBasePrice = basePrice;
-    if (hasCoupon && couponPercentage) {
-      discountedBasePrice = basePrice * (1 - couponPercentage / 100);
-    }
-
-    // Step 3: Apply percentage adjustments to the discounted base price
-    let adjustedPrice = applyPercentageAdjustments(discountedBasePrice, percentageAdjustments);
+    // Product is pre-enriched - finalPriceDiscount includes coupon when auto-apply
+    const adjustedPrice = applyPercentageAdjustments(basePrice, percentageAdjustments);
 
     // Step 4: THEN add product option price to the already discounted and adjusted base price
     // No discount is applied to options - they're added at full price
@@ -741,12 +717,10 @@ export default function DetailsWrapper({
     }
 
     // SIMPLE PRICE CALCULATION - Always start fresh from original product price
-    const originalProductPrice = Number(prd.price || 0);
-    const markedUpPrice = prd.updatedPrice || originalProductPrice;
+    const markedUpPrice = Number(prd.displayMarkedPrice ?? prd.finalPriceDiscount ?? 0);
 
     // Step 1: Determine base price - sum all selected configuration option prices
-    // Get base price (original price, not discounted)
-    let basePrice = Number(prd.finalPriceDiscount || originalProductPrice);
+    let basePrice = Number(prd.finalPriceDiscount ?? 0);
 
     // Get configuration prices and percentage adjustments
     const configResult = getSelectedConfigurationPrice();
@@ -758,14 +732,8 @@ export default function DetailsWrapper({
       basePrice = configFixedPrice;
     }
 
-    // Step 2: Apply coupon discount to base price FIRST (if coupon is active)
-    let discountedBasePrice = basePrice;
-    if (hasCoupon && couponPercentage) {
-      discountedBasePrice = basePrice * (1 - couponPercentage / 100);
-    }
-
-    // Step 3: Apply percentage adjustments to the discounted base price
-    let adjustedPrice = applyPercentageAdjustments(discountedBasePrice, percentageAdjustments);
+    // Product is pre-enriched - finalPriceDiscount includes coupon when auto-apply
+    const adjustedPrice = applyPercentageAdjustments(basePrice, percentageAdjustments);
 
     // Step 4: THEN add product option price to the already discounted and adjusted base price
     // No discount is applied to options - they're added at full price

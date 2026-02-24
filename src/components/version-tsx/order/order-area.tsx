@@ -312,7 +312,7 @@ export default function OrderArea({ orderId }: { orderId: string }) {
   const orderTime = dayjs(createdAt).format('h:mm A');
   const subtotal = cart.reduce(
     (sum: number, item: any) =>
-      sum + Number(item.finalPriceDiscount ?? item.price ?? 0) * (item.orderQuantity ?? 1),
+      sum + Number(item.finalPriceDiscount ?? 0) * (item.orderQuantity ?? 1),
     0
   );
 
@@ -888,11 +888,11 @@ export default function OrderArea({ orderId }: { orderId: string }) {
                   </div>
                   <div className="text-right flex-shrink-0">
                     <div className="font-semibold text-foreground">
-                      ${(Number(item.finalPriceDiscount ?? item.price ?? 0) * (item.orderQuantity ?? 1)).toFixed(2)}
+                      ${(Number(item.finalPriceDiscount ?? 0) * (item.orderQuantity ?? 1)).toFixed(2)}
                     </div>
                     {item.orderQuantity > 1 && (
                       <div className="text-xs text-muted-foreground">
-                        ${Number(item.finalPriceDiscount ?? item.price ?? 0).toFixed(2)} each
+                        ${Number(item.finalPriceDiscount ?? 0).toFixed(2)} each
                       </div>
                     )}
                   </div>

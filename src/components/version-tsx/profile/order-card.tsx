@@ -172,7 +172,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
                       )}
                       <div className="flex flex-wrap gap-2 mt-1 text-xs text-muted-foreground">
                         <span>Qty: {item.orderQuantity || 1}</span>
-                        <span>${Number(item.finalPriceDiscount ?? item.price ?? 0).toFixed(2)}</span>
+                        <span>${Number(item.finalPriceDiscount ?? 0).toFixed(2)}</span>
                       </div>
                     </div>
                   </div>

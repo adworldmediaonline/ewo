@@ -43,8 +43,14 @@ export const wishlistSlice = createSlice({
       notifyError(`${payload.title} removed from wishlist`);
     },
     get_wishlist_products: state => {
-      state.wishlist = (getLocalStorage('wishlist_items') ||
-        []) as WishlistItem[];
+      const raw = (getLocalStorage('wishlist_items') || []) as WishlistItem[];
+      // Legacy migration: ensure all items have finalPriceDiscount for display
+      state.wishlist = raw.map((item: WishlistItem) => {
+        const hasFinal = item.finalPriceDiscount != null && item.finalPriceDiscount !== '';
+        if (hasFinal) return item;
+        const fallback = Number((item as { updatedPrice?: number }).updatedPrice ?? (item as { price?: number }).price ?? 0);
+        return { ...item, finalPriceDiscount: fallback };
+      });
     },
   },
 });

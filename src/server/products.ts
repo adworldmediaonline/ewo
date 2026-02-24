@@ -3,6 +3,7 @@
 // import { cache } from "react";
 import { cacheLife } from "next/cache";
 import { API_ENDPOINT } from "./api-endpoint";
+import { enrichProductsWithDisplayPrices } from "@/server/enrich-products";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -88,8 +89,10 @@ export async function getProductSingle(id: string) {
       throw new Error('Failed to fetch product');
     }
     const data = await response.json();
+    if (!data) return null;
 
-    return data;
+    const [enriched] = await enrichProductsWithDisplayPrices([data]);
+    return enriched ?? data;
   } catch (error) {
     console.error('Error fetching product:', error);
     return null;

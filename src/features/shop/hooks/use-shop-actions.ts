@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { add_cart_product } from '@/redux/features/cartSlice';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { notifyError, notifySuccess } from '@/utils/toast';
-import { useProductCoupon } from '@/hooks/useProductCoupon';
+import { resolveCartItemPrice } from '@/lib/product-price';
 
 import type { ShopProduct, AddToCartProduct } from '../shop-types';
 import type { ProductBase } from '@/types/product';
@@ -50,23 +50,21 @@ export const useShopActions = () => {
         return;
       }
 
-      // Use the finalPriceDiscount from product (already calculated with coupon discount if active)
-      // The product card calculates this price: if coupon is active, it applies the discount;
-      // if not active, it uses the original finalPriceDiscount
-      const finalPrice = Number(product.finalPriceDiscount || 0);
+      const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
+      const finalPrice = resolveCartItemPrice(product, optionPrice);
 
       const cartProduct = {
         _id: product._id,
         title: product.title,
         img: (product as any).image?.url ?? product.imageURLs?.[0] ?? product.img ?? '',
-        finalPriceDiscount: finalPrice, // Use price from product (already includes coupon discount if active)
+        finalPriceDiscount: finalPrice,
         orderQuantity: 1,
         quantity: product.quantity,
         slug: product.slug,
         shipping: product.shipping || { price: 0 },
         sku: product.sku ?? product._id ?? '',
-        selectedOption: selectedOption, // Store selected option details
-        basePrice: Number((product as { basePrice?: number }).basePrice ?? product.finalPriceDiscount ?? product.price ?? 0), // Original price (for product-level discount display)
+        selectedOption: selectedOption,
+        basePrice: Number((product as { basePrice?: number }).basePrice ?? product.displayMarkedPrice ?? product.finalPriceDiscount ?? 0),
         appliedCouponCode: (product as { appliedCouponCode?: string }).appliedCouponCode,
       };
 

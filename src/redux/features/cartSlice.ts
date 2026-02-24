@@ -184,8 +184,14 @@ export const cartSlice = createSlice({
       const shouldShowModal = state.showCartConfirmation;
       const savedLastProduct = state.lastAddedProduct;
 
-      state.cart_products = (getLocalStorage('cart_products') ||
-        []) as CartProduct[];
+      const raw = (getLocalStorage('cart_products') || []) as CartProduct[];
+      // Legacy migration: ensure all items have finalPriceDiscount (use price/updatedPrice fallback once)
+      state.cart_products = raw.map((item: CartProduct) => {
+        const hasFinal = item.finalPriceDiscount != null && item.finalPriceDiscount !== '';
+        if (hasFinal) return item;
+        const fallback = Number((item as { updatedPrice?: number }).updatedPrice ?? item.price ?? 0);
+        return { ...item, finalPriceDiscount: fallback };
+      });
       state.cartMiniOpen = false;
 
       if (shouldShowModal) {

@@ -18,8 +18,6 @@ import {
   initialOrderQuantity,
 } from '@/redux/features/cartSlice';
 import { notifyError } from '@/utils/toast';
-import { useProductCoupon } from '@/hooks/useProductCoupon';
-import { useRefetchOnVisibility } from '@/hooks/use-refetch-on-visibility';
 import { getProductImageUrl } from '@/lib/product-image';
 import type { Product } from '@/components/version-tsx/product-card';
 
@@ -61,14 +59,6 @@ export default function ProductConfigurationDialog({
   const dispatch = useDispatch();
   const { cart_products, orderQuantity } = useSelector((state: any) => state.cart);
 
-  // Check if coupon is active for this product (when auto-apply is enabled)
-  const baseUnitPrice = Number(product.finalPriceDiscount || product.price || 0);
-  const couponRefetchKey = useRefetchOnVisibility();
-  const { hasCoupon, couponPercentage } = useProductCoupon(
-    product._id,
-    baseUnitPrice,
-    couponRefetchKey
-  );
   const [selectedOption, setSelectedOption] = useState<any>(null);
   const [customNotes, setCustomNotes] = useState<{
     [configIndex: number]: string;
@@ -221,41 +211,26 @@ export default function ProductConfigurationDialog({
     return adjustedPrice;
   }, []);
 
-  // Calculate final price
   const calculateFinalPrice = useCallback(() => {
-    // Get base price (original price, not discounted)
-    let basePrice = Number(product.finalPriceDiscount || product.price);
+    let basePrice = Number(product.finalPriceDiscount ?? 0);
 
-    // Get configuration prices and percentage adjustments
     const configResult = getSelectedConfigurationPrice();
     const configFixedPrice = configResult.fixedPrice || 0;
     const percentageAdjustments = configResult.percentageAdjustments || [];
 
-    // If configuration has fixed price, use it instead of base price
     if (configFixedPrice > 0) {
       basePrice = configFixedPrice;
     }
 
-    // Apply coupon discount to base price FIRST (if coupon is active)
-    let discountedBasePrice = basePrice;
-    if (hasCoupon && couponPercentage) {
-      discountedBasePrice = basePrice * (1 - couponPercentage / 100);
-    }
-
-    // Apply percentage adjustments to the discounted base price
-    let adjustedPrice = applyPercentageAdjustments(discountedBasePrice, percentageAdjustments);
-
-    // THEN add option price to the already discounted and adjusted base price
-    // No discount is applied to options - they're added at full price
+    const adjustedPrice = applyPercentageAdjustments(basePrice, percentageAdjustments);
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
     const finalPrice = adjustedPrice + optionPrice;
 
     return finalPrice.toFixed(2);
-  }, [getSelectedConfigurationPrice, applyPercentageAdjustments, selectedOption, product.finalPriceDiscount, product.price, hasCoupon, couponPercentage]);
+  }, [getSelectedConfigurationPrice, applyPercentageAdjustments, selectedOption, product.finalPriceDiscount]);
 
-  // Marked price = original base (price/updatedPrice) before product/coupon discounts
   const calculateMarkedUpPrice = useCallback(() => {
-    const originalBase = Number(product.price ?? product.updatedPrice ?? product.finalPriceDiscount ?? 0);
+    const originalBase = Number((product as { displayMarkedPrice?: number }).displayMarkedPrice ?? product.finalPriceDiscount ?? 0);
     let basePrice = originalBase;
 
     const configResult = getSelectedConfigurationPrice();
@@ -269,12 +244,10 @@ export default function ProductConfigurationDialog({
     const adjustedPrice = applyPercentageAdjustments(Number(basePrice), percentageAdjustments);
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
     return (adjustedPrice + optionPrice).toFixed(2);
-  }, [getSelectedConfigurationPrice, applyPercentageAdjustments, selectedOption, product.price, product.updatedPrice, product.finalPriceDiscount]);
+  }, [getSelectedConfigurationPrice, applyPercentageAdjustments, selectedOption, product.finalPriceDiscount]);
 
-  const hasProductDiscount =
-    Number(product.finalPriceDiscount ?? 0) > 0 &&
-    Number(product.finalPriceDiscount ?? 0) < Number(product.price ?? 0);
-  const showMarkedPrice = hasProductDiscount || (hasCoupon && couponPercentage);
+  const hasProductDiscount = (product as { hasDisplayDiscount?: boolean }).hasDisplayDiscount ?? false;
+  const showMarkedPrice = hasProductDiscount;
 
   // Helper function to compare configurations
   const configurationsChanged = useCallback(
@@ -356,32 +329,19 @@ export default function ProductConfigurationDialog({
       return;
     }
 
-    // Calculate prices
-    const originalProductPrice = Number(product.price || 0);
-    const markedUpPrice = product.updatedPrice || originalProductPrice;
+    const markedUpPrice = Number((product as { displayMarkedPrice?: number }).displayMarkedPrice ?? product.finalPriceDiscount ?? 0);
 
-    // Calculate base price - sum all selected configuration option prices
-    // Get base price (original price, not discounted)
-    let basePrice = Number(product.finalPriceDiscount || originalProductPrice);
+    let basePrice = Number(product.finalPriceDiscount ?? 0);
 
-    // Get configuration prices and percentage adjustments
     const configResult = getSelectedConfigurationPrice();
     const configFixedPrice = configResult.fixedPrice || 0;
     const percentageAdjustments = configResult.percentageAdjustments || [];
 
-    // If configuration has fixed price, use it instead of base price
     if (configFixedPrice > 0) {
       basePrice = configFixedPrice;
     }
 
-    // Apply coupon discount to base price FIRST (if coupon is active)
-    let discountedBasePrice = basePrice;
-    if (hasCoupon && couponPercentage) {
-      discountedBasePrice = basePrice * (1 - couponPercentage / 100);
-    }
-
-    // Apply percentage adjustments to the discounted base price
-    let adjustedPrice = applyPercentageAdjustments(discountedBasePrice, percentageAdjustments);
+    const adjustedPrice = applyPercentageAdjustments(basePrice, percentageAdjustments);
 
     // THEN add product option price to the already discounted and adjusted base price
     // No discount is applied to options - they're added at full price

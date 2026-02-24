@@ -101,23 +101,19 @@ export default function QuickViewModal() {
     }
   }, [reviews]);
 
-  // finalPriceDiscount is single source of truth; marked = original base
   const calculateFinalPrice = () => {
-    const mainPrice = Number(finalPriceDiscount ?? price ?? 0);
+    const mainPrice = Number(finalPriceDiscount ?? 0);
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
     return (mainPrice + optionPrice).toFixed(2);
   };
 
   const calculateMarkedPrice = () => {
-    const originalBase = Number(price ?? updatedPrice ?? finalPriceDiscount ?? 0);
+    const originalBase = Number(productItem?.displayMarkedPrice ?? finalPriceDiscount ?? 0);
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
     return (originalBase + optionPrice).toFixed(2);
   };
 
-  const hasProductDiscount =
-    Number(finalPriceDiscount ?? 0) > 0 &&
-    Number(finalPriceDiscount ?? 0) < Number(price ?? 0);
-  const showMarkedPrice = hasProductDiscount;
+  const showMarkedPrice = productItem?.hasDisplayDiscount ?? false;
 
   const handleOptionChange = e => {
     const optionIndex = e.target.value;
@@ -147,8 +143,7 @@ export default function QuickViewModal() {
       return;
     }
 
-    // finalPriceDiscount is single source of truth
-    const mainPrice = Number(prd.finalPriceDiscount ?? prd.price ?? 0);
+    const mainPrice = Number(prd.finalPriceDiscount ?? 0);
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
     const totalPrice = mainPrice + optionPrice;
 
@@ -156,7 +151,7 @@ export default function QuickViewModal() {
       ...prd,
       finalPriceDiscount: totalPrice,
       selectedOption,
-      basePrice: mainPrice,
+      basePrice: Number(prd.displayMarkedPrice ?? prd.finalPriceDiscount ?? 0),
     };
 
     dispatch(add_cart_product(productToAdd));

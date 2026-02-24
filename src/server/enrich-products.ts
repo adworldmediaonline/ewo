@@ -72,6 +72,7 @@ export async function enrichProductsWithDisplayPrices<T extends ProductForEnrich
 
       return {
         ...p,
+        finalPriceDiscount: displayPrice,
         displayPrice,
         displayMarkedPrice,
         hasDisplayDiscount,
@@ -83,10 +84,13 @@ export async function enrichProductsWithDisplayPrices<T extends ProductForEnrich
       const mainPrice = Number(p.finalPriceDiscount ?? p.price ?? 0);
       const originalBasePrice = Number(p.price ?? p.updatedPrice ?? mainPrice);
       const hasDisplayDiscount = mainPrice < originalBasePrice;
+      const displayPrice = mainPrice;
+      const displayMarkedPrice = hasDisplayDiscount ? originalBasePrice : undefined;
       return {
         ...p,
-        displayPrice: mainPrice,
-        displayMarkedPrice: hasDisplayDiscount ? originalBasePrice : undefined,
+        finalPriceDiscount: displayPrice,
+        displayPrice,
+        displayMarkedPrice,
         hasDisplayDiscount,
       };
     });
