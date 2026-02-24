@@ -59,11 +59,18 @@ export function useProductCard({
 
   const baseUnitPrice = Number(product.finalPriceDiscount || product.price || 0);
   const couponRefetchKey = useRefetchOnVisibility();
-  const { hasCoupon, couponPercentage, couponCode } = useProductCoupon(
+  const { hasCoupon, couponPercentage, couponCode, couponReady } = useProductCoupon(
     product._id,
     baseUnitPrice,
     couponRefetchKey
   );
+
+  /** Product-level discount from backend: finalPriceDiscount < price */
+  const hasProductDiscount = useMemo(() => {
+    const priceVal = Number(product.price ?? 0);
+    const discountVal = Number(product.finalPriceDiscount ?? 0);
+    return discountVal > 0 && discountVal < priceVal;
+  }, [product.price, product.finalPriceDiscount]);
 
   const cartItem = (cart_products as { _id: string; orderQuantity?: number; selectedOption?: { title: string } }[]).find(
     (prd) => {
@@ -108,9 +115,11 @@ export function useProductCard({
       : 0;
 
   const calculateFinalPrice = (opt?: SelectedOption | null) => {
-    const basePrice = product.finalPriceDiscount || product.price;
-    let discountedBasePrice = Number(basePrice);
-    if (hasCoupon && couponPercentage) {
+    const basePrice = hasProductDiscount
+      ? Number(product.finalPriceDiscount)
+      : Number(product.finalPriceDiscount || product.price);
+    let discountedBasePrice = basePrice;
+    if (couponReady && hasCoupon && couponPercentage) {
       discountedBasePrice = basePrice * (1 - couponPercentage / 100);
     }
     const optionPrice = (opt ?? selectedOption) ? Number((opt ?? selectedOption)!.price) : 0;
@@ -119,9 +128,11 @@ export function useProductCard({
   };
 
   const calculateMarkedPrice = (opt?: SelectedOption | null) => {
-    const basePrice = product.finalPriceDiscount || product.price;
+    const originalPrice = hasProductDiscount
+      ? Number(product.price ?? product.updatedPrice ?? 0)
+      : Number(product.finalPriceDiscount || product.price);
     const optionPrice = (opt ?? selectedOption) ? Number((opt ?? selectedOption)!.price) : 0;
-    return (Number(basePrice) + optionPrice).toFixed(2);
+    return (originalPrice + optionPrice).toFixed(2);
   };
 
   return {
@@ -131,6 +142,8 @@ export function useProductCard({
     hasCoupon,
     couponPercentage,
     couponCode,
+    couponReady,
+    hasProductDiscount,
     hasConfigurations,
     imageSrc,
     imageAlt,

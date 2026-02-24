@@ -75,6 +75,8 @@ export function ProductCard({
     hasCoupon,
     couponPercentage,
     couponCode,
+    couponReady,
+    hasProductDiscount,
     hasConfigurations,
     imageSrc,
     imageAlt,
@@ -110,9 +112,11 @@ export function ProductCard({
       return;
     }
 
-    const basePrice = product.finalPriceDiscount || product.price;
-    let discountedBasePrice = Number(basePrice);
-    if (hasCoupon && couponPercentage) {
+    const basePrice = hasProductDiscount
+      ? Number(product.finalPriceDiscount)
+      : Number(product.finalPriceDiscount || product.price);
+    let discountedBasePrice = basePrice;
+    if (couponReady && hasCoupon && couponPercentage) {
       discountedBasePrice = basePrice * (1 - couponPercentage / 100);
     }
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
@@ -169,9 +173,11 @@ export function ProductCard({
   const handleDecrementFromCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const basePrice = product.finalPriceDiscount || product.price;
-    let discountedBasePrice = Number(basePrice);
-    if (hasCoupon && couponPercentage) {
+    const basePrice = hasProductDiscount
+      ? Number(product.finalPriceDiscount)
+      : Number(product.finalPriceDiscount || product.price);
+    let discountedBasePrice = basePrice;
+    if (couponReady && hasCoupon && couponPercentage) {
       discountedBasePrice = basePrice * (1 - couponPercentage / 100);
     }
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
@@ -206,6 +212,9 @@ export function ProductCard({
 
   const loading = seo.lowPriority ? 'lazy' : shouldEagerLoad ? 'eager' : 'lazy';
   const fetchPriority = seo.lowPriority ? 'low' : shouldUseHighPriority ? 'high' : undefined;
+
+  const finalPrice = calculateFinalPrice();
+  const markedPrice = calculateMarkedPrice();
 
   const imageSection = (
     <ProductCardImage
@@ -254,9 +263,13 @@ export function ProductCard({
       />
 
       <ProductCardPrice
-        finalPrice={calculateFinalPrice()}
-        markedPrice={calculateMarkedPrice()}
-        showMarkedPrice={!!(hasCoupon && couponPercentage)}
+        finalPrice={finalPrice}
+        markedPrice={markedPrice}
+        showMarkedPrice={
+          (hasProductDiscount ||
+            (couponReady && hasCoupon && couponPercentage > 0)) &&
+          markedPrice !== finalPrice
+        }
       />
 
         <ProductCardActions
@@ -287,7 +300,7 @@ export function ProductCard({
       >
         {layout === 'horizontal' ? (
           <>
-            <div className="relative w-full sm:w-32 h-32 sm:h-32 flex-shrink-0 bg-muted overflow-hidden">
+            <div className="relative w-full sm:w-32 h-32 sm:h-32 shrink-0 bg-muted overflow-hidden">
               {imageSection}
             </div>
             {infoSection}
