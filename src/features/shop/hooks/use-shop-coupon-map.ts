@@ -6,6 +6,9 @@ import { getCouponMapForProducts, type CouponMapEntry } from '@/lib/store-api';
 type ProductForCoupon = { _id: string; price?: number; finalPriceDiscount?: number };
 
 /**
+ * @deprecated Shop page now uses server-side enrichment. Products arrive with
+ * displayPrice/displayMarkedPrice pre-computed. This hook is no longer used.
+ *
  * Pre-fetches coupon data for all products in one batch.
  * Returns a map and isReady. Only render product cards when isReady to avoid price flicker.
  * On load-more, fetches for new products only and merges (keeps isReady true).

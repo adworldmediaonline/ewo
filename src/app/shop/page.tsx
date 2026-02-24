@@ -11,6 +11,7 @@ import ShopContentWrapper from '@/components/version-tsx/shop-content-wrapper';
 import Wrapper from '@/components/wrapper';
 import { getCategories } from '@/lib/server-data';
 import { getPaginatedProductsServer } from '@/server/products';
+import { enrichProductsWithDisplayPrices } from '@/server/enrich-products';
 import { getActivePageSections } from '@/server/page-sections';
 import { getPageMetadata } from '@/server/page-metadata';
 import { buildPageMetadata } from '@/lib/build-page-metadata';
@@ -48,8 +49,11 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     }),
   ]);
 
-  const initialProducts = initialProductsResult?.data ?? [];
+  const rawProducts = initialProductsResult?.data ?? [];
   const initialPagination = initialProductsResult?.pagination ?? null;
+  const initialProducts = await enrichProductsWithDisplayPrices(
+    rawProducts as Array<{ _id: string; price?: number; updatedPrice?: number; finalPriceDiscount?: number }>
+  );
 
   return (
     <Wrapper>

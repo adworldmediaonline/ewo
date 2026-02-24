@@ -41,7 +41,8 @@ export async function GET(request: NextRequest) {
       headers: {
         'Content-Type': contentType,
         'Content-Disposition': `inline; filename="${downloadFilename}"`,
-        'Cache-Control': 'public, max-age=86400, s-maxage=86400',
+        'Cache-Control':
+          'public, max-age=86400, s-maxage=86400, stale-while-revalidate=86400',
       },
     });
   } catch (err) {

@@ -23,6 +23,12 @@ export interface ProductBase {
   price: number;
   updatedPrice?: number;
   finalPriceDiscount?: number;
+  /** Pre-computed display price (after all discounts). From server enrichment. */
+  displayPrice?: number;
+  /** Pre-computed marked price (original base). From server enrichment. */
+  displayMarkedPrice?: number;
+  /** Whether to show discount styling. From server enrichment. */
+  hasDisplayDiscount?: boolean;
   category?: {
     name: string;
     id?: string;
