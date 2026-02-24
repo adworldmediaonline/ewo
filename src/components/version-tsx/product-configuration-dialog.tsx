@@ -81,7 +81,14 @@ export default function ProductConfigurationDialog({
     const initial: {
       [configIndex: number]: {
         optionIndex: number;
-        option: Record<string, unknown>;
+        option: {
+          name: string;
+          price: number;
+          priceType?: 'fixed' | 'percentage';
+          percentage?: number;
+          isPercentageIncrease?: boolean;
+          image?: string;
+        };
       };
     } = {};
     if (product.productConfigurations && product.productConfigurations.length > 0) {
@@ -91,7 +98,14 @@ export default function ProductConfigurationDialog({
             opt => opt.isSelected
           );
           if (preselectedIndex !== -1) {
-            const opt = config.options[preselectedIndex];
+            const opt = config.options[preselectedIndex] as {
+              name: string;
+              price: number;
+              priceType?: 'fixed' | 'percentage';
+              percentage?: number;
+              isPercentageIncrease?: boolean;
+              image?: string;
+            };
             initial[configIndex] = {
               optionIndex: preselectedIndex,
               option: {
@@ -117,7 +131,14 @@ export default function ProductConfigurationDialog({
       const initial: {
         [configIndex: number]: {
           optionIndex: number;
-          option: Record<string, unknown>;
+          option: {
+            name: string;
+            price: number;
+            priceType?: 'fixed' | 'percentage';
+            percentage?: number;
+            isPercentageIncrease?: boolean;
+            image?: string;
+          };
         };
       } = {};
       if (product.productConfigurations && product.productConfigurations.length > 0) {
@@ -127,7 +148,14 @@ export default function ProductConfigurationDialog({
               opt => opt.isSelected
             );
             if (preselectedIndex !== -1) {
-              const opt = config.options[preselectedIndex];
+              const opt = config.options[preselectedIndex] as {
+                name: string;
+                price: number;
+                priceType?: 'fixed' | 'percentage';
+                percentage?: number;
+                isPercentageIncrease?: boolean;
+                image?: string;
+              };
               initial[configIndex] = {
                 optionIndex: preselectedIndex,
                 option: {
