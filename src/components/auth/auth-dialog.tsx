@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowRight, Eye, EyeOff, Lock, Mail, User, Shield, CheckCircle2, ArrowLeft } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { z } from 'zod';
@@ -32,6 +32,7 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from '@/components/ui/input-otp';
+import { REGEXP_ONLY_DIGITS } from 'input-otp';
 
 const signInSchema = z.object({
   email: z.string().email({
@@ -73,6 +74,10 @@ const resetPasswordSchema = z.object({
 
 type DialogView = 'auth' | 'verify' | 'forgot' | 'reset';
 
+/** Normalize pasted OTP (remove spaces, dashes, newlines) for reliable paste-from-email */
+const otpPasteTransformer = (pasted: string) =>
+  pasted.replace(/[\s\-–—]/g, '').replace(/\D/g, '');
+
 interface AuthDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -81,6 +86,7 @@ interface AuthDialogProps {
 
 export function AuthDialog({ open, onOpenChange, defaultTab = 'signin' }: AuthDialogProps) {
   const router = useRouter();
+  const { refetch: refetchSession } = authClient.useSession();
   const [view, setView] = useState<DialogView>('auth');
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [isLoading, setIsLoading] = useState(false);
@@ -88,6 +94,9 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'signin' }: AuthDi
   const [showPassword, setShowPassword] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [verifyInfoMessage, setVerifyInfoMessage] = useState<string | null>(null);
 
   const signInForm = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
@@ -147,7 +156,23 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'signin' }: AuthDi
         },
         onError: ctx => {
           setIsLoading(false);
-          setError(ctx.error.message);
+          const err = ctx.error;
+          const isUnverified =
+            err?.status === 403 ||
+            err?.code === 'EMAIL_NOT_VERIFIED' ||
+            err?.message?.toLowerCase().includes('not verified');
+          if (isUnverified) {
+            setUserEmail(values.email);
+            setView('verify');
+            setError(null);
+            setVerifyInfoMessage('Please verify your email to sign in. A new code has been sent.');
+            void authClient.emailOtp.sendVerificationOtp({
+              email: values.email,
+              type: 'email-verification',
+            }).then(() => setResendCooldown(60));
+          } else {
+            setError(err?.message ?? 'Sign in failed');
+          }
         },
       }
     );
@@ -173,7 +198,21 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'signin' }: AuthDi
         },
         onError: ctx => {
           setIsLoading(false);
-          setError(ctx.error.message);
+          const err = ctx.error;
+          const isAlreadyExists =
+            err?.code === 'USER_ALREADY_EXISTS' ||
+            err?.message?.toLowerCase().includes('already exists');
+          if (isAlreadyExists) {
+            setUserEmail(values.email);
+            setView('verify');
+            setError(null);
+            void authClient.emailOtp.sendVerificationOtp({
+              email: values.email,
+              type: 'email-verification',
+            }).then(() => setResendCooldown(60));
+          } else {
+            setError(err?.message ?? 'Sign up failed');
+          }
         },
       }
     );
@@ -190,15 +229,16 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'signin' }: AuthDi
           setIsLoading(true);
           setError(null);
         },
-        onSuccess: () => {
+        onSuccess: async () => {
           setIsLoading(false);
           verifyEmailForm.reset();
-          setSuccessMessage('Email verified successfully!');
+          setVerifyInfoMessage(null);
+          setSuccessMessage('Email verified successfully! Signing you in...');
+          await refetchSession();
           setTimeout(() => {
             setSuccessMessage('');
-            setView('auth');
-            setActiveTab('signin');
-          }, 1500);
+            onOpenChange(false);
+          }, 1200);
         },
         onError: ctx => {
           setIsLoading(false);
@@ -207,6 +247,28 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'signin' }: AuthDi
       }
     );
   };
+
+  const handleResendOtp = async () => {
+    if (!userEmail || resendCooldown > 0 || resendLoading) return;
+    setResendLoading(true);
+    setError(null);
+    const { error: resendError } = await authClient.emailOtp.sendVerificationOtp({
+      email: userEmail,
+      type: 'email-verification',
+    });
+    setResendLoading(false);
+    if (resendError) {
+      setError(resendError.message ?? 'Failed to resend code');
+      return;
+    }
+    setResendCooldown(60);
+  };
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setInterval(() => setResendCooldown((c) => c - 1), 1000);
+    return () => clearInterval(t);
+  }, [resendCooldown]);
 
   const handleForgotPassword = async (values: z.infer<typeof forgotPasswordSchema>) => {
     await authClient.forgetPassword.emailOtp(
@@ -266,6 +328,7 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'signin' }: AuthDi
     setView('auth');
     setError(null);
     setSuccessMessage('');
+    setVerifyInfoMessage(null);
     verifyEmailForm.reset();
     forgotPasswordForm.reset();
     resetPasswordForm.reset();
@@ -591,6 +654,11 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'signin' }: AuthDi
                 </div>
               ) : (
                 <>
+                  {verifyInfoMessage && (
+                    <div className="mb-4 p-3 text-sm text-muted-foreground bg-muted/50 border border-border rounded-md">
+                      {verifyInfoMessage}
+                    </div>
+                  )}
                   {error && (
                     <div className="mb-4 p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
                       {error}
@@ -604,9 +672,36 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'signin' }: AuthDi
                         name="otp"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Verification Code</FormLabel>
+                            <div className="flex items-center justify-between">
+                              <FormLabel>Verification Code</FormLabel>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="h-8 text-xs"
+                                disabled={resendLoading || resendCooldown > 0}
+                                onClick={handleResendOtp}
+                              >
+                                {resendLoading ? (
+                                  'Sending...'
+                                ) : resendCooldown > 0 ? (
+                                  `Resend in ${resendCooldown}s`
+                                ) : (
+                                  'Resend OTP'
+                                )}
+                              </Button>
+                            </div>
                             <FormControl>
-                              <InputOTP maxLength={6} {...field}>
+                              <InputOTP
+                                maxLength={6}
+                                pattern={REGEXP_ONLY_DIGITS}
+                                value={field.value ?? ''}
+                                onChange={field.onChange}
+                                onBlur={field.onBlur}
+                                ref={field.ref}
+                                pushPasswordManagerStrategy="none"
+                                pasteTransformer={otpPasteTransformer}
+                              >
                                 <InputOTPGroup>
                                   <InputOTPSlot index={0} />
                                   <InputOTPSlot index={1} />
@@ -758,7 +853,16 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'signin' }: AuthDi
                           <FormItem>
                             <FormLabel>Reset Code</FormLabel>
                             <FormControl>
-                              <InputOTP maxLength={6} {...field}>
+                              <InputOTP
+                                maxLength={6}
+                                pattern={REGEXP_ONLY_DIGITS}
+                                value={field.value ?? ''}
+                                onChange={field.onChange}
+                                onBlur={field.onBlur}
+                                ref={field.ref}
+                                pushPasswordManagerStrategy="none"
+                                pasteTransformer={otpPasteTransformer}
+                              >
                                 <InputOTPGroup>
                                   <InputOTPSlot index={0} />
                                   <InputOTPSlot index={1} />
