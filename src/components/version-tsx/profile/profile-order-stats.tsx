@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { useGetUserOrdersQuery } from '@/redux/features/order/orderApi';
@@ -8,9 +9,11 @@ import {
   CheckCircle,
   Clock,
   Package,
+  ShoppingBag,
   TrendingUp,
   Truck,
 } from 'lucide-react';
+import Link from 'next/link';
 import React from 'react';
 
 interface ProfileOrderStatsProps {
@@ -91,6 +94,31 @@ const ProfileOrderStats: React.FC<ProfileOrderStatsProps> = ({ userId }) => {
           </Card>
         ))}
       </div>
+    );
+  }
+
+  // Empty state - no orders yet
+  if (totalOrders === 0) {
+    return (
+      <Card className="mb-8">
+        <CardContent className="flex flex-col items-center justify-center py-12 px-6 text-center">
+          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+            <ShoppingBag className="w-8 h-8 text-muted-foreground" />
+          </div>
+          <h3 className="text-lg font-semibold text-foreground mb-2">
+            No orders yet
+          </h3>
+          <p className="text-muted-foreground text-sm max-w-sm mb-6">
+            Start shopping to see your order history and track deliveries here.
+          </p>
+          <Button asChild size="lg">
+            <Link href="/shop" className="flex items-center gap-2">
+              <ShoppingBag className="w-4 h-4" />
+              Start Shopping
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
     );
   }
 

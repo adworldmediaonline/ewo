@@ -13,4 +13,5 @@ export { default as ProfileOverview } from './profile-overview';
 export { default as ProfileSessionInfo } from './profile-session-info';
 export { default as ProfileSettings } from './profile-settings';
 export { default as ProfileSkeleton } from './profile-skeleton';
+export { default as ProfileWishlist } from './profile-wishlist';
 export { default as ProfileStats } from './profile-stats';

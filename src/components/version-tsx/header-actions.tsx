@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import useCartInfo from '@/hooks/use-cart-info';
 import { authClient } from '@/lib/authClient';
-import { Heart, LogOut, Settings, ShoppingCart, User } from 'lucide-react';
+import { Heart, LogOut, ShoppingCart, User } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
@@ -143,12 +143,6 @@ export function HeaderActions({
                 <Link href="/profile">
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/settings">
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
