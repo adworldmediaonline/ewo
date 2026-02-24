@@ -23,6 +23,10 @@ export type EnrichedProduct = ProductForEnrichment & {
   displayPrice?: number;
   displayMarkedPrice?: number;
   hasDisplayDiscount?: boolean;
+  /** Coupon code when auto-applied (for cart discount badge) */
+  appliedCouponCode?: string;
+  /** Coupon percentage when auto-applied (for cart discount badge) */
+  appliedCouponPercentage?: number;
 };
 
 /**
@@ -63,6 +67,21 @@ export async function enrichProductsWithDisplayPrices<T extends ProductForEnrich
           displayPrice = Math.round((mainPrice - best.discountAmount) * 100) / 100;
           displayMarkedPrice = originalBasePrice;
           hasDisplayDiscount = true;
+          const couponPercentage =
+            best.type === "percentage"
+              ? Math.round(best.value)
+              : mainPrice > 0
+                ? Math.round((best.discountAmount / mainPrice) * 100)
+                : 0;
+          return {
+            ...p,
+            finalPriceDiscount: displayPrice,
+            displayPrice,
+            displayMarkedPrice,
+            hasDisplayDiscount,
+            appliedCouponCode: best.code,
+            appliedCouponPercentage: couponPercentage,
+          };
         } else {
           displayMarkedPrice = hasDisplayDiscount ? originalBasePrice : undefined;
         }

@@ -66,6 +66,7 @@ export const useShopActions = () => {
         selectedOption: selectedOption,
         basePrice: Number((product as { basePrice?: number }).basePrice ?? product.displayMarkedPrice ?? product.finalPriceDiscount ?? 0),
         appliedCouponCode: (product as { appliedCouponCode?: string }).appliedCouponCode,
+        appliedCouponPercentage: (product as { appliedCouponPercentage?: number }).appliedCouponPercentage,
       };
 
       dispatch(add_cart_product(cartProduct));

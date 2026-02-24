@@ -421,6 +421,12 @@ export default function ProductConfigurationDialog({
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
     const finalPrice = adjustedPrice + optionPrice;
 
+    // basePrice = marked price (for discount badge). When config: marked = configFixedPrice + optionPrice before discount
+    const basePriceForCart =
+      configFixedPrice > 0
+        ? applyPercentageAdjustments(configFixedPrice, percentageAdjustments) + optionPrice
+        : markedUpPrice + optionPrice;
+
     // Determine the product image to use (option image if available, otherwise original)
     let productImage = getProductImageUrl(product);
     if (selectedConfigurations && Object.keys(selectedConfigurations).length > 0) {
@@ -516,7 +522,7 @@ export default function ProductConfigurationDialog({
       finalPriceDiscount: finalPrice,
       updatedPrice: markedUpPrice,
       selectedOption,
-      basePrice: basePrice,
+      basePrice: basePriceForCart,
       orderQuantity: orderQuantity,
       productConfigurations:
         updatedProductConfigurations || product.productConfigurations,

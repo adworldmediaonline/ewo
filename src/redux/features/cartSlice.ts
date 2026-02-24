@@ -27,6 +27,7 @@ interface CartProduct {
   basePrice?: number;
   shipping?: { price?: number };
   appliedCouponCode?: string;
+  appliedCouponPercentage?: number;
 }
 
 interface LastAddedProduct {
