@@ -179,6 +179,104 @@ export async function validateStoreDiscount(
 }
 
 /**
+ * Build offers for a single product from pre-fetched coupons (sync).
+ * Used by getCouponMapForProducts for batched pre-fetch.
+ */
+function buildOffersForProduct(
+  coupons: RawCoupon[],
+  productId: string,
+  unitPrice: number
+): AvailableOffer[] {
+  const productIds = new Set([productId]);
+  const applicable = coupons.filter((c) => {
+    if (c.status !== 'active') return false;
+    if (c.applicableType === 'all') return true;
+    if (c.applicableType === 'product' && c.applicableProducts?.length) {
+      return c.applicableProducts.some((p) =>
+        productIds.has(typeof p === 'object' ? (p as { _id: string })._id : String(p))
+      );
+    }
+    return true;
+  });
+
+  return applicable.map((c): AvailableOffer => {
+    const type = c.discountType === 'fixed_amount' ? 'fixed' : 'percentage';
+    const value = type === 'percentage' ? (c.discountPercentage ?? 0) : (c.discountAmount ?? 0);
+    const discountAmount =
+      type === 'percentage'
+        ? Math.round(unitPrice * (value / 100) * 100) / 100
+        : Math.min(value, unitPrice);
+
+    return {
+      code: c.couponCode,
+      type,
+      value,
+      minOrderAmount: c.minimumAmount ?? null,
+      discountAmount,
+      description: c.title ?? c.description ?? c.couponCode,
+      allowAutoApply: c.allowAutoApply ?? true,
+      createdAt: c.createdAt ?? null,
+    };
+  });
+}
+
+export type CouponMapEntry = {
+  hasCoupon: boolean;
+  couponPercentage: number;
+  couponCode: string | null;
+};
+
+/**
+ * Pre-fetch coupon data for multiple products in one batch (2 API calls total).
+ * Returns a map of productId -> coupon info. Use this to avoid per-card async fetches.
+ */
+export async function getCouponMapForProducts(
+  products: Array<{ _id: string; price?: number; finalPriceDiscount?: number }>
+): Promise<Record<string, CouponMapEntry>> {
+  const settings = await getStoreCouponSettings();
+  if (
+    !settings.autoApply ||
+    settings.autoApplyStrategy === 'customer_choice'
+  ) {
+    return {};
+  }
+
+  const coupons = await getActiveCoupons();
+  const strategy = settings.autoApplyStrategy as
+    | 'best_savings'
+    | 'first_created'
+    | 'highest_percentage';
+  const map: Record<string, CouponMapEntry> = {};
+
+  for (const p of products) {
+    const unitPrice = Number(p.finalPriceDiscount || p.price || 0);
+    if (unitPrice <= 0) {
+      map[p._id] = { hasCoupon: false, couponPercentage: 0, couponCode: null };
+      continue;
+    }
+
+    const offers = buildOffersForProduct(coupons, p._id, unitPrice);
+    const best = pickBestOffer(offers, strategy);
+
+    if (!best || best.discountAmount <= 0) {
+      map[p._id] = { hasCoupon: false, couponPercentage: 0, couponCode: null };
+      continue;
+    }
+
+    const couponPercentage =
+      unitPrice > 0 ? Math.round((best.discountAmount / unitPrice) * 100) : 0;
+
+    map[p._id] = {
+      hasCoupon: true,
+      couponPercentage,
+      couponCode: best.code,
+    };
+  }
+
+  return map;
+}
+
+/**
  * Get available offers for cart - filters active coupons that apply to cart items.
  * Returns normalized format for UI components.
  */

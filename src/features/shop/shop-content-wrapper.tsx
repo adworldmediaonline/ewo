@@ -5,14 +5,17 @@ import { useInView } from 'react-intersection-observer';
 import Image from 'next/image';
 
 import { cn } from '@/lib/utils';
+import { ShopCouponProvider } from '@/context/shop-coupon-context';
 
 import ShopEmptyState from '@/features/shop/components/shop-empty-state';
 import ShopLoadMoreTrigger from '@/features/shop/components/shop-load-more-trigger';
 import ShopMobileFilters from '@/features/shop/components/shop-mobile-filters';
 import ShopProductGrid from '@/features/shop/components/shop-product-grid';
+import ShopProductGridSkeleton from '@/features/shop/components/shop-product-grid-skeleton';
 import ShopSidebar from '@/features/shop/components/shop-sidebar';
 import ShopToolbar from '@/features/shop/components/shop-toolbar';
 import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
+import { useShopCouponMap } from '@/features/shop/hooks/use-shop-coupon-map';
 import { useShopProducts } from '@/features/shop/hooks/use-shop-products';
 import { useShopQueryState } from '@/features/shop/hooks/use-shop-query-state';
 import { DEFAULT_FILTERS } from '@/features/shop/shop-types';
@@ -60,6 +63,7 @@ const ShopContentWrapper = ({
     canFetchMore,
   } = useShopProducts(filters, { initialProducts, initialPagination });
 
+  const { couponMap, isReady: isCouponReady } = useShopCouponMap(products);
   const { handleAddToCart, handleAddToWishlist } = useShopActions();
 
   const activeFiltersCount = useMemo(() => {
@@ -394,12 +398,18 @@ const ShopContentWrapper = ({
               <ShopEmptyState variant="empty" onReset={handleClearFilters} />
             ) : (
               <>
-                <ShopProductGrid
-                  products={products}
-                  isLoading={isLoading}
-                  onAddToCart={handleAddToCart}
-                  onAddToWishlist={handleAddToWishlist}
-                />
+                <ShopCouponProvider value={{ couponMap, isReady: isCouponReady }}>
+                  {isCouponReady ? (
+                    <ShopProductGrid
+                      products={products}
+                      isLoading={isLoading}
+                      onAddToCart={handleAddToCart}
+                      onAddToWishlist={handleAddToWishlist}
+                    />
+                  ) : (
+                    <ShopProductGridSkeleton />
+                  )}
+                </ShopCouponProvider>
 
                 <ShopLoadMoreTrigger
                   ref={loadMoreRef}

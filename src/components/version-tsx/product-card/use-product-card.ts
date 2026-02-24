@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { useShopCoupon } from '@/context/shop-coupon-context';
 import { useProductCoupon } from '@/hooks/useProductCoupon';
 import { useRefetchOnVisibility } from '@/hooks/use-refetch-on-visibility';
 import {
@@ -61,11 +62,19 @@ export function useProductCard({
 
   const baseUnitPrice = Number(product.finalPriceDiscount || product.price || 0);
   const couponRefetchKey = useRefetchOnVisibility();
-  const { hasCoupon, couponPercentage, couponCode, couponReady } = useProductCoupon(
+
+  /** Pre-fetched coupon from Shop context (available immediately, no flicker) */
+  const shopCoupon = useShopCoupon(product._id);
+  const fallbackCoupon = useProductCoupon(
     product._id,
     baseUnitPrice,
     couponRefetchKey
   );
+
+  const hasCoupon = shopCoupon?.hasCoupon ?? fallbackCoupon.hasCoupon;
+  const couponPercentage = shopCoupon?.couponPercentage ?? fallbackCoupon.couponPercentage;
+  const couponCode = shopCoupon?.couponCode ?? fallbackCoupon.couponCode;
+  const couponReady = shopCoupon !== null ? true : fallbackCoupon.couponReady;
 
   /** Product-level discount from backend: finalPriceDiscount < price */
   const hasProductDiscount = useMemo(() => {
