@@ -346,61 +346,50 @@ export default function DetailsWrapper({
     return adjustedPrice;
   };
 
-  // Calculate final selling price (bold) - finalPriceDiscount after coupon discount
+  // finalPriceDiscount is single source of truth. Marked = original base. Final = after discounts.
   const calculateFinalPrice = () => {
-    // Get base price (original price, not discounted)
-    let basePrice = finalPriceDiscount || price;
+    // Main price from backend (product/category discounts already applied)
+    let basePrice = Number(finalPriceDiscount ?? price ?? 0);
 
-    // Get configuration prices and percentage adjustments
     const configResult = getSelectedConfigurationPrice();
     const configFixedPrice = configResult.fixedPrice || 0;
     const percentageAdjustments = configResult.percentageAdjustments || [];
 
-    // If configuration has fixed price, use it instead of base price
     if (configFixedPrice > 0) {
       basePrice = configFixedPrice;
     }
 
-    // Apply coupon discount to base price FIRST (if coupon is active)
-    let discountedBasePrice = Number(basePrice);
+    let discountedBasePrice = basePrice;
     if (hasCoupon && couponPercentage) {
       discountedBasePrice = basePrice * (1 - couponPercentage / 100);
     }
 
-    // Apply percentage adjustments to the discounted base price
-    let adjustedPrice = applyPercentageAdjustments(discountedBasePrice, percentageAdjustments);
-
-    // THEN add option price to the already discounted and adjusted base price
-    // No discount is applied to options - they're added at full price
+    const adjustedPrice = applyPercentageAdjustments(discountedBasePrice, percentageAdjustments);
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-    const finalPrice = adjustedPrice + optionPrice;
-
-    return finalPrice.toFixed(2);
+    return (adjustedPrice + optionPrice).toFixed(2);
   };
 
-  // Calculate marked price (strikethrough) - finalPriceDiscount before coupon
+  // Marked price = original base (before product/coupon discounts)
   const calculateMarkedUpPrice = () => {
-    // Get base price (original price, not discounted)
-    let basePrice = finalPriceDiscount || price;
+    const originalBase = Number(price ?? updatedPrice ?? finalPriceDiscount ?? 0);
+    let basePrice = originalBase;
 
-    // Get configuration prices and percentage adjustments
     const configResult = getSelectedConfigurationPrice();
     const configFixedPrice = configResult.fixedPrice || 0;
     const percentageAdjustments = configResult.percentageAdjustments || [];
 
-    // If configuration has fixed price, use it instead of base price
     if (configFixedPrice > 0) {
       basePrice = configFixedPrice;
     }
 
-    // Apply percentage adjustments to base price (before coupon)
-    let adjustedPrice = applyPercentageAdjustments(Number(basePrice), percentageAdjustments);
-
-    // Add option price if selected (options are different from configurations)
+    const adjustedPrice = applyPercentageAdjustments(Number(basePrice), percentageAdjustments);
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
-
     return (adjustedPrice + optionPrice).toFixed(2);
   };
+
+  // Show marked price when: product discount (finalPriceDiscount < price) OR coupon applies
+  const hasProductDiscount = Number(finalPriceDiscount ?? 0) > 0 && Number(finalPriceDiscount ?? 0) < Number(price ?? 0);
+  const showMarkedPrice = hasProductDiscount || (hasCoupon && couponPercentage);
 
   // Handle option selection
   const handleOptionChange = e => {
@@ -1041,10 +1030,10 @@ export default function DetailsWrapper({
         </div>
       </div>
 
-      {/* Pricing */}
+      {/* Pricing - finalPriceDiscount is single source of truth; marked = original base */}
       <div className="space-y-3">
         <div className="flex items-baseline gap-3">
-          {hasCoupon && couponPercentage && (
+          {showMarkedPrice && (
             <span className="text-lg text-muted-foreground line-through">
               ${calculateMarkedUpPrice()}
             </span>

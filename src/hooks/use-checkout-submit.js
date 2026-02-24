@@ -165,9 +165,9 @@ const useCheckoutSubmit = () => {
     try {
       const cartSubtotal = cart_products.reduce((sum, item) => {
         const quantity = Number(item?.orderQuantity || 0);
-        const price = Number(item?.price || 0);
-        if (isNaN(quantity) || isNaN(price)) return sum;
-        return sum + quantity * price;
+        const unitPrice = Number(item?.finalPriceDiscount ?? item?.price ?? 0);
+        if (isNaN(quantity) || isNaN(unitPrice)) return sum;
+        return sum + quantity * unitPrice;
       }, 0);
 
       return {
