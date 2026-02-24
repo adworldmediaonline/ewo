@@ -12,6 +12,8 @@ export interface UseProductCouponResult {
   couponPercentage: number;
   couponCode: string | null;
   discountedPrice: number | null;
+  /** True after the coupon check has completed (avoids flickering from async state) */
+  couponReady: boolean;
 }
 
 /**
@@ -30,6 +32,7 @@ export function useProductCoupon(
     couponPercentage: 0,
     couponCode: null,
     discountedPrice: null,
+    couponReady: false,
   });
 
   useEffect(() => {
@@ -39,6 +42,7 @@ export function useProductCoupon(
         couponPercentage: 0,
         couponCode: null,
         discountedPrice: null,
+        couponReady: true,
       });
       return;
     }
@@ -57,6 +61,7 @@ export function useProductCoupon(
             couponPercentage: 0,
             couponCode: null,
             discountedPrice: null,
+            couponReady: true,
           });
           return;
         }
@@ -84,6 +89,7 @@ export function useProductCoupon(
               couponPercentage: 0,
               couponCode: null,
               discountedPrice: null,
+              couponReady: true,
             });
             return;
           }
@@ -102,6 +108,7 @@ export function useProductCoupon(
             couponPercentage,
             couponCode: best.code,
             discountedPrice,
+            couponReady: true,
           });
         });
       })
@@ -112,6 +119,7 @@ export function useProductCoupon(
             couponPercentage: 0,
             couponCode: null,
             discountedPrice: null,
+            couponReady: true,
           });
         }
       });

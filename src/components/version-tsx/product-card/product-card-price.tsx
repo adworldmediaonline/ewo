@@ -14,13 +14,16 @@ export function ProductCardPrice({
   className = '',
 }: ProductCardPriceProps) {
   return (
-    <div className={`flex items-center gap-1.5 sm:gap-2 mb-2 ${className}`}>
+    <div
+      className={`flex min-h-[1.75rem] items-center gap-1.5 sm:gap-2 mb-2 ${className}`}
+      style={{ contain: 'layout' }}
+    >
       {showMarkedPrice && markedPrice && (
-        <span className="text-[10px] sm:text-sm text-primary line-through">
+        <span className="text-[10px] sm:text-sm text-muted-foreground line-through shrink-0">
           ${markedPrice}
         </span>
       )}
-      <span className="text-sm sm:text-lg font-bold">${finalPrice}</span>
+      <span className="text-sm sm:text-lg font-bold shrink-0">${finalPrice}</span>
     </div>
   );
 }
