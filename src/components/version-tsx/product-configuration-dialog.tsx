@@ -16,6 +16,7 @@ import ProductConfigurations from '@/components/version-tsx/product-details/prod
 import {
   add_cart_product,
   initialOrderQuantity,
+  update_product_option,
 } from '@/redux/features/cartSlice';
 import { notifyError } from '@/utils/toast';
 import { getProductImageUrl } from '@/lib/product-image';
@@ -76,11 +77,18 @@ export default function ProductConfigurationDialog({
       };
     };
   }>(() => {
-    // Initialize with preselected options from backend
+    // Initialize with preselected options from backend - preserve full option for pricing
     const initial: {
       [configIndex: number]: {
         optionIndex: number;
-        option: { name: string; price: number };
+        option: {
+          name: string;
+          price: number;
+          priceType?: 'fixed' | 'percentage';
+          percentage?: number;
+          isPercentageIncrease?: boolean;
+          image?: string;
+        };
       };
     } = {};
     if (product.productConfigurations && product.productConfigurations.length > 0) {
@@ -90,11 +98,23 @@ export default function ProductConfigurationDialog({
             opt => opt.isSelected
           );
           if (preselectedIndex !== -1) {
+            const opt = config.options[preselectedIndex] as {
+              name: string;
+              price: number;
+              priceType?: 'fixed' | 'percentage';
+              percentage?: number;
+              isPercentageIncrease?: boolean;
+              image?: string;
+            };
             initial[configIndex] = {
               optionIndex: preselectedIndex,
               option: {
-                name: config.options[preselectedIndex].name,
-                price: config.options[preselectedIndex].price,
+                name: opt.name,
+                price: opt.price,
+                priceType: opt.priceType,
+                percentage: opt.percentage,
+                isPercentageIncrease: opt.isPercentageIncrease,
+                image: opt.image,
               },
             };
           }
@@ -107,11 +127,18 @@ export default function ProductConfigurationDialog({
   // Reset state when dialog opens/closes
   useEffect(() => {
     if (!open) {
-      // Reset to default selections when dialog closes
+      // Reset to default selections when dialog closes - preserve full option for pricing
       const initial: {
         [configIndex: number]: {
           optionIndex: number;
-          option: { name: string; price: number };
+          option: {
+            name: string;
+            price: number;
+            priceType?: 'fixed' | 'percentage';
+            percentage?: number;
+            isPercentageIncrease?: boolean;
+            image?: string;
+          };
         };
       } = {};
       if (product.productConfigurations && product.productConfigurations.length > 0) {
@@ -121,11 +148,23 @@ export default function ProductConfigurationDialog({
               opt => opt.isSelected
             );
             if (preselectedIndex !== -1) {
+              const opt = config.options[preselectedIndex] as {
+                name: string;
+                price: number;
+                priceType?: 'fixed' | 'percentage';
+                percentage?: number;
+                isPercentageIncrease?: boolean;
+                image?: string;
+              };
               initial[configIndex] = {
                 optionIndex: preselectedIndex,
                 option: {
-                  name: config.options[preselectedIndex].name,
-                  price: config.options[preselectedIndex].price,
+                  name: opt.name,
+                  price: opt.price,
+                  priceType: opt.priceType,
+                  percentage: opt.percentage,
+                  isPercentageIncrease: opt.isPercentageIncrease,
+                  image: opt.image,
                 },
               };
             }
@@ -138,18 +177,25 @@ export default function ProductConfigurationDialog({
     }
   }, [open, product.productConfigurations]);
 
-  // Handle configuration change
+  // Handle configuration change - preserve full option (priceType, percentage, isPercentageIncrease) for pricing
   const handleConfigurationChange = useCallback(
     (
       configIndex: number,
       optionIndex: number,
-      option: { name: string; price: number }
+      option: {
+        name: string;
+        price: number;
+        priceType?: 'fixed' | 'percentage';
+        percentage?: number;
+        isPercentageIncrease?: boolean;
+        image?: string;
+      }
     ) => {
       setSelectedConfigurations(prev => ({
         ...prev,
         [configIndex]: {
           optionIndex,
-          option,
+          option: { ...option },
         },
       }));
     },
@@ -212,7 +258,11 @@ export default function ProductConfigurationDialog({
   }, []);
 
   const calculateFinalPrice = useCallback(() => {
-    let basePrice = Number(product.finalPriceDiscount ?? 0);
+    const productFinal = Number(product.finalPriceDiscount ?? 0);
+    const productMarked = Number((product as { displayMarkedPrice?: number }).displayMarkedPrice ?? product.finalPriceDiscount ?? 0);
+    const hasDiscount = (product as { hasDisplayDiscount?: boolean }).hasDisplayDiscount ?? false;
+
+    let basePrice = productFinal;
 
     const configResult = getSelectedConfigurationPrice();
     const configFixedPrice = configResult.fixedPrice || 0;
@@ -220,6 +270,11 @@ export default function ProductConfigurationDialog({
 
     if (configFixedPrice > 0) {
       basePrice = configFixedPrice;
+      // Apply product discount to config price when product has discount (e.g. coupon)
+      if (hasDiscount && productMarked > 0) {
+        const discountRatio = productFinal / productMarked;
+        basePrice = configFixedPrice * discountRatio;
+      }
     }
 
     const adjustedPrice = applyPercentageAdjustments(basePrice, percentageAdjustments);
@@ -227,11 +282,11 @@ export default function ProductConfigurationDialog({
     const finalPrice = adjustedPrice + optionPrice;
 
     return finalPrice.toFixed(2);
-  }, [getSelectedConfigurationPrice, applyPercentageAdjustments, selectedOption, product.finalPriceDiscount]);
+  }, [getSelectedConfigurationPrice, applyPercentageAdjustments, selectedOption, product.finalPriceDiscount, product]);
 
   const calculateMarkedUpPrice = useCallback(() => {
-    const originalBase = Number((product as { displayMarkedPrice?: number }).displayMarkedPrice ?? product.finalPriceDiscount ?? 0);
-    let basePrice = originalBase;
+    const productMarked = Number((product as { displayMarkedPrice?: number }).displayMarkedPrice ?? product.finalPriceDiscount ?? 0);
+    let basePrice = productMarked;
 
     const configResult = getSelectedConfigurationPrice();
     const configFixedPrice = configResult.fixedPrice || 0;
@@ -244,7 +299,7 @@ export default function ProductConfigurationDialog({
     const adjustedPrice = applyPercentageAdjustments(Number(basePrice), percentageAdjustments);
     const optionPrice = selectedOption ? Number(selectedOption.price) : 0;
     return (adjustedPrice + optionPrice).toFixed(2);
-  }, [getSelectedConfigurationPrice, applyPercentageAdjustments, selectedOption, product.finalPriceDiscount]);
+  }, [getSelectedConfigurationPrice, applyPercentageAdjustments, selectedOption, product.finalPriceDiscount, product]);
 
   const hasProductDiscount = (product as { hasDisplayDiscount?: boolean }).hasDisplayDiscount ?? false;
   const showMarkedPrice = hasProductDiscount;
@@ -288,7 +343,7 @@ export default function ProductConfigurationDialog({
       return;
     }
 
-    // Check if product already exists in cart
+    // Check if product already exists in cart (any item with same _id - we may be replacing it)
     const existingProduct = cart_products.find(
       (item: any) => item._id === product._id
     );
@@ -329,7 +384,20 @@ export default function ProductConfigurationDialog({
       return;
     }
 
+    // If option or configuration changed, remove the existing cart item first
+    if (productChanged && existingProduct) {
+      dispatch(
+        update_product_option({
+          id: existingProduct._id,
+          selectedOption: existingProduct.selectedOption,
+          selectedConfigurations: existingProduct.selectedConfigurations,
+          customNotes: existingProduct.customNotes,
+        })
+      );
+    }
+
     const markedUpPrice = Number((product as { displayMarkedPrice?: number }).displayMarkedPrice ?? product.finalPriceDiscount ?? 0);
+    const hasDiscount = (product as { hasDisplayDiscount?: boolean }).hasDisplayDiscount ?? false;
 
     let basePrice = Number(product.finalPriceDiscount ?? 0);
 
@@ -339,6 +407,11 @@ export default function ProductConfigurationDialog({
 
     if (configFixedPrice > 0) {
       basePrice = configFixedPrice;
+      // Apply product discount to config price when product has discount (e.g. coupon)
+      if (hasDiscount && markedUpPrice > 0) {
+        const discountRatio = Number(product.finalPriceDiscount ?? 0) / markedUpPrice;
+        basePrice = configFixedPrice * discountRatio;
+      }
     }
 
     const adjustedPrice = applyPercentageAdjustments(basePrice, percentageAdjustments);
@@ -492,9 +565,7 @@ export default function ProductConfigurationDialog({
               <div className="space-y-6">
                 {/* Render configurations with options (when custom note is disabled) */}
                 <ProductConfigurations
-                  configurations={product.productConfigurations.filter(
-                    (config: any) => !config.enableCustomNote
-                  )}
+                  configurations={product.productConfigurations}
                   onConfigurationChange={handleConfigurationChange}
                 />
                 {/* Custom Note Fields (when custom note is enabled) */}

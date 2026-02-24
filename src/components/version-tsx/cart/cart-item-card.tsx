@@ -83,6 +83,32 @@ export function CartItemCard({
             {Number(item.selectedOption.price).toFixed(2)})
           </p>
         )}
+        {item.selectedConfigurations &&
+          Object.keys(item.selectedConfigurations).length > 0 && (
+            <div className="mt-1 space-y-0.5">
+              {Object.entries(item.selectedConfigurations).map(
+                ([idx, config]) =>
+                  config?.option?.name && (
+                    <p key={idx} className="text-muted-foreground text-xs">
+                      {config.option.name}
+                    </p>
+                  )
+              )}
+            </div>
+          )}
+        {item.customNotes &&
+          Object.keys(item.customNotes).length > 0 && (
+            <div className="mt-1 space-y-0.5">
+              {Object.entries(item.customNotes).map(
+                ([, note]) =>
+                  note && (
+                    <p key={note} className="text-muted-foreground text-xs italic">
+                      Note: {note}
+                    </p>
+                  )
+              )}
+            </div>
+          )}
         <div className="mt-2.5 flex flex-wrap items-center gap-2">
           <div className="flex items-center overflow-hidden rounded-lg border border-border/60 bg-muted/30">
             <Button

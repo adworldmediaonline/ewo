@@ -12,6 +12,13 @@ export interface CartItemType {
   finalPriceDiscount?: number | string;
   orderQuantity: number;
   selectedOption?: { title: string; price: number };
+  /** Product configurations (e.g. Rod Ends preference) - affects cart line identity */
+  selectedConfigurations?: Record<
+    number,
+    { optionIndex: number; option: { name: string; price: number } }
+  >;
+  /** Custom notes for configs with enableCustomNote */
+  customNotes?: Record<number, string>;
   shipping?: { price?: number };
   /** Original price before product-level discount (for savings display) */
   basePrice?: number;

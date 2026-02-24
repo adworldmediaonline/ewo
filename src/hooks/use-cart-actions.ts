@@ -49,6 +49,8 @@ export function useCartActions() {
           title: item.title,
           id: item._id,
           selectedOption: item.selectedOption,
+          selectedConfigurations: item.selectedConfigurations,
+          customNotes: item.customNotes,
         })
       );
     },

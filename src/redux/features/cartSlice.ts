@@ -1,6 +1,7 @@
 import { getLocalStorage, setLocalStorage } from '@/utils/localstorage';
 import { notifyError } from '@/utils/toast';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
+import { getCartItemId } from '@/lib/cart-item-id';
 
 interface SelectedOption {
   title: string;
@@ -18,6 +19,11 @@ interface CartProduct {
   quantity?: number;
   slug?: string;
   selectedOption?: SelectedOption;
+  selectedConfigurations?: Record<
+    number,
+    { optionIndex: number; option: { name: string; price: number } }
+  >;
+  customNotes?: Record<number, string>;
   basePrice?: number;
   shipping?: { price?: number };
   appliedCouponCode?: string;
@@ -58,15 +64,10 @@ export const cartSlice = createSlice({
   initialState,
   reducers: {
     add_cart_product: (state, { payload }: PayloadAction<CartProduct>) => {
-      const productId = payload.selectedOption
-        ? `${payload._id}-option-${payload.selectedOption.title}`
-        : payload._id;
+      const productId = getCartItemId(payload);
 
       const isExist = state.cart_products.some((item: CartProduct) => {
-        const itemId = item.selectedOption
-          ? `${item._id}-option-${item.selectedOption.title}`
-          : item._id;
-        return itemId === productId;
+        return getCartItemId(item) === productId;
       });
 
       if (!isExist) {
@@ -89,31 +90,29 @@ export const cartSlice = createSlice({
         };
       } else {
         state.cart_products = state.cart_products.map((item: CartProduct) => {
-          const itemId = item.selectedOption
-            ? `${item._id}-option-${item.selectedOption.title}`
-            : item._id;
+          if (getCartItemId(item) !== productId) {
+            return { ...item } as CartProduct;
+          }
 
-          if (itemId === productId) {
-            if (
-              (Number(item.quantity) || 0) >=
-              (Number(item.orderQuantity) || 0) + state.orderQuantity
-            ) {
-              item.orderQuantity =
-                state.orderQuantity !== 1
-                  ? state.orderQuantity + Number(item.orderQuantity || 0)
-                  : Number(item.orderQuantity || 0) + 1;
+          if (
+            (Number(item.quantity) || 0) >=
+            (Number(item.orderQuantity) || 0) + state.orderQuantity
+          ) {
+            item.orderQuantity =
+              state.orderQuantity !== 1
+                ? state.orderQuantity + Number(item.orderQuantity || 0)
+                : Number(item.orderQuantity || 0) + 1;
 
-              state.showCartConfirmation = true;
-              state.lastAddedProduct = {
-                title: item.title,
-                img: item.img,
-                selectedOption: item.selectedOption,
-                orderQuantity: state.orderQuantity,
-              };
-            } else {
-              notifyError('No more quantity available for this product!');
-              state.orderQuantity = 1;
-            }
+            state.showCartConfirmation = true;
+            state.lastAddedProduct = {
+              title: item.title,
+              img: item.img,
+              selectedOption: item.selectedOption,
+              orderQuantity: state.orderQuantity,
+            };
+          } else {
+            notifyError('No more quantity available for this product!');
+            state.orderQuantity = 1;
           }
           return { ...item } as CartProduct;
         });
@@ -131,13 +130,11 @@ export const cartSlice = createSlice({
           : (state.orderQuantity = 1);
     },
     quantityDecrement: (state, { payload }: PayloadAction<CartProduct>) => {
-      state.cart_products.map((item: CartProduct) => {
-        if (item._id === payload._id) {
-          if (Number(item.orderQuantity || 0) > 1) {
-            item.orderQuantity = Number(item.orderQuantity || 0) - 1;
-          }
+      const targetId = getCartItemId(payload);
+      state.cart_products.forEach((item: CartProduct) => {
+        if (getCartItemId(item) === targetId && Number(item.orderQuantity || 0) > 1) {
+          item.orderQuantity = Number(item.orderQuantity || 0) - 1;
         }
-        return { ...item } as CartProduct;
       });
 
       setLocalStorage('cart_products', state.cart_products);
@@ -150,17 +147,22 @@ export const cartSlice = createSlice({
         id: string;
         title: string;
         selectedOption?: SelectedOption;
+        selectedConfigurations?: Record<
+          number,
+          { optionIndex: number; option: { name: string; price: number } }
+        >;
+        customNotes?: Record<number, string>;
       }>
     ) => {
-      const targetId = payload.selectedOption
-        ? `${payload.id}-option-${payload.selectedOption.title}`
-        : payload.id;
+      const targetId = getCartItemId({
+        _id: payload.id,
+        selectedOption: payload.selectedOption,
+        selectedConfigurations: payload.selectedConfigurations,
+        customNotes: payload.customNotes,
+      });
 
       state.cart_products = state.cart_products.filter((item: CartProduct) => {
-        const itemId = item.selectedOption
-          ? `${item._id}-option-${item.selectedOption.title}`
-          : item._id;
-        return itemId !== targetId;
+        return getCartItemId(item) !== targetId;
       });
 
       setLocalStorage('cart_products', state.cart_products);
@@ -172,10 +174,26 @@ export const cartSlice = createSlice({
     },
     update_product_option: (
       state,
-      { payload }: PayloadAction<{ id: string }>
+      {
+        payload,
+      }: PayloadAction<{
+        id: string;
+        selectedOption?: SelectedOption;
+        selectedConfigurations?: Record<
+          number,
+          { optionIndex: number; option: { name: string; price: number } }
+        >;
+        customNotes?: Record<number, string>;
+      }>
     ) => {
+      const targetId = getCartItemId({
+        _id: payload.id,
+        selectedOption: payload.selectedOption,
+        selectedConfigurations: payload.selectedConfigurations,
+        customNotes: payload.customNotes,
+      });
       state.cart_products = state.cart_products.filter(
-        (item: CartProduct) => item._id !== payload.id
+        (item: CartProduct) => getCartItemId(item) !== targetId
       );
 
       setLocalStorage('cart_products', state.cart_products);
