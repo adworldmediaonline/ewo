@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { CategoryItem, toSlug } from '@/lib/server-data';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 
 interface ShopSidebarProps {
   categories: CategoryItem[];
@@ -37,6 +38,8 @@ const ShopSidebar = ({
             const categorySlug = toSlug(category.parent);
             const isActiveCategory = categorySlug === activeCategory;
 
+            const hasChildren = Boolean(category.children?.length);
+
             return (
               <div key={category._id} className="space-y-0.5">
                 <Button
@@ -45,12 +48,27 @@ const ShopSidebar = ({
                   size="sm"
                   onClick={() => onToggleCategory(categorySlug)}
                   className={cn(
-                    'min-h-9 h-auto w-full justify-start px-3 py-2 text-left text-sm font-medium whitespace-normal wrap-break-word',
+                    'min-h-9 h-auto w-full justify-between px-3 py-2 text-left text-sm font-medium whitespace-normal wrap-break-word gap-2',
                     isActiveCategory && 'shadow-sm',
                     !isActiveCategory && 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
                   )}
                 >
-                  {category.parent}
+                  <span>{category.parent}</span>
+                  {hasChildren && (
+                    <span
+                      className={cn(
+                        'shrink-0 flex items-center',
+                        isActiveCategory ? 'text-primary-foreground/80' : 'text-muted-foreground'
+                      )}
+                      aria-hidden
+                    >
+                      {isActiveCategory ? (
+                        <ChevronDown className="w-4 h-4" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4" />
+                      )}
+                    </span>
+                  )}
                 </Button>
 
                 {isActiveCategory && category.children?.length ? (

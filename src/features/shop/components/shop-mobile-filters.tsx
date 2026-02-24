@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Sheet,
@@ -14,7 +15,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { CategoryItem, toSlug } from '@/lib/server-data';
-import { Filter } from 'lucide-react';
+import { ChevronDown, ChevronRight, Filter } from 'lucide-react';
 
 interface ShopMobileFiltersProps {
   categories: CategoryItem[];
@@ -77,6 +78,7 @@ const ShopMobileFilters = ({
               const categorySlug = toSlug(category.parent);
               const isActiveCategory = categorySlug === activeCategory;
               const productsCount = category.products?.length ?? 0;
+              const hasChildren = Boolean(category.children?.length);
 
               return (
                 <div key={category._id} className="space-y-2">
@@ -84,14 +86,29 @@ const ShopMobileFilters = ({
                     type="button"
                     variant={isActiveCategory ? 'default' : 'ghost'}
                     size="sm"
-                    className="w-full justify-between"
+                    className="w-full justify-between gap-2"
                     onClick={() => handleCategoryClick(categorySlug)}
                   >
-                    <span className="truncate text-left text-sm font-medium">
-                      {category.parent}
+                    <span className="flex items-center gap-1.5 text-left text-sm font-medium min-w-0">
+                      {hasChildren && (
+                        <span
+                          className={cn(
+                            'shrink-0',
+                            isActiveCategory ? 'text-primary-foreground/80' : 'text-muted-foreground'
+                          )}
+                          aria-hidden
+                        >
+                          {isActiveCategory ? (
+                            <ChevronDown className="w-4 h-4" />
+                          ) : (
+                            <ChevronRight className="w-4 h-4" />
+                          )}
+                        </span>
+                      )}
+                      <span>{category.parent}</span>
                     </span>
                     {productsCount ? (
-                      <Badge variant="secondary" className="text-[10px]">
+                      <Badge variant="secondary" className="text-[10px] shrink-0">
                         {productsCount}
                       </Badge>
                     ) : null}
