@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import Image from 'next/image';
 
@@ -79,6 +79,22 @@ const ShopContentWrapper = ({
     rootMargin: '200px 0px',
     threshold: 0,
   });
+
+  const shopContentRef = useRef<HTMLDivElement>(null);
+  const isInitialMount = useRef(true);
+
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    // Scroll to the shop content container (toolbar + products) so the filter banner
+    // stays visible and the product section is in view
+    shopContentRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  }, [filters.category, filters.subcategory]);
 
   useEffect(() => {
     if (!inView || !canFetchMore || isLoadingMore) {
@@ -340,7 +356,10 @@ const ShopContentWrapper = ({
             )}
         </div>
       )}
-      <div className="min-h-screen bg-background py-2 lg:py-6">
+      <div
+        ref={shopContentRef}
+        className="min-h-screen bg-background py-2 lg:py-6 scroll-mt-[11rem]"
+      >
         {/* Full-width toolbar above category filter and content */}
         <div className="w-full mb-4 lg:mb-6">
           <ShopToolbar
@@ -384,7 +403,10 @@ const ShopContentWrapper = ({
             activeFiltersCount={activeFiltersCount}
           />
 
-          <section className="min-w-0 flex-1 space-y-6">
+          <section
+            className="min-w-0 flex-1 space-y-6"
+            aria-label="Products"
+          >
             {showErrorState ? (
               <ShopEmptyState
                 variant="error"
