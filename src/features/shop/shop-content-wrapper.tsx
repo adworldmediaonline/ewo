@@ -26,6 +26,10 @@ import {
 
 interface ShopContentWrapperProps {
   categories: CategoryItem[];
+  /** Category slug from path params */
+  initialCategory?: string;
+  /** Subcategory slug from path params (backend format: comma-separated for grouped) */
+  initialSubcategory?: string;
   /** SSR initial products for instant first paint */
   initialProducts?: ShopProduct[];
   /** SSR initial pagination */
@@ -34,6 +38,8 @@ interface ShopContentWrapperProps {
 
 const ShopContentWrapper = ({
   categories,
+  initialCategory = '',
+  initialSubcategory = '',
   initialProducts = [],
   initialPagination = null,
 }: ShopContentWrapperProps) => {
@@ -46,7 +52,7 @@ const ShopContentWrapper = ({
     resetFilters,
     hasActiveFilters,
     sortKey,
-  } = useShopQueryState();
+  } = useShopQueryState({ initialCategory, initialSubcategory });
 
   const {
     products,

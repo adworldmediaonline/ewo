@@ -1,12 +1,13 @@
 'use client';
 
 import { useCallback, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { parseAsString, parseAsStringEnum, useQueryStates } from 'nuqs';
+
+import { toSubcategoryUrlSlug } from '@/lib/shop-url-utils';
 
 import {
   DEFAULT_FILTERS,
-  SHOP_SORT_FIELDS,
-  SHOP_SORT_ORDERS,
   type ShopFiltersState,
 } from '../shop-types';
 
@@ -20,12 +21,20 @@ const toQueryValue = (value: string | undefined) => {
   return value;
 };
 
-export const useShopQueryState = () => {
-  const [filters, setQueryState] = useQueryStates(
+export interface UseShopQueryStateOptions {
+  /** Category from path params - used instead of nuqs */
+  initialCategory?: string;
+  /** Subcategory from path params (backend format, comma-separated for grouped) - used instead of nuqs */
+  initialSubcategory?: string;
+}
+
+export const useShopQueryState = (options: UseShopQueryStateOptions = {}) => {
+  const router = useRouter();
+  const { initialCategory = '', initialSubcategory = '' } = options;
+
+  const [queryState, setQueryState] = useQueryStates(
     {
       search: parseAsString.withDefault(DEFAULT_FILTERS.search),
-      category: parseAsString.withDefault(DEFAULT_FILTERS.category),
-      subcategory: parseAsString.withDefault(DEFAULT_FILTERS.subcategory),
       sortBy: parseAsStringEnum([
         'skuArrangementOrderNo',
         'createdAt',
@@ -41,6 +50,23 @@ export const useShopQueryState = () => {
     }
   );
 
+  const filters: ShopFiltersState = useMemo(
+    () => ({
+      search: queryState.search,
+      category: initialCategory,
+      subcategory: initialSubcategory,
+      sortBy: queryState.sortBy,
+      sortOrder: queryState.sortOrder,
+    }),
+    [
+      queryState.search,
+      queryState.sortBy,
+      queryState.sortOrder,
+      initialCategory,
+      initialSubcategory,
+    ]
+  );
+
   const setSearch = useCallback(
     async (value: string) => {
       await setQueryState({ search: toQueryValue(value) });
@@ -51,44 +77,38 @@ export const useShopQueryState = () => {
   const setSort = useCallback(
     async (sortBy: string, sortOrder: ShopFiltersState['sortOrder']) => {
       await setQueryState({
-        sortBy: toQueryValue(sortBy) as any,
-        sortOrder: toQueryValue(sortOrder) as any,
+        sortBy: toQueryValue(sortBy) as never,
+        sortOrder: toQueryValue(sortOrder) as never,
       });
     },
     [setQueryState]
   );
 
   const toggleCategory = useCallback(
-    async (category: string) => {
-      const nextCategory = category === filters.category ? '' : category;
-
-      await setQueryState({
-        category: toQueryValue(nextCategory),
-        subcategory: null,
-      });
+    (category: string) => {
+      if (category === initialCategory) return;
+      router.push(`/shop/${category}`);
     },
-    [filters.category, setQueryState]
+    [initialCategory, router]
   );
 
   const toggleSubcategory = useCallback(
-    async (subcategory: string) => {
-      const nextSubcategory =
-        subcategory === filters.subcategory ? '' : subcategory;
-
-      await setQueryState({ subcategory: toQueryValue(nextSubcategory) });
+    (subcategorySlug: string) => {
+      if (subcategorySlug === initialSubcategory) return;
+      const urlSlug = toSubcategoryUrlSlug(subcategorySlug);
+      router.push(`/shop/${initialCategory}/${urlSlug}`);
     },
-    [filters.subcategory, setQueryState]
+    [initialCategory, initialSubcategory, router]
   );
 
   const resetFilters = useCallback(async () => {
     await setQueryState({
       search: null,
-      category: null,
-      subcategory: null,
       sortBy: null,
       sortOrder: null,
     });
-  }, [setQueryState]);
+    router.push('/shop');
+  }, [setQueryState, router]);
 
   const hasActiveFilters = useMemo(() => {
     return (
@@ -116,4 +136,3 @@ export const useShopQueryState = () => {
     sortKey,
   } as const;
 };
-

@@ -1,8 +1,10 @@
 'use client';
+
 import { useRouter } from 'next/navigation';
-import { toSlug } from '@/lib/server-data';
 import Link from 'next/link';
 import Image from 'next/image';
+import { toSlug } from '@/lib/server-data';
+import { toSubcategoryUrlSlug } from '@/lib/shop-url-utils';
 
 export interface CategoryItem {
   _id: string;
@@ -54,15 +56,15 @@ export const CategoryCard = ({
     e.stopPropagation();
     const parentSlug = item.parentCategorySlug ?? toSlug(parent);
     const childSlug = toSlug(child);
-    router.push(`/shop?category=${parentSlug}&subcategory=${childSlug}`);
+    router.push(`/shop/${parentSlug}/${childSlug}`);
     onNavigate?.();
   };
 
-  // Subcategory/grouped card: use parent+subcategory URL (subcategorySlug can be comma-separated for grouped)
+  // Subcategory/grouped card: use path-based URL (subcategorySlug can be comma-separated for grouped)
   const hasSubcategoryLink = item.parentCategorySlug && item.subcategorySlug;
   const href = hasSubcategoryLink
-    ? `/shop?category=${item.parentCategorySlug}&subcategory=${item.subcategorySlug}`
-    : `/shop?category=${toSlug(item.parent)}`;
+    ? `/shop/${item.parentCategorySlug}/${toSubcategoryUrlSlug(item.subcategorySlug ?? '')}`
+    : `/shop/${toSlug(item.parent)}`;
 
   const isMega = variant === 'mega';
 

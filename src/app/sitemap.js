@@ -1,3 +1,6 @@
+import { getCategories } from '@/lib/server-data';
+import { getAllCategoryPaths } from '@/lib/shop-url-utils';
+
 async function fetchProducts() {
   try {
     // Use internal API URL for server-side calls to avoid external network issues
@@ -111,8 +114,19 @@ export default async function sitemap() {
     priority: 0.8,
   }));
 
-  // Debug final sitemap
-  const finalSitemap = [...staticPages, ...productPages];
+  // Generate category pages
+  const categories = await getCategories();
+  const categoryPaths = getAllCategoryPaths(categories);
+  const categoryPages = categoryPaths.map(({ category, subcategory }) => ({
+    url: subcategory
+      ? `${baseUrl}/shop/${category}/${subcategory}`
+      : `${baseUrl}/shop/${category}`,
+    lastModified: currentDate,
+    changeFrequency: 'weekly',
+    priority: 0.8,
+  }));
+
+  const finalSitemap = [...staticPages, ...categoryPages, ...productPages];
 
   // Combine static pages and product pages
   return finalSitemap;

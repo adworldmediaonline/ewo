@@ -26,7 +26,7 @@ export const BreadcrumbDynamicContent = ({
       <BreadcrumbItem>
         <BreadcrumbLink asChild>
           <Link
-            href={`/shop?category=${categorySlug}`}
+            href={`/shop/${categorySlug}`}
             className="text-muted-foreground hover:text-foreground transition-colors capitalize"
           >
             {categoryName}
