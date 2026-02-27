@@ -7,9 +7,9 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import PageSectionsRenderer from '@/components/version-tsx/page-sections-renderer';
-import { ShopCategoryGrid } from '@/features/shop/components/shop-category-grid';
+// import { ShopCategoryGrid } from '@/features/shop/components/shop-category-grid';
 import Wrapper from '@/components/wrapper';
-import { getCategories } from '@/lib/server-data';
+import { getCategoriesShow } from '@/server/categories';
 import { getActivePageSections } from '@/server/page-sections';
 import { getPageMetadata } from '@/server/page-metadata';
 import { buildPageMetadata } from '@/lib/build-page-metadata';
@@ -25,10 +25,7 @@ export async function generateMetadata() {
 }
 
 export default async function ShopPage() {
-  const [categories, pageSections] = await Promise.all([
-    getCategories(),
-    getActivePageSections('shop'),
-  ]);
+  const categories = await getCategoriesShow();
 
   return (
     <Wrapper>
@@ -45,17 +42,14 @@ export default async function ShopPage() {
           </BreadcrumbList>
         </Breadcrumb>
 
-        <PageSectionsRenderer pageSlug="shop" sections={pageSections} />
+        {/* <PageSectionsRenderer pageSlug="shop" sections={pageSections} /> */}
 
-        <section className="w-full py-6 md:py-8" aria-labelledby="shop-heading">
-          <h1
-            id="shop-heading"
-            className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight mb-4 md:mb-6"
-          >
-            Collections
-          </h1>
-          <ShopCategoryGrid categories={categories} />
-        </section>
+        {/* <section className="w-full py-6 md:py-8" aria-labelledby="shop-heading"> */}
+        <PageSectionsRenderer
+          pageSlug="shop"
+          categories={categories}
+        />
+
       </div>
     </Wrapper>
   );
