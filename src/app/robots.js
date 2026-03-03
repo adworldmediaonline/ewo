@@ -11,6 +11,11 @@ export default function robots() {
       },
       {
         userAgent: '*',
+        allow: [
+          '/api/image/',
+          '/_next/image/',
+          '/_next/static/',
+        ],
         disallow: [
           '/blog/',
           '/sign-in',
