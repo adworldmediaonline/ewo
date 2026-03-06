@@ -4,16 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useCartSummary } from '@/hooks/use-cart-summary';
 import { useCartActions } from '@/hooks/use-cart-actions';
-import { useCouponAutoApply } from '@/hooks/use-coupon-auto-apply';
-import { useRefetchOnVisibility } from '@/hooks/use-refetch-on-visibility';
-import { saveUserRemoved } from '@/lib/coupon-user-removed';
-import { getStoreCouponSettings } from '@/lib/store-api';
-import {
-  applyCoupon,
-  get_cart_products,
-  removeCoupon,
-} from '@/redux/features/cartSlice';
-import { CouponSection } from './coupon-section';
+import { get_cart_products } from '@/redux/features/cartSlice';
 import {
   CardNumberElement,
   CardExpiryElement,
@@ -31,7 +22,6 @@ import {
 export default function CheckoutOrderArea({ checkoutData, variant = 'full' }) {
   const dispatch = useDispatch();
   const [cartDataLoaded, setCartDataLoaded] = useState(false);
-  const [hideCouponSection, setHideCouponSection] = useState(false);
 
   const {
     cartTotal = 0,
@@ -46,8 +36,6 @@ export default function CheckoutOrderArea({ checkoutData, variant = 'full' }) {
   const { cart_products, couponCode, discountAmount, isAutoApplied } = useSelector(state => state.cart);
   const summary = useCartSummary();
   const { handleIncrement, handleDecrement, handleRemove } = useCartActions();
-  const { retryAutoApply } = useCouponAutoApply();
-  const couponRefetchKey = useRefetchOnVisibility();
 
   const cardExpiryRef = useRef(null);
   const cardCvcRef = useRef(null);
@@ -81,16 +69,6 @@ export default function CheckoutOrderArea({ checkoutData, variant = 'full' }) {
 
     return () => clearTimeout(fallbackTimer);
   }, [cartDataLoaded]);
-
-  useEffect(() => {
-    getStoreCouponSettings()
-      .then((settings) => {
-        const autoApplyOn =
-          settings.autoApply && settings.autoApplyStrategy !== 'customer_choice';
-        setHideCouponSection(!!autoApplyOn);
-      })
-      .catch(() => setHideCouponSection(false));
-  }, [couponRefetchKey]);
 
   if (!cartDataLoaded) {
     const loadingTitle = variant === 'summary' ? 'Order Summary' : 'Your Order';
@@ -178,27 +156,6 @@ export default function CheckoutOrderArea({ checkoutData, variant = 'full' }) {
                 ${(Number(summary.subtotal) || 0).toFixed(2)}
               </span>
             </div>
-
-            {!hideCouponSection && (
-            <CouponSection
-              subtotal={summary.subtotal}
-              items={items.map((i) => ({
-                productId: i._id,
-                quantity: i.orderQuantity,
-                unitPrice: Number(i.finalPriceDiscount ?? 0),
-                title: i.title,
-              }))}
-              onApplied={(amount, code) => dispatch(applyCoupon({ code, discountAmount: amount }))}
-              appliedCode={couponCode}
-              appliedAmount={discountAmount}
-              onRemove={() => {
-                saveUserRemoved(summary.quantity, summary.subtotal);
-                dispatch(removeCoupon());
-              }}
-              onRetryAutoApply={retryAutoApply}
-              refetchKey={couponRefetchKey}
-            />
-            )}
 
             {couponCode && discountAmount > 0 &&
               (isAutoApplied ? (
