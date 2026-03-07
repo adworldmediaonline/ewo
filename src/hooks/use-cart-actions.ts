@@ -8,6 +8,7 @@ import {
   remove_product,
 } from '@/redux/features/cartSlice';
 import { useLazyGetProductQuery } from '@/redux/features/productApi';
+import { getConfigOptionAvailableQuantity } from '@/lib/product-stock';
 import { notifyError } from '@/utils/toast';
 import type { CartItemType } from '@/components/version-tsx/cart/cart-types';
 
@@ -29,7 +30,15 @@ export function useCartActions() {
           notifyError('Unable to verify product availability. Please try again.');
           return;
         }
-        freshQuantity = Number(result.data?.quantity ?? 0);
+        const freshProduct = result.data;
+        const configOptionQty = getConfigOptionAvailableQuantity(
+          freshProduct,
+          item.selectedConfigurations
+        );
+        freshQuantity =
+          configOptionQty != null
+            ? configOptionQty
+            : Number(freshProduct?.quantity ?? 0);
         const currentQty = Number(item.orderQuantity ?? 0);
         const requestedQty = currentQty + 1;
         if (freshQuantity < requestedQty) {

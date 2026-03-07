@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
+import { isOptionOutOfStock } from '@/lib/product-stock';
 
 interface ConfigurationOption {
   name: string;
@@ -10,6 +11,7 @@ interface ConfigurationOption {
   isPercentageIncrease?: boolean;
   isSelected: boolean;
   image?: string;
+  quantity?: number | null;
 }
 
 interface ProductConfiguration {
@@ -35,11 +37,11 @@ export default function ProductConfigurations({
   const [selectedOptions, setSelectedOptions] = useState<{
     [configIndex: number]: number;
   }>(() => {
-    // Initialize with preselected options
+    // Initialize with preselected options (skip out-of-stock)
     const initial: { [configIndex: number]: number } = {};
     configurations.forEach((config, configIndex) => {
       const preselectedIndex = config.options.findIndex(
-        opt => opt.isSelected
+        opt => opt.isSelected && !isOptionOutOfStock(opt)
       );
       if (preselectedIndex !== -1) {
         initial[configIndex] = preselectedIndex;
@@ -53,6 +55,8 @@ export default function ProductConfigurations({
     optionIndex: number,
     option: ConfigurationOption
   ) => {
+    if (isOptionOutOfStock(option)) return;
+
     setSelectedOptions(prev => ({
       ...prev,
       [configIndex]: optionIndex,
@@ -116,35 +120,48 @@ export default function ProductConfigurations({
               {config.options.map((option, optionIndex) => {
                 const isSelected = selectedIndex === optionIndex;
                 const hasPrice = option.price && Number(option.price) > 0;
+                const outOfStock = isOptionOutOfStock(option);
 
                 return (
                   <button
                     key={optionIndex}
                     type="button"
                     onClick={() =>
-                      handleOptionSelect(configIndex, optionIndex, option)
+                      !outOfStock && handleOptionSelect(configIndex, optionIndex, option)
                     }
+                    disabled={outOfStock}
                     className={cn(
                       'relative px-4 py-3 rounded-lg border-2 transition-all duration-200 text-left',
                       'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
-                      isSelected
+                      outOfStock && 'opacity-60 cursor-not-allowed',
+                      isSelected && !outOfStock
                         ? 'border-foreground bg-background font-semibold'
-                        : 'border-muted-foreground/30 bg-background hover:border-muted-foreground/50'
+                        : !outOfStock
+                          ? 'border-muted-foreground/30 bg-background hover:border-muted-foreground/50'
+                          : 'border-muted-foreground/20 bg-muted/30'
                     )}
                     aria-pressed={isSelected}
-                    aria-label={`Select ${option.name}${hasPrice ? ` for $${Number(option.price).toFixed(2)}` : ''}`}
+                    aria-disabled={outOfStock}
+                    aria-label={`Select ${option.name}${outOfStock ? ' (Out of Stock)' : hasPrice ? ` for $${Number(option.price).toFixed(2)}` : ''}`}
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span
                         className={cn(
                           'text-sm font-medium',
-                          isSelected
+                          isSelected && !outOfStock
                             ? 'text-foreground'
-                            : 'text-foreground/90'
+                            : outOfStock
+                              ? 'text-muted-foreground'
+                              : 'text-foreground/90'
                         )}
                       >
                         {option.name}
                       </span>
+                      {outOfStock && (
+                        <span className="text-xs font-medium text-destructive">
+                          Out of Stock
+                        </span>
+                      )}
                       {/* {hasPrice && (
                         <span
                           className={cn(

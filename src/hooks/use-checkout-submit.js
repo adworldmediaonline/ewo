@@ -23,7 +23,7 @@ import {
 } from '@/redux/features/order/orderSlice';
 import { notifyError, notifySuccess } from '@/utils/toast';
 import { useLazyGetProductQuery } from '@/redux/features/productApi';
-import { isOutOfStock } from '@/lib/product-stock';
+import { isOutOfStock, getConfigOptionAvailableQuantity } from '@/lib/product-stock';
 
 /** Parse saveOrder error for stock validation (400 + invalidItems). */
 const getSaveOrderErrorMessage = (error) => {
@@ -287,7 +287,14 @@ const useCheckoutSubmit = () => {
             invalidItems.push({ title: item.title || freshProduct?.title || 'Unknown product' });
             continue;
           }
-          const availableQty = Number(freshProduct?.quantity ?? 0);
+          const configOptionQty = getConfigOptionAvailableQuantity(
+            freshProduct,
+            item.selectedConfigurations
+          );
+          const availableQty =
+            configOptionQty != null
+              ? configOptionQty
+              : Number(freshProduct?.quantity ?? 0);
           const requestedQty = Number(item.orderQuantity ?? 1);
           if (availableQty < requestedQty) {
             invalidItems.push({

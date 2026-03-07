@@ -36,7 +36,7 @@ import { add_to_compare } from '@/redux/features/compareSlice';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { notifyError, notifySuccess } from '@/utils/toast';
 import { getProductDisplayPrices, resolveCartItemPrice } from '@/lib/product-price';
-import { isOutOfStock } from '@/lib/product-stock';
+import { isOutOfStock, getConfigOptionAvailableQuantity } from '@/lib/product-stock';
 import { useLazyGetProductQuery } from '@/redux/features/productApi';
 import { getCartItemId } from '@/lib/cart-item-id';
 import {
@@ -447,7 +447,13 @@ export default function DetailsWrapper({
         notifyError('This product is out of stock.');
         return;
       }
-      prd = { ...prd, quantity: Number(freshProduct?.quantity ?? 0) };
+      const configOptionQty = getConfigOptionAvailableQuantity(freshProduct, selectedConfigurations);
+      const availableQty = configOptionQty != null ? configOptionQty : Number(freshProduct?.quantity ?? 0);
+      if (configOptionQty != null && configOptionQty <= 0) {
+        notifyError('The selected configuration option is out of stock.');
+        return;
+      }
+      prd = { ...prd, quantity: availableQty };
     } catch {
       notifyError('Unable to verify product availability. Please try again.');
       return;

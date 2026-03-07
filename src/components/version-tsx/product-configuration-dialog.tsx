@@ -20,7 +20,7 @@ import {
 } from '@/redux/features/cartSlice';
 import { notifyError } from '@/utils/toast';
 import { getProductImageUrl } from '@/lib/product-image';
-import { isOutOfStock } from '@/lib/product-stock';
+import { isOutOfStock, getConfigOptionAvailableQuantity } from '@/lib/product-stock';
 import { useLazyGetProductQuery } from '@/redux/features/productApi';
 import type { Product } from '@/components/version-tsx/product-card';
 
@@ -364,8 +364,20 @@ export default function ProductConfigurationDialog({
       return;
     }
 
-    // Use fresh quantity for validation
-    const productWithFreshQuantity = { ...product, quantity: Number(freshProduct?.quantity ?? 0) };
+    // Use fresh quantity for validation (product-level or config option-level)
+    const configOptionQty = getConfigOptionAvailableQuantity(freshProduct, selectedConfigurations);
+    const productWithFreshQuantity = {
+      ...product,
+      quantity: configOptionQty != null ? configOptionQty : Number(freshProduct?.quantity ?? 0),
+    };
+
+    // Validate selected config options are not out of stock
+    if (configOptionQty != null) {
+      if (configOptionQty <= 0) {
+        notifyError('The selected configuration option is out of stock.');
+        return;
+      }
+    }
 
     // Check if product already exists in cart (any item with same _id - we may be replacing it)
     const existingProduct = cart_products.find(
