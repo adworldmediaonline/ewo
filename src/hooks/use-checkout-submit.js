@@ -22,6 +22,8 @@ import {
   set_tax_preview,
 } from '@/redux/features/order/orderSlice';
 import { notifyError, notifySuccess } from '@/utils/toast';
+import { useLazyGetProductQuery } from '@/redux/features/productApi';
+import { isOutOfStock } from '@/lib/product-stock';
 
 /** Parse saveOrder error for stock validation (400 + invalidItems). */
 const getSaveOrderErrorMessage = (error) => {
@@ -44,6 +46,7 @@ const useCheckoutSubmit = () => {
   const [saveOrder] = useSaveOrderMutation();
   const [createPaymentIntent] = useCreatePaymentIntentMutation();
   const [calculateTax, { isLoading: isTaxLoading }] = useCalculateTaxMutation();
+  const [fetchProduct] = useLazyGetProductQuery();
   const { cart_products, couponCode, discountAmount } = useSelector(state => state.cart);
 
   const { tax_preview } = useSelector(state => state.order);
@@ -265,6 +268,48 @@ const useCheckoutSubmit = () => {
       setIsCheckoutSubmit(false);
       dispatch(end_checkout_submission());
       return;
+    }
+
+    // Re-validate stock before any payment processing (handles stale cart when another user bought last item)
+    if (cart_products?.length > 0) {
+      const invalidItems = [];
+      for (const item of cart_products) {
+        const productId = item._id || item.productId || item.product?._id;
+        if (!productId) continue;
+        try {
+          const result = await fetchProduct(productId);
+          if (result.error || !result.data) {
+            invalidItems.push({ title: item.title || 'Unknown product' });
+            continue;
+          }
+          const freshProduct = result.data;
+          if (isOutOfStock(freshProduct)) {
+            invalidItems.push({ title: item.title || freshProduct?.title || 'Unknown product' });
+            continue;
+          }
+          const availableQty = Number(freshProduct?.quantity ?? 0);
+          const requestedQty = Number(item.orderQuantity ?? 1);
+          if (availableQty < requestedQty) {
+            invalidItems.push({
+              title: item.title || freshProduct?.title || 'Unknown product',
+              available: availableQty,
+              requested: requestedQty,
+            });
+          }
+        } catch {
+          invalidItems.push({ title: item.title || 'Unknown product' });
+        }
+      }
+      if (invalidItems.length > 0) {
+        const itemNames = invalidItems.map((i) => i.title).filter(Boolean);
+        const detail = itemNames.length > 0 ? ` (${itemNames.join(', ')})` : '';
+        notifyError(
+          `Some items in your cart are no longer available. Please remove them and try again.${detail}`
+        );
+        setIsCheckoutSubmit(false);
+        dispatch(end_checkout_submission());
+        return;
+      }
     }
 
     const rawSubTotal =
