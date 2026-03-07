@@ -450,7 +450,7 @@ export default function DetailsWrapper({
       const configOptionQty = getConfigOptionAvailableQuantity(freshProduct, selectedConfigurations);
       const availableQty = configOptionQty != null ? configOptionQty : Number(freshProduct?.quantity ?? 0);
       if (configOptionQty != null && configOptionQty <= 0) {
-        notifyError('The selected configuration option is out of stock.');
+        notifyError('The selected option is out of stock.');
         return;
       }
       prd = { ...prd, quantity: availableQty };

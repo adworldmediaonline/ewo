@@ -374,7 +374,7 @@ export default function ProductConfigurationDialog({
     // Validate selected config options are not out of stock
     if (configOptionQty != null) {
       if (configOptionQty <= 0) {
-        notifyError('The selected configuration option is out of stock.');
+        notifyError('The selected option is out of stock.');
         return;
       }
     }
@@ -597,7 +597,7 @@ export default function ProductConfigurationDialog({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">
-            Configure {product.title}
+            {product.title}
           </DialogTitle>
         </DialogHeader>
 
