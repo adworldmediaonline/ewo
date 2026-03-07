@@ -22,6 +22,18 @@ import {
   set_tax_preview,
 } from '@/redux/features/order/orderSlice';
 import { notifyError, notifySuccess } from '@/utils/toast';
+
+/** Parse saveOrder error for stock validation (400 + invalidItems). */
+const getSaveOrderErrorMessage = (error) => {
+  const data = error?.data ?? error?.response?.data;
+  const status = error?.status ?? error?.response?.status;
+  if (status === 400 && data?.invalidItems && Array.isArray(data.invalidItems) && data.invalidItems.length > 0) {
+    const items = data.invalidItems.map((i) => i.title || i.productId).filter(Boolean);
+    const detail = items.length > 0 ? ` (${items.join(', ')})` : '';
+    return `Some items in your cart are no longer available. Please remove them and try again.${detail}`;
+  }
+  return data?.message || 'Something went wrong with your order. Please try again.';
+};
 import { authClient } from '../lib/authClient';
 import useCartInfo from './use-cart-info';
 import { useCartSummary } from './use-cart-summary';
@@ -340,10 +352,8 @@ const useCheckoutSubmit = () => {
           setProcessingPayment(false);
           dispatch(end_checkout_submission());
         })
-        .catch(() => {
-          notifyError(
-            'Something went wrong with your order. Please try again.'
-          );
+        .catch((err) => {
+          notifyError(getSaveOrderErrorMessage(err));
           setIsCheckoutSubmit(false);
           dispatch(end_checkout_submission());
         });
@@ -422,10 +432,8 @@ const useCheckoutSubmit = () => {
                   '🎉 Your free order has been placed successfully!'
                 );
               })
-              .catch(() => {
-                notifyError(
-                  'Something went wrong with your free order. Please try again.'
-                );
+              .catch((err) => {
+                notifyError(getSaveOrderErrorMessage(err));
                 setIsCheckoutSubmit(false);
                 setProcessingPayment(false);
                 dispatch(end_checkout_submission());
@@ -485,13 +493,6 @@ const useCheckoutSubmit = () => {
 
           if (paymentIntent.status === 'succeeded') {
             setPaymentSuccessful(true);
-
-            localStorage.removeItem('cart_products');
-            localStorage.removeItem('shipping_info');
-
-            dispatch(clearCart());
-            dispatch(hideCartConfirmation());
-
             setIsCheckoutSubmit(false);
             setProcessingPayment(false);
 
@@ -515,22 +516,24 @@ const useCheckoutSubmit = () => {
                   res.data?.order?.invoice ||
                   res.order?.invoice;
 
+                localStorage.removeItem('cart_products');
+                localStorage.removeItem('shipping_info');
+                dispatch(clearCart());
+                dispatch(hideCartConfirmation());
+
                 setTimeout(() => {
                   setPaymentSuccessful(false);
                   router.push(`/order/${orderId}`);
                 }, 1500);
               })
-              .catch(() => {
+              .catch((err) => {
                 setPaymentSuccessful(false);
-                const productSummary =
-                  cart_products.length > 1
-                    ? `${cart_products[0].title} and ${cart_products.length - 1} other items`
-                    : cart_products[0]?.title || 'your product';
-
-                notifyError(
-                  `Your payment for ${productSummary} was successful, but we encountered an issue saving your order details. Our team has been notified.`
-                );
-                router.push('/order');
+                const isStockError = err?.data?.invalidItems ?? err?.response?.data?.invalidItems;
+                notifyError(getSaveOrderErrorMessage(err));
+                dispatch(end_checkout_submission());
+                if (!isStockError) {
+                  router.push('/order');
+                }
               });
           } else {
             notifyError(

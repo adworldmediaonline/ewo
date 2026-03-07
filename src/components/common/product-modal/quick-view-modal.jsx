@@ -19,6 +19,8 @@ import {
   getProductImageAlt,
   getVariantImageAlt,
 } from '@/lib/product-image';
+import { isOutOfStock } from '@/lib/product-stock';
+import { useLazyGetProductQuery } from '@/redux/features/productApi';
 import './quick-view-modal.css';
 
 const customStyles = {
@@ -59,6 +61,7 @@ export default function QuickViewModal() {
   const { productItem, isModalOpen } = useSelector(state => state.productModal);
   const { orderQuantity, cart_products } = useSelector(state => state.cart);
   const dispatch = useDispatch();
+  const [fetchProduct] = useLazyGetProductQuery();
 
   const {
     _id,
@@ -70,12 +73,12 @@ export default function QuickViewModal() {
     price,
     updatedPrice,
     finalPriceDiscount,
-    status,
     reviews,
     tags,
     options,
   } = productItem || {};
 
+  const outOfStock = isOutOfStock(productItem);
   const img = getProductImageSrc(productItem || {});
   const imageURLs = getProductImageSrcsForGallery(productItem || {});
   const imageAlt = getProductImageAlt(productItem || {});
@@ -124,11 +127,29 @@ export default function QuickViewModal() {
     }
   };
 
-  const handleAddProduct = prd => {
+  const handleAddProduct = async prd => {
     if (options && options.length > 0 && !selectedOption) {
       notifyError(
         'Please select an option before adding the product to your cart.'
       );
+      return;
+    }
+
+    // Re-fetch product to validate stock (handles stale page when another user bought last item)
+    try {
+      const result = await fetchProduct(prd._id);
+      if (result.error || !result.data) {
+        notifyError('Unable to verify product availability. Please try again.');
+        return;
+      }
+      const freshProduct = result.data;
+      if (isOutOfStock(freshProduct)) {
+        notifyError('This product is out of stock.');
+        return;
+      }
+      prd = { ...prd, quantity: Number(freshProduct?.quantity ?? 0) };
+    } catch {
+      notifyError('Unable to verify product availability. Please try again.');
       return;
     }
 
@@ -223,7 +244,7 @@ export default function QuickViewModal() {
                 crop="pad"
                 gravity="center"
               />
-              {status === 'out-of-stock' && (
+              {outOfStock && (
                 <div className="stock-badge">Out of Stock</div>
               )}
             </div>
@@ -289,10 +310,10 @@ export default function QuickViewModal() {
                   <span className="availability-label">Availability:</span>
                   <span
                     className={`availability-status ${
-                      status === 'in-stock' ? 'in-stock' : 'out-of-stock'
+                      outOfStock ? 'out-of-stock' : 'in-stock'
                     }`}
                   >
-                    {status === 'in-stock' ? 'In Stock' : 'Out of Stock'}
+                    {outOfStock ? 'Out of Stock' : 'In Stock'}
                   </span>
                 </div>
 
@@ -468,7 +489,7 @@ export default function QuickViewModal() {
               <button
                 className="add-to-cart-btn"
                 onClick={() => handleAddProduct(productItem)}
-                disabled={status === 'out-of-stock'}
+                disabled={outOfStock}
                 type="button"
               >
                 <svg

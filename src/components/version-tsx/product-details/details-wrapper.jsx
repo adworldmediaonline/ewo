@@ -36,6 +36,8 @@ import { add_to_compare } from '@/redux/features/compareSlice';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { notifyError, notifySuccess } from '@/utils/toast';
 import { getProductDisplayPrices, resolveCartItemPrice } from '@/lib/product-price';
+import { isOutOfStock } from '@/lib/product-stock';
+import { useLazyGetProductQuery } from '@/redux/features/productApi';
 import { getCartItemId } from '@/lib/cart-item-id';
 import {
   BarChart3,
@@ -125,7 +127,6 @@ export default function DetailsWrapper({
     title,
     category,
     price,
-    status,
     reviews,
     tags,
     offerDate,
@@ -139,6 +140,7 @@ export default function DetailsWrapper({
     children,
     parent
   } = productItem || {};
+  const outOfStock = isOutOfStock(productItem);
   const img = getProductImageUrl(productItem || {});
   const imageURLs = getProductImageUrls(productItem || {});
   const [selectedOption, setSelectedOption] = useState(null);
@@ -206,6 +208,7 @@ export default function DetailsWrapper({
   const router = useRouter();
   const pathname = usePathname();
   const { orderQuantity, cart_products } = useSelector(state => state.cart);
+  const [fetchProduct] = useLazyGetProductQuery();
 
   // Calculate average rating (derived state - no memoization needed for simple calculation)
   const ratingVal = reviews?.length > 0
@@ -423,12 +426,30 @@ export default function DetailsWrapper({
   };
 
   // handle add product
-  const handleAddProduct = prd => {
+  const handleAddProduct = async prd => {
     // Check if product has options but none are selected
     if (options && options.length > 0 && !selectedOption) {
       notifyError(
         'Please select an option before adding the product to your cart.'
       );
+      return;
+    }
+
+    // Re-fetch product to validate stock (handles stale page when another user bought last item)
+    try {
+      const result = await fetchProduct(prd._id);
+      if (result.error || !result.data) {
+        notifyError('Unable to verify product availability. Please try again.');
+        return;
+      }
+      const freshProduct = result.data;
+      if (isOutOfStock(freshProduct)) {
+        notifyError('This product is out of stock.');
+        return;
+      }
+      prd = { ...prd, quantity: Number(freshProduct?.quantity ?? 0) };
+    } catch {
+      notifyError('Unable to verify product availability. Please try again.');
       return;
     }
 
@@ -1036,7 +1057,7 @@ export default function DetailsWrapper({
         </Popover>
 
         <div className="flex items-center gap-2">
-          {status === 'in-stock' ? (
+          {!outOfStock ? (
             <div className="flex items-center gap-2 text-green-600">
               <CheckCircle className="w-4 h-4" />
               <span className="text-sm font-medium">In Stock</span>
@@ -1192,7 +1213,7 @@ export default function DetailsWrapper({
           <ProductQuantity productItem={productItem} />
           <Button
             onClick={() => handleAddProduct(productItem)}
-            disabled={status === 'out-of-stock'}
+            disabled={outOfStock}
             size="lg"
             className="flex-1 h-12 text-base font-medium"
           >

@@ -23,7 +23,7 @@ const GalleryContent = ({
   productItem,
   imgWidth = 580,
   imgHeight = 580,
-  status,
+  outOfStock = false,
 }) => {
   const product = productItem || { title: '' };
   const mainAlt = getProductImageAlt(product);
@@ -435,7 +435,7 @@ export default function DetailsThumbWrapper({
   productItem,
   imgWidth = 580,
   imgHeight = 580,
-  status,
+  outOfStock = false,
 }) {
   return (
     <Gallery
@@ -455,7 +455,7 @@ export default function DetailsThumbWrapper({
         productItem={productItem}
         imgWidth={imgWidth}
         imgHeight={imgHeight}
-        status={status}
+        outOfStock={outOfStock}
       />
     </Gallery>
   );

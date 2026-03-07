@@ -103,5 +103,6 @@ export const {
   useGetOfferProductsQuery,
   useGetTopRatedProductsQuery,
   useGetProductQuery,
+  useLazyGetProductQuery,
   useGetRelatedProductsQuery,
 } = productApi;

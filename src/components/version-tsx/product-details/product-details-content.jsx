@@ -1,5 +1,6 @@
 'use client';
 import { useState, useRef } from 'react';
+import { isOutOfStock } from '@/lib/product-stock';
 import DetailsThumbWrapper from './details-thumb-wrapper';
 import DetailsWrapper from './details-wrapper';
 import ProductVideoPlayer from './product-video-player';
@@ -16,7 +17,8 @@ export default function ProductDetailsContent({ productItem, children }) {
   if (imageURLs.length === 0 && mainImg) {
     imageURLs = [mainImg];
   }
-  const { videoId, status } = productItem || {};
+  const { videoId } = productItem || {};
+  const outOfStock = isOutOfStock(productItem);
   const [activeImg, setActiveImg] = useState(imageURLs?.[0] || mainImg);
   const addToCartRef = useRef(null);
   const proceedToBuyRef = useRef(null);
@@ -41,7 +43,7 @@ export default function ProductDetailsContent({ productItem, children }) {
               imgWidth={580}
               imgHeight={580}
               videoId={videoId}
-              status={status}
+              outOfStock={outOfStock}
             />
           </div>
         </div>

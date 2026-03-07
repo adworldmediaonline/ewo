@@ -1,9 +1,10 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart } from 'lucide-react';
+import { isOutOfStock } from '@/lib/product-stock';
 
 export default function ProductDetailsFixedBar({ productItem, onAddToCart, onProceedToBuy }) {
-  const { status } = productItem || {};
+  const outOfStock = isOutOfStock(productItem);
 
 
   return (
@@ -18,7 +19,7 @@ export default function ProductDetailsFixedBar({ productItem, onAddToCart, onPro
             {/* Add to Cart Button */}
             <Button
               onClick={() => onAddToCart?.(productItem)}
-              disabled={status === 'out-of-stock'}
+              disabled={outOfStock}
               variant="outline"
               size="lg"
               className="flex-1 h-12 text-base font-medium"
@@ -30,7 +31,7 @@ export default function ProductDetailsFixedBar({ productItem, onAddToCart, onPro
             {/* Proceed to Buy Button */}
             <Button
               onClick={() => onProceedToBuy?.(productItem)}
-              disabled={status === 'out-of-stock'}
+              disabled={outOfStock}
               size="lg"
               className="flex-1 h-12 text-base font-medium"
             >

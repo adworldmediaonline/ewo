@@ -1,7 +1,9 @@
 'use client';
 
 import { add_cart_product } from '@/redux/features/cartSlice';
-import { notifySuccess } from '@/utils/toast';
+import { notifySuccess, notifyError } from '@/utils/toast';
+import { useLazyGetProductQuery } from '@/redux/features/productApi';
+import { isOutOfStock } from '@/lib/product-stock';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import dayjs from 'dayjs';
@@ -27,32 +29,63 @@ interface OrderCardProps {
 const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
   const dispatch = useDispatch();
   const [isReordering, setIsReordering] = useState(false);
+  const [fetchProduct] = useLazyGetProductQuery();
 
   const handleReorder = async () => {
     if (!order.cart?.length) return;
     setIsReordering(true);
     let addedCount = 0;
+    const skippedItems: string[] = [];
     for (const item of order.cart) {
       const qty = item.orderQuantity || 1;
-      const cartProduct = {
-        _id: item._id,
-        title: item.title || `Product`,
-        img: item.img || '',
-        finalPriceDiscount: Number(item.finalPriceDiscount || 0),
-        orderQuantity: 1,
-        quantity: item.quantity || 999,
-        slug: item.slug || item._id,
-        shipping: item.shipping || { price: 0 },
-        sku: item.sku ?? item._id ?? '',
-        selectedOption: item.selectedOption,
-      };
-      for (let i = 0; i < qty; i++) {
-        dispatch(add_cart_product(cartProduct));
-        addedCount++;
+      try {
+        const result = await fetchProduct(item._id);
+        if (result.error || !result.data) {
+          skippedItems.push(item.title || 'Unknown product');
+          continue;
+        }
+        const freshProduct = result.data;
+        if (isOutOfStock(freshProduct)) {
+          skippedItems.push(item.title || 'Unknown product');
+          continue;
+        }
+        const availableQty = Number(freshProduct?.quantity ?? 0);
+        if (availableQty < qty) {
+          skippedItems.push(`${item.title || 'Unknown'} (only ${availableQty} available)`);
+          continue;
+        }
+        const cartProduct = {
+          _id: item._id,
+          title: item.title || `Product`,
+          img: item.img || '',
+          finalPriceDiscount: Number(item.finalPriceDiscount || 0),
+          orderQuantity: 1,
+          quantity: availableQty,
+          slug: item.slug || item._id,
+          shipping: item.shipping || { price: 0 },
+          sku: item.sku ?? item._id ?? '',
+          selectedOption: item.selectedOption,
+        };
+        for (let i = 0; i < qty; i++) {
+          dispatch(add_cart_product(cartProduct));
+          addedCount++;
+        }
+      } catch {
+        skippedItems.push(item.title || 'Unknown product');
       }
     }
     setIsReordering(false);
-    notifySuccess(`Added ${addedCount} item${addedCount !== 1 ? 's' : ''} to cart`);
+    if (addedCount > 0) {
+      notifySuccess(`Added ${addedCount} item${addedCount !== 1 ? 's' : ''} to cart`);
+    }
+    if (skippedItems.length > 0) {
+      notifyError(
+        `Some items could not be added (out of stock or unavailable): ${skippedItems.join(', ')}`
+      );
+    }
+    if (addedCount === 0 && skippedItems.length > 0) {
+      notifyError('No items could be added. All products are out of stock or unavailable.');
+    }
   };
   const orderDate = dayjs(order.createdAt).format('MMM D, YYYY');
   const orderTime = dayjs(order.createdAt).format('h:mm A');
