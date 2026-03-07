@@ -14,7 +14,7 @@ export interface ProductCardImageProps {
   productSlug: string;
   productId: string;
   productTitle: string;
-  status: string;
+  outOfStock: boolean;
   imageSrc: string;
   imageAlt: string;
   imageTitle: string | null;
@@ -49,7 +49,7 @@ export function ProductCardImage({
   productSlug,
   productId,
   productTitle,
-  status,
+  outOfStock,
   imageSrc,
   imageAlt,
   imageTitle,
@@ -106,7 +106,7 @@ export function ProductCardImage({
             )}
           </div>
 
-          {status === 'out-of-stock' && (
+          {outOfStock && (
             <Badge
               variant="secondary"
               className="absolute right-1 top-1 sm:right-2 sm:top-2 z-10 text-[9px] sm:text-xs px-1 py-0 sm:px-2.5 sm:py-0.5"
@@ -115,7 +115,7 @@ export function ProductCardImage({
             </Badge>
           )}
 
-          {status !== 'out-of-stock' && (
+          {!outOfStock && (
             <div className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 z-10">
               <div
                 className="rounded-full bg-linear-to-r from-emerald-500 to-green-600 text-white border-2 border-white shadow-lg flex flex-col items-center justify-center text-center h-14 w-14 sm:h-16 sm:w-16"
@@ -206,7 +206,7 @@ export function ProductCardImage({
                       isAddedToCart ? 'bg-primary text-primary-foreground' : 'bg-white/90 hover:bg-white'
                     }`}
                     onClick={onAddToCart}
-                    disabled={status === 'out-of-stock'}
+                    disabled={outOfStock}
                   >
                     <ShoppingCart
                       className={`h-4 w-4 ${isAddedToCart ? 'fill-current' : ''}`}

@@ -18,6 +18,7 @@ import { ProductCardInfo } from './product-card-info';
 import { ProductCardPrice } from './product-card-price';
 import { ProductCardActions } from './product-card-actions';
 import { resolveCartItemPrice } from '@/lib/product-price';
+import { isOutOfStock } from '@/lib/product-stock';
 import { useProductCard } from './use-product-card';
 
 export type ProductCardVariant = 'shop' | 'related' | 'search' | 'wishlist';
@@ -202,7 +203,7 @@ export function ProductCard({
       productSlug={productSlug}
       productId={product._id}
       productTitle={product.title}
-      status={product.status}
+      outOfStock={isOutOfStock(product)}
       imageSrc={imageSrc}
       imageAlt={imageAlt}
       imageTitle={imageTitle}

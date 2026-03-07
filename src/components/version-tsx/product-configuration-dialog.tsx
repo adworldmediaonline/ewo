@@ -20,6 +20,8 @@ import {
 } from '@/redux/features/cartSlice';
 import { notifyError } from '@/utils/toast';
 import { getProductImageUrl } from '@/lib/product-image';
+import { isOutOfStock, getConfigOptionAvailableQuantity } from '@/lib/product-stock';
+import { useLazyGetProductQuery } from '@/redux/features/productApi';
 import type { Product } from '@/components/version-tsx/product-card';
 
 interface ProductConfigurationDialogProps {
@@ -59,6 +61,7 @@ export default function ProductConfigurationDialog({
 }: ProductConfigurationDialogProps) {
   const dispatch = useDispatch();
   const { cart_products, orderQuantity } = useSelector((state: any) => state.cart);
+  const [fetchProduct] = useLazyGetProductQuery();
 
   const [selectedOption, setSelectedOption] = useState<any>(null);
   const [customNotes, setCustomNotes] = useState<{
@@ -334,13 +337,46 @@ export default function ProductConfigurationDialog({
   );
 
   // Handle add to cart
-  const handleAddToCartClick = useCallback(() => {
+  const handleAddToCartClick = useCallback(async () => {
     // Check if product has options but none are selected
     if (product.options && product.options.length > 0 && !selectedOption) {
       notifyError(
         'Please select an option before adding the product to your cart.'
       );
       return;
+    }
+
+    // Re-fetch product to validate stock (handles stale page when another user bought last item)
+    let freshProduct: typeof product;
+    try {
+      const result = await fetchProduct(product._id);
+      if (result.error || !result.data) {
+        notifyError('Unable to verify product availability. Please try again.');
+        return;
+      }
+      freshProduct = result.data as typeof product;
+      if (isOutOfStock(freshProduct)) {
+        notifyError('This product is out of stock.');
+        return;
+      }
+    } catch {
+      notifyError('Unable to verify product availability. Please try again.');
+      return;
+    }
+
+    // Use fresh quantity for validation (product-level or config option-level)
+    const configOptionQty = getConfigOptionAvailableQuantity(freshProduct, selectedConfigurations);
+    const productWithFreshQuantity = {
+      ...product,
+      quantity: configOptionQty != null ? configOptionQty : Number(freshProduct?.quantity ?? 0),
+    };
+
+    // Validate selected config options are not out of stock
+    if (configOptionQty != null) {
+      if (configOptionQty <= 0) {
+        notifyError('The selected option is out of stock.');
+        return;
+      }
     }
 
     // Check if product already exists in cart (any item with same _id - we may be replacing it)
@@ -375,10 +411,10 @@ export default function ProductConfigurationDialog({
       finalQuantity = currentQty + orderQuantity;
     }
 
-    // Check quantity limits
-    if (product.quantity && finalQuantity > product.quantity) {
+    // Check quantity limits (use fresh quantity from refetch)
+    if (productWithFreshQuantity.quantity && finalQuantity > productWithFreshQuantity.quantity) {
       notifyError(
-        `Sorry, only ${product.quantity} items available. ${existingProduct ? `You already have ${currentQty} in your cart.` : ''
+        `Sorry, only ${productWithFreshQuantity.quantity} items available. ${existingProduct ? `You already have ${currentQty} in your cart.` : ''
         }`
       );
       return;
@@ -544,6 +580,7 @@ export default function ProductConfigurationDialog({
     onOpenChange(false);
   }, [
     product,
+    fetchProduct,
     selectedOption,
     selectedConfigurations,
     cart_products,
@@ -560,7 +597,7 @@ export default function ProductConfigurationDialog({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">
-            Configure {product.title}
+            {product.title}
           </DialogTitle>
         </DialogHeader>
 
@@ -660,9 +697,9 @@ export default function ProductConfigurationDialog({
             className="w-full"
             size="lg"
             onClick={handleAddToCartClick}
-            disabled={product.status === 'out-of-stock'}
+            disabled={isOutOfStock(product)}
           >
-            {product.status === 'out-of-stock'
+            {isOutOfStock(product)
               ? 'Out of Stock'
               : 'Add to Cart'}
           </Button>

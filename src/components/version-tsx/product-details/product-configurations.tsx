@@ -1,6 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { PackageX } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { isOptionOutOfStock } from '@/lib/product-stock';
 
 interface ConfigurationOption {
   name: string;
@@ -10,6 +12,7 @@ interface ConfigurationOption {
   isPercentageIncrease?: boolean;
   isSelected: boolean;
   image?: string;
+  quantity?: number | null;
 }
 
 interface ProductConfiguration {
@@ -35,12 +38,10 @@ export default function ProductConfigurations({
   const [selectedOptions, setSelectedOptions] = useState<{
     [configIndex: number]: number;
   }>(() => {
-    // Initialize with preselected options
+    // Initialize with preselected options (include out-of-stock so they show as active for experienced users)
     const initial: { [configIndex: number]: number } = {};
     configurations.forEach((config, configIndex) => {
-      const preselectedIndex = config.options.findIndex(
-        opt => opt.isSelected
-      );
+      const preselectedIndex = config.options.findIndex(opt => opt.isSelected);
       if (preselectedIndex !== -1) {
         initial[configIndex] = preselectedIndex;
       }
@@ -53,6 +54,8 @@ export default function ProductConfigurations({
     optionIndex: number,
     option: ConfigurationOption
   ) => {
+    if (isOptionOutOfStock(option)) return;
+
     setSelectedOptions(prev => ({
       ...prev,
       [configIndex]: optionIndex,
@@ -116,31 +119,47 @@ export default function ProductConfigurations({
               {config.options.map((option, optionIndex) => {
                 const isSelected = selectedIndex === optionIndex;
                 const hasPrice = option.price && Number(option.price) > 0;
+                const outOfStock = isOptionOutOfStock(option);
 
                 return (
                   <button
                     key={optionIndex}
                     type="button"
                     onClick={() =>
-                      handleOptionSelect(configIndex, optionIndex, option)
+                      !outOfStock && handleOptionSelect(configIndex, optionIndex, option)
                     }
+                    disabled={outOfStock}
                     className={cn(
-                      'relative px-4 py-3 rounded-lg border-2 transition-all duration-200 text-left',
+                      'relative px-4 py-3 rounded-lg border-2 transition-all duration-200 text-left overflow-hidden',
                       'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+                      outOfStock && 'cursor-not-allowed opacity-60',
                       isSelected
                         ? 'border-foreground bg-background font-semibold'
-                        : 'border-muted-foreground/30 bg-background hover:border-muted-foreground/50'
+                        : !outOfStock
+                          ? 'border-muted-foreground/30 bg-background hover:border-muted-foreground/50'
+                          : 'border-muted-foreground/25 bg-muted/40'
                     )}
                     aria-pressed={isSelected}
-                    aria-label={`Select ${option.name}${hasPrice ? ` for $${Number(option.price).toFixed(2)}` : ''}`}
+                    aria-disabled={outOfStock}
+                    aria-label={`Select ${option.name}${outOfStock ? ' (Out of Stock)' : hasPrice ? ` for $${Number(option.price).toFixed(2)}` : ''}`}
                   >
-                    <div className="flex items-center justify-between gap-2">
+                    {/* Out of Stock corner badge */}
+                    {outOfStock && (
+                      <div className="absolute top-0 right-0 flex items-center gap-1.5 rounded-bl-lg bg-destructive px-2.5 py-1 text-xs font-medium text-destructive-foreground shadow-sm">
+                        <PackageX className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                        <span>Out of Stock</span>
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between gap-2 pr-24">
                       <span
                         className={cn(
                           'text-sm font-medium',
                           isSelected
                             ? 'text-foreground'
-                            : 'text-foreground/90'
+                            : outOfStock
+                              ? 'text-muted-foreground'
+                              : 'text-foreground/90'
                         )}
                       >
                         {option.name}
@@ -161,7 +180,10 @@ export default function ProductConfigurations({
 
                     {/* Selection Indicator */}
                     {isSelected && (
-                      <div className="absolute top-2 right-2">
+                      <div className={cn(
+                        'absolute top-2',
+                        outOfStock ? 'left-2' : 'right-2'
+                      )}>
                         <div className="h-2 w-2 rounded-full bg-foreground" />
                       </div>
                     )}

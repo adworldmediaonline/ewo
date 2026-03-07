@@ -1,5 +1,6 @@
 'use client';
 
+import { isOutOfStock } from '@/lib/product-stock';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -17,7 +18,7 @@ export interface ProductOption {
 }
 
 export interface ProductCardActionsProps {
-  product: { _id: string; title: string; status: string; slug?: string; options?: ProductOption[] };
+  product: { _id: string; title: string; quantity?: number | null; slug?: string; options?: ProductOption[] };
   hasConfigurations: boolean;
   selectedOption: ProductOption | null;
   onOptionChange: (value: string) => void;
@@ -49,6 +50,7 @@ export function ProductCardActions({
 }: ProductCardActionsProps) {
   const hasOptions = product.options && product.options.length > 0;
   const productSlug = product.slug || product._id;
+  const outOfStock = isOutOfStock(product);
 
   if (variant === 'wishlist' && layout === 'horizontal') {
     return (
@@ -128,7 +130,7 @@ export function ProductCardActions({
             <Button
               onClick={onChooseOptions}
               className="flex items-center gap-2 px-4 py-2 h-auto text-sm font-medium"
-              disabled={product.status === 'out-of-stock'}
+              disabled={outOfStock}
               size="sm"
             >
               <Settings className="w-4 h-4" />
@@ -138,7 +140,7 @@ export function ProductCardActions({
             <Button
               onClick={onAddToCart}
               className="flex items-center gap-2 px-4 py-2 h-auto text-sm font-medium"
-              disabled={product.status === 'out-of-stock'}
+              disabled={outOfStock}
               size="sm"
             >
               <ShoppingCart className="w-4 h-4" />
@@ -222,11 +224,11 @@ export function ProductCardActions({
           className="w-full h-8 text-[10px] sm:h-10 sm:text-sm"
           rounded="full"
           onClick={hasConfigurations ? onChooseOptions : onAddToCart}
-          disabled={product.status === 'out-of-stock'}
+          disabled={outOfStock}
           data-testid={`product-button-${product._id}`}
           data-has-configurations={hasConfigurations}
         >
-          {product.status === 'out-of-stock'
+          {outOfStock
             ? 'Out of Stock'
             : hasConfigurations
               ? 'Choose Options'

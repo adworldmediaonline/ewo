@@ -6,14 +6,47 @@ import { Rating } from 'react-simple-star-rating';
 // internal
 import { add_cart_product } from '@/redux/features/cartSlice';
 import { remove_compare_product } from '@/redux/features/compareSlice';
+import { useLazyGetProductQuery } from '@/redux/features/productApi';
+import { isOutOfStock } from '@/lib/product-stock';
+import { notifyError } from '@/utils/toast';
 
 export default function CompareArea() {
   const { compareItems } = useSelector(state => state.compare);
+  const { cart_products } = useSelector(state => state.cart);
   const dispatch = useDispatch();
+  const [fetchProduct] = useLazyGetProductQuery();
 
   // handle add product
-  const handleAddProduct = prd => {
-    dispatch(add_cart_product(prd));
+  const handleAddProduct = async prd => {
+    if (isOutOfStock(prd)) {
+      notifyError('This product is out of stock.');
+      return;
+    }
+    try {
+      const result = await fetchProduct(prd._id);
+      if (result.error || !result.data) {
+        notifyError('Unable to verify product availability. Please try again.');
+        return;
+      }
+      const freshProduct = result.data;
+      if (isOutOfStock(freshProduct)) {
+        notifyError('This product is out of stock.');
+        return;
+      }
+      const availableQty = Number(freshProduct?.quantity ?? 0);
+      const existingProduct = cart_products.find(item => item._id === prd._id);
+      const currentQty = existingProduct ? existingProduct.orderQuantity : 0;
+      const requestedQty = currentQty + 1;
+      if (availableQty < requestedQty) {
+        notifyError(
+          `Sorry, only ${availableQty} items available. ${existingProduct ? `You already have ${currentQty} in your cart.` : ''}`
+        );
+        return;
+      }
+      dispatch(add_cart_product({ ...prd, quantity: availableQty }));
+    } catch {
+      notifyError('Unable to verify product availability. Please try again.');
+    }
   };
 
   // handle remove product
@@ -151,6 +184,8 @@ export default function CompareArea() {
                       <button
                         onClick={() => handleAddProduct(item)}
                         className=""
+                        disabled={isOutOfStock(item)}
+                        type="button"
                       >
                         <svg
                           width="16"
@@ -164,7 +199,7 @@ export default function CompareArea() {
                           <circle cx="20" cy="21" r="1"></circle>
                           <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                         </svg>
-                        Add to Cart
+                        {isOutOfStock(item) ? 'Out of Stock' : 'Add to Cart'}
                       </button>
                       <Link href={`/product/${item.slug}`} className="">
                         View Details

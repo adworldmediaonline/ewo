@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Image from 'next/image';
 import { Rating } from 'react-simple-star-rating';
 import Link from 'next/link';
@@ -9,6 +9,9 @@ import { handleProductModal } from '@/redux/features/productModalSlice';
 import { add_cart_product } from '@/redux/features/cartSlice';
 import { add_to_wishlist } from '@/redux/features/wishlist-slice';
 import { add_to_compare } from '@/redux/features/compareSlice';
+import { useLazyGetProductQuery } from '@/redux/features/productApi';
+import { isOutOfStock } from '@/lib/product-stock';
+import { notifyError } from '@/utils/toast';
 
 const ShopListItem = ({ product }) => {
   const {
@@ -37,8 +40,36 @@ const ShopListItem = ({ product }) => {
   }, [reviews]);
 
   // handle add product
-  const handleAddProduct = prd => {
-    dispatch(add_cart_product(prd));
+  const handleAddProduct = async prd => {
+    if (isOutOfStock(prd)) {
+      notifyError('This product is out of stock.');
+      return;
+    }
+    try {
+      const result = await fetchProduct(prd._id);
+      if (result.error || !result.data) {
+        notifyError('Unable to verify product availability. Please try again.');
+        return;
+      }
+      const freshProduct = result.data;
+      if (isOutOfStock(freshProduct)) {
+        notifyError('This product is out of stock.');
+        return;
+      }
+      const availableQty = Number(freshProduct?.quantity ?? 0);
+      const existingProduct = cart_products.find(item => item._id === prd._id);
+      const currentQty = existingProduct ? existingProduct.orderQuantity : 0;
+      const requestedQty = currentQty + 1;
+      if (availableQty < requestedQty) {
+        notifyError(
+          `Sorry, only ${availableQty} items available. ${existingProduct ? `You already have ${currentQty} in your cart.` : ''}`
+        );
+        return;
+      }
+      dispatch(add_cart_product({ ...prd, quantity: availableQty }));
+    } catch {
+      notifyError('Unable to verify product availability. Please try again.');
+    }
   };
   // handle wishlist product
   const handleWishlistProduct = prd => {
@@ -135,8 +166,10 @@ const ShopListItem = ({ product }) => {
             <button
               onClick={() => handleAddProduct(product)}
               className="tp-product-list-add-to-cart-btn"
+              disabled={isOutOfStock(product)}
+              type="button"
             >
-              Add To Cart
+              {isOutOfStock(product) ? 'Out of Stock' : 'Add To Cart'}
             </button>
           </div>
         </div>

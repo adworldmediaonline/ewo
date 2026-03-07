@@ -22,6 +22,20 @@ import {
   set_tax_preview,
 } from '@/redux/features/order/orderSlice';
 import { notifyError, notifySuccess } from '@/utils/toast';
+import { useLazyGetProductQuery } from '@/redux/features/productApi';
+import { isOutOfStock, getConfigOptionAvailableQuantity } from '@/lib/product-stock';
+
+/** Parse saveOrder error for stock validation (400 + invalidItems). */
+const getSaveOrderErrorMessage = (error) => {
+  const data = error?.data ?? error?.response?.data;
+  const status = error?.status ?? error?.response?.status;
+  if (status === 400 && data?.invalidItems && Array.isArray(data.invalidItems) && data.invalidItems.length > 0) {
+    const items = data.invalidItems.map((i) => i.title || i.productId).filter(Boolean);
+    const detail = items.length > 0 ? ` (${items.join(', ')})` : '';
+    return `Some items in your cart are no longer available. Please remove them and try again.${detail}`;
+  }
+  return data?.message || 'Something went wrong with your order. Please try again.';
+};
 import { authClient } from '../lib/authClient';
 import useCartInfo from './use-cart-info';
 import { useCartSummary } from './use-cart-summary';
@@ -32,6 +46,7 @@ const useCheckoutSubmit = () => {
   const [saveOrder] = useSaveOrderMutation();
   const [createPaymentIntent] = useCreatePaymentIntentMutation();
   const [calculateTax, { isLoading: isTaxLoading }] = useCalculateTaxMutation();
+  const [fetchProduct] = useLazyGetProductQuery();
   const { cart_products, couponCode, discountAmount } = useSelector(state => state.cart);
 
   const { tax_preview } = useSelector(state => state.order);
@@ -255,6 +270,55 @@ const useCheckoutSubmit = () => {
       return;
     }
 
+    // Re-validate stock before any payment processing (handles stale cart when another user bought last item)
+    if (cart_products?.length > 0) {
+      const invalidItems = [];
+      for (const item of cart_products) {
+        const productId = item._id || item.productId || item.product?._id;
+        if (!productId) continue;
+        try {
+          const result = await fetchProduct(productId);
+          if (result.error || !result.data) {
+            invalidItems.push({ title: item.title || 'Unknown product' });
+            continue;
+          }
+          const freshProduct = result.data;
+          if (isOutOfStock(freshProduct)) {
+            invalidItems.push({ title: item.title || freshProduct?.title || 'Unknown product' });
+            continue;
+          }
+          const configOptionQty = getConfigOptionAvailableQuantity(
+            freshProduct,
+            item.selectedConfigurations
+          );
+          const availableQty =
+            configOptionQty != null
+              ? configOptionQty
+              : Number(freshProduct?.quantity ?? 0);
+          const requestedQty = Number(item.orderQuantity ?? 1);
+          if (availableQty < requestedQty) {
+            invalidItems.push({
+              title: item.title || freshProduct?.title || 'Unknown product',
+              available: availableQty,
+              requested: requestedQty,
+            });
+          }
+        } catch {
+          invalidItems.push({ title: item.title || 'Unknown product' });
+        }
+      }
+      if (invalidItems.length > 0) {
+        const itemNames = invalidItems.map((i) => i.title).filter(Boolean);
+        const detail = itemNames.length > 0 ? ` (${itemNames.join(', ')})` : '';
+        notifyError(
+          `Some items in your cart are no longer available. Please remove them and try again.${detail}`
+        );
+        setIsCheckoutSubmit(false);
+        dispatch(end_checkout_submission());
+        return;
+      }
+    }
+
     const rawSubTotal =
       cart_products?.reduce(
         (acc, item) => acc + Number(item.finalPriceDiscount || item.price || 0) * item.orderQuantity,
@@ -340,10 +404,8 @@ const useCheckoutSubmit = () => {
           setProcessingPayment(false);
           dispatch(end_checkout_submission());
         })
-        .catch(() => {
-          notifyError(
-            'Something went wrong with your order. Please try again.'
-          );
+        .catch((err) => {
+          notifyError(getSaveOrderErrorMessage(err));
           setIsCheckoutSubmit(false);
           dispatch(end_checkout_submission());
         });
@@ -422,10 +484,8 @@ const useCheckoutSubmit = () => {
                   '🎉 Your free order has been placed successfully!'
                 );
               })
-              .catch(() => {
-                notifyError(
-                  'Something went wrong with your free order. Please try again.'
-                );
+              .catch((err) => {
+                notifyError(getSaveOrderErrorMessage(err));
                 setIsCheckoutSubmit(false);
                 setProcessingPayment(false);
                 dispatch(end_checkout_submission());
@@ -485,13 +545,6 @@ const useCheckoutSubmit = () => {
 
           if (paymentIntent.status === 'succeeded') {
             setPaymentSuccessful(true);
-
-            localStorage.removeItem('cart_products');
-            localStorage.removeItem('shipping_info');
-
-            dispatch(clearCart());
-            dispatch(hideCartConfirmation());
-
             setIsCheckoutSubmit(false);
             setProcessingPayment(false);
 
@@ -515,22 +568,24 @@ const useCheckoutSubmit = () => {
                   res.data?.order?.invoice ||
                   res.order?.invoice;
 
+                localStorage.removeItem('cart_products');
+                localStorage.removeItem('shipping_info');
+                dispatch(clearCart());
+                dispatch(hideCartConfirmation());
+
                 setTimeout(() => {
                   setPaymentSuccessful(false);
                   router.push(`/order/${orderId}`);
                 }, 1500);
               })
-              .catch(() => {
+              .catch((err) => {
                 setPaymentSuccessful(false);
-                const productSummary =
-                  cart_products.length > 1
-                    ? `${cart_products[0].title} and ${cart_products.length - 1} other items`
-                    : cart_products[0]?.title || 'your product';
-
-                notifyError(
-                  `Your payment for ${productSummary} was successful, but we encountered an issue saving your order details. Our team has been notified.`
-                );
-                router.push('/order');
+                const isStockError = err?.data?.invalidItems ?? err?.response?.data?.invalidItems;
+                notifyError(getSaveOrderErrorMessage(err));
+                dispatch(end_checkout_submission());
+                if (!isStockError) {
+                  router.push('/order');
+                }
               });
           } else {
             notifyError(

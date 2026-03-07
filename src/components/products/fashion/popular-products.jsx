@@ -9,7 +9,8 @@ import Link from 'next/link';
 // internal
 import { TextShapeLine } from '@/svg';
 import ErrorMsg from '@/components/common/error-msg';
-import { useGetPopularProductByTypeQuery } from '@/redux/features/productApi';
+import { isOutOfStock } from '@/lib/product-stock';
+import { useGetPopularProductByTypeQuery, useLazyGetProductQuery } from '@/redux/features/productApi';
 import { add_cart_product } from '@/redux/features/cartSlice';
 import { HomeTwoPopularPrdLoader } from '@/components/loader';
 import { notifyError } from '@/utils/toast';
@@ -53,13 +54,29 @@ const PopularProducts = () => {
   } = useGetPopularProductByTypeQuery('fashion');
   const { cart_products } = useSelector(state => state.cart);
   const dispatch = useDispatch();
+  const [fetchProduct] = useLazyGetProductQuery();
 
   // handle add product
-  const handleAddProduct = prd => {
-    if (prd.status === 'out-of-stock') {
-      notifyError(`This product out-of-stock`);
-    } else {
-      dispatch(add_cart_product(prd));
+  const handleAddProduct = async prd => {
+    if (isOutOfStock(prd)) {
+      notifyError('This product is out of stock');
+      return;
+    }
+    // Re-fetch product to validate stock (handles stale page when another user bought last item)
+    try {
+      const result = await fetchProduct(prd._id);
+      if (result.error || !result.data) {
+        notifyError('Unable to verify product availability. Please try again.');
+        return;
+      }
+      const freshProduct = result.data;
+      if (isOutOfStock(freshProduct)) {
+        notifyError('This product is out of stock.');
+        return;
+      }
+      dispatch(add_cart_product({ ...prd, quantity: Number(freshProduct?.quantity ?? 0) }));
+    } catch {
+      notifyError('Unable to verify product availability. Please try again.');
     }
   };
   // decide what to render
