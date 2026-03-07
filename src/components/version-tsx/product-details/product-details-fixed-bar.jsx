@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { ShoppingCart } from 'lucide-react';
 import { isOutOfStock } from '@/lib/product-stock';
 
-export default function ProductDetailsFixedBar({ productItem, onAddToCart, onProceedToBuy }) {
+export default function ProductDetailsFixedBar({ productItem, onAddToCart }) {
   const outOfStock = isOutOfStock(productItem);
 
 
@@ -15,29 +15,15 @@ export default function ProductDetailsFixedBar({ productItem, onAddToCart, onPro
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0.75rem)' }}
       >
         <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center gap-3">
-            {/* Add to Cart Button */}
-            <Button
-              onClick={() => onAddToCart?.(productItem)}
-              disabled={outOfStock}
-              variant="outline"
-              size="lg"
-              className="flex-1 h-12 text-base font-medium"
-            >
-              <ShoppingCart className="w-5 h-5 mr-2" />
-              Add to Cart
-            </Button>
-
-            {/* Proceed to Buy Button */}
-            <Button
-              onClick={() => onProceedToBuy?.(productItem)}
-              disabled={outOfStock}
-              size="lg"
-              className="flex-1 h-12 text-base font-medium"
-            >
-              Proceed to Buy
-            </Button>
-          </div>
+          <Button
+            onClick={() => onAddToCart?.(productItem)}
+            disabled={outOfStock}
+            size="lg"
+            className="w-full h-12 text-base font-medium"
+          >
+            <ShoppingCart className="w-5 h-5 mr-2" />
+            Add to Cart
+          </Button>
         </div>
       </div>
 

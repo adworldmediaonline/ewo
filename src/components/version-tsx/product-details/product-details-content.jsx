@@ -87,7 +87,6 @@ export default function ProductDetailsContent({ productItem, children }) {
       <ProductDetailsFixedBar
         productItem={productItem}
         onAddToCart={(prd) => addToCartRef.current?.(prd)}
-        onProceedToBuy={(prd) => proceedToBuyRef.current?.(prd)}
       />
     </>
   );
