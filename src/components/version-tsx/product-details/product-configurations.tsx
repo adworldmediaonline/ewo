@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { PackageX } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { isOptionOutOfStock } from '@/lib/product-stock';
 
@@ -37,12 +38,10 @@ export default function ProductConfigurations({
   const [selectedOptions, setSelectedOptions] = useState<{
     [configIndex: number]: number;
   }>(() => {
-    // Initialize with preselected options (skip out-of-stock)
+    // Initialize with preselected options (include out-of-stock so they show as active for experienced users)
     const initial: { [configIndex: number]: number } = {};
     configurations.forEach((config, configIndex) => {
-      const preselectedIndex = config.options.findIndex(
-        opt => opt.isSelected && !isOptionOutOfStock(opt)
-      );
+      const preselectedIndex = config.options.findIndex(opt => opt.isSelected);
       if (preselectedIndex !== -1) {
         initial[configIndex] = preselectedIndex;
       }
@@ -131,24 +130,32 @@ export default function ProductConfigurations({
                     }
                     disabled={outOfStock}
                     className={cn(
-                      'relative px-4 py-3 rounded-lg border-2 transition-all duration-200 text-left',
+                      'relative px-4 py-3 rounded-lg border-2 transition-all duration-200 text-left overflow-hidden',
                       'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
-                      outOfStock && 'opacity-60 cursor-not-allowed',
-                      isSelected && !outOfStock
+                      outOfStock && 'cursor-not-allowed opacity-60',
+                      isSelected
                         ? 'border-foreground bg-background font-semibold'
                         : !outOfStock
                           ? 'border-muted-foreground/30 bg-background hover:border-muted-foreground/50'
-                          : 'border-muted-foreground/20 bg-muted/30'
+                          : 'border-muted-foreground/25 bg-muted/40'
                     )}
                     aria-pressed={isSelected}
                     aria-disabled={outOfStock}
                     aria-label={`Select ${option.name}${outOfStock ? ' (Out of Stock)' : hasPrice ? ` for $${Number(option.price).toFixed(2)}` : ''}`}
                   >
-                    <div className="flex items-center justify-between gap-2">
+                    {/* Out of Stock corner badge */}
+                    {outOfStock && (
+                      <div className="absolute top-0 right-0 flex items-center gap-1.5 rounded-bl-lg bg-destructive px-2.5 py-1 text-xs font-medium text-destructive-foreground shadow-sm">
+                        <PackageX className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                        <span>Out of Stock</span>
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between gap-2 pr-24">
                       <span
                         className={cn(
                           'text-sm font-medium',
-                          isSelected && !outOfStock
+                          isSelected
                             ? 'text-foreground'
                             : outOfStock
                               ? 'text-muted-foreground'
@@ -157,11 +164,6 @@ export default function ProductConfigurations({
                       >
                         {option.name}
                       </span>
-                      {outOfStock && (
-                        <span className="text-xs font-medium text-destructive">
-                          Out of Stock
-                        </span>
-                      )}
                       {/* {hasPrice && (
                         <span
                           className={cn(
@@ -178,7 +180,10 @@ export default function ProductConfigurations({
 
                     {/* Selection Indicator */}
                     {isSelected && (
-                      <div className="absolute top-2 right-2">
+                      <div className={cn(
+                        'absolute top-2',
+                        outOfStock ? 'left-2' : 'right-2'
+                      )}>
                         <div className="h-2 w-2 rounded-full bg-foreground" />
                       </div>
                     )}
