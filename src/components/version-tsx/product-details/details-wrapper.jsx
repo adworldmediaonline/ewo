@@ -170,6 +170,9 @@ export default function DetailsWrapper({
   });
 
   // Update main product image when option with image is selected (preselected or manually)
+  // Only run when selectedConfigurations or productConfigurations change - NOT on every render.
+  // Including imageURLs/img in deps causes the effect to run on every render (new array ref),
+  // which overwrites thumbnail clicks. Use selectedConfigurations as the trigger only.
   useEffect(() => {
     if (!productConfigurations || productConfigurations.length === 0) return;
     if (!handleImageActive) return;
@@ -200,7 +203,8 @@ export default function DetailsWrapper({
       // Fallback to main product image
       handleImageActive(img);
     }
-  }, [selectedConfigurations, productConfigurations, handleImageActive, imageURLs, img]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- imageURLs/img excluded: they create new refs each render and would overwrite thumbnail clicks
+  }, [selectedConfigurations, productConfigurations, handleImageActive]);
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
   const [isReviewsPopoverOpen, setIsReviewsPopoverOpen] = useState(false);
   const { data: session } = authClient.useSession();

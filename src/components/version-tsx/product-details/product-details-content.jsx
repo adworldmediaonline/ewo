@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { isOutOfStock } from '@/lib/product-stock';
 import DetailsThumbWrapper from './details-thumb-wrapper';
 import DetailsWrapper from './details-wrapper';
@@ -23,10 +23,10 @@ export default function ProductDetailsContent({ productItem, children }) {
   const addToCartRef = useRef(null);
   const proceedToBuyRef = useRef(null);
 
-  // handle image active
-  const handleImageActive = img => {
+  // handle image active - useCallback to prevent DetailsWrapper useEffect from resetting on every render
+  const handleImageActive = useCallback((img) => {
     setActiveImg(img);
-  };
+  }, []);
 
   return (
     <>
