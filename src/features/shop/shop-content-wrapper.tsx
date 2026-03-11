@@ -5,6 +5,7 @@ import { useInView } from 'react-intersection-observer';
 import Image from 'next/image';
 
 import { cn } from '@/lib/utils';
+import { isCloudinaryUrl } from '@/lib/product-image';
 
 import ShopEmptyState from '@/features/shop/components/shop-empty-state';
 import ShopLoadMoreTrigger from '@/features/shop/components/shop-load-more-trigger';
@@ -328,14 +329,18 @@ const ShopContentWrapper = ({
             <div className="w-full flex items-center justify-center">
               <div className="relative w-full mx-auto">
                 <Image
-                  src={`/api/image?url=${encodeURIComponent(categoryBannerContext.banner.url)}&filename=${encodeURIComponent(categoryBannerContext.banner.fileName || 'category-banner.webp')}`}
+                  src={
+                    isCloudinaryUrl(categoryBannerContext.banner.url)
+                      ? categoryBannerContext.banner.url
+                      : `/api/image?url=${encodeURIComponent(categoryBannerContext.banner.url)}&filename=${encodeURIComponent(categoryBannerContext.banner.fileName || 'category-banner.webp')}`
+                  }
                   alt={categoryBannerContext.banner.altText || categoryBannerContext.banner.title || 'Category banner'}
                   title={categoryBannerContext.banner.title}
                   width={1920}
                   height={800}
                   className="w-full h-auto object-contain"
                   sizes="100vw"
-                  unoptimized
+                  unoptimized={!isCloudinaryUrl(categoryBannerContext.banner.url)}
                   priority={false}
                 />
               </div>

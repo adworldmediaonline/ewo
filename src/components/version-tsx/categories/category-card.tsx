@@ -1,6 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { toSlug } from '@/lib/server-data';
+import { isCloudinaryUrl } from '@/lib/product-image';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -41,6 +42,13 @@ export const CategoryCard = ({
   const imageTitle = item.image?.title || item.parent;
   const imageFileName = item.image?.fileName;
   const hasImage = Boolean(imageUrl);
+  // Use direct Cloudinary URL when possible to avoid proxy bottleneck
+  const imageSrc =
+    imageUrl && isCloudinaryUrl(imageUrl)
+      ? imageUrl
+      : hasImage
+        ? `/api/image?url=${encodeURIComponent(imageUrl as string)}&filename=${encodeURIComponent(imageFileName || `${toSlug(item.parent)}.webp`)}`
+        : '';
   const childLabels = Array.isArray(item.children)
     ? item.children.slice(0, 3)
     : [];
@@ -86,7 +94,7 @@ export const CategoryCard = ({
           {hasImage ? (
             <div className="relative h-full w-full p-1.5 sm:p-2">
               <Image
-                src={`/api/image?url=${encodeURIComponent(imageUrl as string)}&filename=${encodeURIComponent(imageFileName || `${toSlug(item.parent)}.webp`)}`}
+                src={imageSrc}
                 alt={imageAlt}
                 title={imageTitle}
                 fill
@@ -94,7 +102,7 @@ export const CategoryCard = ({
                 className="object-contain"
                 loading={index < 4 ? 'eager' : 'lazy'}
                 priority={index < 4}
-                unoptimized
+                unoptimized={!isCloudinaryUrl(imageUrl as string)}
               />
             </div>
           ) : (
