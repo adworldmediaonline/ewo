@@ -89,7 +89,7 @@ export type ValidateDiscountResult =
 
 export async function getStoreCouponSettings(): Promise<CouponBehaviorSettings> {
   const res = await fetch(`${apiUrl}/api/store/settings/coupon`, {
-    cache: 'no-store',
+    next: { revalidate: 300 },
   });
   if (!res.ok) throw new Error('Failed to fetch coupon settings');
   return res.json();
@@ -105,7 +105,7 @@ export async function getStoreShippingSettings(): Promise<ShippingSettings> {
 
 export async function getActiveCoupons(): Promise<RawCoupon[]> {
   const res = await fetch(`${apiUrl}/api/coupon/active`, {
-    cache: 'no-store',
+    next: { revalidate: 300 },
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message ?? 'Failed to fetch coupons');

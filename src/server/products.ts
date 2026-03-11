@@ -40,7 +40,9 @@ export async function getPaginatedProductsServer(
       }
     });
     const url = `${API_BASE_URL}/api/product/paginated?${searchParams.toString()}`;
-    const response = await fetch(url, { cache: "no-store" });
+    const response = await fetch(url, {
+      next: { revalidate: 60 },
+    });
     if (!response.ok) return null;
     const json = await response.json();
     if (!json?.success || !Array.isArray(json?.data)) return null;

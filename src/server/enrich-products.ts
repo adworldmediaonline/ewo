@@ -40,7 +40,11 @@ export async function enrichProductsWithDisplayPrices<T extends ProductForEnrich
   if (products.length === 0) return [];
 
   try {
-    const settings = await getStoreCouponSettings();
+    // Fetch settings and coupons in parallel to avoid waterfall
+    const [settings, couponsRaw] = await Promise.all([
+      getStoreCouponSettings(),
+      getActiveCoupons(),
+    ]);
     const strategy =
       settings.autoApply && settings.autoApplyStrategy !== "customer_choice"
         ? (settings.autoApplyStrategy as
@@ -48,8 +52,7 @@ export async function enrichProductsWithDisplayPrices<T extends ProductForEnrich
             | "first_created"
             | "highest_percentage")
         : null;
-
-    const coupons = strategy ? await getActiveCoupons() : [];
+    const coupons = strategy ? couponsRaw : [];
 
     return products.map((p) => {
       const mainPrice = Number(p.finalPriceDiscount ?? p.price ?? 0);

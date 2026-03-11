@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -71,7 +72,17 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
         </Breadcrumb>
 
         {!hasCategoryFilter && (
-          <PageSectionsRenderer pageSlug="shop" sections={pageSections} />
+          <Suspense
+            fallback={
+              <div className="min-h-[120px] w-full animate-pulse rounded-lg bg-muted/50" aria-hidden />
+            }
+          >
+            <PageSectionsRenderer
+              pageSlug="shop"
+              sections={pageSections}
+              categories={categories}
+            />
+          </Suspense>
         )}
 
         <ShopContentWrapper

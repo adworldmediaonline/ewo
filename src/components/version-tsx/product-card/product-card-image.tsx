@@ -45,6 +45,10 @@ export interface ProductCardImageProps {
 const IMAGE_SIZES =
   '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw';
 
+/** Minimal blur placeholder for above-fold product images (perceived performance) */
+const BLUR_DATA_URL =
+  'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAQIAAtAAAD/AAAAA';
+
 export function ProductCardImage({
   productSlug,
   productId,
@@ -150,6 +154,8 @@ export function ProductCardImage({
                   fetchPriority={fetchPriority}
                   onLoad={onLoad}
                   unoptimized
+                  placeholder={loading === 'eager' ? 'blur' : undefined}
+                  blurDataURL={loading === 'eager' ? BLUR_DATA_URL : undefined}
                 />
               ) : (
                 <CldImage
@@ -166,6 +172,8 @@ export function ProductCardImage({
                   preserveTransformations={isCloudinaryAsset}
                   deliveryType={isCloudinaryAsset ? undefined : 'fetch'}
                   onLoad={onLoad}
+                  placeholder={loading === 'eager' ? 'blur' : undefined}
+                  blurDataURL={loading === 'eager' ? BLUR_DATA_URL : undefined}
                 />
               )
             ) : (
