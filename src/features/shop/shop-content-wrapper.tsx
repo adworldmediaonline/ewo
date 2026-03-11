@@ -19,7 +19,7 @@ const ShopMobileFilters = dynamic(
   { loading: () => <div className="mb-3 lg:hidden h-10 w-full" /> }
 );
 import ShopProductGrid from '@/features/shop/components/shop-product-grid';
-import ShopProductGridSkeleton from '@/features/shop/components/shop-product-grid-skeleton';
+import ShopLoadingFade from '@/features/shop/components/shop-loading-fade';
 import ShopSidebar from '@/features/shop/components/shop-sidebar';
 import ShopToolbar from '@/features/shop/components/shop-toolbar';
 import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
@@ -221,14 +221,16 @@ const ShopContentWrapper = ({
             ) : (
               <>
                 {isLoading && products.length === 0 ? (
-                  <ShopProductGridSkeleton />
+                  <ShopLoadingFade />
                 ) : (
-                  <ShopProductGrid
-                    products={products}
-                    isLoading={isLoading}
-                    onAddToCart={handleAddToCart}
-                    onAddToWishlist={handleAddToWishlist}
-                  />
+                  <div className="animate-shop-fade-in">
+                    <ShopProductGrid
+                      products={products}
+                      isLoading={isLoading}
+                      onAddToCart={handleAddToCart}
+                      onAddToWishlist={handleAddToWishlist}
+                    />
+                  </div>
                 )}
 
                 <ShopLoadMoreTrigger
