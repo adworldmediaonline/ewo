@@ -1,5 +1,6 @@
 import { getPaginatedProductsServer } from '@/server/products';
 import { enrichProductsWithDisplayPrices } from '@/server/enrich-products';
+import { getStoreCouponSettings, getActiveCoupons } from '@/lib/store-api';
 import ShopContentWrapper from '@/components/version-tsx/shop-content-wrapper';
 import { DEFAULT_FILTERS } from '@/features/shop/shop-types';
 import type { CategoryItem } from '@/lib/server-data';
@@ -23,11 +24,16 @@ export async function ShopProductSection({
     sortOrder: DEFAULT_FILTERS.sortOrder,
   };
 
-  const initialProductsResult = await getPaginatedProductsServer({
-    page: 1,
-    limit: 12,
-    ...filters,
-  });
+  // Fetch products and enrichment data in parallel to reduce time-to-first paint
+  const [initialProductsResult, settings, coupons] = await Promise.all([
+    getPaginatedProductsServer({
+      page: 1,
+      limit: 12,
+      ...filters,
+    }),
+    getStoreCouponSettings(),
+    getActiveCoupons(),
+  ]);
 
   const rawProducts = initialProductsResult?.data ?? [];
   const initialPagination = initialProductsResult?.pagination ?? null;
@@ -37,7 +43,8 @@ export async function ShopProductSection({
       price?: number;
       updatedPrice?: number;
       finalPriceDiscount?: number;
-    }>
+    }>,
+    { settings, coupons }
   );
 
   const initialFilters: ShopFiltersState = {

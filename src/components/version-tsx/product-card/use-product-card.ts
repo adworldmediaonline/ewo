@@ -101,7 +101,7 @@ export function useProductCard({
     imageSrc.includes('/upload/');
 
   const shouldEagerLoad = index < 8;
-  const shouldUseHighPriority = index < 4;
+  const shouldUseHighPriority = index < 8;
 
   const averageRating =
     product.reviews && product.reviews.length > 0
