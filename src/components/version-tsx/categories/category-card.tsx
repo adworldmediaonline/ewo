@@ -74,12 +74,18 @@ export const CategoryCard = ({
 
   const isMega = variant === 'mega';
 
+  const handlePrefetch = () => {
+    router.prefetch(href);
+  };
+
   return (
     <div className="group flex flex-col overflow-hidden rounded-lg sm:rounded-xl border border-border bg-card text-left shadow-sm transition-all duration-200 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring h-full">
       {/* Main category link - covers the image and title area */}
       <div></div>
       <Link
         href={href}
+        prefetch={true}
+        onMouseEnter={handlePrefetch}
         className="flex-1 flex flex-col"
         aria-label={`Browse ${item.parent}`}
       >
@@ -131,25 +137,31 @@ export const CategoryCard = ({
           {/* Subcategory tags integrated within the same dark background */}
           {childLabels.length > 0 && (
             <div className="flex flex-wrap gap-1 sm:gap-2 justify-center">
-              {childLabels.map(child => (
-                <span
-                  key={child}
-                  onClick={e => handleSubcategoryClick(e, item.parent, child)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleSubcategoryClick(e as any, item.parent, child);
-                    }
-                  }}
-                  className={`inline-flex cursor-pointer items-center rounded-full bg-white/90 px-2 py-0.5 font-medium text-foreground hover:bg-white ${
-                    isMega ? 'text-[9px] sm:text-[10px]' : 'text-[10px] sm:text-xs'
-                  }`}
-                >
-                  {child}
-                </span>
-              ))}
+              {childLabels.map(child => {
+                const parentSlug = item.parentCategorySlug ?? toSlug(item.parent);
+                const childSlug = toSlug(child);
+                const subcategoryHref = `/shop?category=${parentSlug}&subcategory=${childSlug}`;
+                return (
+                  <span
+                    key={child}
+                    onClick={e => handleSubcategoryClick(e, item.parent, child)}
+                    onMouseEnter={() => router.prefetch(subcategoryHref)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleSubcategoryClick(e as any, item.parent, child);
+                      }
+                    }}
+                    className={`inline-flex cursor-pointer items-center rounded-full bg-white/90 px-2 py-0.5 font-medium text-foreground hover:bg-white ${
+                      isMega ? 'text-[9px] sm:text-[10px]' : 'text-[10px] sm:text-xs'
+                    }`}
+                  >
+                    {child}
+                  </span>
+                );
+              })}
             </div>
           )}
         </div>
