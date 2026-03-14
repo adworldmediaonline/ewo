@@ -82,9 +82,11 @@ interface AuthDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   defaultTab?: 'signin' | 'signup';
+  /** Custom message to display (e.g. when opened from review form: "Please sign in to submit a review") */
+  message?: string;
 }
 
-export function AuthDialog({ open, onOpenChange, defaultTab = 'signin' }: AuthDialogProps) {
+export function AuthDialog({ open, onOpenChange, defaultTab = 'signin', message }: AuthDialogProps) {
   const router = useRouter();
   const { refetch: refetchSession } = authClient.useSession();
   const [view, setView] = useState<DialogView>('auth');
@@ -364,9 +366,10 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'signin' }: AuthDi
                 {activeTab === 'signin' ? 'Welcome back' : 'Create account'}
               </h2>
               <p className="text-sm text-muted-foreground mb-4">
-                {activeTab === 'signin'
-                  ? 'Sign in to access your account and continue shopping'
-                  : 'Join us today and start your shopping journey'}
+                {message ??
+                  (activeTab === 'signin'
+                    ? 'Sign in to access your account and continue shopping'
+                    : 'Join us today and start your shopping journey')}
               </p>
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="signin" className="text-sm">Sign In</TabsTrigger>

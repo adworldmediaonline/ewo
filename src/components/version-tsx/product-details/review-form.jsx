@@ -6,11 +6,10 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useAddReviewMutation } from '@/redux/features/reviewApi';
 import { Send, Star } from 'lucide-react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { authClient } from '../../../lib/authClient';
+import { useAuthDialog } from '@/context/auth-dialog-context';
 
 // Consistent Rating Component
 const RatingInput = ({ rating, onRatingChange, disabled = false }) => {
@@ -55,8 +54,8 @@ const RatingInput = ({ rating, onRatingChange, disabled = false }) => {
 };
 
 export default function ReviewForm({ productId, onSuccess }) {
-  const { data: session, isPending } = authClient.useSession();
-  const router = useRouter();
+  const { data: session } = authClient.useSession();
+  const openAuthDialog = useAuthDialog()?.openAuthDialog;
   const [addReview, { isLoading: isSubmitting }] = useAddReviewMutation();
   const [rating, setRating] = useState(0);
   const [formData, setFormData] = useState({
@@ -75,26 +74,13 @@ export default function ReviewForm({ productId, onSuccess }) {
   const handleSubmit = async e => {
     e.preventDefault();
 
-    // Check if user is signed in
+    // Check if user is signed in - open auth dialog instead of toast
     if (!session) {
-      toast.error(
-        <div className="flex flex-col gap-2">
-          <span>Please sign in to submit a review</span>
-          <Link
-            href="/sign-in"
-            className="text-primary hover:underline font-medium"
-          >
-            Sign In →
-          </Link>
-        </div>,
-        {
-          duration: 5000,
-          action: {
-            label: 'Sign In',
-            onClick: () => router.push('/sign-in'),
-          },
-        }
-      );
+      if (openAuthDialog) {
+        openAuthDialog('Please sign in to submit a review');
+      } else {
+        toast.error('Please sign in to submit a review');
+      }
       return;
     }
 
