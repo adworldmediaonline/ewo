@@ -2,6 +2,7 @@
 
 import ClientOnlyWrapper from '@/components/client-only-wrapper';
 import { AuthDialog } from '@/components/auth/auth-dialog';
+import { useAuthDialog } from '@/context/auth-dialog-context';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -31,8 +32,12 @@ export function HeaderActions({
   const router = useRouter();
   const { data: session } = authClient.useSession();
   const [isPendingSignOut, startTransition] = React.useTransition();
-  const [authDialogOpen, setAuthDialogOpen] = React.useState(false);
+  const authDialog = useAuthDialog();
+  const [localAuthOpen, setLocalAuthOpen] = React.useState(false);
   const [cartOpen, setCartOpen] = React.useState(false);
+
+  const authDialogOpen = authDialog ? authDialog.open : localAuthOpen;
+  const setAuthDialogOpen = authDialog ? authDialog.setOpen : setLocalAuthOpen;
   const _dispatch = useDispatch();
   const { quantity } = useCartInfo();
   const wishlist: unknown[] = useSelector(
@@ -165,7 +170,11 @@ export function HeaderActions({
           >
             <User className="h-4 w-4 md:h-4 md:w-4" />
             </button>
-            <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
+            <AuthDialog
+              open={authDialogOpen}
+              onOpenChange={setAuthDialogOpen}
+              message={authDialog?.message ?? undefined}
+            />
           </>
         )}
       </div>
