@@ -17,7 +17,6 @@ export default function robots() {
           '/_next/static/',
         ],
         disallow: [
-          '/blog/',
           '/sign-in',
           '/sign-up',
           '/api/',
