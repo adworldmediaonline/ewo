@@ -4,6 +4,7 @@ import {
   getProductImageSrcsForGallery,
   type ProductWithImageMeta,
 } from '@/lib/product-image';
+import { isOutOfStock } from '@/lib/product-stock';
 
 const SITE_URL = 'https://www.eastwestoffroad.com';
 
@@ -100,10 +101,9 @@ export default async function ProductSchema({ productId }: ProductSchemaProps) {
       url: productUrl,
       priceCurrency: 'USD',
       price: String(price.toFixed(2)),
-      availability:
-        (product as { status?: string }).status === 'in-stock'
-          ? 'https://schema.org/InStock'
-          : 'https://schema.org/OutOfStock',
+      availability: isOutOfStock(product)
+        ? 'https://schema.org/OutOfStock'
+        : 'https://schema.org/InStock',
       itemCondition: 'https://schema.org/NewCondition',
     },
     ...(reviewCount > 0 && {
