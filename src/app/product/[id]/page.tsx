@@ -1,5 +1,6 @@
 import ProductDetailsArea from '@/components/version-tsx/product-details/product-details-area';
 import ProductBreadcrumbAsync from '@/components/version-tsx/product-details/product-breadcrumb-async';
+import ProductSchema from '@/components/version-tsx/product-details/product-schema';
 import { BreadcrumbShell } from '@/components/version-tsx/product-details/breadcrumb-shell';
 import { ProductContentSkeleton } from '@/components/version-tsx/product-details/product-content-skeleton';
 import { getProductSingle } from '@/server/products';
@@ -53,8 +54,10 @@ export const generateMetadata = async (props: {
 export default async function ProductDetailsPage(props: {
   params: Promise<{ id: string }>;
 }) {
+  const params = await props.params;
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <ProductSchema productId={params.id} />
       {/*
         Static breadcrumb shell renders instantly
         Dynamic breadcrumb content (category + product) streams in via Suspense
@@ -70,9 +73,9 @@ export default async function ProductDetailsPage(props: {
         Cached product data streams in, providing fast subsequent loads
         Related products have their own nested Suspense boundary
       */}
-      <Suspense fallback={<ProductContentSkeleton />}>
-        <ProductDetailsArea params={props.params} />
-      </Suspense>
+        <Suspense fallback={<ProductContentSkeleton />}>
+          <ProductDetailsArea params={Promise.resolve(params)} />
+        </Suspense>
     </div>
   );
 }
