@@ -29,6 +29,10 @@ const nextConfig = {
 
   cacheComponents: true,
   reactCompiler: true,
+  cacheLife: {
+    'shop-products': { stale: 60, revalidate: 300, expire: 3600 },
+    'shop-categories': { stale: 300, revalidate: 900, expire: 86400 },
+  },
 
   // Compiler optimizations
   compiler: {
@@ -71,9 +75,6 @@ const nextConfig = {
       },
     ],
   },
-
-  // Enable SWC minification (faster than Terser)
-  swcMinify: true,
 };
 
 module.exports = nextConfig;

@@ -183,7 +183,7 @@ export function ProductCardImage({
             )}
 
             {isImageLoading && (
-              <div className="absolute inset-0 bg-muted animate-pulse" />
+              <div className="absolute inset-0 bg-muted/20 transition-opacity duration-200" />
             )}
 
             {showQuickActions && (

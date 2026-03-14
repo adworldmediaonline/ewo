@@ -9,7 +9,7 @@ import {
 import Link from 'next/link';
 import * as React from 'react';
 import ShopMenuMegaContent from './shop-menu-mega-content';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import type { CategoryItem } from '@/lib/server-data';
 import { ChevronDownIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -22,7 +22,12 @@ export default function DesktopNav({
   categories,
 }: DesktopNavProps): React.ReactElement {
   const pathname = usePathname();
+  const router = useRouter();
   const [shopOpen, setShopOpen] = React.useState(false);
+
+  const handleShopPrefetch = React.useCallback(() => {
+    router.prefetch('/shop');
+  }, [router]);
 
   const visibleCategories = React.useMemo(
     () =>
@@ -49,7 +54,13 @@ export default function DesktopNav({
         {PRIMARY_LINKS[0].label}
       </Link>
       {/* Shop by Category - Popover opens on click only */}
-      <Popover open={shopOpen} onOpenChange={setShopOpen}>
+      <Popover
+        open={shopOpen}
+        onOpenChange={(open) => {
+          setShopOpen(open);
+          if (open) handleShopPrefetch();
+        }}
+      >
         <PopoverTrigger
           className={cn(
             'inline-flex items-center gap-1 px-2 py-1 text-xs md:text-sm font-medium transition-colors',
@@ -85,6 +96,8 @@ export default function DesktopNav({
         <Link
           key={link.href}
           href={link.href}
+          prefetch={true}
+          onMouseEnter={link.href === '/shop' ? handleShopPrefetch : undefined}
           className={cn(
             'px-2 py-1 text-xs md:text-sm font-medium transition-colors',
             pathname === link.href

@@ -8,15 +8,13 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import PageSectionsRenderer from '@/components/version-tsx/page-sections-renderer';
-import ShopContentWrapper from '@/components/version-tsx/shop-content-wrapper';
+import { ShopProductSection } from '@/features/shop/components/shop-product-section';
+import ShopLoadingFade from '@/features/shop/components/shop-loading-fade';
 import Wrapper from '@/components/wrapper';
 import { getCategories } from '@/lib/server-data';
-import { getPaginatedProductsServer } from '@/server/products';
-import { enrichProductsWithDisplayPrices } from '@/server/enrich-products';
 import { getActivePageSections } from '@/server/page-sections';
 import { getPageMetadata } from '@/server/page-metadata';
 import { buildPageMetadata } from '@/lib/build-page-metadata';
-import { DEFAULT_FILTERS } from '@/features/shop/shop-types';
 
 export async function generateMetadata() {
   const cmsData = await getPageMetadata('shop');
@@ -38,23 +36,11 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     params?.category?.trim() || params?.subcategory?.trim()
   );
 
-  // Parallelize: fetch categories, page sections, and initial products
-  const [categories, pageSections, initialProductsResult] = await Promise.all([
+  // Parallelize: fetch categories and page sections (products fetched in ShopProductSection for streaming)
+  const [categories, pageSections] = await Promise.all([
     getCategories(),
     hasCategoryFilter ? Promise.resolve([]) : getActivePageSections('shop'),
-    getPaginatedProductsServer({
-      page: 1,
-      limit: 12,
-      sortBy: DEFAULT_FILTERS.sortBy,
-      sortOrder: DEFAULT_FILTERS.sortOrder,
-    }),
   ]);
-
-  const rawProducts = initialProductsResult?.data ?? [];
-  const initialPagination = initialProductsResult?.pagination ?? null;
-  const initialProducts = await enrichProductsWithDisplayPrices(
-    rawProducts as Array<{ _id: string; price?: number; updatedPrice?: number; finalPriceDiscount?: number }>
-  );
 
   return (
     <Wrapper>
@@ -85,11 +71,29 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
           </Suspense>
         )}
 
-        <ShopContentWrapper
-          categories={categories}
-          initialProducts={initialProducts as any[]}
-          initialPagination={initialPagination}
-        />
+        <Suspense
+          fallback={
+            <div className="min-h-screen py-2 lg:py-6 animate-shop-fade-in">
+              <div className="mb-4 lg:mb-6 h-12 w-full rounded-lg bg-muted/10" />
+              <div className="flex w-full items-start gap-4 lg:gap-8">
+                <aside className="hidden lg:block w-56 shrink-0 space-y-1">
+                  {Array.from({ length: 8 }).map((_, i) => (
+                    <div key={i} className="h-9 rounded-md bg-muted/5" />
+                  ))}
+                </aside>
+                <section className="flex-1 min-w-0">
+                  <ShopLoadingFade count={12} />
+                </section>
+              </div>
+            </div>
+          }
+        >
+          <ShopProductSection
+            categories={categories}
+            categorySlug={params?.category}
+            subcategorySlug={params?.subcategory}
+          />
+        </Suspense>
       </div>
     </Wrapper>
   );

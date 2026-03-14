@@ -1,29 +1,37 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
-import Image from 'next/image';
 
-import { cn } from '@/lib/utils';
-import { isCloudinaryUrl } from '@/lib/product-image';
-
+import {
+  ShopCategoryBanner,
+  resolveCategoryBannerContext,
+} from '@/features/shop/components/shop-category-banner';
 import ShopEmptyState from '@/features/shop/components/shop-empty-state';
 import ShopLoadMoreTrigger from '@/features/shop/components/shop-load-more-trigger';
-import ShopMobileFilters from '@/features/shop/components/shop-mobile-filters';
+
+const ShopMobileFilters = dynamic(
+  () =>
+    import('@/features/shop/components/shop-mobile-filters').then(
+      (mod) => mod.default
+    ),
+  { loading: () => <div className="mb-3 lg:hidden h-10 w-full" /> }
+);
 import ShopProductGrid from '@/features/shop/components/shop-product-grid';
-import ShopProductGridSkeleton from '@/features/shop/components/shop-product-grid-skeleton';
+import ShopLoadingFade from '@/features/shop/components/shop-loading-fade';
 import ShopSidebar from '@/features/shop/components/shop-sidebar';
 import ShopToolbar from '@/features/shop/components/shop-toolbar';
 import { useShopActions } from '@/features/shop/hooks/use-shop-actions';
 import { useShopProducts } from '@/features/shop/hooks/use-shop-products';
 import { useShopQueryState } from '@/features/shop/hooks/use-shop-query-state';
 import { DEFAULT_FILTERS } from '@/features/shop/shop-types';
-import type { ShopPagination, ShopProduct } from '@/features/shop/shop-types';
-import {
-  CategoryItem,
-  toSlug,
-  type BannerDisplayScope,
-} from '@/lib/server-data';
+import type {
+  ShopFiltersState,
+  ShopPagination,
+  ShopProduct,
+} from '@/features/shop/shop-types';
+import { CategoryItem } from '@/lib/server-data';
 
 interface ShopContentWrapperProps {
   categories: CategoryItem[];
@@ -31,12 +39,15 @@ interface ShopContentWrapperProps {
   initialProducts?: ShopProduct[];
   /** SSR initial pagination */
   initialPagination?: ShopPagination | null;
+  /** Filters used for SSR fetch; use initial when client filters match */
+  initialFilters?: ShopFiltersState;
 }
 
 const ShopContentWrapper = ({
   categories,
   initialProducts = [],
   initialPagination = null,
+  initialFilters,
 }: ShopContentWrapperProps) => {
   const {
     filters,
@@ -60,7 +71,11 @@ const ShopContentWrapper = ({
     reset: resetProducts,
     refresh,
     canFetchMore,
-  } = useShopProducts(filters, { initialProducts, initialPagination });
+  } = useShopProducts(filters, {
+    initialProducts,
+    initialPagination,
+    initialFilters,
+  });
 
   const { handleAddToCart, handleAddToWishlist } = useShopActions();
 
@@ -128,238 +143,21 @@ const ShopContentWrapper = ({
 
   const showErrorState = status === 'error';
 
-  // Resolve category banner - image scope and content scope work independently.
-  // Supports grouped subcategories: subcategory can be comma-separated (e.g. "dana-44,10-bolt").
-  const categoryBannerContext = useMemo(() => {
-    const categorySlug = filters.category;
-    const subcategorySlug = filters.subcategory;
-
-    if (!categorySlug || !categories.length) {
-      return null;
-    }
-
-    const category = categories.find(
-      (c) => toSlug(c.parent) === categorySlug
-    );
-    if (!category) return null;
-
-    // Parse subcategory: single slug or comma-separated (grouped cards)
-    const subcategorySlugs = subcategorySlug
-      ? subcategorySlug.split(',').map((s) => s.trim()).filter(Boolean)
-      : [];
-    const isParentView = subcategorySlugs.length === 0;
-
-    // Banner IMAGE scope - show if ANY of the active subcategory slugs is in scope
-    const imageScope: BannerDisplayScope =
-      category.bannerDisplayScope || 'all';
-    const imageDisplayChildren = category.bannerDisplayChildren || [];
-    const isImageChildInScope =
-      subcategorySlugs.length > 0 &&
-      subcategorySlugs.some((slug) => imageDisplayChildren.includes(slug));
-
-    let showBannerImage = false;
-    if (category.banner?.url) {
-      switch (imageScope) {
-        case 'all':
-          showBannerImage = true;
-          break;
-        case 'parent_only':
-          showBannerImage = isParentView;
-          break;
-        case 'children_only':
-          showBannerImage = !!isImageChildInScope;
-          break;
-        case 'parent_and_children':
-          showBannerImage = isParentView || !!isImageChildInScope;
-          break;
-        default:
-          showBannerImage = true;
-      }
-    }
-
-    // Banner CONTENT scope - same logic for grouped subcategories
-    const contentScope: BannerDisplayScope =
-      category.bannerContentDisplayScope || 'all';
-    const contentDisplayChildren = category.bannerContentDisplayChildren || [];
-    const isContentChildInScope =
-      subcategorySlugs.length > 0 &&
-      subcategorySlugs.some((slug) => contentDisplayChildren.includes(slug));
-
-    let showBannerContent = false;
-    if (category.bannerContentActive) {
-      switch (contentScope) {
-        case 'all':
-          showBannerContent = true;
-          break;
-        case 'parent_only':
-          showBannerContent = isParentView;
-          break;
-        case 'children_only':
-          showBannerContent = !!isContentChildInScope;
-          break;
-        case 'parent_and_children':
-          showBannerContent = isParentView || !!isContentChildInScope;
-          break;
-        default:
-          showBannerContent = true;
-      }
-    }
-
-    // Render only when at least one is visible
-    if (!showBannerImage && !showBannerContent) return null;
-
-    // Dynamic banner title: category name + product count (separate for styling)
-    const productCount = totalProducts;
-    const productLabel = productCount === 1 ? 'product' : 'products';
-    const productCountText = ` (${productCount} ${productLabel})`;
-
-    // Resolve display name: parent, single child, or joined child names for grouped
-    const categoryName = isParentView
-      ? category.parent
-      : subcategorySlugs
-          .map((slug) =>
-            category.children?.find((c) => toSlug(c) === slug) || slug
-          )
-          .join(', ');
-
-    // Resolve per-scope classes: use first matching child slug for grouped view
-    const defaultTitleClasses = 'text-center';
-    const defaultDescClasses = 'text-center';
-    const legacyTitleClasses =
-      category.bannerTitleClasses?.trim() || defaultTitleClasses;
-    const legacyDescClasses =
-      category.bannerDescriptionClasses?.trim() || defaultDescClasses;
-
-    const scopeClasses = category.bannerContentClassesByScope;
-    const parentScope = scopeClasses?.parent;
-    const childrenScope = scopeClasses?.children ?? {};
-
-    let bannerTitleClasses: string;
-    let bannerDescriptionClasses: string;
-    let bannerHeadingTag: 'h1' | 'h2' | 'h3';
-    let bannerProductCountClasses: string;
-
-    if (isParentView) {
-      bannerTitleClasses =
-        parentScope?.titleClasses?.trim() || legacyTitleClasses;
-      bannerDescriptionClasses =
-        parentScope?.descriptionClasses?.trim() || legacyDescClasses;
-      bannerHeadingTag =
-        parentScope?.headingTag || 'h2';
-      bannerProductCountClasses =
-        parentScope?.productCountClasses?.trim() || '';
-    } else {
-      // For grouped subcategories: use first slug with scope override, else parent fallback
-      const childScope = subcategorySlugs
-        .map((slug) => childrenScope[slug])
-        .find(Boolean);
-      bannerTitleClasses =
-        childScope?.titleClasses?.trim() ||
-        parentScope?.titleClasses?.trim() ||
-        legacyTitleClasses;
-      bannerDescriptionClasses =
-        childScope?.descriptionClasses?.trim() ||
-        parentScope?.descriptionClasses?.trim() ||
-        legacyDescClasses;
-      bannerHeadingTag =
-        childScope?.headingTag ||
-        parentScope?.headingTag ||
-        'h2';
-      bannerProductCountClasses =
-        childScope?.productCountClasses?.trim() ||
-        parentScope?.productCountClasses?.trim() ||
-        '';
-    }
-
-    return {
-      banner: category.banner,
-      showBannerImage,
-      showBannerContent,
-      bannerCategoryName: showBannerContent ? categoryName : '',
-      bannerProductCountText: showBannerContent ? productCountText : '',
-      bannerDescription: category.bannerDescription || '',
-      bannerTitleClasses: bannerTitleClasses || defaultTitleClasses,
-      bannerDescriptionClasses:
-        bannerDescriptionClasses || defaultDescClasses,
-      bannerHeadingTag,
-      bannerProductCountClasses,
-    };
-  }, [
-    filters.category,
-    filters.subcategory,
-    categories,
-    totalProducts,
-  ]);
+  const categoryBannerContext = useMemo(
+    () =>
+      resolveCategoryBannerContext(
+        categories,
+        filters.category,
+        filters.subcategory,
+        totalProducts
+      ),
+    [categories, filters.category, filters.subcategory, totalProducts]
+  );
 
   return (
     <>
-      {/* Category banner - image and content scopes work independently */}
       {categoryBannerContext && (
-        <div className="w-full flex flex-col items-center justify-center space-y-0">
-          {categoryBannerContext.showBannerContent &&
-            categoryBannerContext.bannerCategoryName && (
-            <div className="container mx-auto px-3 py-4 md:px-6">
-              {(() => {
-                const HeadingTag =
-                  categoryBannerContext.bannerHeadingTag;
-                return (
-                  <HeadingTag
-                    className={cn(
-                      'text-xl sm:text-2xl md:text-3xl font-bold text-foreground',
-                      categoryBannerContext.bannerTitleClasses
-                    )}
-                  >
-                    {categoryBannerContext.bannerCategoryName}
-                    {categoryBannerContext.bannerProductCountText && (
-                      <span
-                        className={cn(
-                          'ml-1.5 font-normal text-muted-foreground text-sm sm:text-base',
-                          categoryBannerContext.bannerProductCountClasses
-                        )}
-                      >
-                        {categoryBannerContext.bannerProductCountText}
-                      </span>
-                    )}
-                  </HeadingTag>
-                );
-              })()}
-            </div>
-          )}
-          {categoryBannerContext.showBannerImage && categoryBannerContext.banner?.url && (
-            <div className="w-full flex items-center justify-center">
-              <div className="relative w-full mx-auto">
-                <Image
-                  src={
-                    isCloudinaryUrl(categoryBannerContext.banner.url)
-                      ? categoryBannerContext.banner.url
-                      : `/api/image?url=${encodeURIComponent(categoryBannerContext.banner.url)}&filename=${encodeURIComponent(categoryBannerContext.banner.fileName || 'category-banner.webp')}`
-                  }
-                  alt={categoryBannerContext.banner.altText || categoryBannerContext.banner.title || 'Category banner'}
-                  title={categoryBannerContext.banner.title}
-                  width={1920}
-                  height={800}
-                  className="w-full h-auto object-contain"
-                  sizes="100vw"
-                  unoptimized={!isCloudinaryUrl(categoryBannerContext.banner.url)}
-                  priority={false}
-                />
-              </div>
-            </div>
-          )}
-          {categoryBannerContext.showBannerContent &&
-            categoryBannerContext.bannerDescription && (
-              <div className="container mx-auto px-3 py-4 md:px-6">
-                <p
-                  className={cn(
-                    'text-sm sm:text-base text-muted-foreground leading-relaxed',
-                    categoryBannerContext.bannerDescriptionClasses
-                  )}
-                >
-                  {categoryBannerContext.bannerDescription}
-                </p>
-              </div>
-            )}
-        </div>
+        <ShopCategoryBanner context={categoryBannerContext} />
       )}
       <div
         ref={shopContentRef}
@@ -423,14 +221,16 @@ const ShopContentWrapper = ({
             ) : (
               <>
                 {isLoading && products.length === 0 ? (
-                  <ShopProductGridSkeleton />
+                  <ShopLoadingFade />
                 ) : (
-                  <ShopProductGrid
-                    products={products}
-                    isLoading={isLoading}
-                    onAddToCart={handleAddToCart}
-                    onAddToWishlist={handleAddToWishlist}
-                  />
+                  <div className="animate-shop-fade-in">
+                    <ShopProductGrid
+                      products={products}
+                      isLoading={isLoading}
+                      onAddToCart={handleAddToCart}
+                      onAddToWishlist={handleAddToWishlist}
+                    />
+                  </div>
                 )}
 
                 <ShopLoadMoreTrigger

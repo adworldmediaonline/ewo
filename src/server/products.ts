@@ -1,7 +1,7 @@
 "use cache";
 
 // import { cache } from "react";
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import { API_ENDPOINT } from "./api-endpoint";
 import { enrichProductsWithDisplayPrices } from "@/server/enrich-products";
 
@@ -18,7 +18,7 @@ export interface PaginatedProductsResponse {
   };
 }
 
-/** Server-side fetch for initial shop products (SSR). No cache for fresh data. */
+/** Server-side fetch for initial shop products (SSR). Cached with Cache Components. */
 export async function getPaginatedProductsServer(
   params: {
     page?: number;
@@ -30,6 +30,10 @@ export async function getPaginatedProductsServer(
     sortOrder?: string;
   } = {}
 ): Promise<PaginatedProductsResponse | null> {
+  "use cache";
+  cacheLife("shop-products");
+  cacheTag("products");
+
   if (!API_BASE_URL?.trim()) return null;
 
   try {

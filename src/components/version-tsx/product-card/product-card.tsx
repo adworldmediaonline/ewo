@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { Card } from '@/components/ui/card';
 import {
   Dialog,
@@ -11,8 +12,15 @@ import { Play, X, Youtube } from 'lucide-react';
 import * as React from 'react';
 import { notifyError } from '@/utils/toast';
 import { useAddToCartAnimation } from '@/context/add-to-cart-animation-context';
-import ProductConfigurationDialog from '@/components/version-tsx/product-configuration-dialog';
 import type { Product, ProductBase, WishlistProduct } from '@/types/product';
+
+const ProductConfigurationDialog = dynamic(
+  () =>
+    import('@/components/version-tsx/product-configuration-dialog').then(
+      (mod) => mod.default
+    ),
+  { ssr: false }
+);
 import { ProductCardImage } from './product-card-image';
 import { ProductCardInfo } from './product-card-info';
 import { ProductCardPrice } from './product-card-price';
